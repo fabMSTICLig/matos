@@ -18,12 +18,14 @@ from api import views
 from django.urls import path
 from django.views.generic import TemplateView
 from django.conf.urls import url, include
-from api.views import login, sample_api
+from api.views import sample_api, signup_success
+import django_cas_ng.views
 
 urlpatterns = [
     url(r'^$', view=TemplateView.as_view(template_name='listview/home.html')),
     path('admin/', admin.site.urls),
-    path('api/login', login),
+    path('api/login',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
+    path('api/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     url(r'^products/$', views.product_list.as_view()),
     url(r'^products/(?P<pk>[0-9]+)$', views.product_detail.as_view()),
     url(r'^families/$', views.family_list.as_view()),
@@ -32,5 +34,11 @@ urlpatterns = [
     url(r'^locations/(?P<pk>[0-9]+)$', views.location_detail.as_view()),
     url(r'^transactions/$', views.transaction_list.as_view()),
     url(r'^transactions/(?P<pk>[0-9]+)$', views.transaction_detail.as_view()),
-    path('api/sampleapi', sample_api)
+    path('api/sampleapi', sample_api),
+    url(r'^signup-success/$', signup_success),
+    url(r'^person-create/$', views.PersonView.as_view()),
+    url(r'^organization-create/$', views.OrganizationView.as_view()),
+    path('organizations', views.organization_list.as_view()),
+
+
 ]

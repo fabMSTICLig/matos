@@ -1,0 +1,7 @@
+<h1>Organizations</h1>
+<ul>
+    {% for organization in organization_list %}
+        <li>{{ organization.name }}</li>
+        <li>{{ organization.orga_type }}</li>
+    {% endfor %}
+</ul>

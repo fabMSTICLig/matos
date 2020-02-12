@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'api',
-    'listview'
+    'listview',
+    'django.contrib.postgres',
+    'django_cas_ng',
+    'bootstrap3'
 ]
 
 MIDDLEWARE = [
@@ -52,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_cas_ng.middleware.CASMiddleware'
 ]
 
 ROOT_URLCONF = 'djangovue.urls'
@@ -76,11 +80,9 @@ WSGI_APPLICATION = 'djangovue.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':
-        ['rest_framework.permissions.IsAuthenticated'],
+        ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
     'PAGE_SIZE': 10,
-     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
+     
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
     )
@@ -88,10 +90,25 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+DATABASE_NAME = "taskbuster_db"
+DATABASE_USER = "fabowner"
+DATABASE_PASSWORD = "robair"
+
+CAS_SERVER_URL = "https://cas-inp.grenet.fr/login"
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_cas_ng.backends.CASBackend',
+)
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': '127.0.0.1',
+        'PORT': ''
     }
 }
 
