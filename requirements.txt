@@ -1,0 +1,4 @@
+django
+gunicorn
+django-rest-framework
+django-bootstrap3==12.0.3

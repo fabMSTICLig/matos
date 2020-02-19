@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib.auth import authenticate
 from django.shortcuts import render
-from rest_framework import status, generics, mixins, authentication, permissions
+from rest_framework import viewsets, serializers, status, generics, mixins, authentication, permissions
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -17,7 +17,7 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from api.forms import PersonForm, OrganizationForm
+from api.forms import  OrganizationForm
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 from django_cas_ng import views as baseviews
@@ -41,7 +41,7 @@ def signup_success(request):
 
 class PersonView(FormView):
     template_name = 'person.html'
-    form_class = PersonForm
+    ##form_class = PersonForm
     success_url = '/signup-success'
 
     def form_valid(self, form):
@@ -63,20 +63,12 @@ class organization_list(ListView):
     paginate_by = 10
 
   
-class product_list(generics.ListCreateAPIView):
+class productListViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-   
-    def post(self, request, format=None):
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
      
 class product_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):

@@ -103,23 +103,6 @@ class Transaction(models.Model):
 
         return 'Transaction :  %d' % (self.id)
 
-class User(models.Model):
-
-    def __str__(self):
-        return self.getChild().__str__()
-
-    def getChild(self):
-        try:
-            return self.organization
-        except (Organization.DoesNotExist):
-            return self.person
-            
-    username = models.CharField(max_length=40)
-    firstname = models.CharField(max_length=40)
-    lastname = models.CharField(max_length=100)
-    email = models.CharField(max_length=250)
-
-
 class OrganizationType(models.Model):
     """
     Type of organization (Labo,School, ...)
@@ -129,44 +112,83 @@ class OrganizationType(models.Model):
     def __str__(self):
         return self.name
             
-class Organization(User):
+class Affiliation(models.Model):
+    name = models.CharField(max_length=50)
+    status = models.CharField(max_length=30)
+    def __str__(self):
+        return self.name
+
+
+class Person(models.Model):
+
+    username = models.CharField(max_length=40)
+    firstname = models.CharField(max_length=40)
+    lastname = models.CharField(max_length=100)
+    email = models.CharField(max_length=250)
+    affiliations = models.ManyToManyField(
+        Affiliation, blank=True, related_name="members")
+    supervisor = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.username+"("+self.firstname+" "+self.lastname+")"
+
+
+class Organization(models.Model):
     """
-    Represent an Organization
+    an Organization
     """
+    
     name = models.CharField(max_length=30)
     contact = models.EmailField(max_length=100)
+    managed = models.ManyToManyField(Person,blank=False, related_name="managers")
     orga_type = models.ForeignKey(
         OrganizationType, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name   
+
+
+
+
    
-class Person(User):
-    """
-    Represent a person 
-    It is automaticaly created when creating a user
 
-    A ForeignKey with unique is used instead of a OneToOneField
-    This choice was made to not be in conflict with the Inheritance OneToOneField
-
-    organizations : [Organizations]
-        Organizations to which the user belongs
-    supervisor : bool
-        True if the user can supervise a project
-    charter : bool
-        True if the user have signed the charter
+class Reservation():
     """
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        unique=True,
-        on_delete=models.CASCADE,
-        related_name='person'
+    Represent a reservation
+    ----------
+    user : Person
+        user making this reservation
+    date : datetime
+        Starting date and time of this reservation
+    end_date : datetime
+        Ending date and time of this reservation
+    status : int
+        Status of this reservation can be (Requested,Accepted,Denied,Changed)
+    uses : [Equipment], 
+        Equipment used for this reservation 
+        (verified with the need of the reservation_type)
+    created_date : datetime
+        Time of creation of this reservation
+    commentary : string, optional
+        context of reservation or project linked in
+    """
+    REQUESTED = 1
+    ACCEPTED = 2
+    DENIED = 3
+    CHANGED = 4
+    STATUS = (
+        (REQUESTED, ("Requested")),
+        (ACCEPTED, ("Accepted")),
+        (DENIED, ("Denied")),
+        (CHANGED, ("Changed")),
     )
-    organizations = models.ManyToManyField(
-        Organization, blank=True, related_name="members")
-    supervisor = models.BooleanField(default=False)
-    charter = models.BooleanField(default=False)
-
-   
+    status = models.SmallIntegerField(choices=STATUS, default=REQUESTED)
+    end_date = models.DateTimeField()
+    uses = models.ManyToManyField(Product, blank=False)
+    created_date = models.DateTimeField(auto_now_add=True)
+    commentary = models.CharField(max_length=300, null=True, blank=True)
+    user = models.ForeignKey(
+        Person, null=False, blank=False, on_delete=models.SET_NULL)
+        
     def __str__(self):
-        return self.user.username+"("+self.user.first_name+" "+self.user.last_name+")"
+        return self.user.__str__()+'('+str(self.date)+' '+str(self.end_date)+')'

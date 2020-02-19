@@ -39,6 +39,7 @@ const store = new Vuex.Store({
   }
 })
 
+
 const Counter = {
   template: `<div>{{ count }}</div>`,
   computed: {
@@ -48,6 +49,10 @@ const Counter = {
     }
   }
 }
+
+
+
+
 new Vue({
     
     delimiters: ['${', '}$'],
@@ -62,12 +67,12 @@ new Vue({
   http: {
       root: 'http://localhost:8000',
       headers: {
-          Authorization: 'Token 6fba0ea21a684f3dbb80c41a6c56307a6978890b'
+          "Content-Type": 'application-json'
       }
   },
   methods: {
             getProducts: function () {
-                this.$http.get('/products/').then(function (data,request) {
+                this.$http.get('/api/equipments/').then(function (data,request) {
                 if (data.status == 200) {
                     this.products = data.body;
                     console.log(data);

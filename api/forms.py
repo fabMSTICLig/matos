@@ -1,13 +1,12 @@
 from django.forms import ModelForm
-from api.models import User, Person, Organization
+from api.models import Person, Affiliation, Organization
 from django.db import models
-from django.contrib.auth.models import User
 
-class PersonForm(ModelForm):
+class UserForm(ModelForm):
     class Meta:
         model = Person
-        fields = ['username', 'email', 'firstname', 'lastname', 'organizations']
-    organizations = models.ManyToManyField(Organization)
+        fields = ['username', 'email', 'firstname', 'lastname', 'affiliations']
+    affiliations = models.ManyToManyField(Affiliation)
 
 class OrganizationForm(ModelForm):
     class Meta:

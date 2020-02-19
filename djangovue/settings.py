@@ -44,10 +44,12 @@ INSTALLED_APPS = [
     'listview',
     'django.contrib.postgres',
     'django_cas_ng',
-    'bootstrap3'
+    'bootstrap3',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_cas_ng.middleware.CASMiddleware'
+    'django_cas_ng.middleware.CASMiddleware',
 ]
 
 ROOT_URLCONF = 'djangovue.urls'
@@ -82,6 +84,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':
         ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
     'PAGE_SIZE': 10,
+     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
      
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
@@ -94,7 +99,7 @@ DATABASE_NAME = "taskbuster_db"
 DATABASE_USER = "fabowner"
 DATABASE_PASSWORD = "robair"
 
-CAS_SERVER_URL = "https://cas-inp.grenet.fr/login"
+CAS_SERVER_URL = "https://cas-simsu.grenet.fr/login"
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -151,3 +156,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+CORS_ORIGIN_ALLOW_ALL = True
+try:
+    from .local_settings import *
+except ImportError:
+    print('error import local settings')
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8080',
+]
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'http://localhost:8080',
+]
