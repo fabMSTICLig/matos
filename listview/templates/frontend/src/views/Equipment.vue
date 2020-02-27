@@ -5,9 +5,7 @@
                 <input type="text" placeholder="Post title" v-model="equipment.title" class="form-control">
 
             </div>
-            <div class="form-group">
-                <input type="text" v-model="equipment.quantity" placeholder="Equipment quantity" class="form-control">
-            </div>
+           
             <div class="form-group">
                 <input type="text" v-model="equipment.sku" placeholder="Equipment stock" class="form-control">
             </div>
@@ -15,10 +13,7 @@
                 <input type="text" v-model="equipment.barcode" placeholder="Equipment barcode" class="form-control">
             </div>
              <div class="form-group">
-                <input type="text" v-model="equipment.unitCost" placeholder="Equipment cout unitaire" class="form-control">
-            </div>
-             <div class="form-group">
-                <input type="text" v-model="equipment.minQuantity" placeholder="Equipment minimum quantité" class="form-control">
+                <input type="number" v-model="equipment.refUsine" placeholder="ref fabricant" class="form-control">
             </div>
             <div class="form-group">
                 <input type="text" v-model="equipment.description" placeholder="Description" class="form-control">
@@ -29,6 +24,7 @@
              <div class="form-group">
                 <input type="number" v-model="equipment.family" placeholder="Categorie" class="form-control">
             </div>
+            
             <div class="form-group">
                 <button :disabled="!isValid" class="btn btn-block btn-primary" @click.prevent="createEquipment(equipment)">Submit
                 </button>
@@ -37,6 +33,7 @@
     </template>
 
     <script>
+
         export default {
             name: "CreateEquipment",
             data() {
@@ -47,6 +44,7 @@
                     }
                 }
             },
+            
             methods: {
                 createEquipment(equipment) {
                     this.$store.dispatch('createEquipment', equipment)
@@ -54,7 +52,7 @@
             },
             computed: {
                 isValid() {
-                    return this.equipment.title !== '' && this.equipment.quantity !== ''
+                    return this.equipment.title !== '' && this.equipment.sku !== ''
                 }
             }
         }

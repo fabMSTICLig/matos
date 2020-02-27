@@ -8,6 +8,7 @@ import state from "./state";
     Vue.use(Vuex);
 
     export default new Vuex.Store({
+        namespaced: true, // namespaced instead namespace
         state,
         mutations,
         getters,

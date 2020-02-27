@@ -100,6 +100,7 @@ DATABASE_USER = "fabowner"
 DATABASE_PASSWORD = "robair"
 
 CAS_SERVER_URL = "https://cas-simsu.grenet.fr/login"
+CAS_ADMIN_PREFIX = "admin"
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -156,7 +157,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_ALLOW_ALL = False
+
 try:
     from .local_settings import *
 except ImportError:
@@ -170,3 +173,9 @@ CORS_ORIGIN_WHITELIST = [
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:8080',
 ]
+
+CSRF_COOKIE_DOMAIN="localhost"
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
+
+DEBUG=True

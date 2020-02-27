@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
-
+from django.contrib import admin
+import uuid # Required for unique book instances
 # Create your models here.
 
 class Product(models.Model):
@@ -13,12 +14,9 @@ class Product(models.Model):
     title = models.CharField(max_length=200, help_text="Enter Product Title")
     description = models.TextField(help_text="Enter Product Description")
 
-    unitCost = models.FloatField(help_text="Enter Product Unit Cost")
     ##unit = models.CharField(max_length=10,help_text="Enter Product Unit ")
 
-    quantity = models.FloatField(help_text="Enter Product Quantity")
-    minQuantity = models.FloatField(help_text="Enter Product Min Quantity")
-
+    refUsine = models.CharField(max_length=200, help_text="Product Manufacturing", blank=True)
     family = models.ForeignKey('Family', models.CASCADE, blank=False, null = False)
     location = models.ForeignKey('Location', models.CASCADE, blank=False, null = False)
 
@@ -32,15 +30,40 @@ class Product(models.Model):
 
         return self.title
 
+class ProductInstance(models.Model):
+    """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text='Unique ID for this particular book across whole library')
+    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True) 
+    quantity = models.IntegerField(default=1)
+    due_back = models.DateField(null=True, blank=True)
+
+    LOAN_STATUS = (
+        ('p', 'Partially returned'),
+        ('o', 'On loan'),
+        ('a', 'Available'),
+        ('r', 'Reserved'),
+        ('c', 'Modified')
+    )
+
+    status = models.CharField(
+        max_length=1,
+        choices=LOAN_STATUS,
+        blank=True,
+        default='m',
+        help_text='Product availability',
+    )
+
+    class Meta:
+        ordering = ['due_back']
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return f'{self.id} ({self.product.title})'
+
 class Family(models.Model):
 
     reference = models.CharField(max_length=150, help_text="Enter Family Reference")
     title = models.CharField(max_length=200, help_text="Enter Family Title")
-    description = models.TextField(help_text="Enter Family Description")
-
-    unit = models.CharField(max_length=40,help_text="Enter Family Unit ")
-
-    minQuantity = models.FloatField(help_text="Enter Family Min Quantity")
 
     def get_absolute_url(self):
         """
@@ -127,7 +150,7 @@ class Person(models.Model):
     email = models.CharField(max_length=250)
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="members")
-    supervisor = models.BooleanField(default=False)
+    #supervisor = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username+"("+self.firstname+" "+self.lastname+")"
@@ -146,11 +169,6 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name   
-
-
-
-
-   
 
 class Reservation():
     """
@@ -192,3 +210,4 @@ class Reservation():
         
     def __str__(self):
         return self.user.__str__()+'('+str(self.date)+' '+str(self.end_date)+')'
+

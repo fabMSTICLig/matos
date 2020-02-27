@@ -1,6 +1,10 @@
 <template>
-   <div>
-            <h4 class="text-center font-weight-bold">Equipments liste</h4>
+   <div class="home">
+       <div class="d-flex flex-wrap">
+            <organization v-bind:organization="1"></organization>
+       </div>
+        <hr />
+        <h4 class="text-center font-weight-bold">Equipments liste</h4>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -18,7 +22,7 @@
                     <td>{{equipment.family}}</td>
 
                     <td>
-                        <button class="btn btn-danger" @click="deleteEquipment(equipment)"><i style="color:white" class="fa fa-trash"></i></button>
+                        <button class="btn btn-danger" @click="deleteEquipment(equipment)"><b-icon-trash></b-icon-trash></button>
                     </td>
                 </tr>
                 </tbody>
@@ -28,7 +32,7 @@
 
 <script>
     import {mapGetters} from 'vuex'
-   
+    import Organization from './Organization.vue'
    
    export default {
         name:"Home",
@@ -46,6 +50,9 @@
            this.$store.dispatch('fetchEquipments')
         },
 
+        components: {
+            Organization
+        },
         computed: {
             ...mapGetters([
                 'equipments'

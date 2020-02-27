@@ -1,5 +1,10 @@
 let state = {
-    equipments: []
+  equipments: [],
+  equipment: String,
+  category: String,
+  categories: [],
+  organizations: [],
+  organizationsTypes: []
 }
 
 export default state

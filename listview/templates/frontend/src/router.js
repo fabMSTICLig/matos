@@ -17,12 +17,16 @@ export default new VueRouter({
       component: () => import("./views/Equipment"),
     },
     {
+      name: "equipmentEdit",
+      path: "/equipment/:id",
+      component: () => import("./views/EquipmentEdit"),
+    },
+    {
       name: "login",
       path: "/login",
       component: () => import("./views/Login"),
     }
   
-    
     ]
 
 });

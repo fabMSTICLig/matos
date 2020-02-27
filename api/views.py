@@ -2,13 +2,14 @@
 from __future__ import unicode_literals
 from django.contrib.auth import authenticate
 from django.shortcuts import render
+from django.views.generic.edit import CreateView
 from rest_framework import viewsets, serializers, status, generics, mixins, authentication, permissions
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
-from .models import Product , Location ,Family ,Transaction, Organization
+from .models import Product , Location ,Family ,Transaction, Organization, Person
 from .serializers import *   
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
@@ -21,9 +22,16 @@ from api.forms import  OrganizationForm
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 from django_cas_ng import views as baseviews
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 
+
+@api_view(["GET"])
+def index(request):
+    if request.user.is_authenticated:
+        return HttpResponse('<p>Welcome to <a href="https://djangocas.dev">django-cas-ng</a>.</p><p>You logged in as <strong>%s</strong>.</p><p><a href="/accounts/logout">Logout</a></p>' % request.user)
+    else:
+        return HttpResponse('<p>Welcome to <a href="https://djangocas.dev">django-cas-ng</a>.</p><p><a href="/accounts/login">Login</a></p>')
 
 
 @csrf_exempt
@@ -48,6 +56,8 @@ class PersonView(FormView):
         form.save()
         return super().form_valid(form)
 
+
+
 class OrganizationView(FormView):
     template_name = 'organization.html'
     form_class = OrganizationForm
@@ -58,18 +68,28 @@ class OrganizationView(FormView):
         form.save()
         return super().form_valid(form)
 
-class organization_list(ListView):
-    model = Organization
-    paginate_by = 10
+class organizationListView(viewsets.ModelViewSet):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
-  
+
+class organizationTypeListView(viewsets.ModelViewSet):
+    queryset = OrganizationType.objects.all()
+    serializer_class = OrganizationTypeSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
 class productListViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     
 
-
+class productInstanceListView(viewsets.ModelViewSet):
+    queryset = ProductInstance.objects.all()
+    serializer_class = ProductInstanceSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    
      
 class product_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
     queryset = Product.objects.all()
