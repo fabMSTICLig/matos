@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Person, Family, Product, ProductInstance, Organization, OrganizationType
+from .models import Person, Family, Product, ProductInstance, Organization, Affiliation
 # Register your models here.
 @admin.register(Family)
 class FamilyAdmin(admin.ModelAdmin):
@@ -20,8 +20,8 @@ class ProductAdmin(admin.ModelAdmin):
 class OrganizationAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(OrganizationType)
-class OrganizationTypeAdmin(admin.ModelAdmin):
+@admin.register(Affiliation)
+class AffiliationAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(ProductInstance)
@@ -39,4 +39,4 @@ class ProductInstanceAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    pass
+   pass

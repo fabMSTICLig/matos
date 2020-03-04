@@ -112,8 +112,6 @@ class Transaction(models.Model):
         ('nr', 'Unusable Return'),
         ('ul', 'Usable Lend')
     )
-
-
     reason = models.CharField(max_length=2, choices=REASONS, blank=True, default='ns', help_text='Reason for transaction')
 
     def get_absolute_url(self):
@@ -126,24 +124,36 @@ class Transaction(models.Model):
 
         return 'Transaction :  %d' % (self.id)
 
-class OrganizationType(models.Model):
-    """
-    Type of organization (Labo,School, ...)
-    """
-    name = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.name
-            
+         
 class Affiliation(models.Model):
     name = models.CharField(max_length=50)
-    status = models.CharField(max_length=30)
+    TYPE_AFFILIATION = (
+         ('Labo','Laboratoire'), 
+         ('Ecole','Ecole'),
+         ('Platforme','Platforme')       
+    )
+
+    type = models.CharField(
+        max_length=20,
+        choices=TYPE_AFFILIATION,
+        blank=True,
+        default='',
+        help_text='Type d\'affiliation',
+    )
+
     def __str__(self):
         return self.name
 
 
 class Person(models.Model):
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        unique=True,
+        on_delete=models.CASCADE,
+        related_name='person',
+        default="1"
+    )
     username = models.CharField(max_length=40)
     firstname = models.CharField(max_length=40)
     lastname = models.CharField(max_length=100)
@@ -151,22 +161,21 @@ class Person(models.Model):
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="members")
     #supervisor = models.BooleanField(default=False)
-
+    superuser = models.BooleanField(default=False)
     def __str__(self):
-        return self.username+"("+self.firstname+" "+self.lastname+")"
-
+        return self.user.username+"("+self.user.first_name+" "+self.user.last_name+")"
 
 class Organization(models.Model):
     """
     an Organization
     """
     
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
     contact = models.EmailField(max_length=100)
     managed = models.ManyToManyField(Person,blank=False, related_name="managers")
-    orga_type = models.ForeignKey(
-        OrganizationType, null=True, blank=True, on_delete=models.SET_NULL)
-
+    description = models.TextField(blank=True)
+    affiliations = models.ManyToManyField(
+        Affiliation, blank=True, related_name="affiliation")
     def __str__(self):
         return self.name   
 

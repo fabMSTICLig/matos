@@ -11,4 +11,4 @@ class UserForm(ModelForm):
 class OrganizationForm(ModelForm):
     class Meta:
         model = Organization
-        fields = ['name','contact','orga_type']
+        fields = ['name','contact','affiliations']

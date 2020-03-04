@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from rest_framework import viewsets, serializers, status, generics, mixins, authentication, permissions
@@ -24,7 +24,9 @@ from django.views.generic.list import ListView
 from django_cas_ng import views as baseviews
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
-
+from rest_framework.views import APIView
+from django.contrib.auth.models import Permission
+from django.contrib.auth.decorators import permission_required
 
 @api_view(["GET"])
 def index(request):
@@ -57,6 +59,11 @@ class PersonView(FormView):
         return super().form_valid(form)
 
 
+class get_users(generics.ListCreateAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 class OrganizationView(FormView):
     template_name = 'organization.html'
@@ -74,10 +81,6 @@ class organizationListView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
-class organizationTypeListView(viewsets.ModelViewSet):
-    queryset = OrganizationType.objects.all()
-    serializer_class = OrganizationTypeSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 class productListViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -90,7 +93,25 @@ class productInstanceListView(viewsets.ModelViewSet):
     serializer_class = ProductInstanceSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     
-     
+class organizationDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    @permission_required('manage_entity')
+    def get(self, request, *args, **kwargs):
+        data=self.retrieve(request, *args,**kwargs)
+        user=get_user(request)
+        print(user.has_perm('manage_entity'))
+        return self.retrieve(request, *args,**kwargs) 
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args,**kwargs) 
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs) 
+
+
 class product_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -161,3 +182,22 @@ class transaction_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixin
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)  
+
+class Ismanager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user and request.user.groups.filter(name='manager'):
+            return True
+        return False
+
+class UserInstanceView(APIView):
+    @csrf_exempt
+    def get(self, request, format=None):
+        print("self api")
+        print(request)
+        if request.user.is_authenticated:
+            instance = UserSerializer(request.user, context={'request': request})
+            if request.user.groups.filter(name='manager'):
+                return Response({"user": instance.data, "manager":True})
+        return Response({"not authorized"})
+        #return Response('appel api')
+

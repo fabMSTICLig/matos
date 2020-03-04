@@ -1,6 +1,41 @@
-from rest_framework import serializers, exceptions
-from .models import Location, Family, Product, Transaction, ProductInstance, Organization, OrganizationType
+from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
 
+from rest_framework import serializers, exceptions
+from .models import Location, Family, Product, Transaction, ProductInstance, Organization, Person
+
+
+class PersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ('id','firstname','lastname','username','email')
+
+class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer class of the User Model
+
+    The class member person is a nested representation
+    """
+    #person = PersonSerializer(many=True)
+    externe = serializers.SerializerMethodField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'email',
+                  'first_name', 'last_name', 'is_staff','externe')
+        read_only_fields = ('username',)
+
+    def get_externe(self, obj):
+        try :
+            if password in obj:
+                return len(obj.password)==0
+        except NameError:
+            return 0
+        else:
+            return 0
+
+
+ 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location 
@@ -33,9 +68,6 @@ class ProductInstanceSerializer(serializers.ModelSerializer):
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ('id', 'name','managed', 'contact','orga_type')
+        fields = ('id', 'name','managed', 'contact', 'description')
 
-class OrganizationTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrganizationType
-        fields = ('id','name')
+

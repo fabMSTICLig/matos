@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'api',
-    'listview',
     'django.contrib.postgres',
     'django_cas_ng',
     'bootstrap3',
@@ -65,7 +64,7 @@ ROOT_URLCONF = 'djangovue.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates"),],
+        'DIRS': [os.path.join(BASE_DIR, './static'), os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,13 +79,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangovue.wsgi.application'
 
+SILENCED_SYSTEM_CHECKS = ["fields.W342"]
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':
         ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
     'PAGE_SIZE': 10,
      'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+
     ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+
      
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
@@ -107,16 +112,27 @@ AUTHENTICATION_BACKENDS = (
     'django_cas_ng.backends.CASBackend',
 )
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': DATABASE_NAME,
-        'USER': DATABASE_USER,
-        'PASSWORD': DATABASE_PASSWORD,
-        'HOST': '127.0.0.1',
-        'PORT': ''
+DATABASES = {}
+if DEBUG == True:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else: 
+    DATABASES = {
+            'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': DATABASE_NAME,
+            'USER': DATABASE_USER,
+            'PASSWORD': DATABASE_PASSWORD,
+            'HOST': '127.0.0.1',
+            'PORT': ''
+        }
+    }
+
+
 
 
 
@@ -157,6 +173,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+#STATIC_ROOT = '../static'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, './static'),
+]
 
 CORS_ORIGIN_ALLOW_ALL = False
 
@@ -169,9 +189,11 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8080',
+    'http://localhost:8081'
 ]
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:8080',
+    'http://localhost:8081'
 ]
 
 CSRF_COOKIE_DOMAIN="localhost"
