@@ -47,8 +47,7 @@ class FamilySerializer(serializers.ModelSerializer):
         fields = ('id', 'reference', 'title')
 
 class ProductSerializer(serializers.ModelSerializer):
-    family = FamilySerializer(many=False, read_only=True)
-    
+    family = FamilySerializer(many=True, read_only=True)    
     class Meta:
         model = Product 
         fields = ('id','barcode', 'title', 'description','location', 'family','sku', 'refUsine')

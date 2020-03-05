@@ -92,3 +92,36 @@ a.button-head-sub:hover, a.button-head:hover, .router-link-active {
     background: black;
     color:#fff;
 }
+
+.self-container {
+    width: 275px;
+}
+
+.grid-2 {
+display: flex;
+align-items: center;
+justify-content: space-between;
+width: 90%;
+}
+
+.align-form {
+    width: 500px;
+    /*! margin-right: 50%; */
+    margin-top: 20px;
+}
+.align-form label {
+    float: left;
+}
+.align-form .form-control {
+    float: right;
+    margin-bottom: 20px;
+}
+.align-form {
+    width: 500px;
+    margin-top: 20px;
+    margin-left: 93px;
+}
+.card-body > .router-link-active {
+    background: none;
+    color: #2d3333;
+}

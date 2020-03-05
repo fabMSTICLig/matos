@@ -27,7 +27,7 @@ export default new VueRouter({
     {
       name: "equipment",
       path: "/equipment",
-      component: () => import("./views/Equipment")
+      component: () => import("./views/EquipmentCreate")
     },
     {
       name: "equipmentEdit",
@@ -46,15 +46,26 @@ export default new VueRouter({
       beforeEnter: requireAuthManager
     },
     {
-      name: "manage-entity",
+      name: "manageEntity",
       path: "/manage/entity/:id",
       component: () => import("./views/Manage"),
       beforeEnter: requireAuthManager
     },
     {
-      name: "manage-users",
+      name: "manageUsers",
       path: "/manage/users",
       component: () => import("./views/Manage")
+    },
+    {
+      name: "family",
+      path: "/families/:id",
+      component: () => import("./views/Categorie")
+    },
+    {
+      name: "manageEquipment-list",
+      path: "/manage/entity/:id/equipment-list",
+      component: () => import("./views/Manage"),
+      beforeEnter: requireAuthManager
     }
   ]
 });

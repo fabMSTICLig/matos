@@ -1,7 +1,7 @@
 <template>
-<div>
-  <choice :items="entities" :title="listEntities"></choice>
-  <div v-if="entity" class="small-form">
+<div class="grid-2">
+    <choice :items="entities" :title="listEntities"></choice>
+  <div v-if="entity" class="align-form">
     <form  @submit="saveObject(entity)">
       <div class="form-group">
         <label>Nom </label>

@@ -7,6 +7,7 @@
         v-bind:organization="entity.id"
         v-show="isManagement"
       ></organization>
+      <equipment-list v-show="equipmentvue"></equipment-list>
       <manage-users v-show="isUsersManagement"></manage-users>
     </div>
     <hr />
@@ -18,13 +19,18 @@ import { mapGetters, mapState } from "vuex";
 import Organization from "./Organization.vue";
 import ManageUsers from "./ManageUsers.vue";
 import navbar from "@/components/navbar.vue";
+import EquipmentList from "./EquipmentList.vue";
 
 export default {
   name: "Manage",
 
   data() {
     return {
-      organization: 1
+      organization: 1,
+      equipmentvue: false,
+      loansvue: false,
+      usersvue: false,
+      historyvue: false
     };
   },
   methods: {
@@ -40,9 +46,13 @@ export default {
     $route(to, from) {
       this.show = false;
       console.log(to)
-      if (this.$route.name == "manage-entity") {
+      if (this.$route.name == "manageEntity") {
         console.log("chargement entité");
         this.organization = this.$route.params.id;
+      }
+       if (this.$route.name == "manageEquipment-list") {
+        console.log("liste equipements");
+        this.equipmentvue = true;
       }
     }
   },
@@ -56,7 +66,8 @@ export default {
   components: {
     Organization,
     navbar,
-    ManageUsers
+    ManageUsers,
+    EquipmentList,
   },
   computed: {
     ...mapGetters(["equipments"]),
@@ -66,11 +77,11 @@ export default {
     }),
 
     isUsersManagement() {
-      return this.$route.name == "manage-users";
+      return this.$route.name == "manageUsers";
     },
 
     isManagement() {
-      let re = /manage\-\w+/
+      let re = /manageEntity/
       let myRoute = this.$route.name.match(re);
       let routeBase = "manage"
       if(myRoute && myRoute.length || this.$route.name == routeBase ) {
@@ -94,7 +105,7 @@ export default {
         { link: "/manage/users", name: "Utilisateurs" },
         { link: "lends", name: "Prêts en cours" },
         { link: "./history", name: "Historique de prêts" },
-        { link: "./equipments", name: "Matériels" }
+        { link: this.$route.params.id + "/equipment-list", name: "Matériels" }
       ];
     }
   }

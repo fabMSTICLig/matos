@@ -69,7 +69,7 @@ let actions = {
 
   getOrganizations ({ commit }, index) {
     ApiService
-      .get(`api/organizations/`, { headers: {} })
+      .get(`api/organizations`)
       .then(res => {
         console.log('Data', JSON.stringify(res, null, 4))
         commit('GET_ORGANIZATIONS', res.data)
@@ -94,7 +94,7 @@ let actions = {
 
   getUserInstance ({ commit }, index) {
     ApiService
-      .get(`api/self`, { headers: {} })
+      .get(`api/self`, '', { withCredentials: true })
       .then(res => {
         console.log('Data', JSON.stringify(res, null, 4))
         commit('AUTH_USER', res.data)
