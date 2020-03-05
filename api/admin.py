@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db import models
 from .models import Person, Family, Product, ProductInstance, Organization, Affiliation
 # Register your models here.
 @admin.register(Family)
@@ -13,6 +14,7 @@ class OrganizationInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    family = models.ManyToManyField(Family, limit_choices_to={'available': True})
     list_display = ('title', 'sku', 'family', 'location')
     inlines = [ProductInstanceInline]
 

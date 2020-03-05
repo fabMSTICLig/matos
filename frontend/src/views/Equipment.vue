@@ -13,7 +13,7 @@
                 <input type="text" v-model="equipment.barcode" placeholder="Equipment barcode" class="form-control">
             </div>
              <div class="form-group">
-                <input type="number" v-model="equipment.refUsine" placeholder="ref fabricant" class="form-control">
+                <input type="text" v-model="equipment.refUsine" placeholder="ref fabricant" class="form-control">
             </div>
             <div class="form-group">
                 <input type="text" v-model="equipment.description" placeholder="Description" class="form-control">

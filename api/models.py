@@ -7,6 +7,22 @@ from django.contrib import admin
 import uuid # Required for unique book instances
 # Create your models here.
 
+
+class Family(models.Model):
+
+    reference = models.CharField(max_length=150, help_text="Enter Family Reference")
+    title = models.CharField(max_length=200, help_text="Enter Family Title")
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular instance of Family.
+        """
+        return reverse('family-detail-view', args=[str(self.id)])
+
+    def __str__(self):
+
+        return self.title
+        
 class Product(models.Model):
     sku = models.CharField(max_length=150,help_text="Enter Product Stock Keeping Unit")
     barcode = models.CharField(max_length=50,help_text="Enter Product Barcode (ISBN, UPC ...)")
@@ -17,7 +33,7 @@ class Product(models.Model):
     ##unit = models.CharField(max_length=10,help_text="Enter Product Unit ")
 
     refUsine = models.CharField(max_length=200, help_text="Product Manufacturing", blank=True)
-    family = models.ForeignKey('Family', models.CASCADE, blank=False, null = False)
+    family = models.ManyToManyField(Family, blank=False, related_name="families")
     location = models.ForeignKey('Location', models.CASCADE, blank=False, null = False)
 
     def get_absolute_url(self):
@@ -60,20 +76,6 @@ class ProductInstance(models.Model):
         """String for representing the Model object."""
         return f'{self.id} ({self.product.title})'
 
-class Family(models.Model):
-
-    reference = models.CharField(max_length=150, help_text="Enter Family Reference")
-    title = models.CharField(max_length=200, help_text="Enter Family Title")
-
-    def get_absolute_url(self):
-        """
-        Returns the url to access a particular instance of Family.
-        """
-        return reverse('family-detail-view', args=[str(self.id)])
-
-    def __str__(self):
-
-        return self.title
 
 class Location(models.Model):
 

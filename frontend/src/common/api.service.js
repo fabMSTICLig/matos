@@ -6,15 +6,13 @@ import {
 } from "@/common/config";
 
 
-
 const ApiService = {
     init() {
         Vue.use(VueAxios, axios);
         Vue.axios.defaults.baseURL = API_URL;
-        Vue.axios.defaults.timeout = 10000;
-        Vue.axios.defaults.headers.common[
-            "Content-Type"
-        ] = "application/json";
+        Vue.axios.defaults.withCredentials = true;
+        Vue.axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+        Vue.axios.defaults.xsrfCookieName = 'csrftoken'
     },
 
     query(resource, params) {
@@ -30,7 +28,7 @@ const ApiService = {
     },
 
     update(resource, slug, params) {
-        return Vue.axios.patch(`${resource}/${slug}/`, params);
+        return Vue.axios.patch(`${resource}/${slug}/`, params)
     },
 
     put(resource, params) {
@@ -43,11 +41,6 @@ const ApiService = {
 };
 
 export default ApiService;
-
-
-
-
-
 
 
 
