@@ -11,8 +11,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(equipment, index) in equipments" v-bind:key="equipment.id">
-          <td>{{ equipment.title }}</td>
+        <tr v-for="(equipment) in equipments" v-bind:key="equipment.id">
+          <td>
+            <router-link tag="a" :to="itemLink(equipment.id)">{{ equipment.title }}</router-link>
+          </td>
           <td>{{ equipment.sku }}</td>
           <td>
                 <b-button v-b-toggle="'my-collapse-'+equipment.id">
@@ -22,7 +24,7 @@
                   <b-list-group>
                     <b-list-group-item v-for="item in equipment.family" :key="item.id">
                         <div>
-                            {{item.title}}
+                            <router-link tag="a" :to="itemLink(item.id)">{{item.title}}</router-link>
                         </div>
                   </b-list-group-item>
               </b-list-group>
@@ -54,7 +56,11 @@ export default {
     },
     idList(index) {
       return String(index)
+    },
+     itemLink(index) {
+      return "/equipment/"+index
     }
+
   },
 
   mounted() {
@@ -66,8 +72,9 @@ export default {
     
   },
   computed: {
-    ...mapGetters(["equipments"])
+    ...mapGetters(["equipments"]),
 
+   
     
   }
 };

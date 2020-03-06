@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="container">
-      <navbar :items="items"></navbar>
+      <navbar :items="items" :entity="entity.id"></navbar>
 
       <organization
         v-bind:organization="entity.id"
@@ -49,10 +49,18 @@ export default {
       if (this.$route.name == "manageEntity") {
         console.log("chargement entité");
         this.organization = this.$route.params.id;
+        this.equipmentvue = false
+        this.loansvue = false
+        this.historyvue = false
+        this.usersvue = false
       }
        if (this.$route.name == "manageEquipment-list") {
         console.log("liste equipements");
-        this.equipmentvue = true;
+        this.equipmentvue = !this.equipmentvue;
+      }
+      if (this.$route.name !== "manageEquipment-list") {
+        //this.equipmentvue = false;
+
       }
     }
   },
@@ -101,7 +109,7 @@ export default {
 
     items() {
       return [
-        { link: "/manage", name: this.entity.name },
+        { link: "/manage/entity/"+this.entity.id, name: this.entity.name },
         { link: "/manage/users", name: "Utilisateurs" },
         { link: "lends", name: "Prêts en cours" },
         { link: "./history", name: "Historique de prêts" },

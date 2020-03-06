@@ -12,6 +12,7 @@ class Family(models.Model):
 
     reference = models.CharField(max_length=150, help_text="Enter Family Reference")
     title = models.CharField(max_length=200, help_text="Enter Family Title")
+    material = models.ForeignKey('Product', on_delete=models.CASCADE, null=True)
 
     def get_absolute_url(self):
         """
@@ -22,10 +23,11 @@ class Family(models.Model):
     def __str__(self):
 
         return self.title
-        
+
 class Product(models.Model):
     sku = models.CharField(max_length=150,help_text="Enter Product Stock Keeping Unit")
     barcode = models.CharField(max_length=50,help_text="Enter Product Barcode (ISBN, UPC ...)")
+    categories = models.ManyToManyField('Family')
 
     title = models.CharField(max_length=200, help_text="Enter Product Title")
     description = models.TextField(help_text="Enter Product Description")
@@ -33,7 +35,6 @@ class Product(models.Model):
     ##unit = models.CharField(max_length=10,help_text="Enter Product Unit ")
 
     refUsine = models.CharField(max_length=200, help_text="Product Manufacturing", blank=True)
-    family = models.ManyToManyField(Family, blank=False, related_name="families")
     location = models.ForeignKey('Location', models.CASCADE, blank=False, null = False)
 
     def get_absolute_url(self):
@@ -45,6 +46,8 @@ class Product(models.Model):
     def __str__(self):
 
         return self.title
+
+        
 
 class ProductInstance(models.Model):
     """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""

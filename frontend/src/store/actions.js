@@ -56,7 +56,7 @@ let actions = {
 
   getCategories ({ commit }, index) {
     ApiService
-      .get(`api/families/`, { headers: {} })
+      .get(`api/families`)
       .then(res => {
         console.log('Data', JSON.stringify(res, null, 4))
         commit('GET_CATEGORIES', res.data)

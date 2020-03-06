@@ -125,3 +125,11 @@ width: 90%;
     background: none;
     color: #2d3333;
 }
+.navbar > .router-link-active {
+    background: none;
+}
+
+select[multiple] {
+    height: auto;
+    min-height: 150px;
+}

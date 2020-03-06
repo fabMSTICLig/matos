@@ -1,58 +1,68 @@
 <template>
-  <div v-if="category" class="display-4 ma-4 d-flex justify-center">
-    <select v-model="sorting" v-on:change="sortKey">
-      <option v-for="family in categories" :key="family.id" :value="family.id" selected="family.id == 1 ? selected">{{family.title}}</option>
+  <div v-if="categories" class="ma-4 d-flex justify-center">
+    <span>Selected: {{ selectedItems }}</span>
+    <select multiple v-model="selectedItems" v-on:change="updateValue($event.target.value)"
+     v-bind:value="value">
+      <option v-for="family in familiesList" :value="family.value" :key="family.id" >{{family.text}}</option>
     </select>
-   </div>
+  </div>
 </template>
 
 <script>
 // eslint-disable-next-line no-unused-vars
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState } from "vuex";
+import Vue from "vue"
 
 export default {
-  name: 'categorie',
+  name: "categorie",
 
-  data () {
+  data() {
     return {
-      description: '',
-      sorting: '1'
-    }
+      description: "",
+      sorting: "1",
+      selectedItems: []
+    };
   },
+  props: [
+    'value'
+  ],
+ 
+  methods: {
+    selectedFamily(id) {
+      return this.families.find(family => family.id == id) || {};
+    },
 
-  props: {
-    family: {
-      type: Number,
-      default () {
-        return ''
-      }
+    updateValue(value) {
+
+      
+      console.log(this.selectedItems)
+      this.$emit('input', this.selectedItems);
     }
   },
-  methods: {},
-  created () {
-    this.$store.dispatch('getCategories')
+  created() {
+    this.$store.dispatch("getCategories");
   },
 
   computed: {
-    category () {
-      return this.categories.find(family => family.id == this.family) || {}
- //this.$store.state.category
-    },
     ...mapState({
       equipment: state => state.equipment,
       categories: state => state.categories
     }),
-    sortKey: {
-      get: function () {
-        this.$store.dispatch('getCategory', this.sorting.split(' ')[0])
-        return this.sorting.split(' ')[0] // return the key part
+
+    familiesList() {
+      let families = []
+      for (let i = 0; i <= this.categories.length - 1; i++) {
+        let family = {
+          text: this.categories[i].title,
+          value: this.categories[i]
+        };
+        families.push(family);
       }
+
+      return families;
     },
-    sortOrder: {
-      get: function () {
-        return this.sorting.split(' ')[1] // return the order part
-      }
-    }
+
+    
   }
-}
+};
 </script>
