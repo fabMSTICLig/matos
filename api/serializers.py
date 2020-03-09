@@ -46,52 +46,22 @@ class FamilySerializer(serializers.ModelSerializer):
         model = Family 
         fields = ('id', 'reference', 'title')
 
-class FamilyRelatedField(RelatedField):
-    def get_queryset(self):
-        return Family.objects.all()
-
-    def to_representation(self, instance):
-        return {'reference': instance.reference, 'title': instance.title, 'material': instance.material.title}
-
-    def to_internal_value(self, data):
-        title = data.get('title', None)
-        reference = data.get('reference', None) 
-        material = data.get('material', None)
-        try:
-            product = Product.objects.get(title=material)
-        except Setting.DoesNotExist:
-            raise serializers.ValidationError('bad inventor')
-        return Family(title=title, reference=reference, material=product)
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    categories = FamilyRelatedField(many=True )
+    categories = FamilySerializer(many=True, read_only=True )
     class Meta:
         model = Product 
         fields = ('id','barcode', 'title', 'description','location', 'categories','sku', 'refUsine')
     
-    depth = 1
-    def update(self, instance, validated_data):
-            families_data = validated_data.pop('families')
-            # Unless the application properly enforces that this field is
-            # always set, the following could raise a `DoesNotExist`, which
-            # would need to be handled.
 
-            instance.barcode = validated_data.get('barcode', instance.barcode)
-            instance.title = validated_data.get('title', instance.title)
-            instance.description = validated_data.get('description', instance.description)
-            instance.location = validated_data.get('location', instance.location)
-            instance.sku = validated_data.get('sku', instance.sku)
-            instance.refUsine = validated_data.get('refUsine', instance.refUsine)
-            for family in families_data:
-                print(family)
-                family = Family.objects.get(pk=family_id)
-                instance.set(family)
-            #families = Family.objects.filter(product__in=families_data)
-            print(instance)
-            # instance.families.set(families)
-            #families.save()
-            return instance    
+class ProductSetupSerializer(serializers.ModelSerializer):
+    families = FamilySerializer(many=True, read_only=True )
+
+    class Meta:
+        model = Product 
+        fields = ('id','barcode', 'title', 'description','location', 'families','sku', 'refUsine')
+  
 
 class TransactionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):

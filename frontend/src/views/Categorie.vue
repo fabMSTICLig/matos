@@ -1,54 +1,80 @@
 <template>
   <div v-if="categories" class="ma-4 d-flex justify-center">
-    <span>Selected: {{ selectedItems }}</span>
-    <select multiple v-model="selectedItems" v-on:change="updateValue($event.target.value)"
-     v-bind:value="value">
-      <option v-for="family in familiesList" :value="family.value" :key="family.id" >{{family.text}}</option>
+    {{option}}
+    <select multiple="multiple" v-model="option" v-on:change="updateValue($event.target.value)"
+     v-bind:value="value" v-if="value">
+      <option v-for="family in familiesList" :value="family.value" :key="family.id" :selected="isFamily(family)">{{family.text}}</option>
     </select>
+          <button @click="emptySelect()" >reset</button>
+
   </div>
 </template>
 
 <script>
+
+//selected --> init value //
+
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from "vuex";
 import Vue from "vue"
 
 export default {
   name: "categorie",
-
-  data() {
-    return {
-      description: "",
-      sorting: "1",
-      selectedItems: []
-    };
-  },
-  props: [
+   props: [
     'value'
   ],
+  data() {
+    return {
+      option: '',
+      description: "",
+      sorting: "1"
+    }
+  },
+ 
  
   methods: {
-    selectedFamily(id) {
-      return this.families.find(family => family.id == id) || {};
+   
+    isFamily(val) {
+            console.log(val.value.id)
+                  console.log(this.value)
+
+      let family_equipment = this.value.find(family => family.id == val.value.id);
+      return family_equipment ? 'selected' : ''
     },
 
+    emptySelect() {
+      this.option = []
+      this.$emit('input', "" )
+    },
     updateValue(value) {
 
-      
-      console.log(this.selectedItems)
-      this.$emit('input', this.selectedItems);
+      console.log(value)
+     // this.option = value
+     //this.option.push( value)
+      this.$emit('input', this.option);
     }
+   
   },
   created() {
     this.$store.dispatch("getCategories");
+     console.log(this.value)
+       // this.option = this.value
   },
+
+  
+ 
 
   computed: {
     ...mapState({
       equipment: state => state.equipment,
       categories: state => state.categories
     }),
+     getCurrentFamilies() {
+      return this.value
+    },
 
+    
+   
     familiesList() {
       let families = []
       for (let i = 0; i <= this.categories.length - 1; i++) {

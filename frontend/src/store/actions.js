@@ -107,7 +107,7 @@ let actions = {
   
   updateEquipment ({ commit }, equipment) {
     ApiService
-      .put(`api/equipments/${equipment.id}/`, equipment, {
+      .put(`api/equipment/${equipment.id}`, equipment, {
         withCredentials: true
       })
       .then(res => {

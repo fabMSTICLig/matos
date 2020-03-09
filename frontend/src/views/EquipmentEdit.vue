@@ -1,6 +1,6 @@
 <template>
   <form action="" @submit="updateEquipment(equipment)" v-if="equipment">
-    <h4 class="text-center font-weight-bold">Equipment creation form</h4>
+    <h4 class="text-center font-weight-bold">Mise à jour Equipement</h4>
     <div class="form-group">
       <input
         type="text"
@@ -44,8 +44,7 @@
     <div class="form-group">
       {{equipment.families}}
       <categorie
-        v-if="equipment.families"
-        v-model="equipment.families"
+        v-model="equipment.categories"
       ></categorie>
       </div>
     <div class="form-group">

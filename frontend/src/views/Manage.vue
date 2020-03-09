@@ -113,7 +113,7 @@ export default {
         { link: "/manage/users", name: "Utilisateurs" },
         { link: "lends", name: "Prêts en cours" },
         { link: "./history", name: "Historique de prêts" },
-        { link: this.$route.params.id + "/equipment-list", name: "Matériels" }
+        { link: "/manage/entity/"+ this.$route.params.id + "/equipment-list", name: "Matériels" }
       ];
     }
   }

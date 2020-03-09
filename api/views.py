@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, get_user
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from rest_framework import viewsets, serializers, status, generics, mixins, authentication, permissions
-from rest_framework.decorators import api_view,permission_classes
+from rest_framework.decorators import api_view,permission_classes, action
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
@@ -110,19 +110,42 @@ class organizationDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixin
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs) 
+    
+    def ___init__(self, name):
+        self.name = name
 
 
-class product_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
+class productDetailViewSet(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    print('>>>>>')
     def get(self, request, *args, **kwargs):
+        print("equipment view")
         data=self.retrieve(request, *args,**kwargs)
         return self.retrieve(request, *args,**kwargs) 
     
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args,**kwargs) 
+        print("equipment view")
+        print("mise a jour produit")
+        families_data = self.request.data['categories']
+        equipment_id = self.request.data['id']
+        location_id = self.request.data['location']
+        equipment = Product.objects.get(pk=equipment_id)
+        equipment.title =  self.request.data['title']
+        equipment.description = self.request.data['description']
+        equipment.barcode = self.request.data['barcode']
+        equipment.location = Location.objects.get(pk=location_id)
+        equipment.sku = self.request.data['sku']
+        equipment.refUsine = self.request.data['refUsine']
+        equipment.categories.clear()
+        
+        for family in families_data :
+            family_obj = Family.objects.get(pk=family['id'])
+            equipment.categories.add(family_obj)
+
+        equipment.save() 
+        return self.get(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs) 

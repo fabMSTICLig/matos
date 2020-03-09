@@ -7,7 +7,6 @@
         <tr>
           <th scope="col">Title</th>
           <th scope="col">Quantité</th>
-          <th scope="col">Categorie</th>
         </tr>
       </thead>
       <tbody>
@@ -16,21 +15,6 @@
             <router-link tag="a" :to="itemLink(equipment.id)">{{ equipment.title }}</router-link>
           </td>
           <td>{{ equipment.sku }}</td>
-          <td>
-                <b-button v-b-toggle="'my-collapse-'+equipment.id">
-                            <span>+</span>
-                </b-button>
-              <b-collapse :id="`my-collapse-${equipment.id}`">
-                  <b-list-group>
-                    <b-list-group-item v-for="item in equipment.family" :key="item.id">
-                        <div>
-                            <router-link tag="a" :to="itemLink(item.id)">{{item.title}}</router-link>
-                        </div>
-                  </b-list-group-item>
-              </b-list-group>
-             </b-collapse>
-
-          </td>
 
           <td>
             <button class="btn btn-danger" @click="deleteEquipment(equipment)">

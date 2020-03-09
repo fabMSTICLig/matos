@@ -12,7 +12,6 @@ class Family(models.Model):
 
     reference = models.CharField(max_length=150, help_text="Enter Family Reference")
     title = models.CharField(max_length=200, help_text="Enter Family Title")
-    material = models.ForeignKey('Product', on_delete=models.CASCADE, null=True)
 
     def get_absolute_url(self):
         """
@@ -27,7 +26,7 @@ class Family(models.Model):
 class Product(models.Model):
     sku = models.CharField(max_length=150,help_text="Enter Product Stock Keeping Unit")
     barcode = models.CharField(max_length=50,help_text="Enter Product Barcode (ISBN, UPC ...)")
-    categories = models.ManyToManyField('Family')
+    categories = models.ManyToManyField(Family, related_name='categories')
 
     title = models.CharField(max_length=200, help_text="Enter Product Title")
     description = models.TextField(help_text="Enter Product Description")

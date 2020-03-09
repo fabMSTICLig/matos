@@ -14,9 +14,8 @@ class OrganizationInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    families = models.ManyToManyField(Family, limit_choices_to={'available': True})
-    list_display = ('title', 'sku', 'families', 'location')
-    inlines = [ProductInstanceInline]
+    categories = models.ManyToManyField(Family, limit_choices_to={'available': True})
+    list_display = ('title', 'sku', 'categories', 'location')
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
