@@ -31,7 +31,7 @@ export default {
       logged: false
     }
   },
-  mounted () {
+  beforeMount () {
     this.$store.dispatch('getUserInstance')
   },
   computed: {

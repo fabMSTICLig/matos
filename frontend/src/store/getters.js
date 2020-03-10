@@ -2,9 +2,10 @@ let getters = {
     equipments: state => {
         return state.equipments
     },
-    isAdmin: state => {
-        return true;
+    isManager: state => {
+        return state.authUser.manager;
     },
+   
     userAuth: state => {
         return state.authUser;
 

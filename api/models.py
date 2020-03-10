@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import admin
 import uuid # Required for unique book instances
 # Create your models here.
+from django.contrib.auth.models import User
 
 
 class Family(models.Model):
@@ -176,7 +177,7 @@ class Organization(models.Model):
     
     name = models.CharField(max_length=60)
     contact = models.EmailField(max_length=100)
-    managed = models.ManyToManyField(Person,blank=False, related_name="managers")
+    managed = models.ManyToManyField(User,blank=False, related_name="managers")
     description = models.TextField(blank=True)
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="affiliation")

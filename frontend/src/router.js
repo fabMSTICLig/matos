@@ -1,13 +1,16 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "./store";
+import auth from './store/auth.module'
+import { CHECK_AUTH } from "@/store/actions.type"
+import state from "./store/state";
+Vue.use(VueRouter)
 
-Vue.use(VueRouter);
 
 function requireAuthManager (to, from, next) {
-  if (store.getters.isAdmin) {
+  if (store.getters.isManager) {
     console.log('auth')
-    if (store.getters.isAdmin && store.getters.userAuth.manager) {
+    if (store.getters.isManager && store.getters.userAuth.manager) {
          next()
     } else {
       next({ name: 'home' })
@@ -17,6 +20,26 @@ function requireAuthManager (to, from, next) {
   }
 }
 
+
+function requireAuthAdmin (to, from, next) {
+  Promise.all([store.dispatch(CHECK_AUTH)])
+  .then(res => {
+        if (store.state.auth.authUser.is_staff) {
+          next()
+        }
+        else {
+          next({ name: 'home' })
+        }
+      })
+  .catch(err => {
+    next('/')
+  })
+  
+  }
+   
+
+
+ 
 export default new VueRouter({
   routes: [
     {
@@ -66,6 +89,13 @@ export default new VueRouter({
       path: "/manage/entity/:id/equipment-list",
       component: () => import("./views/Manage"),
       beforeEnter: requireAuthManager
+    },
+
+    {
+      name: "admin-orga",
+      path: "/admin/orgas",
+      component: () => import("./views/Admin"),
+      beforeEnter: requireAuthAdmin
     }
   ]
 });

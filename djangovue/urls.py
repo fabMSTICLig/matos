@@ -21,11 +21,12 @@ from django.conf.urls import url, include
 from api.views import sample_api, signup_success, productListViewSet, productInstanceListView, index, organizationListView, get_users, UserInstanceView, productDetailViewSet
 import django_cas_ng.views
 from rest_framework import routers
+from adminplatform.urls import router as adminrouter
 
 router = routers.DefaultRouter()
 router.register(r'api/equipments', productListViewSet)
 router.register(r'api/products-instance', productInstanceListView)
-router.register(r'api/organizations', organizationListView)
+router.registry.extend(adminrouter.registry)
 
 urlpatterns = [
     url(r'^$', view=TemplateView.as_view(template_name='index.html')),

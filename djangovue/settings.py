@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'api',
     'django.contrib.postgres',
     'django_cas_ng',
-    'bootstrap3',
+    'adminplatform',
     'corsheaders'
 ]
 

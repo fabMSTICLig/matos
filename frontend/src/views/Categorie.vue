@@ -5,7 +5,7 @@
      v-bind:value="value" v-if="value">
       <option v-for="family in familiesList" :value="family.value" :key="family.id" :selected="isFamily(family)">{{family.text}}</option>
     </select>
-          <button @click="emptySelect()" >reset</button>
+    <button @click="emptySelect()" >reset</button>
 
   </div>
 </template>

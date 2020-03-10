@@ -1,3 +1,5 @@
+import { SET_AUTHUSER } from "./mutations.type";
+
 /* eslint-disable eqeqeq */
 let mutations = {
   CREATE_EQUIPMENT (state, equipment) {
@@ -44,6 +46,9 @@ let mutations = {
   },
   SET_ORGA (state,user) {
     console.log("orga update")
+  },
+  SET_AUTHUSER (state,user) {
+    return (state.authUser = user)
   }
 }
 
