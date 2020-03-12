@@ -16,7 +16,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    font-size: 1.3rem;
+    font-size: 1.0rem;
     padding-right: 10px;
     padding-left: 10px;
 }
@@ -132,4 +132,15 @@ width: 90%;
 select[multiple] {
     height: auto;
     min-height: 150px;
+}
+
+.custom-control.custom-radio {
+    width: 178px;
+    display: flex;
+}
+
+.radio-form-group {
+    margin-left: auto;
+    margin-right: auto;
+    width: 250px;
 }

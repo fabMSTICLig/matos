@@ -7,7 +7,8 @@
 <script>
   
   import { mapState } from "vuex"
-
+  import { FETCH_USERS } from '@/store/actions.type'
+  
   export default {
     name: "Users",
     methods: {
@@ -19,7 +20,7 @@
       })
     },
     beforeMount() {
-          this.$store.dispatch("getUsers");
+          this.$store.dispatch(FETCH_USERS);
 
     }
   };

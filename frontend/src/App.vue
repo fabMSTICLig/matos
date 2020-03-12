@@ -4,15 +4,19 @@
           <div class="nav-header">
             <router-link tag="a" class="button-head" class-active="active" to="/" exact>Réservations</router-link>
             <router-link tag="a" class="button-head" class-active="active" to="/manage" exact>Gestion</router-link>
+            <router-link tag="a" v-if="isAdmin" class="button-head" class-active="active" to="/admin/orgas" exact>Organisations</router-link>
           </div>
           <div class="nav-header">
-            <div v-if="!authuser.user">
+            <div v-if="!isAuthenticated">
               <a href="/api/login"  class="button-head-sub">login CAS</a>
             </div>
-             <div v-if="authuser.user">
-              <a href="/api/self"  class="button-head-sub">{{authuser.user.username}}</a>
+            <div v-if="isAuthenticated">
+              <a href="/api/self"  class="button-head-sub">{{authUser.username}}</a>
             </div>
-            <div>
+            <div v-if="isAuthenticated">
+              <a :href="authUser.externe ? '/api/logout' : '/auth/logout'" >Log out</a>
+            </div>
+            <div v-if="!isAuthenticated">
               <a href="/auth/register" class="button-head-sub">Register</a>
             </div>
           </div>
@@ -22,7 +26,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
+import store from './store/index'
+import { CHECK_AUTH } from './store/actions.type'
 
 export default {
   name: 'App',
@@ -32,13 +38,11 @@ export default {
     }
   },
   beforeMount () {
-    this.$store.dispatch('getUserInstance')
+    //this.$store.dispatch(CHECK_AUTH)
   },
   computed: {
 
-    ...mapState({
-      authuser: state => state.authUser
-    })
+    ...mapGetters(["authUser", "isAuthenticated","isAdmin"])
 
   }
 }

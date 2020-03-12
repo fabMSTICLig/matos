@@ -177,7 +177,7 @@ class Organization(models.Model):
     
     name = models.CharField(max_length=60)
     contact = models.EmailField(max_length=100)
-    managed = models.ManyToManyField(User,blank=False, related_name="managers")
+    managed = models.ManyToManyField(User,blank=True, related_name="managers")
     description = models.TextField(blank=True)
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="affiliation")

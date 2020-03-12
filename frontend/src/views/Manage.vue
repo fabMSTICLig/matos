@@ -20,12 +20,18 @@ import Organization from "./Organization.vue";
 import ManageUsers from "./ManageUsers.vue";
 import navbar from "@/components/navbar.vue";
 import EquipmentList from "./EquipmentList.vue";
+import { GET_ORGA, UPDATE_ORGA, CREATE_ORGA, FETCH_ORGAS, FETCH_EQUIPMENTS } from '@/store/actions.type'
 
 export default {
   name: "Manage",
-
-  data() {
+  data () {
     return {
+      actions: {
+        GET: GET_ORGA,
+        UPDATE: UPDATE_ORGA,
+        CREATE: CREATE_ORGA,
+        FETCH: FETCH_ORGAS
+      },
       organization: 1,
       equipmentvue: false,
       loansvue: false,
@@ -65,49 +71,51 @@ export default {
     }
   },
 
-  created() {
-    this.$store.dispatch("getOrganizations");
-    console.log("route");
-    console.log(this.$route.name);
+  created () {
+    console.log("route")
+    console.log(this.$route.name)
   },
 
   components: {
     Organization,
     navbar,
     ManageUsers,
-    EquipmentList,
+    EquipmentList
   },
   computed: {
-    ...mapGetters(["equipments"]),
+    ...mapGetters(['orgas', 'equipments']),
 
     ...mapState({
-      organizations: state => state.organizations
+      organizations: state => state.orgas
     }),
 
-    isUsersManagement() {
+    isUsersManagement () {
       return this.$route.name == "manageUsers";
     },
 
-    isManagement() {
+    isManagement () {
       let re = /manageEntity/
       let myRoute = this.$route.name.match(re);
-      let routeBase = "manage"
-      if(myRoute && myRoute.length || this.$route.name == routeBase ) {
+      let routeBase = 'manage'
+      if ((myRoute && myRoute.length) || (this.$route.name == routeBase)) {
         return true
+      }
+      else {
+        return false
       }
     },
 
-    entity() {
-      console.log("entity default")
+    entity () {
+      console.log('entity default')
       console.log(this.organization)
       return (
-        this.organizations.find(
-          organization => organization.id == this.organization
+        this.orgas.find(
+          organization => organization.id == this.$route.params.id
         ) || {}
-      );
+      )
     },
 
-    items() {
+    items () {
       return [
         { link: "/manage/entity/"+this.entity.id, name: this.entity.name },
         { link: "/manage/users", name: "Utilisateurs" },
@@ -116,6 +124,10 @@ export default {
         { link: "/manage/entity/"+ this.$route.params.id + "/equipment-list", name: "Matériels" }
       ];
     }
+  },
+  beforeMount () {
+    this.$store.dispatch(FETCH_ORGAS)
+    this.$store.dispatch(FETCH_EQUIPMENTS)
   }
 };
 </script>

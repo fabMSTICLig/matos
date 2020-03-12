@@ -10,12 +10,20 @@ import 'bootstrap-vue/dist/bootstrap-vue-icons.common'
 import { sync } from 'vuex-router-sync'
 import store from './store/index'
 import ApiService from './common/api.service'
+import { CHECK_AUTH } from './store/actions.type'
 
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
 ApiService.init()
 
 Vue.config.productionTip = false
+//Ensure we checked auth before each page load.
+router.beforeEach((to, from, next) => {
+  Promise.all([store.dispatch(CHECK_AUTH)])
+      .then(next)
+      .catch(next)
+});
+
 sync(store, router)
 
 

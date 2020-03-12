@@ -13,7 +13,6 @@ class PersonSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer class of the User Model
-
     The class member person is a nested representation
     """
     #person = PersonSerializer(many=True)
@@ -26,15 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('username',)
 
     def get_externe(self, obj):
-        try :
-            if password in obj:
-                return len(obj.password)==0
-        except NameError:
-            return 0
-        else:
-            return 0
-
-
+        return len(obj.password)==0
  
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:

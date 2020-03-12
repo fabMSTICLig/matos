@@ -17,6 +17,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
+from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from api.forms import  OrganizationForm
 from django.views.generic.edit import FormView
@@ -60,8 +61,8 @@ class PersonView(FormView):
 
 
 class get_users(generics.ListCreateAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PersonSerializer
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
@@ -107,6 +108,17 @@ class organizationDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixin
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args,**kwargs) 
+    
+    def get_object(self, pk):
+        return Organization.objects.get(pk=pk)
+
+    def patch(self, request, pk):
+        instance_object = self.get_object(pk)
+        serializer = OrganizationSerializer(instance_object, data=request.data, partial=True) # set partial=True to update a data partially
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({'code':201, 'data':serializer.data})
+        return JsonResponse({'code':400, 'data':"wrong parameters"})
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs) 
@@ -221,6 +233,8 @@ class UserInstanceView(APIView):
             instance = UserSerializer(request.user, context={'request': request})
             if request.user.groups.filter(name='manager'):
                 return Response({"user": instance.data, "manager":True})
+            else:
+                return Response({"user": instance.data, "manager":False})
         return Response({"not authorized"})
         #return Response('appel api')
 

@@ -5,7 +5,7 @@ import {
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD
 } from "./actions.type";
-import { SET_AUTHUSER, PURGE_AUTH, SET_ERROR } from "./mutations.type";
+import { SET_AUTHUSER, PURGE_AUTH, SET_ERROR, SET_AUTHUSER_MANAGER } from "./mutations.type";
 
 const state = {
   errors: null,
@@ -14,22 +14,26 @@ const state = {
 
 const getters = {
   authUser(state) {
-    return state.authUser;
+    return state.authUser
   },
   isAuthenticated(state) {
-    return !!state.authUser.username;
+    return !!state.authUser.username
   },
   isAdmin(state) {
-    return state.authUser.is_staff;
+    return state.authUser.is_staff
+  },
+  isManager(state) {
+    return state.authUser.is_manager
   }
 };
 
 const actions = {
   [CHECK_AUTH](context) {
     return new Promise((resolve, reject) => {
-      ApiService.query("api/self",{})
+      ApiService.query("api/self", { withCredentials: true })
         .then(({ data }) => {
-          	context.commit(SET_AUTHUSER, data.user);
+            context.commit(SET_AUTHUSER, data.user);
+            context.commit(SET_AUTHUSER_MANAGER, data.manager);
             resolve();
         })
         .catch((e) => {
@@ -63,6 +67,10 @@ const mutations = {
   [PURGE_AUTH](state) {
     state.authUser = {};
     state.errors = {};
+  },
+  [SET_AUTHUSER_MANAGER](state, manager) {
+    state.authUser.is_manager = manager
+    state.errors = {}
   }
 };
 

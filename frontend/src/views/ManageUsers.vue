@@ -11,7 +11,7 @@
 <script>
 import { mapState } from 'vuex'
 import Users from './Users.vue'
-
+import { FETCH_ORGAS, FETCH_USERS } from '@/store/actions.type'
 export default {
   name: 'ManageUsers',
 
@@ -29,11 +29,11 @@ export default {
   },
 
   mounted () {
-    this.$store.dispatch('getUsers')
+    this.$store.dispatch(FETCH_USERS)
   },
 
   created () {
-    this.$store.dispatch('getOrganizations')
+    this.$store.dispatch(FETCH_ORGAS)
   },
 
 

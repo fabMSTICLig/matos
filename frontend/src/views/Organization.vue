@@ -1,7 +1,7 @@
 <template>
 <div class="grid-2">
-    <choice :items="entities" :title="listEntities"></choice>
-  <div v-if="entity" class="align-form">
+  <choice :items="entities" :title="listEntities"></choice>
+  <div v-show="!isEmpty" class="align-form">
     <form  @submit="saveObject(entity)">
       <div class="form-group">
         <label>Nom </label>
@@ -34,6 +34,8 @@
 <script>
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from "vuex";
+import { FETCH_ORGAS, UPDATE_ORGA } from "@/store/actions.type"
+
 import choice from "@/components/choice"
 
 export default {
@@ -50,7 +52,7 @@ export default {
     organization: {
       type: Number,
       default() {
-        return "";
+        return 0;
       }
     }
   },
@@ -63,12 +65,12 @@ export default {
   methods: {
     saveObject(entity) {
       console.log('update entity')
-      this.$store.dispatch("updateEntity",entity)
+      this.$store.dispatch(UPDATE_ORGA, { id: entity.id, data: entity }).then((entity) => {
+            console.log('organisation mise a jour')
+          });
     }
   },
-  created() {
-    this.$store.dispatch("getOrganizations");
-  },
+ 
 
   computed: {
     items() {
@@ -81,33 +83,33 @@ export default {
       ];
     },
 
-    entities() {
+    isEmpty() {
+      console.log(Object.keys(this.entity).length === 0)
+      return Object.keys(this.entity).length === 0
+    },
 
+    entities() {
       let entities = []
-      for(let i=0; i<=this.organizations.length -1 ; i++) {
-        entities[i] = { link: `/manage/entity/${this.organizations[i].id}`, name: this.organizations[i].name }
+      for(let i=0; i<=this.orgas.length -1 ; i++) {
+        entities[i] = { link: `/manage/entity/${this.orgas[i].id}`, name: this.orgas[i].name }
       }
-      return entities
-      
+      return entities      
     },
 
     entity() {
-      return (
-        this.organizations.find(
-          organization => organization.id == this.organization
-        ) || {}
-      );
+      console.log(this.organization)
+      return this.orgas.find( orga => orga.id == this.$route.params.id) || {}
+      
     },
 
-  
+    ...mapGetters(['orgas']),
+
     ...mapState({
       equipment: state => state.equipment,
-      organizations: state => state.organizations
-      //orgatypes: state => state.organizationTypes
+      organizations: state => state.orgas
     }),
     sortKey: {
       get: function() {
-        //this.$store.dispatch('getOrganizationTypes', this.sorting.split(' ')[0])
         return this.sorting.split(" ")[0]; // return the key part
       }
     },
@@ -117,6 +119,11 @@ export default {
       }
     }
   },
+
+  beforeMount () {
+    this.$store.dispatch(FETCH_ORGAS)
+  },
+
   render(h) {
     return this.$route == "manage" ? h("organization") : h("home");
   }
