@@ -1,8 +1,8 @@
 <template>
   <div>
     <b-card-group rows v-if="update || add">
-      <h4>Création d'une organisation</h4>
-      <form action="" @submit="saveEntity(organization)">
+      <h4>Création d'une entité</h4>
+      <b-form @submit="saveEntity()">
         <div class="form-group">
           <label for="organame">nom</label
           ><input
@@ -18,21 +18,18 @@
             <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation">{{affiliation.name}}</option>
           </select>
         </b-form-group>
-       
         </div>
         <div class="form-group">
           <input type="email" placeholder="email contact" v-model="organization.contact">
         </div>
-        
-       
-        <button class="btn btn-primary" v-if="add" type="submit" @click.prevent="saveEntity(organization)">
-          Créer
-        </button>
-        
-        <button class="btn btn-primary" v-if="update" type="submit" @click.prevent="saveEntity(organization)">
-          Mise à jour
-        </button>
-      </form>
+
+          <b-row>
+            <b-button class="float-right" type="submit" v-show="update" @click.prevent="saveObject" variant="primary">Update</b-button>
+            <b-button class="float-right" type="submit" @click.prevent="saveEntity()" v-show="add" variant="primary">Add</b-button>
+          </b-row>
+        </b-form>
+            
+      
     </b-card-group>
   </div>
 </template>
@@ -56,39 +53,40 @@ export default {
   components: {},
   data () {
     return {
+      EmptyObject: { name: null, contact: null, affiliations: [] },
       organization: {
-        type: Object,
-        default: ""
+         type: Object,
+         default:''
       },
-      actions:{
+
+      actions: {
         GET: GET_ORGA,
         UPDATE: UPDATE_ORGA,
         CREATE: CREATE_ORGA,
         FETCH: FETCH_ORGAS
       },
-      managed: [],
-      affiliates: [],
-      multiple: "true",
-      addAffiliation: false
+      objectName:'Entity',
+      affiliates: []
     };
   },
   computed: {
     ...mapGetters(["orgas", "affiliations","users"]),
-    ...mapState({
-      affiliations: state => state.affiliations.affiliations,
-      organizations: state => state.organizations,
-      users: state => state.users
-    })
-    
-  
+        
   },
   methods: {
-    saveEntity (entity) {
+    saveEntity () {
       console.log("update entity");
-      this.$store.dispatch(CREATE_ORGA, { data: entity }).then(entity => {
+
+        this.$store.dispatch(CREATE_ORGA, { data: this.organization }).then(entity => {
         console.log(entity)
         this.add = false
         this.$router.push({ name: 'update-orga', params: { id: entity.id } })
+      }).catch(e =>  {
+          if(e.response.status === 400 ){
+              console.log(e.response)
+
+              this.$bvModal.msgBoxOk(e.response.data)
+          }
       })
     },
     updateManager (manager) {
@@ -96,30 +94,64 @@ export default {
     },
     updateAffiliations (affiliations) {
       this.organization.affiliations = this.affiliates
-
     },
 
-    emptySelect() {
+    emptySelect () {
       this.option = []
       this.$emit('input', "" )
     }
   },
+
+  watch:{
+    $route(to, from) {
+      console.log(to)
+       if (this.$route.params.id) {
+      this.update = true
+      this.add = false
+      let idRoute = this.$route.params.id
+      this.organization = this.orgas.find(organization => organization.id == idRoute ) || {}
+      this.object = Object.assign({}, this.organization);
+
+      }
+    }
+  },
+
   beforeMount () {
     this.$store.dispatch(FETCH_ORGAS)
     this.$store.dispatch(FETCH_AFFILIATIONS)
     this.$store.dispatch(FETCH_USERS)
+    this.object = Object.assign({}, this.organization)
+    
+    
+
     if (!this.$route.params.id) {
        this.add = true
+        console.log(this.object)
     }
+     if (this.$route.params.id) {
+      this.update = true
+      this.add = false
+      let idRoute = this.$route.params.id
+      this.organization = this.orgas.find(organization => organization.id == idRoute ) || {}
+      this.object = Object.assign({}, this.organization);
+
+      }
+   
+
+  },
+  created() {
     if (this.$route.params.id) {
       this.update = true
       this.add = false
       let idRoute = this.$route.params.id
-      this.organization = this.organizations.orgas.find(organization => organization.id == idRoute ) || {}
+      this.$store.dispatch(FETCH_ORGAS).then( orgas => {
+              this.organization = this.orgas.find(organization => organization.id == idRoute ) || {}
 
-      this.update = true
-    }
+      })
 
+      this.object = Object.assign({}, this.organization);
+
+      }
   }
 };
 </script>

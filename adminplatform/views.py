@@ -17,6 +17,11 @@ from django.conf import settings
 from django.shortcuts import render
 from django.core.mail import send_mail
 from django.http import QueryDict, Http404
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK
+)
 from django.db import transaction, DatabaseError
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
@@ -153,8 +158,18 @@ class organizationListView(viewsets.ModelViewSet):
             organization.name = data['name']
             organization.contact = data['contact']
             affiliations = data['affiliations']
-            organization.save()
 
+            try:
+                organization_existing = Organization.objects.get(name=organization.name)
+                print("existing orga")
+                print(organization_existing)
+                if organization_existing :
+                      return Response("entity already registered with same name", status=status.HTTP_400_BAD_REQUEST)
+            except:
+                pass
+  
+            organization.save()
+          
             try:
                 organization.save() # Could throw exception
             except IntegrityError:
@@ -163,7 +178,6 @@ class organizationListView(viewsets.ModelViewSet):
             for affiliation in affiliations:
                 affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
                 organization.affiliations.add(affiliation_obj)
-
             
             organization.save()
             #for manager in managers :
@@ -171,11 +185,8 @@ class organizationListView(viewsets.ModelViewSet):
               #  organization.manager.add(manager_obj)
         
         serialized_class = OrganizationSerializer(organization)
-
-        # self.perform_create(serializer)
         headers = self.get_success_headers(serialized_class.data)
         print(serialized_class.data)
-
         return Response(serialized_class.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
