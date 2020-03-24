@@ -104,7 +104,7 @@ let actions = {
         console.log(err)
       })
   },
-  
+
   updateEquipment ({ commit }, equipment) {
     ApiService
       .put(`api/equipment/${equipment.id}`, equipment, {
@@ -122,7 +122,7 @@ let actions = {
     console.log(axios.defaults.headers)
   },
 
-  updateEntity( {commit}, entity) {
+  updateEntity ({ commit }, entity) {
     ApiService
       .put(`api/organizations/${entity.id}/`, entity, {
         withCredentials: true
@@ -140,7 +140,6 @@ let actions = {
   },
 
   deleteEquipment ({ commit }, equipment) {
-   
     ApiService
       .delete(`api/equipments/${equipment.id}`)
       .then(res => {

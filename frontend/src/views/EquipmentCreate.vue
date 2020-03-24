@@ -73,27 +73,27 @@
 
 <script>
 export default {
-  name: "CreateEquipment",
-  data() {
+  name: 'CreateEquipment',
+  data () {
     return {
       equipment: {
-        title: "",
-        quantity: ""
+        title: '',
+        quantity: ''
       }
-    };
+    }
   },
 
   methods: {
-    createEquipment(equipment) {
-      this.$store.dispatch("createEquipment", equipment);
+    createEquipment (equipment) {
+      this.$store.dispatch('createEquipment', equipment)
     }
   },
   computed: {
-    isValid() {
-      return this.equipment.title !== "" && this.equipment.sku !== "";
+    isValid () {
+      return this.equipment.title !== '' && this.equipment.sku !== ''
     }
   }
-};
+}
 </script>
 
 <style scoped></style>

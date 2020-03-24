@@ -12,83 +12,73 @@
 
 <script>
 
-//selected --> init value //
+// selected --> init value //
 
 // eslint-disable-next-line no-unused-vars
-import { mapGetters, mapState } from "vuex";
-import Vue from "vue"
+import { mapGetters, mapState } from 'vuex'
 
 export default {
-  name: "categorie",
-   props: [
+  name: 'categorie',
+  props: [
     'value'
   ],
-  data() {
+  data () {
     return {
       option: '',
-      description: "",
-      sorting: "1"
+      description: '',
+      sorting: '1'
     }
   },
- 
- 
+
   methods: {
-   
-    isFamily(val) {
-            console.log(val.value.id)
-                  console.log(this.value)
 
-      let family_equipment = this.value.find(family => family.id == val.value.id);
-      return family_equipment ? 'selected' : ''
+    isFamily (val) {
+      console.log(val.value.id)
+      console.log(this.value)
+
+      let familyEquipment = this.value.find(family => family.id == val.value.id)
+      return familyEquipment ? 'selected' : ''
     },
 
-    emptySelect() {
+    emptySelect () {
       this.option = []
-      this.$emit('input', "" )
+      this.$emit('input', '')
     },
-    updateValue(value) {
-
+    updateValue (value) {
       console.log(value)
-     // this.option = value
-     //this.option.push( value)
-      this.$emit('input', this.option);
+      // this.option = value
+      // this.option.push( value)
+      this.$emit('input', this.option)
     }
-   
-  },
-  created() {
-    this.$store.dispatch("getCategories");
-     console.log(this.value)
-       // this.option = this.value
-  },
 
-  
- 
+  },
+  created () {
+    this.$store.dispatch('getCategories')
+    console.log(this.value)
+  },
 
   computed: {
     ...mapState({
       equipment: state => state.equipment,
       categories: state => state.categories
     }),
-     getCurrentFamilies() {
+    getCurrentFamilies () {
       return this.value
     },
 
-    
-   
-    familiesList() {
+    familiesList () {
       let families = []
       for (let i = 0; i <= this.categories.length - 1; i++) {
         let family = {
           text: this.categories[i].title,
           value: this.categories[i]
-        };
-        families.push(family);
+        }
+        families.push(family)
       }
 
-      return families;
-    },
+      return families
+    }
 
-    
   }
-};
+}
 </script>

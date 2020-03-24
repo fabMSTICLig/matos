@@ -1,35 +1,72 @@
+
 <template>
 <div>
-  <b-card-group rows v-if="update || add">
-        <h4>Création d'une entité</h4>
-        {{organization.affiliations}}
-        <b-form @submit.prevent="saveEntity">
-          <div class="form-group">
-            <label for="organame">nom</label
-            ><input
-              type="text"
-              name="organame"
-              v-model="organization.name"
-              placeholder="nom"
+      <h2>Gestion des entités</h2>
+       <b-row>
+      <b-col lg="4">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody v-if="orgas">
+            <tr v-for="entity in orgas" :key="entity.id">
+              <td>{{entity.name}}</td>
+              <td class="text-right">
+                <a href="#" @click.prevent="editEntity(entity)">Edit</a> -
+                <a href="#" @click.prevent="deleteEntity(entity.id)">Delete</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </b-col>
+      <b-col lg="3">
+        <b-card  v-if="update || add">
+          <b-form @submit.prevent="saveEntity">
+            <b-form-group
+              id="label-nom"
+              label="Nom"
+              label-for="name-input"
+            >
+            <b-form-input
+                type="text"
+                id="name-input"
+                name="organame"
+                v-model="organization.name"
+                placeholder="nom"
             />
-          </div>
-          <div class="form-group">
-            <b-form-group label="Affiliations">
-            <select multiple="false" v-model = "organization.affiliations" v-on:change="updateAffiliations($event.target.value)" v-if="organization.affiliations">
-              <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation" :selected="ownAffiliations(affiliation.id)">{{affiliation.name}}</option>
-            </select>
-          </b-form-group>
-          </div>
-          <div class="form-group">
-            <input type="email" placeholder="email contact" v-model="organization.contact">
-          </div>
+            </b-form-group>
+            <b-form-group
+              label="Affiliations"
+              label-for="select-affiliations"
+              >
+              <b-form-select multiple="multiple" id="select-affiliations" v-model = "affiliates" v-on:change="updateAffiliations($event)">
+                <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation" :selected="ownAffiliations(affiliation.id)">{{affiliation.name}}</option>
+              </b-form-select>
+            </b-form-group>
+            <b-form-group
+              label="contact"
+              label-for="contact-input">
+              <b-form-input
+                id="contact-input"
+                type="email"
+                placeholder="email contact"
+                v-model="organization.contact" />
+            </b-form-group>
 
-            <b-row>
-              <b-button class="float-right" type="submit" v-show="update" @click.prevent="saveEntity" variant="primary">Update</b-button>
-              <b-button class="float-right" type="submit" @click.prevent="saveEntity" v-show="add" variant="primary">Add</b-button>
-            </b-row>
-          </b-form>
-        </b-card-group>
+              <b-row>
+                <b-button class="float-right" type="submit" v-show="update" @click.prevent="saveEntity" variant="primary">Update</b-button>
+                <b-button class="float-right" type="submit" @click.prevent="saveEntity" v-show="add" variant="primary">Add</b-button>
+              </b-row>
+            </b-form>
+        </b-card>
+      </b-col>
+        <b-col lg="2">
+          <button class="btn btn-info" @click="createLink()">Add new one</button>
+        </b-col>
+       </b-row>
   </div>
 </template>
 
@@ -77,27 +114,38 @@ export default {
     updateManager (manager) {
       this.organization.managed = this.managed
     },
-    updateAffiliations (affiliations) {
+    updateAffiliations (evt) {
+      if (this.organization) {
+        console.log(evt)
+        this.organization.affiliations = evt
+      }
+    },
+    editEntity (entity) {
+      this.assignObject(entity)
+      // eslint-disable-next-line no-unused-vars
+      let id = entity.id
+      // eslint-disable-next-line standard/object-curly-even-spacing
+      this.$router.push({ path: `/admin/orgas/${id}` })
+    },
+    createLink () {
+      this.$router.push({ path: '/admin/orgas' })
     },
 
-    emptySelect () {
-      this.option = []
-      this.$emit('input', '')
-    },
-    // eslint-disable-next-line vue/return-in-computed-property
     ownAffiliations (id) {
       // eslint-disable-next-line no-undef
       // eslint-disable-next-line eqeqeq
-      let ownAffiliation = this.organization.affiliations.find(affiliation => affiliation.id == id)
-      console.log(ownAffiliation)
-      return ownAffiliation ? 'selected' : ''
+      if (this.organization.affiliations) {
+        let ownAffiliation = this.organization.affiliations.find(affiliation => affiliation.id == id)
+        console.log(ownAffiliation)
+        return ownAffiliation ? 'selected' : ''
+      } else {
+        return ''
+      }
     }
   },
 
   watch: {
     $route (to, from) {
-      console.log(to)
-
       if (this.$route.params.id) {
         this.update = true
         this.add = false
@@ -107,7 +155,6 @@ export default {
         this.object = Object.assign({}, this.organization)
       } if (!this.$route.params.id) {
         this.organization = {}
-        alert(this.organization)
       }
       this.object = Object.assign({}, this.organization)
     }

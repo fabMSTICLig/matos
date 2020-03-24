@@ -59,51 +59,45 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
-import categorie from "./Categorie.vue";
+import { mapGetters, mapState } from 'vuex'
+import categorie from './Categorie.vue'
 
 export default {
-  name: "EquipmentEdit",
-  data() {
+  name: 'EquipmentEdit',
+  data () {
     return {
-      organisation: "",
-      categorie: ""
-    };
-  },
-  methods: {
-    /**findEquipment () {
-      console.log(this.equipments)
-      this.equipment = this.equipments.find(equipment => {
-        // eslint-disable-next-line eqeqeq
-        return equipment.id == this.$route.params.id
-      })
-    },**/
-    updateEquipment(equipment) {
-      console.log(this.equipment)
-      this.$store.dispatch("updateEquipment", equipment);
+      organisation: '',
+      categorie: ''
     }
   },
-  mounted() {
-    this.$store.dispatch("fetchEquipments");
+  methods: {
+
+    updateEquipment (equipment) {
+      console.log(this.equipment)
+      this.$store.dispatch('updateEquipment', equipment)
+    }
+  },
+  mounted () {
+    this.$store.dispatch('fetchEquipments')
   },
   components: {
     categorie
   },
   computed: {
-    equipment() {
-      console.log("equipement");
+    equipment () {
+      console.log('equipement')
       return (
         this.equipments.find(
           equipement => equipement.id == this.$route.params.id
         ) || {}
-      );
+      )
     },
-    ...mapGetters(["equipments"]),
+    ...mapGetters(['equipments']),
     ...mapState({
       equipments: state => state.equipments
     })
   }
-};
+}
 </script>
 
 <style scoped></style>

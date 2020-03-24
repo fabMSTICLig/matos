@@ -21,7 +21,7 @@ export default {
     }
   },
   methods: {
-    
+
   },
 
   components: {
@@ -35,7 +35,6 @@ export default {
   created () {
     this.$store.dispatch(FETCH_ORGAS)
   },
-
 
   computed: {
 

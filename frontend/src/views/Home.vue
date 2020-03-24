@@ -6,17 +6,13 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import Organization from "./Organization.vue";
 
 export default {
-  name: "Home",
+  name: 'Home',
 
-  
   components: {
-    Organization,
-    
+
   }
-  
-};
+
+}
 </script>

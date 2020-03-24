@@ -28,38 +28,35 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import Organization from "./Organization.vue";
+import { mapGetters } from 'vuex'
+import Organization from './Organization.vue'
 
 export default {
-  name: "EquipmentList",
+  name: 'EquipmentList',
 
   methods: {
-    deleteEquipment(equipment) {
-      this.$store.dispatch("deleteEquipment", equipment);
+    deleteEquipment (equipment) {
+      this.$store.dispatch('deleteEquipment', equipment)
     },
-    idList(index) {
+    idList (index) {
       return String(index)
     },
-     itemLink(index) {
-      return "/equipment/"+index
+    itemLink (index) {
+      return '/equipment/' + index
     }
 
   },
 
-  mounted() {
-    this.$store.dispatch("fetchEquipments");
+  mounted () {
+    this.$store.dispatch('fetchEquipments')
   },
 
   components: {
-    Organization,
-    
+
   },
   computed: {
-    ...mapGetters(["equipments"]),
+    ...mapGetters(['equipments'])
 
-   
-    
   }
-};
+}
 </script>
