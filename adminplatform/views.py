@@ -133,6 +133,13 @@ class organizationListView(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
+    #Helper method to get a person
+    def get_organization(self, pk):
+        try:
+            return Organization.objects.get(pk=pk)
+        except Organization.DoesNotExist:
+            raise Http404
+
     def get_permissions(self):
         print(self.action)
         if self.action == 'list':
@@ -142,6 +149,37 @@ class organizationListView(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
+
+    def update(self, request, *args, **kwargs):
+        if(not request.user.is_staff):
+            raise PermissionDenied("You are not allowed to perform this action")
+
+        print(request)
+        print("update organization")
+        organization_id = self.request.data['id']
+        organization = self.get_organization(organization_id)
+        organization.name = self.request.data['name']
+        organization.description = self.request.data['description']
+        organization.contact = self.request.data['contact']
+        organization_managers = self.request.data['managed']
+        organization_affiliates = self.request.data['affiliations']
+
+        organization.affiliations.clear()
+
+        for affiliation in organization_affiliates :
+            affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
+            organization.affiliations.add(affiliation_obj)
+        
+        organization.managed.clear()
+
+        for manager in organization_managers :
+            manager_obj = Person.objects.get(pk=manager['id'])
+            organization.managed.add(manager_obj)
+
+        organization.save() 
+        print(organization.name)
+
+        return self.get(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         """
@@ -157,14 +195,15 @@ class organizationListView(viewsets.ModelViewSet):
             organization = Organization()
             organization.name = data['name']
             organization.contact = data['contact']
-            affiliations = data['affiliations']
-
+            #affiliations = data['affiliations']
+            print(organization.name)
+            print(Organization.objects.filter(name=organization.name))
             try:
                 organization_existing = Organization.objects.get(name=organization.name)
                 print("existing orga")
                 print(organization_existing)
                 if organization_existing :
-                      return Response("entity already registered with same name", status=status.HTTP_400_BAD_REQUEST)
+                    return Response("entity already registered with same name", status=status.HTTP_400_BAD_REQUEST)
             except:
                 pass
   
@@ -175,16 +214,16 @@ class organizationListView(viewsets.ModelViewSet):
             except IntegrityError:
                 transaction.rollback()
 
-            for affiliation in affiliations:
-                affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
-                organization.affiliations.add(affiliation_obj)
+            #for affiliation in affiliations:
+               # affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
+              #  organization.affiliations.add(affiliation_obj)
             
             organization.save()
             #for manager in managers :
              #   manager_obj = User.objects.get(pk=manager['id'])
               #  organization.manager.add(manager_obj)
         
-        serialized_class = OrganizationSerializer(organization)
+        serialized_class = OrganizationCreateSerializer(organization)
         headers = self.get_success_headers(serialized_class.data)
         print(serialized_class.data)
         return Response(serialized_class.data, status=status.HTTP_201_CREATED, headers=headers)

@@ -31,6 +31,7 @@ router.registry.extend(adminrouter.registry)
 urlpatterns = [
     url(r'^$', view=TemplateView.as_view(template_name='index.html')),
     path('admin/', admin.site.urls),
+    path('auth/', include('django.contrib.auth.urls')),
     path('api/login',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
     path('api/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     url(r'^home/', index),

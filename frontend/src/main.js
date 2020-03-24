@@ -17,17 +17,15 @@ Vue.use(BootstrapVueIcons)
 ApiService.init()
 
 Vue.config.productionTip = false
-//Ensure we checked auth before each page load.
+
 router.beforeEach((to, from, next) => {
   Promise.all([store.dispatch(CHECK_AUTH)])
-      .then(next)
-      .catch(next)
-});
+    .then(next)
+    .catch(next)
+})
 
+Vue.config.devtools = true
 sync(store, router)
-
-
-
 
 new Vue({
   router,

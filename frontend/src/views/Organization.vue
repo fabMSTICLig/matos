@@ -1,131 +1,149 @@
 <template>
-<div class="grid-2">
-  <choice :items="entities" :title="listEntities"></choice>
-  <div v-show="!isEmpty" class="align-form">
-    <form  @submit="saveObject(entity)">
-      <div class="form-group">
-        <label>Nom </label>
-        <input
-          type="text"
-          class="form-control"
-          v-model="entity.name"
-          placeholder="entity.name"
-        />
-        <label>Email </label
-        ><input
-          type="email"
-          class="form-control"
-          v-model="entity.contact"
-          placeholder="entity.contact"
-        />
-        <label>Description </label
-        ><textarea
-          class="form-control"
-          v-model="entity.description"
-          placeholder="entity.description"
-        ></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary" @click.prevent="saveObject(entity)" >Submit</button>
-    </form>
+<div>
+  <b-card-group rows v-if="update || add">
+        <h4>Création d'une entité</h4>
+        {{organization.affiliations}}
+        <b-form @submit.prevent="saveEntity">
+          <div class="form-group">
+            <label for="organame">nom</label
+            ><input
+              type="text"
+              name="organame"
+              v-model="organization.name"
+              placeholder="nom"
+            />
+          </div>
+          <div class="form-group">
+            <b-form-group label="Affiliations">
+            <select multiple="false" v-model = "organization.affiliations" v-on:change="updateAffiliations($event.target.value)" v-if="organization.affiliations">
+              <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation" :selected="ownAffiliations(affiliation.id)">{{affiliation.name}}</option>
+            </select>
+          </b-form-group>
+          </div>
+          <div class="form-group">
+            <input type="email" placeholder="email contact" v-model="organization.contact">
+          </div>
+
+            <b-row>
+              <b-button class="float-right" type="submit" v-show="update" @click.prevent="saveEntity" variant="primary">Update</b-button>
+              <b-button class="float-right" type="submit" @click.prevent="saveEntity" v-show="add" variant="primary">Add</b-button>
+            </b-row>
+          </b-form>
+        </b-card-group>
   </div>
-</div>
 </template>
 
 <script>
 // eslint-disable-next-line no-unused-vars
-import { mapGetters, mapState } from "vuex";
-import { FETCH_ORGAS, UPDATE_ORGA } from "@/store/actions.type"
+import { mapGetters, mapState } from 'vuex'
+import { EditorMixin } from '@/common/mixins'
 
-import choice from "@/components/choice"
+import {
+  FETCH_ORGAS,
+  FETCH_AFFILIATIONS,
+  CREATE_ORGA,
+  FETCH_USERS,
+  GET_ORGA,
+  UPDATE_ORGA
+} from '@/store/actions.type'
 
 export default {
-  name: "Organization",
+  mixins: [EditorMixin],
+  name: 'Organization',
+  components: {},
 
-  data() {
+  data () {
     return {
-      sorting: "1",
-      listEntities: "Liste entités"
-    };
-  },
-
-  props: {
-    organization: {
-      type: Number,
-      default() {
-        return 0;
-      }
+      organization: this.organization || {},
+      actions: {
+        GET: GET_ORGA,
+        UPDATE: UPDATE_ORGA,
+        CREATE: CREATE_ORGA,
+        FETCH: FETCH_ORGAS
+      },
+      objectName: 'Entity',
+      affiliates: []
     }
   },
-
-  components: {
-    choice
-    // eslint-disable-next-line no-unused-expressions
-  },
-
-  methods: {
-    saveObject(entity) {
-      console.log('update entity')
-      this.$store.dispatch(UPDATE_ORGA, { id: entity.id, data: entity }).then((entity) => {
-            console.log('organisation mise a jour')
-          });
-    }
-  },
- 
-
   computed: {
-    items() {
-      return [
-        this.entity.name,
-        "Utilisateurs",
-        "Prêts en cours",
-        "Historique de prêts",
-        "Matériels"
-      ];
+    ...mapGetters([ 'orgas', 'affiliations', 'users' ])
+
+  },
+  methods: {
+    saveEntity (EventForm) {
+      this.assignObject(this.organization)
+      this.saveObject(EventForm)
+    },
+    updateManager (manager) {
+      this.organization.managed = this.managed
+    },
+    updateAffiliations (affiliations) {
     },
 
-    isEmpty() {
-      console.log(Object.keys(this.entity).length === 0)
-      return Object.keys(this.entity).length === 0
+    emptySelect () {
+      this.option = []
+      this.$emit('input', '')
     },
+    // eslint-disable-next-line vue/return-in-computed-property
+    ownAffiliations (id) {
+      // eslint-disable-next-line no-undef
+      // eslint-disable-next-line eqeqeq
+      let ownAffiliation = this.organization.affiliations.find(affiliation => affiliation.id == id)
+      console.log(ownAffiliation)
+      return ownAffiliation ? 'selected' : ''
+    }
+  },
 
-    entities() {
-      let entities = []
-      for(let i=0; i<=this.orgas.length -1 ; i++) {
-        entities[i] = { link: `/manage/entity/${this.orgas[i].id}`, name: this.orgas[i].name }
+  watch: {
+    $route (to, from) {
+      console.log(to)
+
+      if (this.$route.params.id) {
+        this.update = true
+        this.add = false
+        let idRoute = this.$route.params.id
+        // eslint-disable-next-line eqeqeq
+        this.organization = this.orgas.find(organization => organization.id == idRoute) || {}
+        this.object = Object.assign({}, this.organization)
+      } if (!this.$route.params.id) {
+        this.organization = {}
+        alert(this.organization)
       }
-      return entities      
-    },
-
-    entity() {
-      console.log(this.organization)
-      return this.orgas.find( orga => orga.id == this.$route.params.id) || {}
-      
-    },
-
-    ...mapGetters(['orgas']),
-
-    ...mapState({
-      equipment: state => state.equipment,
-      organizations: state => state.orgas
-    }),
-    sortKey: {
-      get: function() {
-        return this.sorting.split(" ")[0]; // return the key part
-      }
-    },
-    sortOrder: {
-      get: function() {
-        return this.sorting.split(" ")[1]; // return the order part
-      }
+      this.object = Object.assign({}, this.organization)
     }
   },
 
   beforeMount () {
     this.$store.dispatch(FETCH_ORGAS)
-  },
+    this.$store.dispatch(FETCH_AFFILIATIONS)
+    this.$store.dispatch(FETCH_USERS)
+    this.object = Object.assign({}, this.organization)
 
-  render(h) {
-    return this.$route == "manage" ? h("organization") : h("home");
+    // eslint-disable-next-line eqeqeq
+    if (!this.$route.params.id) {
+      this.add = true
+      console.log(this.object)
+    }
+    if (this.$route.params.id) {
+      this.update = true
+      this.add = false
+      let idRoute = this.$route.params.id
+      this.$store.dispatch(FETCH_ORGAS).then(orgas => {
+        // eslint-disable-next-line eqeqeq
+        this.organization = orgas.find(organization => organization.id == idRoute) || {}
+        this.object = Object.assign({}, this.organization)
+        console.log('creation')
+        console.log(this.object)
+      })
+    }
+  },
+  created () {
+    this.$store.dispatch(FETCH_ORGAS)
+
+    if (this.$route.params.id) {
+      this.update = true
+      this.add = false
+    }
   }
-};
+}
 </script>

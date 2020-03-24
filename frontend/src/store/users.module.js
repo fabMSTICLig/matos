@@ -1,5 +1,5 @@
-import ApiService from "@/common/api.service"
-import { DataHelper } from "../common/helpers"
+import ApiService from '@/common/api.service'
+import { DataHelper } from '../common/helpers'
 
 import {
   FETCH_USERS,
@@ -8,27 +8,27 @@ import {
   CREATE_USER
 } from './actions.type'
 
-import { SET_USERS, SET_USER, ADD_USER } from './mutations.type'
+import { SET_USERS, SET_USER } from './mutations.type'
 
 export const state = {
-  users: [],
+  users: []
 }
 const getters = {
-    users (state) {
-        return state.users
-    }
+  users (state) {
+    return state.users
+  }
 }
 
 export const actions = {
   [FETCH_USERS] (context, force = false) {
+    // eslint-disable-next-line eqeqeq
     if (context.state.users.length == 0 || force) {
       return ApiService.get('api/users')
         .then(({ data }) => {
           context.commit(SET_USERS, data)
           return data
         })
-    }
-    else {
+    } else {
       return Promise.resolve(context.state.families)
     }
   },

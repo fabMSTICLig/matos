@@ -94,7 +94,7 @@ class productInstanceListView(viewsets.ModelViewSet):
     serializer_class = ProductInstanceSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     
-class organizationDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
+class organizationDetail(APIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -107,13 +107,16 @@ class organizationDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixin
         return self.retrieve(request, *args,**kwargs) 
 
     def put(self, request, *args, **kwargs):
+        print("put")
         return self.update(request, *args,**kwargs) 
     
     def get_object(self, pk):
         return Organization.objects.get(pk=pk)
-
+    
     def patch(self, request, pk):
         instance_object = self.get_object(pk)
+        print(request)
+        print('patch')
         serializer = OrganizationSerializer(instance_object, data=request.data, partial=True) # set partial=True to update a data partially
         if serializer.is_valid():
             serializer.save()

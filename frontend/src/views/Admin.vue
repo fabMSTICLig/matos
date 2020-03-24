@@ -1,157 +1,99 @@
 <template>
-  <div>
-    <b-card-group rows v-if="update || add">
-      <h4>Création d'une entité</h4>
-      <b-form @submit="saveEntity()">
-        <div class="form-group">
-          <label for="organame">nom</label
-          ><input
-            type="text"
-            name="organame"
-            v-model="organization.name"
-            placeholder="nom"
-          />
-        </div>
-        <div class="form-group">
-           <b-form-group label="Affiliations">
-          <select multiple="false" v-model="affiliates" v-on:change="updateAffiliations($event.target.value)">
-            <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation">{{affiliation.name}}</option>
-          </select>
-        </b-form-group>
-        </div>
-        <div class="form-group">
-          <input type="email" placeholder="email contact" v-model="organization.contact">
-        </div>
-
-          <b-row>
-            <b-button class="float-right" type="submit" v-show="update" @click.prevent="saveObject" variant="primary">Update</b-button>
-            <b-button class="float-right" type="submit" @click.prevent="saveEntity()" v-show="add" variant="primary">Add</b-button>
-          </b-row>
-        </b-form>
-            
-      
-    </b-card-group>
+  <div class="container-fluid mt-4">
+    <h2>Gestion des entités</h2>
+       <b-row>
+      <b-col>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>&nbsp;</th>
+            </tr>
+          </thead>
+          <tbody v-if="orgas">
+            <tr v-for="entity in orgas" :key="entity.id">
+              <td>{{entity.name}}</td>
+              <td class="text-right">
+                <a href="#" @click.prevent="editEntity(entity)">Edit</a> -
+                <a href="#" @click.prevent="deleteEntity(entity.id)">Delete</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </b-col>
+      <b-col lg="3">
+          <organization v-if="orga" organization="organization"></organization>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
 // eslint-disable-next-line no-unused-vars
-import { mapGetters, mapState } from "vuex"
-import { EditorMixin } from "@/common/mixins";
+import { mapGetters, mapState } from 'vuex'
+import { EditorMixin } from '@/common/mixins'
+import Organization from './Organization'
 
 import {
   FETCH_ORGAS,
-  FETCH_AFFILIATIONS,
-  CREATE_ORGA,
-  FETCH_USERS
-} from "@/store/actions.type";
-import { GET_ORGA, UPDATE_ORGA } from '../../../../fac-manager/facmanager/src/store/actions.type';
+  // eslint-disable-next-line no-unused-vars
+  FETCH_AFFILIATIONS
+} from '@/store/actions.type'
 
 export default {
   mixins: [EditorMixin],
-  name: "Admin",
-  components: {},
+  name: 'Admin',
+  components: {
+    Organization
+  },
   data () {
     return {
-      EmptyObject: { name: null, contact: null, affiliations: [] },
-      organization: {
-         type: Object,
-         default:''
-      },
+      organization: this.organization || {},
 
       actions: {
-        GET: GET_ORGA,
-        UPDATE: UPDATE_ORGA,
-        CREATE: CREATE_ORGA,
         FETCH: FETCH_ORGAS
-      },
-      objectName:'Entity',
-      affiliates: []
-    };
+      }
+    }
   },
   computed: {
-    ...mapGetters(["orgas", "affiliations","users"]),
-        
+    ...mapGetters([ 'orgas', 'affiliations', 'users' ])
+
+  },
+  watch: {
+    $route (to, from) {
+      console.log(to)
+
+      if (this.$route.params.id) {
+        this.update = true
+        this.add = false
+        let idRoute = this.$route.params.id
+        // eslint-disable-next-line eqeqeq
+        this.organization = this.orgas.find(organization => organization.id == idRoute) || {}
+      } if (!this.$route.params.id) {
+        this.organization = {}
+        // eslint-disable-next-line standard/object-curly-even-spacing
+      }
+      this.object = Object.assign({}, this.organization)
+    }
   },
   methods: {
-    saveEntity () {
-      console.log("update entity");
-
-        this.$store.dispatch(CREATE_ORGA, { data: this.organization }).then(entity => {
-        console.log(entity)
-        this.add = false
-        this.$router.push({ name: 'update-orga', params: { id: entity.id } })
-      }).catch(e =>  {
-          if(e.response.status === 400 ){
-              console.log(e.response)
-
-              this.$bvModal.msgBoxOk(e.response.data)
-          }
-      })
-    },
-    updateManager (manager) {
-      this.organization.managed = this.managed
-    },
-    updateAffiliations (affiliations) {
-      this.organization.affiliations = this.affiliates
+    orga () {
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      // eslint-disable-next-line eqeqeq
+      this.organization = this.orgas.find(orga => orga.id == 18)
+      return this.organization
     },
 
-    emptySelect () {
-      this.option = []
-      this.$emit('input', "" )
+    editEntity (entity) {
+      this.assignObject(entity)
+      // eslint-disable-next-line no-unused-vars
+      let id = entity.id
+      // eslint-disable-next-line standard/object-curly-even-spacing
+      this.$router.push({ path: `/admin/orgas/${id}` })
     }
   },
 
-  watch:{
-    $route(to, from) {
-      console.log(to)
-       if (this.$route.params.id) {
-      this.update = true
-      this.add = false
-      let idRoute = this.$route.params.id
-      this.organization = this.orgas.find(organization => organization.id == idRoute ) || {}
-      this.object = Object.assign({}, this.organization);
+  mounted () { }
 
-      }
-    }
-  },
-
-  beforeMount () {
-    this.$store.dispatch(FETCH_ORGAS)
-    this.$store.dispatch(FETCH_AFFILIATIONS)
-    this.$store.dispatch(FETCH_USERS)
-    this.object = Object.assign({}, this.organization)
-    
-    
-
-    if (!this.$route.params.id) {
-       this.add = true
-        console.log(this.object)
-    }
-     if (this.$route.params.id) {
-      this.update = true
-      this.add = false
-      let idRoute = this.$route.params.id
-      this.organization = this.orgas.find(organization => organization.id == idRoute ) || {}
-      this.object = Object.assign({}, this.organization);
-
-      }
-   
-
-  },
-  created() {
-    if (this.$route.params.id) {
-      this.update = true
-      this.add = false
-      let idRoute = this.$route.params.id
-      this.$store.dispatch(FETCH_ORGAS).then( orgas => {
-              this.organization = this.orgas.find(organization => organization.id == idRoute ) || {}
-
-      })
-
-      this.object = Object.assign({}, this.organization);
-
-      }
-  }
-};
+}
 </script>

@@ -1,6 +1,6 @@
-import ApiService from "@/common/api.service"
-import { DataHelper } from "../common/helpers"
-
+import ApiService from '@/common/api.service'
+import { DataHelper } from '../common/helpers'
+import Vue from 'vue'
 import {
   FETCH_ORGAS,
   UPDATE_ORGA,
@@ -11,17 +11,20 @@ import {
 
 import { SET_ORGAS, SET_ORGA } from './mutations.type'
 
+Vue.config.devtools = true
+
 export const state = {
   orgas: []
 }
 const getters = {
   orgas (state) {
     return state.orgas
-  } 
+  }
 }
 
 export const actions = {
   [FETCH_ORGAS] (context, force = false) {
+    // eslint-disable-next-line eqeqeq
     if (context.state.orgas.length == 0 || force) {
       return ApiService.query('gestion/organizations', {})
         .then(({ data }) => {
@@ -42,13 +45,14 @@ export const actions = {
     })
   },
   [UPDATE_ORGA] (context, { id, data }) {
-    console.log("update orga")
+    console.log('update orga')
     return ApiService.update('gestion/organizations', id, data).then(({ data }) => {
       context.commit(SET_ORGA, data)
       console.log(data)
       return data
     })
   },
+
   [CREATE_ORGA] (context, { data }) {
     return ApiService.post('gestion/organizations/', data).then(({ data }) => {
       context.commit(SET_ORGA, data)
@@ -61,8 +65,8 @@ export const actions = {
       contact: '',
       orga_type: ''
     })
-  },
-  
+  }
+
 }
 
 /* eslint no-param-reassign: ["error", { "props": false }] */
