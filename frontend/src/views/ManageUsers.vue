@@ -46,6 +46,7 @@ export default {
     entity () {
       return (
         this.organizations.find(
+          // eslint-disable-next-line eqeqeq
           organization => organization.id == this.organization
         ) || {}
       )

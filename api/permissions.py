@@ -20,3 +20,9 @@ class IsAdminOrIsSelf(permissions.BasePermission):
 class IsManagerOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_manager or request.method in permissions.SAFE_METHODS
+
+class IsManager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user and request.user.groups.filter(name='manager'):
+            return True
+        return False

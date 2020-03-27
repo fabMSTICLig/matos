@@ -29,7 +29,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Organization from './Organization.vue'
 
 export default {
   name: 'EquipmentList',

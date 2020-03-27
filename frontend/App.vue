@@ -7,17 +7,17 @@
             <router-link tag='a' v-if='isAdmin' class='button-head' class-active='active' to='/admin/orgas' exact>Organisations</router-link>
           </div>
           <div class='nav-header'>
-            <div v-if='!isAuthenticated' class='auth-nav'>
-              <b-link href='/api/login'  class='button-head-sub'>login CAS</b-link>
+            <div v-if='!isAuthenticated'>
+              <a href='/api/login'  class='button-head-sub'>login CAS</a>
             </div>
-            <div v-if='isAuthenticated' class='auth-nav'>
-              <b-link href='/api/self' class='button-head-sub'>{{authUser.username}}</b-link>
+            <div v-if='isAuthenticated'>
+              <a href='/api/self'  class='button-head-sub'>{{authUser.username}}</a>
             </div>
-            <div v-if='isAuthenticated' class='auth-nav'>
-              <b-link href="authUser.externe ? '/api/logout' : '/api/logout'" >Log out</b-link>
+            <div v-if='isAuthenticated'>
+              <a :href='authUser.externe ? '/api/logout' : '/auth/logout'' >Log out</a>
             </div>
-            <div v-if='!isAuthenticated' class='auth-nav'>
-              <b-link href='/auth/login' class='button-head-sub'>login</b-link>
+            <div v-if='!isAuthenticated'>
+              <a href='/auth/login' class='button-head-sub'>login</a>
             </div>
           </div>
         </div>

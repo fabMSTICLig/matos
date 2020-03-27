@@ -55,7 +55,6 @@ a.button-head-sub:hover, a.button-head:hover, .router-link-active {
 
 .nav-header > div {
     margin:10px;
-    height: 100%;
 }
 
 .small-form {
@@ -143,4 +142,13 @@ select[multiple] {
     margin-left: auto;
     margin-right: auto;
     width: 250px;
+}
+
+.auth-nav {
+    vertical-align: bottom;
+    margin: 0 auto;
+}
+
+.auth-nav a {
+    color: #fff;
 }

@@ -88,6 +88,7 @@ export default {
       console.log('equipement')
       return (
         this.equipments.find(
+          // eslint-disable-next-line eqeqeq
           equipement => equipement.id == this.$route.params.id
         ) || {}
       )

@@ -3,9 +3,9 @@ from .views import UserViewSet, SelfView, AffiliationViewSet, organizationListVi
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'gestion/users', UserViewSet)
-router.register(r'gestion/organizations', organizationListView)
-router.register(r'gestion/affiliations', AffiliationViewSet)
+router.register(r'api/gestion/users', UserViewSet)
+router.register(r'api/gestion/organizations', organizationListView)
+router.register(r'api/gestion/affiliations', AffiliationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -18,7 +18,7 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import *
 from api.forms import  OrganizationForm
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
@@ -28,6 +28,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from django.contrib.auth.models import Permission
 from django.contrib.auth.decorators import permission_required
+from .permissions import *
 
 @api_view(["GET"])
 def index(request):
@@ -97,10 +98,12 @@ class productInstanceListView(viewsets.ModelViewSet):
 class organizationDetail(APIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsManager)
 
-    @permission_required('manage_entity')
+
     def get(self, request, *args, **kwargs):
+        permission_classes = (IsManager)
+
         data=self.retrieve(request, *args,**kwargs)
         user=get_user(request)
         print(user.has_perm('manage_entity'))
@@ -221,11 +224,6 @@ class transaction_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixin
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)  
 
-class Ismanager(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.user and request.user.groups.filter(name='manager'):
-            return True
-        return False
 
 class UserInstanceView(APIView):
     @csrf_exempt

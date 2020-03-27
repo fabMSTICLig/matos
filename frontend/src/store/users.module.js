@@ -23,7 +23,7 @@ export const actions = {
   [FETCH_USERS] (context, force = false) {
     // eslint-disable-next-line eqeqeq
     if (context.state.users.length == 0 || force) {
-      return ApiService.get('api/users')
+      return ApiService.get('/users')
         .then(({ data }) => {
           context.commit(SET_USERS, data)
           return data
@@ -33,19 +33,19 @@ export const actions = {
     }
   },
   [GET_USER] (context, index) {
-    return ApiService.get('api/users', index).then(({ data }) => {
+    return ApiService.get('/users', index).then(({ data }) => {
       context.commit(SET_USER, data)
       return data
     })
   },
   [UPDATE_USER] (context, { id, data }) {
-    return ApiService.update('api/users/', id, data).then(({ data }) => {
+    return ApiService.update('/users/', id, data).then(({ data }) => {
       context.commit(SET_USER, data)
       return data
     })
   },
   [CREATE_USER] (context, { data }) {
-    return ApiService.post('api/users', data).then(({ data }) => {
+    return ApiService.post('/users', data).then(({ data }) => {
       context.commit(SET_USER, data)
       return data
     })

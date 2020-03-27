@@ -1,8 +1,6 @@
 <template>
-  <div class="container-fluid mt-4">
-
+  <div v-if="isAdmin" class="container-fluid mt-4">
           <organization v-if="orga" organization="organization"></organization>
-
   </div>
 </template>
 
@@ -34,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([ 'orgas', 'affiliations', 'users' ])
+    ...mapGetters([ 'orgas', 'affiliations', 'users', 'isAdmin' ])
 
   },
 
@@ -45,7 +43,6 @@ export default {
       this.organization = this.orgas.find(orga => orga.id == 18)
       return this.organization
     }
-
   },
 
   mounted () { }
