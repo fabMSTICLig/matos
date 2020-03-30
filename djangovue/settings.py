@@ -15,18 +15,22 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+os.system('python3 '+BASE_DIR+'/secret-key-gen.py')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'a7s&k8xgjh=z-%^cho%o8wmw)9!=g+es-fg1)2jjun#22&lzf6'
+with open(BASE_DIR+'/config/secret-key.txt') as f:
+    SECRET_KEY = f.read().strip()
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+print(SECRET_KEY)
 
-ALLOWED_HOSTS = ['localhost']
 
+try:
+    from .local_settings import *
+except ImportError:
+    print('error import local settings')
 
 # Application definition
 
@@ -181,24 +185,15 @@ STATICFILES_DIRS = [
 
 CORS_ORIGIN_ALLOW_ALL = False
 
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
+
+
 try:
     from .local_settings import *
 except ImportError:
     print('error import local settings')
-
-CORS_ALLOW_CREDENTIALS = True
-
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:8080',
-    'http://localhost:8081'
-]
-CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://localhost:8080',
-    'http://localhost:8081'
-]
-
-CSRF_COOKIE_DOMAIN="localhost"
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE=True
-
-DEBUG=True

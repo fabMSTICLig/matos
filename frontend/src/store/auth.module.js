@@ -17,13 +17,25 @@ const getters = {
     return state.authUser
   },
   isAuthenticated (state) {
-    return !!state.authUser.username
+    if (state.authUser) {
+      return !!state.authUser.username
+    } else {
+      return false
+    }
   },
   isAdmin (state) {
-    return state.authUser.is_staff
+    if (state.authUser) {
+      return state.authUser.is_staff || false
+    } else {
+      return false
+    }
   },
   isManager (state) {
-    return state.authUser.is_manager
+    if (state.authUser) {
+      return state.authUser.is_manager || false
+    } else {
+      return false
+    }
   }
 }
 
