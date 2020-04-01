@@ -65,6 +65,7 @@ export const actions = {
   [CREATE_ORGA] (context, { data }) {
     return ApiService.post('gestion/organizations/', data).then(({ data }) => {
       context.commit(SET_ORGA, data)
+      console.log(data)
       return data
     })
   },

@@ -70,6 +70,7 @@ export const EditorMixin = {
             console.log(this.objectName + ' created')
             this.$bvModal.msgBoxOk(this.objectName + ' created')
             this.waiting = false
+            this.$router.push({ path: `${this.object.id}` })
           })
           .catch(e => {
             this.handleErrors(e)

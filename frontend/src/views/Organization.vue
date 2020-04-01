@@ -110,9 +110,11 @@ export default {
 
   },
   methods: {
-    saveEntity (EventForm) {
+    async saveEntity (EventForm) {
       this.assignObject(this.organization)
-      this.saveObject(EventForm)
+      await this.saveObject(EventForm)
+      console.log('entite cree')
+      console.log(this.object)
     },
     updateManager (manager) {
       this.organization.managed = this.managed
@@ -137,7 +139,7 @@ export default {
       this.affiliates = []
     },
     createLink () {
-      this.$router.push({ path: '/admin/orgas' })
+      this.$router.push({ name: 'admin-orga' })
     },
 
     ownAffiliations (id) {
@@ -168,6 +170,7 @@ export default {
         this.affiliates = this.organization.affiliations
       } if (!this.$route.params.id) {
         this.organization = {}
+        this.add = true
       }
       this.object = Object.assign({}, this.organization)
     }
