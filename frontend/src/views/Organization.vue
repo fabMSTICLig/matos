@@ -42,7 +42,7 @@
               label="Affiliations"
               label-for="select-affiliations"
               >
-              <b-form-select multiple="multiple" id="select-affiliations" v-model = "affiliates" v-on:change="updateAffiliations($event)">
+              <b-form-select multiple="multiple" id="select-affiliations" v-model = "affiliates" v-on:change="updateAffiliations($event)" v-if="affiliates">
                 <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation" :selected="ownAffiliations(affiliation.id)">{{affiliation.name}}</option>
               </b-form-select>
             </b-form-group>
@@ -56,11 +56,12 @@
                 v-model="organization.contact" />
             </b-form-group>
 
-              <b-row>
-                <b-button class="float-right" type="submit" v-show="update" @click.prevent="saveEntity" variant="primary">Update</b-button>
-                <b-button class="float-right" type="submit" @click.prevent="saveEntity" v-show="add" variant="primary">Add</b-button>
+              <b-row id="actions-btn">
+                <b-button type="submit" v-show="update" @click.prevent="saveEntity" variant="primary">Update</b-button>
+                <b-button  type="submit" @click.prevent="saveEntity" v-show="add" variant="primary">Add</b-button>
+                <b-button id="unselect-btn" variant="outline-primary" @click="deselectAffiliates">Deselect all</b-button>
               </b-row>
-            </b-form>
+           </b-form>
         </b-card>
       </b-col>
         <b-col lg="2">
@@ -81,7 +82,8 @@ import {
   CREATE_ORGA,
   FETCH_USERS,
   GET_ORGA,
-  UPDATE_ORGA
+  UPDATE_ORGA,
+  DELETE_ORGA
 } from '@/store/actions.type'
 
 export default {
@@ -96,7 +98,8 @@ export default {
         GET: GET_ORGA,
         UPDATE: UPDATE_ORGA,
         CREATE: CREATE_ORGA,
-        FETCH: FETCH_ORGAS
+        FETCH: FETCH_ORGAS,
+        DELETE: DELETE_ORGA
       },
       objectName: 'Entity',
       affiliates: []
@@ -127,17 +130,26 @@ export default {
       // eslint-disable-next-line standard/object-curly-even-spacing
       this.$router.push({ path: `/admin/orgas/${id}` })
     },
+    deleteEntity (id) {
+      this.deleteObject(id)
+    },
+    deselectAffiliates () {
+      this.affiliates = []
+    },
     createLink () {
       this.$router.push({ path: '/admin/orgas' })
     },
 
     ownAffiliations (id) {
-      // eslint-disable-next-line no-undef
       // eslint-disable-next-line eqeqeq
       if (this.organization.affiliations) {
+        console.log(this.organization.affiliations)
+        console.log('id')
+        console.log(id)
+        // eslint-disable-next-line eqeqeq
         let ownAffiliation = this.organization.affiliations.find(affiliation => affiliation.id == id)
-        console.log(ownAffiliation)
-        return ownAffiliation ? 'selected' : ''
+        console.log(ownAffiliation ? 'true' : '')
+        return ownAffiliation ? 'true' : ''
       } else {
         return ''
       }
@@ -153,6 +165,7 @@ export default {
         // eslint-disable-next-line eqeqeq
         this.organization = this.orgas.find(organization => organization.id == idRoute) || {}
         this.object = Object.assign({}, this.organization)
+        this.affiliates = this.organization.affiliations
       } if (!this.$route.params.id) {
         this.organization = {}
       }
@@ -179,6 +192,7 @@ export default {
         // eslint-disable-next-line eqeqeq
         this.organization = orgas.find(organization => organization.id == idRoute) || {}
         this.object = Object.assign({}, this.organization)
+        this.affiliates = this.organization.affiliations
         console.log('creation')
         console.log(this.object)
       })
@@ -190,7 +204,21 @@ export default {
     if (this.$route.params.id) {
       this.update = true
       this.add = false
+      this.affiliates = this.organization.affiliations
     }
   }
 }
 </script>
+<style scoped>
+ #unselect-btn {
+   margin-left: 20px;
+ }
+ #actions-btn {
+   display: flex;
+   justify-content: space-between;
+ }
+ #actions-btn > button {
+   width: auto;
+   height: 35px;
+ }
+</style>

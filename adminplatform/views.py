@@ -5,9 +5,10 @@ from .serializers import *
 from rest_framework import filters
 import traceback
 import sys
-from api.models import Organization, Affiliation
+from api.models import Organization, Affiliation, Person
 from .permissions import IsAdminOrIsSelf, IsAdminOrReadOnly
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, generics
+from rest_framework.viewsets import ViewSetMixin
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
@@ -22,8 +23,39 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
+
 from django.db import transaction, DatabaseError
 # Create your views here.
+
+class PersonViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows persons to be viewed or edited.
+    """
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username', 'email', 'lastname')
+
+    def get_serializer_class(self):
+        """
+        Non admin user cannot see private user attribute for privacy reason
+        """
+        if self.action == "list" and not self.request.user.is_staff:
+            return PersonPublicSerializer
+        else:
+            return PersonSerializer
+
+    def get_permissions(self):
+        print(self.action)
+        if self.action == 'list':
+            permission_classes = [IsAdminOrIsSelf]
+        elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
+            permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -45,7 +77,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         print(self.action)
         if self.action == 'list':
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAdminOrIsSelf]
         elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
             permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
         else:
@@ -75,7 +107,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Special end point for creating user
 
-        Only need first_name, last_name and email
+        Only need first_name, ViewSetMixinlast_name and email
 
         Generate a unique usermane and a password
         """
@@ -115,9 +147,16 @@ class AffiliationViewSet(viewsets.ModelViewSet):
         Non admin user cannot see private user attribute for privacy reason
         """
         if self.action == "list" and not self.request.user.is_staff:
+            permission_classes = (IsAdminOrIsSelf,)
             return PublicAffiliationSerializer
+        
+        elif self.action in ['update', 'partial_update', 'retrieve', 'create']:
+            permission_classes = (IsAdminUser,)
+
         else:
             print("Affiliation Serializer")
+            permission_classes = (IsAdminUser,)
+
             return AffiliationSerializer
 
 class SelfView(APIView):
@@ -128,10 +167,22 @@ class SelfView(APIView):
         return Response({"user": instance.data})
         #return Response('appel api')
 
-class organizationListView(viewsets.ModelViewSet):
+class GenericViewSet(ViewSetMixin, generics.GenericAPIView):
+    """
+    The GenericViewSet class does not provide any actions by default,
+    but does include the base set of generic view behavior, such as
+    the `get_object` and `get_queryset` methods.
+    """
+    pass
+
+class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
+    
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def retrieve(self, request, pk=None):
+        pass
 
     #Helper method to get a person
     def get_organization(self, pk):
@@ -144,10 +195,11 @@ class organizationListView(viewsets.ModelViewSet):
         print(self.action)
         if self.action == 'list':
             permission_classes = [IsAuthenticated]
-        elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
-            permission_classes = [IsAdminOrReadOnly, IsAuthenticated]
+        elif self.action in ['update', 'partial_update', 'retrieve','create', 'delete']:
+            permission_classes = [IsAdminUser]
         else:
             permission_classes = [IsAdminUser]
+            
         return [permission() for permission in permission_classes]
 
     def update(self, request, *args, **kwargs):
@@ -224,10 +276,14 @@ class organizationListView(viewsets.ModelViewSet):
               #  organization.manager.add(manager_obj)
         
         serialized_class = OrganizationCreateSerializer(organization)
-        headers = self.get_success_headers(serialized_class.data)
         print(serialized_class.data)
-        return Response(serialized_class.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serialized_class.data, status=status.HTTP_201_CREATED)
 
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs) 
+    def destroy(self, request, pk, format=None):
+        print('suppression')
+        organization = self.get_organization(pk)
+        id=pk
+        print(pk)
+        organization.delete() 
+        return Response({"id" :id}, status=status.HTTP_200_OK)

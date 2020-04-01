@@ -6,7 +6,8 @@ import {
   UPDATE_ORGA,
   GET_ORGA,
   CREATE_ORGA,
-  RESET_ORGA
+  RESET_ORGA,
+  DELETE_ORGA
 } from './actions.type'
 
 import { SET_ORGAS, SET_ORGA } from './mutations.type'
@@ -52,6 +53,14 @@ export const actions = {
       return data
     })
   },
+  [DELETE_ORGA] (context, { id }) {
+    console.log('update orga')
+    return ApiService.delete('gestion/organizations', id).then(({ data }) => {
+      context.commit(DELETE_ORGA, data)
+      console.log(data)
+      return data
+    })
+  },
 
   [CREATE_ORGA] (context, { data }) {
     return ApiService.post('gestion/organizations/', data).then(({ data }) => {
@@ -77,6 +86,12 @@ export const mutations = {
   [SET_ORGA] (state, orga) {
     if ('id' in orga) {
       DataHelper.updateById(state.orgas, orga)
+    }
+  },
+  [DELETE_ORGA] (state, orga) {
+    console.log(orga)
+    if ('id' in orga) {
+      DataHelper.removeById(state.orgas, orga)
     }
   }
 }

@@ -11,7 +11,8 @@ export const EditorMixin = {
         GET: '',
         UPDATE: '',
         CREATE: '',
-        FETCH: ''
+        FETCH: '',
+        DELETE: ''
       },
       objectName: ''
     }
@@ -19,7 +20,6 @@ export const EditorMixin = {
   methods: {
 
     handleErrors (e) {
-      console.log(e.response)
       this.errors = e.response.data
       this.waiting = false
 
@@ -75,6 +75,21 @@ export const EditorMixin = {
             this.handleErrors(e)
           })
       }
+    },
+    deleteObject (id) {
+      this.$store
+        .dispatch(this.actions.DELETE, {
+          id: id
+        })
+        .then(data => {
+          console.log('object deleted')
+          this.$bvModal.msgBoxOk('entity deleted')
+          this.waiting = false
+        })
+        .catch(e => {
+          console.log(e)
+          this.handleErrors(e)
+        })
     }
   },
   beforeMount () {
