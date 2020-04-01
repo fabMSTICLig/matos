@@ -65,12 +65,11 @@ export const EditorMixin = {
           .dispatch(this.actions.CREATE, { data: this.object })
           .then(data => {
             this.object = Object.assign({}, data)
-            this.add = false
-            this.update = true
+            this.add = true
+            this.update = false
             console.log(this.objectName + ' created')
             this.$bvModal.msgBoxOk(this.objectName + ' created')
             this.waiting = false
-            this.$router.push({ path: `${this.object.id}` })
           })
           .catch(e => {
             this.handleErrors(e)

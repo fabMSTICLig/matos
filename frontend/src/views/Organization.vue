@@ -80,7 +80,6 @@ import {
   FETCH_ORGAS,
   FETCH_AFFILIATIONS,
   CREATE_ORGA,
-  FETCH_USERS,
   GET_ORGA,
   UPDATE_ORGA,
   DELETE_ORGA
@@ -106,7 +105,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([ 'orgas', 'affiliations', 'users' ])
+    ...mapGetters([ 'orgas', 'affiliations' ])
 
   },
   methods: {
@@ -114,7 +113,7 @@ export default {
       this.assignObject(this.organization)
       await this.saveObject(EventForm)
       console.log('entite cree')
-      console.log(this.object)
+      this.fetchData()
     },
     updateManager (manager) {
       this.organization.managed = this.managed
@@ -139,9 +138,16 @@ export default {
       this.affiliates = []
     },
     createLink () {
+      this.update = false
+      this.add = true
       this.$router.push({ name: 'admin-orga' })
     },
-
+    fetchData () {
+      this.$store.dispatch(FETCH_ORGAS)
+      this.update = false
+      this.add = true
+      this.organization = {}
+    },
     ownAffiliations (id) {
       // eslint-disable-next-line eqeqeq
       if (this.organization.affiliations) {
@@ -179,7 +185,6 @@ export default {
   beforeMount () {
     this.$store.dispatch(FETCH_ORGAS)
     this.$store.dispatch(FETCH_AFFILIATIONS)
-    this.$store.dispatch(FETCH_USERS)
     this.object = Object.assign({}, this.organization)
 
     // eslint-disable-next-line eqeqeq
