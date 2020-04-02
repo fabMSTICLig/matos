@@ -13,7 +13,7 @@
           </thead>
           <tbody v-if="orgas">
             <tr v-for="entity in orgas" :key="entity.id">
-              <td>{{entity.name}}</td>
+              <td @click="entityManage(entity.id)">{{entity.name}}</td>
               <td class="text-right">
                 <a href="#" @click.prevent="editEntity(entity)">Edit</a> -
                 <a href="#" @click.prevent="deleteEntity(entity.id)">Delete</a>
@@ -110,6 +110,7 @@ export default {
   },
   methods: {
     async saveEntity (EventForm) {
+      this.organization.affiliations = this.affiliates
       this.assignObject(this.organization)
       await this.saveObject(EventForm)
       console.log('entite cree')
@@ -121,7 +122,7 @@ export default {
     updateAffiliations (evt) {
       if (this.organization) {
         console.log(evt)
-        this.organization.affiliations = evt
+        this.affiliates = evt
       }
     },
     editEntity (entity) {
@@ -136,6 +137,7 @@ export default {
     },
     deselectAffiliates () {
       this.affiliates = []
+      this.organization.affiliations = []
     },
     createLink () {
       this.update = false
@@ -161,6 +163,9 @@ export default {
       } else {
         return ''
       }
+    },
+    entityManage (id) {
+      this.$router.push({ path: `/admin/orga/${id}` })
     }
   },
 

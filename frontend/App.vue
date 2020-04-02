@@ -14,7 +14,7 @@
               <a href='/api/self'  class='button-head-sub'>{{authUser.username}}</a>
             </div>
             <div v-if='isAuthenticated'>
-              <a :href='authUser.externe ? '/api/logout' : '/auth/logout'' >Log out</a>
+              <a :href="authUser.externe ? '/api/logout' : '/auth/logout'" >Log out</a>
             </div>
             <div v-if='!isAuthenticated'>
               <a href='/auth/login' class='button-head-sub'>login</a>

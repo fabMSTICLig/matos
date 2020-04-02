@@ -202,7 +202,7 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
             
         return [permission() for permission in permission_classes]
 
-    def update(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         if(not request.user.is_staff):
             raise PermissionDenied("You are not allowed to perform this action")
 
@@ -217,8 +217,10 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
         organization_affiliates = self.request.data['affiliations']
 
         organization.affiliations.clear()
+        print(organization_affiliates)
 
         for affiliation in organization_affiliates :
+            print(affiliation)
             affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
             organization.affiliations.add(affiliation_obj)
         
@@ -230,8 +232,10 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
 
         organization.save() 
         print(organization.name)
+        serialized_class=OrganizationSerializer(organization)
 
-        return self.get(request, *args, **kwargs)
+        return Response(serialized_class.data, status=status.HTTP_200_OK)
+
 
     def create(self, request, *args, **kwargs):
         """
@@ -247,7 +251,7 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
             organization = Organization()
             organization.name = data['name']
             organization.contact = data['contact']
-            #affiliations = data['affiliations']
+            affiliations = data['affiliations']
             print(organization.name)
             print(Organization.objects.filter(name=organization.name))
             try:
@@ -266,16 +270,18 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
             except IntegrityError:
                 transaction.rollback()
 
-            #for affiliation in affiliations:
-               # affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
-              #  organization.affiliations.add(affiliation_obj)
+            organization.affiliations.clear()
+
+            for affiliation in affiliations:
+                affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
+                organization.affiliations.add(affiliation_obj)
             
             organization.save()
             #for manager in managers :
              #   manager_obj = User.objects.get(pk=manager['id'])
               #  organization.manager.add(manager_obj)
         
-        serialized_class = OrganizationCreateSerializer(organization)
+        serialized_class = OrganizationSerializer(organization)
         print(serialized_class.data)
         return Response(serialized_class.data, status=status.HTTP_201_CREATED)
 

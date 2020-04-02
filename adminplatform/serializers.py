@@ -92,11 +92,6 @@ class OrganizationPublicSerializer(OrganizationSerializer):
         fields = ['id', 'name']
         readonly = ['id', 'name']
 
-class OrganizationCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Organization
-        fields = ['id', 'name', 'contact']
-
 class PersonSerializer(serializers.ModelSerializer):
     affiliations = AffiliationSerializer(many=True, read_only=True)
     class Meta:

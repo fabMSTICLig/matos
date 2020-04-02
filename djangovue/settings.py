@@ -192,8 +192,3 @@ CORS_ALLOW_CREDENTIALS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
-
-try:
-    from .local_settings import *
-except ImportError:
-    print('error import local settings')

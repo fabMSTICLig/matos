@@ -1,5 +1,5 @@
-import ApiService from "@/common/api.service"
-import { DataHelper } from "../common/helpers"
+import ApiService from '@/common/api.service'
+import { DataHelper } from '../common/helpers'
 
 import {
   FETCH_EQUIPMENTS,
@@ -11,7 +11,7 @@ import {
 import { SET_EQUIPMENTS, SET_EQUIPMENT } from './mutations.type'
 
 export const state = {
-  equipments: [],
+  equipments: []
 }
 const getters = {
   equipments (state) {
@@ -21,16 +21,16 @@ const getters = {
 
 export const actions = {
   [FETCH_EQUIPMENTS] (context, force = false) {
+    // eslint-disable-next-line eqeqeq
     if (context.state.equipments.length == 0 || force) {
-      return ApiService.get('api/equipments' )
+      return ApiService.get('api/equipments')
         .then(({ data }) => {
           console.log('equipements')
           console.log(data)
           context.commit(SET_EQUIPMENTS, data)
           return data.data
         })
-    }
-    else {
+    } else {
       return Promise.resolve(context.state.orgas)
     }
   },
@@ -55,7 +55,7 @@ export const actions = {
 
 }
 
-/* eslint no-param-reassign: ["error", { "props": false }] */
+/* eslint no-param-reassign: ['error', { 'props': false }] */
 export const mutations = {
   [SET_EQUIPMENTS] (state, equipments) {
     state.orgas = equipments
