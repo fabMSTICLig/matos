@@ -153,10 +153,7 @@ export default {
     ownAffiliations (id) {
       // eslint-disable-next-line eqeqeq
       if (this.organization.affiliations) {
-        console.log(this.organization.affiliations)
-        console.log('id')
-        console.log(id)
-        // eslint-disable-next-line eqeqeq
+      // eslint-disable-next-line eqeqeq
         let ownAffiliation = this.organization.affiliations.find(affiliation => affiliation.id == id)
         console.log(ownAffiliation ? 'true' : '')
         return ownAffiliation ? 'true' : ''

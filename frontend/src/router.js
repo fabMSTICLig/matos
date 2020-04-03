@@ -92,6 +92,12 @@ export default new VueRouter({
       beforeEnter: requireAuthAdmin
     },
     {
+      name: 'admin-users',
+      path: '/admin/orga/:id/users',
+      component: () => import('./views/Admin'),
+      beforeEnter: requireAuthAdmin
+    },
+    {
       name: 'update-orga',
       path: '/admin/orgas/:id',
       component: () => import('./views/Admin'),

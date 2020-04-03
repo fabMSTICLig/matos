@@ -152,3 +152,12 @@ select[multiple] {
 .auth-nav a {
     color: #fff;
 }
+
+nav .bg-storm {
+  background: rgb(135, 157, 151);
+}
+
+.navbar-dark .navbar-nav .nav-item > .router-link-active {
+    color: #fff;
+    background-color: #000;
+}

@@ -217,6 +217,7 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
         organization_affiliates = self.request.data['affiliations']
 
         organization.affiliations.clear()
+        print('affiliations')
         print(organization_affiliates)
 
         for affiliation in organization_affiliates :
@@ -227,7 +228,7 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
         organization.managed.clear()
 
         for manager in organization_managers :
-            manager_obj = Person.objects.get(pk=manager['id'])
+            manager_obj = User.objects.get(pk=manager['id'])
             organization.managed.add(manager_obj)
 
         organization.save() 

@@ -1,8 +1,49 @@
 <template>
   <div v-if="isAdmin" class="container-fluid mt-4">
-    <organization v-if="organizationList" organization="organization"></organization>
+    <organization v-if="organizationList"></organization>
     <div v-if="organization.id">
-      {{organization.name}}
+        <navbar :items='items' :entity='organization.id'></navbar>
+        <template>
+          <div v-if="adminUsers && users">
+              <b-form class="addUserForm" @submit="onSubmit" @reset="onReset">
+                <b-container fluid="lg" class="">
+                  <b-row >
+                    <b-col>
+                      <b-form-group id="input-group-useradd" label="" label-for="input-useradd">
+                        <b-dropdown
+                          split
+                          split-variant="outline-primary"
+                          variant="primary"
+                          :text="newUser.username || firstUser"
+                          class="m-2"
+                          block
+                        >
+                          <b-dropdown-item>
+                            <b-form-input
+                            id="input-useradd"
+                            v-model="newUser.username"
+                            required
+                            placeholder="Enter name"
+                            ></b-form-input>
+                          </b-dropdown-item>
+                          <b-dropdown-item v-for="user in users" :key="user.id" @click="setUser(user.id)">{{user.username}}</b-dropdown-item>
+                        </b-dropdown>
+                      </b-form-group>
+                    </b-col>
+                    <b-col>
+                      <b-form-group>
+                        <b-button class="centerBt" variant="outline-dark" @click="addUser">Add</b-button>
+                      </b-form-group>
+                    </b-col>
+                    <b-col>
+                      <b-button type="submit" class="centerBt" squared variant="dark">Save</b-button>
+                    </b-col>
+                  </b-row>
+                </b-container>
+              </b-form>
+          </div>
+        </template>
+        <tablecomp :items="usersOrganization"></tablecomp>
     </div>
   </div>
 </template>
@@ -11,11 +52,14 @@
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from 'vuex'
 import { EditorMixin } from '@/common/mixins'
-import Organization from './Organization'
-
+import Organization from './Organization.vue'
+import navbar from '@/components/navbar.vue'
+import tablecomp from '@/components/table.vue'
 import {
   FETCH_ORGAS,
-  GET_ORGA
+  FETCH_USERS,
+  GET_ORGA,
+  UPDATE_ORGA
   // eslint-disable-next-line no-unused-vars
 } from '@/store/actions.type'
 
@@ -23,44 +67,94 @@ export default {
   mixins: [EditorMixin],
   name: 'Admin',
   components: {
-    Organization
-  },
-  actions: {
-    GET: GET_ORGA,
-    FETCH: FETCH_ORGAS
+    Organization,
+    navbar,
+    tablecomp
   },
   data () {
     return {
       organization: this.organization || {},
+      newUser: this.newUser || {},
+      adminUsers: false,
+      addUsers: [],
       organizationList: false,
       actions: {
-        FETCH: FETCH_ORGAS
+        FETCH: FETCH_ORGAS,
+        UPDATE: UPDATE_ORGA,
+        GET: GET_ORGA
       }
     }
   },
   computed: {
-    ...mapGetters([ 'orgas', 'affiliations', 'users', 'isAdmin' ])
-    // eslint-disable-next-line vue/return-in-computed-property
+    ...mapGetters([ 'orgas', 'affiliations', 'users', 'isAdmin' ]),
+    items () {
+      return [
+        { link: '/admin/orga/' + this.organization.id, name: this.organization.name },
+        { link: '/admin/orga/' + this.organization.id + '/users', name: 'Utilisateurs' },
+        { link: '/admin/materials', name: 'Matériels' },
+        { link: './admin/lends', name: 'Prêts' }
+      ]
+    },
+
+    firstUser () {
+      if (this.users) {
+        return 'Utilisateur'
+      }
+      return ''
+    },
+
+    usersOrganization () {
+      console.log(this.organization.managed)
+      return this.organization.managed
+    }
 
   },
 
   methods: {
+    setUser (id) {
+      console.log(id)
+      // eslint-disable-next-line eqeqeq
+      this.newUser = this.users.find(user => user.id == id)
+    },
+    async onSubmit (evt) {
+      evt.preventDefault()
+      this.update = true
+      this.assignObject(this.organization)
+      await this.saveObject(evt)
+      console.log('mise a jour orga ')
+      this.fetchData()
+    },
+
+    onReset (evt) {
+      evt.preventDefault()
+    },
+
+    addUser () {
+      this.organization.managed.push(this.newUser)
+    },
+
+    fetchData () {
+      this.$store.dispatch(GET_ORGA)
+    }
   },
   watch: {
     $route (to, from) {
-      console.log(from)
       // eslint-disable-next-line eqeqeq
-      if (from.name == 'admin-manageOrga') {
+      if (to.name == 'admin-manageOrga') {
+        let id = this.$route.params.id
         // eslint-disable-next-line eqeqeq
-        // eslint-disable-next-line no-undef
-        let id = from.params.id
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         // eslint-disable-next-line eqeqeq
         this.organization = this.orgas.find(organization => organization.id == id)
+        this.organizationList = false
       }
       // eslint-disable-next-line eqeqeq
-      if (from.name == 'admin-orga') {
+      if (to.name == 'admin-orga') {
         this.organizationList = true
+      }
+      // eslint-disable-next-line eqeqeq
+      if (to.name == 'admin-users') {
+        this.$store.dispatch(FETCH_USERS)
+        this.adminUsers = true
       }
     }
   },
@@ -70,15 +164,9 @@ export default {
     let self = this
     let routeName = self.$route.name
     this.$store.dispatch(FETCH_ORGAS).then(data => {
-      console.log(data)
-      // eslint-disable-next-line eqeqeq
+    // eslint-disable-next-line eqeqeq
       if (routeName == 'admin-manageOrga') {
-      // eslint-disable-next-line eqeqeq
-      // eslint-disable-next-line no-undef
         let id = this.$route.params.id
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        // eslint-disable-next-line eqeqeq
-        console.log(this.orgas)
         // eslint-disable-next-line eqeqeq
         this.organization = this.orgas.find(organization => organization.id == id)
       }
@@ -87,9 +175,29 @@ export default {
         this.organizationList = true
         console.log('admin orgas')
       }
+
+      // eslint-disable-next-line eqeqeq
+      if (routeName == 'admin-users') {
+        self.$store.dispatch(FETCH_USERS)
+        self.adminUsers = true
+        let idRoute = self.$route.params.id
+        // eslint-disable-next-line eqeqeq
+        self.organization = self.orgas.find(orga => orga.id == idRoute)
+      }
     })
-    // eslint-disable-next-line eqeqeq
   }
 
 }
 </script>
+<style scoped>
+  .addUserForm {
+    width: 800px;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .centerBt {
+    margin-top: 9px;
+  }
+
+</style>
