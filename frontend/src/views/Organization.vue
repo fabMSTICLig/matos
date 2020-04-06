@@ -13,7 +13,7 @@
           </thead>
           <tbody v-if="orgas">
             <tr v-for="entity in orgas" :key="entity.id">
-              <td @click="entityManage(entity.id)">{{entity.name}}</td>
+              <td @click="entityManage(entity.id)" class="clickRow">{{entity.name}}</td>
               <td class="text-right">
                 <a href="#" @click.prevent="editEntity(entity)">Edit</a> -
                 <a href="#" @click.prevent="deleteEntity(entity.id)">Delete</a>

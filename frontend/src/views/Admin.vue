@@ -36,14 +36,14 @@
                       </b-form-group>
                     </b-col>
                     <b-col>
-                      <b-button type="submit" class="centerBt" squared variant="dark">Save</b-button>
+                      <b-button type="submit" @click="onSubmit" class="centerBt" squared variant="dark">Save</b-button>
                     </b-col>
                   </b-row>
                 </b-container>
               </b-form>
           </div>
         </template>
-        <tablecomp :items="usersOrganization"></tablecomp>
+        <tablecomp v-if="adminUsers" :items="usersOrganization" :actions="true" v-model="item"></tablecomp>
     </div>
   </div>
 </template>
@@ -62,6 +62,7 @@ import {
   UPDATE_ORGA
   // eslint-disable-next-line no-unused-vars
 } from '@/store/actions.type'
+import { bus } from '@/main'
 
 export default {
   mixins: [EditorMixin],
@@ -77,6 +78,7 @@ export default {
       newUser: this.newUser || {},
       adminUsers: false,
       addUsers: [],
+      item: '',
       organizationList: false,
       actions: {
         FETCH: FETCH_ORGAS,
@@ -125,12 +127,24 @@ export default {
       this.fetchData()
     },
 
+    updateUser (item) {
+      console.log('obj remove admin')
+      console.log(item)
+    },
+
     onReset (evt) {
       evt.preventDefault()
     },
 
     addUser () {
       this.organization.managed.push(this.newUser)
+    },
+
+    removeUser (user) {
+      const index = this.organization.managed.indexOf(user)
+      if (index > -1) {
+        this.organization.managed.splice(index, 1)
+      }
     },
 
     fetchData () {
@@ -184,6 +198,14 @@ export default {
         // eslint-disable-next-line eqeqeq
         self.organization = self.orgas.find(orga => orga.id == idRoute)
       }
+    })
+  },
+
+  created () {
+    let self = this
+    bus.$on('item', (data) => {
+      console.log('remove item')
+      self.removeUser(data)
     })
   }
 

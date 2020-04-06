@@ -17,6 +17,7 @@ Vue.use(BootstrapVueIcons)
 ApiService.init()
 
 Vue.config.productionTip = false
+export const bus = new Vue()
 
 router.beforeEach((to, from, next) => {
   Promise.all([store.dispatch(CHECK_AUTH)])

@@ -161,3 +161,7 @@ nav .bg-storm {
     color: #fff;
     background-color: #000;
 }
+
+.clickRow {
+    cursor: pointer;
+}
