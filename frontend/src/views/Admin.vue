@@ -63,6 +63,7 @@ import {
   // eslint-disable-next-line no-unused-vars
 } from '@/store/actions.type'
 import { bus } from '@/main'
+import { DataHelper } from '../common/helpers'
 
 export default {
   mixins: [EditorMixin],
@@ -129,7 +130,7 @@ export default {
 
     updateUser (item) {
       console.log('obj remove admin')
-      console.log(item)
+      DataHelper.updateById(this.organization.managed, item)
     },
 
     onReset (evt) {
@@ -203,9 +204,13 @@ export default {
 
   created () {
     let self = this
-    bus.$on('item', (data) => {
+    bus.$on('removeUser', (data) => {
       console.log('remove item')
       self.removeUser(data)
+    })
+    bus.$on('item', (data) => {
+      console.log('update item')
+      self.updateUser(data)
     })
   }
 

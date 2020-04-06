@@ -175,11 +175,11 @@ class GenericViewSet(ViewSetMixin, generics.GenericAPIView):
     """
     pass
 
-class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
+class organizationListView(viewsets.ModelViewSet):
     
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrIsSelf)
 
     def retrieve(self, request, pk=None):
         pass
@@ -195,47 +195,71 @@ class organizationListView(viewsets.ModelViewSet, generics.GenericAPIView):
         print(self.action)
         if self.action == 'list':
             permission_classes = [IsAuthenticated]
-        elif self.action in ['update', 'partial_update', 'retrieve','create', 'delete']:
+        elif self.action in ['update', 'retrieve','create', 'delete']:
             permission_classes = [IsAdminUser]
         else:
             permission_classes = [IsAdminUser]
             
         return [permission() for permission in permission_classes]
 
-    def partial_update(self, request, *args, **kwargs):
-        if(not request.user.is_staff):
-            raise PermissionDenied("You are not allowed to perform this action")
+    def update(self, request, *args, **kwargs):
+        """
+        Overload update method in order to limit standard user actions
+        """
+        print('>>>>>>>>>>>>>>>>>')
 
-        print(request)
-        print("update organization")
-        organization_id = self.request.data['id']
-        organization = self.get_organization(organization_id)
-        organization.name = self.request.data['name']
-        organization.description = self.request.data['description']
-        organization.contact = self.request.data['contact']
-        organization_managers = self.request.data['managed']
-        organization_affiliates = self.request.data['affiliations']
+        if(isinstance(request.data, QueryDict)):
+            data = request.data.dict()
+        else:
+            data = dict(request.data)
+        # Auto complete if normal user or admin for own usage by removing user member
+        if(not request.user.is_staff or not 'user' in data):
+            data['user'] = request.user
+            organization = Organization.objects.get(pk=data['id'])
+            organization.name = data['name']
+            organization.contact = data['contact']
+            affiliations = data['affiliations']
+            managers = data["managed"]
+            print(organization.name)
+            print(Organization.objects.filter(name=organization.name))
+          
+            organization.save()
+          
+            try:
+                organization.save() # Could throw exception
+            except IntegrityError:
+                transaction.rollback()
 
-        organization.affiliations.clear()
-        print('affiliations')
-        print(organization_affiliates)
+            organization.affiliations.clear()
 
-        for affiliation in organization_affiliates :
-            print(affiliation)
-            affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
-            organization.affiliations.add(affiliation_obj)
-        
-        organization.managed.clear()
+            for affiliation in affiliations:
+                affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
+                organization.affiliations.add(affiliation_obj)
+            
+            organization.save()
+            organization.managed.clear()
 
-        for manager in organization_managers :
-            manager_obj = User.objects.get(pk=manager['id'])
-            organization.managed.add(manager_obj)
+            for manager in managers :
+                print(manager['id'])
+                manager_obj = User.objects.get(pk=manager['id'])
+                manager_obj.first_name = manager['first_name']
+                manager_obj.last_name = manager['last_name']
+                manager_obj.externe = manager['externe']
+                manager_obj.is_staff = manager['is_staff']
+                manager_obj.username = manager['username']
 
-        organization.save() 
-        print(organization.name)
-        serialized_class=OrganizationSerializer(organization)
+                print(manager_obj.username)
 
+                manager_obj.save()
+                organization.managed.add(manager_obj)
+
+        organization.save()
+        serialized_class = OrganizationSerializer(organization)
+        print(serialized_class.data)
         return Response(serialized_class.data, status=status.HTTP_200_OK)
+
+
+        return Response(serializer.data)
 
 
     def create(self, request, *args, **kwargs):

@@ -16,9 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'email',
-                  'first_name', 'last_name', 'is_staff', 'externe')
-        read_only_fields = ('username',)
+        fields = '__all__'
 
     def get_externe(self, obj):
         try :
@@ -43,7 +41,9 @@ class UserSerializer(serializers.ModelSerializer):
             if(user.is_staff == False):
                     raise exceptions.PermissionDenied(
                         detail="You are not allowed to change this field")
-                
+            instance.username = validated_data.get('username', instance.username) 
+            print(instance.username)  
+            instance.save()
            # this will not throw an exception,
         # as `profile` is not part of `validated_data`
         return super(UserSerializer, self).update(instance, validated_data)
@@ -79,13 +79,13 @@ class AffiliationSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'type']
 
 class OrganizationSerializer(serializers.ModelSerializer):
-    managed = UserSerializer(many=True, read_only=True )
+    managed = UserSerializer(many=True)
     affiliations = AffiliationSerializer(many=True, read_only=True)
     class Meta:
         model = Organization
         fields = ['id', 'name','managed', 'contact', 'affiliations', 'description']
 
-
+ 
 class OrganizationPublicSerializer(OrganizationSerializer):
     class Meta:
         model = Organization
