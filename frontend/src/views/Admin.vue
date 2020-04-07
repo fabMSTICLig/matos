@@ -1,6 +1,6 @@
 <template>
   <div v-if="isAdmin" class="container-fluid mt-4">
-    <organization-manage v-if="organizationList"></organization-manage>
+    <organization-admin v-if="organizationList"></organization-admin>
     <div v-if="organization.id">
         <navbar :items='items' :entity='organization.id'></navbar>
         <template>
@@ -52,7 +52,7 @@
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from 'vuex'
 import { EditorMixin } from '@/common/mixins'
-import OrganizationManage from './OrganizationManage.vue'
+import OrganizationAdmin from './OrganizationAdmin.vue'
 import navbar from '@/components/navbar.vue'
 import tablecomp from '@/components/table.vue'
 import {
@@ -69,7 +69,7 @@ export default {
   mixins: [EditorMixin],
   name: 'Admin',
   components: {
-    OrganizationManage,
+    OrganizationAdmin,
     navbar,
     tablecomp
   },

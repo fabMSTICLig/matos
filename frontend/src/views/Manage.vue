@@ -2,7 +2,7 @@
   <div class='home'>
     <div class='container'>
       <navbar :items='items' :entity='entity.id'></navbar>
-      <organization v-show='isManagement'></organization>
+      <organization-manage v-show='isManagement'></organization-manage>
 
     </div>
     <hr />
@@ -11,7 +11,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import Organization from './Organization.vue'
+import OrganizationManage from './OrganizationManage.vue'
 import navbar from '@/components/navbar.vue'
 import {
   GET_ORGA,
@@ -74,7 +74,7 @@ export default {
   },
 
   components: {
-    Organization,
+    OrganizationManage,
     navbar
   },
   computed: {

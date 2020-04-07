@@ -3,8 +3,8 @@
         <div id='header'>
           <div class='nav-header'>
             <router-link tag='a' class='button-head' class-active='active' to='/' exact>Réservations</router-link>
-            <router-link tag='a' class='button-head' class-active='active' to='/manage' exact>Gestion</router-link>
-            <router-link tag='a' v-if='isAdmin' class='button-head' class-active='active' to='/admin/orgas' exact>Organisations</router-link>
+            <router-link tag='a' class='button-head' class-active='active' to='/manage' :active="$route.matched.some(({ name }) => name === 'manage')">Gestion</router-link>
+            <router-link tag='a' v-if='isAdmin' class='button-head' class-active='active' to='/admin/orgas' :active="$route.matched.some(({ name }) => name === 'admin')" >Organisations</router-link>
           </div>
           <div class='nav-header'>
             <div v-if='!isAuthenticated' class='auth-nav'>

@@ -62,16 +62,17 @@ export default new VueRouter({
     },
     {
       name: 'manageEntity',
-      path: '/manage/entity/:id',
+      path: '/manage/:id',
       component: () => import('./views/Manage'),
       beforeEnter: requireAuthManager
     },
 
     {
       name: 'manageUsers',
-      path: '/manage/users',
+      path: '/manage/:id/users',
       component: () => import('./views/Manage')
     },
+
     {
       name: 'family',
       path: '/families/:id',
