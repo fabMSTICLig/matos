@@ -35,19 +35,19 @@ export const actions = {
     }
   },
   [GET_EQUIPMENT] (context, index) {
-    return ApiService.get('api/equipment/', index).then(({ data }) => {
+    return ApiService.get('/equipment/', index).then(({ data }) => {
       context.commit(SET_EQUIPMENT, data)
       return data
     })
   },
   [UPDATE_EQUIPMENT] (context, { id, data }) {
-    return ApiService.update('api/equipment/', id, data).then(({ data }) => {
+    return ApiService.update('/equipment/', id, data).then(({ data }) => {
       context.commit(SET_EQUIPMENT, data)
       return data
     })
   },
   [CREATE_EQUIPMENT] (context, { data }) {
-    return ApiService.post('api/equipments', data).then(({ data }) => {
+    return ApiService.post('/equipments', data).then(({ data }) => {
       context.commit(SET_EQUIPMENT, data)
       return data
     })

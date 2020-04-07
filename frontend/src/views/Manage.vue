@@ -2,10 +2,8 @@
   <div class='home'>
     <div class='container'>
       <navbar :items='items' :entity='entity.id'></navbar>
+      <organization v-show='isManagement'></organization>
 
-      <organization v-bind:organization='entity.id' v-show='isManagement'></organization>
-      <equipment-list v-show='equipmentvue'></equipment-list>
-      <manage-users v-show='isUsersManagement'></manage-users>
     </div>
     <hr />
   </div>
@@ -14,9 +12,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import Organization from './Organization.vue'
-import ManageUsers from './ManageUsers.vue'
 import navbar from '@/components/navbar.vue'
-import EquipmentList from './EquipmentList.vue'
 import {
   GET_ORGA,
   UPDATE_ORGA,
@@ -79,9 +75,7 @@ export default {
 
   components: {
     Organization,
-    navbar,
-    ManageUsers,
-    EquipmentList
+    navbar
   },
   computed: {
     ...mapGetters(['orgas', 'equipments']),

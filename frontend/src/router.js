@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 
 function requireAuthManager (to, from, next) {
   if (store.getters.authUser.is_manager) {
-    console.log('auth manager')
+    console.log(store.getters.authUser)
     next()
   } else {
     next({ name: 'home' })
