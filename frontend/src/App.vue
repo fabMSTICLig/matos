@@ -21,15 +21,21 @@
             </div>
           </div>
         </div>
+            <organization v-if="isAuthenticated"></organization>
+
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import Organization from './views/Organization'
 
 export default {
   name: 'App',
+  components: {
+    Organization
+  },
   data () {
     return {
       logged: false
@@ -42,6 +48,7 @@ export default {
     ...mapGetters(['authUser', 'isAuthenticated', 'isAdmin'])
 
   }
+
 }
 </script>
 

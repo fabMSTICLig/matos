@@ -77,11 +77,6 @@ class OrganizationView(FormView):
         form.save()
         return super().form_valid(form)
 
-class organizationListView(viewsets.ModelViewSet):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-
 
 
 class productListViewSet(viewsets.ModelViewSet):
@@ -95,43 +90,44 @@ class productInstanceListView(viewsets.ModelViewSet):
     serializer_class = ProductInstanceSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     
-class organizationDetail(APIView):
+class organizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsManager)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
+    def get(self, request, pk, format=None):
+        organization = self.get_organization(pk)
+        serializer = OrganizationSerializer(organization)
+        return Response(serializer.data)
 
-    def get(self, request, *args, **kwargs):
-        permission_classes = (IsManager)
-
-        data=self.retrieve(request, *args,**kwargs)
-        user=get_user(request)
-        print(user.has_perm('manage_entity'))
-        return self.retrieve(request, *args,**kwargs) 
 
     def put(self, request, *args, **kwargs):
         print("put")
+        permission_classes = (IsManager,)
+        user=get_user(request)
+        print(user.has_perm('manage_entity'))
         return self.update(request, *args,**kwargs) 
     
-    def get_object(self, pk):
-        return Organization.objects.get(pk=pk)
+        #Helper method to get a person
+    def get_organization(self, pk):
+        try:
+            return Organization.objects.get(pk=pk)
+        except Organization.DoesNotExist:
+            raise Http404
     
     def patch(self, request, pk):
         instance_object = self.get_object(pk)
         print(request)
         print('patch')
+        permission_classes = (IsManager,)
+
         serializer = OrganizationSerializer(instance_object, data=request.data, partial=True) # set partial=True to update a data partially
         if serializer.is_valid():
             serializer.save()
             return JsonResponse({'code':201, 'data':serializer.data})
         return JsonResponse({'code':400, 'data':"wrong parameters"})
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs) 
     
-    def ___init__(self, name):
-        self.name = name
-
+   
 
 class productDetailViewSet(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
     queryset = Product.objects.all()

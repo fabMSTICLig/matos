@@ -18,7 +18,7 @@ from api import views
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf.urls import url, include
-from api.views import sample_api, signup_success, productListViewSet, productInstanceListView, index, organizationListView, get_users, UserInstanceView, productDetailViewSet
+from api.views import sample_api, signup_success, productListViewSet, productInstanceListView, index, organizationViewSet, get_users, UserInstanceView, productDetailViewSet
 import django_cas_ng.views
 from rest_framework import routers
 from adminplatform.urls import router as adminrouter
@@ -27,6 +27,7 @@ router = routers.DefaultRouter()
 router.register(r'api/equipments', productListViewSet)
 router.register(r'api/products-instance', productInstanceListView)
 router.registry.extend(adminrouter.registry)
+router.register(r'api/organizations', organizationViewSet)
 
 urlpatterns = [
     url(r'^$', view=TemplateView.as_view(template_name='index.html')),
@@ -36,7 +37,6 @@ urlpatterns = [
     path('api/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     url(r'^home/', index),
     url(r'^api/users/', get_users.as_view()),
-    url(r'^api/organizations/(?P<pk>[0-9]+)$', views.organizationDetail.as_view()),
     url(r'^api/equipment/(?P<pk>[0-9]+)$', views.productDetailViewSet.as_view()),
     url(r'^api/families/$', views.family_list.as_view()),
     url(r'^api/families/(?P<pk>[0-9]+)$', views.family_detail.as_view()),

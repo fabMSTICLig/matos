@@ -45,6 +45,11 @@ export default new VueRouter({
       component: () => import('./views/EquipmentEdit')
     },
     {
+      name: 'organizationList',
+      path: '/orga/:id',
+      component: () => import('./views/Organization')
+    },
+    {
       name: 'login',
       path: '/login',
       component: () => import('./views/Login')

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers, exceptions
-from .models import Location, Family, Product, Transaction, ProductInstance, Organization, Person
+from .models import Location, Family, Product, Transaction, ProductInstance, Organization, Person, Affiliation
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -68,9 +68,17 @@ class ProductInstanceSerializer(serializers.ModelSerializer):
         model = ProductInstance
         fields = ('product','quantity','due_back','status')
 
+class AffiliationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Affiliation
+        fields = ['id', 'name', 'type']
+
 class OrganizationSerializer(serializers.ModelSerializer):
+    managed = UserSerializer(many=True, read_only=True)
+    affiliations = AffiliationSerializer(many=True, read_only=True)
     class Meta:
         model = Organization
-        fields = ('id', 'name','managed', 'contact', 'description')
+        fields = ['id', 'name','managed', 'contact', 'affiliations', 'description']
+
 
 
