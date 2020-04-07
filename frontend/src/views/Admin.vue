@@ -188,6 +188,7 @@ export default {
       // eslint-disable-next-line eqeqeq
       if (routeName == 'admin-orga' || routeName == 'update-orga') {
         this.organizationList = true
+        this.organization = {}
         console.log('admin orgas')
       }
 
