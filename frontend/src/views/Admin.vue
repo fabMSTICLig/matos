@@ -165,6 +165,8 @@ export default {
       // eslint-disable-next-line eqeqeq
       if (to.name == 'admin-orga') {
         this.organizationList = true
+        this.organization = {}
+
       }
       // eslint-disable-next-line eqeqeq
       if (to.name == 'admin-users') {
