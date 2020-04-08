@@ -1,5 +1,5 @@
-import ApiService from "@/common/api.service"
-import { DataHelper } from "../common/helpers"
+import ApiService from '@/common/api.service'
+import { DataHelper } from '../common/helpers'
 
 import {
   UPDATE_AFFILIATION,
@@ -14,7 +14,7 @@ export const state = {
   affiliations: []
 }
 const getters = {
-  
+
   affiliations (state) {
     return state.affiliations
   }
@@ -22,6 +22,7 @@ const getters = {
 
 export const actions = {
   [FETCH_AFFILIATIONS] (context, force = false) {
+    // eslint-disable-next-line eqeqeq
     if (context.state.affiliations.length == 0 || force) {
       return ApiService.query('gestion/affiliations', {})
         .then(({ data }) => {
@@ -52,12 +53,12 @@ export const actions = {
       name: '',
       type: ''
     })
-  },
+  }
 }
 
 /* eslint no-param-reassign: ["error", { "props": false }] */
 export const mutations = {
- 
+
   [SET_AFFILIATION] (state, orga) {
     if ('id' in orga) {
       DataHelper.updateById(state.orgas, orga)
