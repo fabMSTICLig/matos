@@ -59,18 +59,20 @@ lancer les migrations
 
 ### authentification
 
-> création d’un superutilisateur
-une fois l’installation de Django effectuée, la création d’un utilisateur se fait avec le shell :
+### création d’un superutilisateur
+> une fois l’installation de Django effectuée, la création d’un utilisateur se fait avec le shell :
 ouvrir un terminal et se placer à la racine du projet
+
 - sudo python3 manage.py createsuperuser --username=joe --email=joe@example.com
  
-> création d’un administrateur
-depuis l’interface d’administration, http://localhost:8000/admin
+### création d’un administrateur
+> depuis l’interface d’administration, http://localhost:8000/admin
 se loguer avec l’identifiant superutilisateur, puis ajouter des utilisateur depuis  « Users » 
 Ajouter les permissions **Staff status
 
-> ajout d’un manager
-sur l’interface d’administration, aller sur un utilisateur (Users), puis affecter le groupe « manager » à l’utilisateur. Revenir sur l’application, et vérifier que la rubrique « Organisations » apparaît, une fois logué avec l’utilisateur
+### ajout d’un manager
+
+> sur l’interface d’administration, aller sur un utilisateur (Users), puis affecter le groupe « manager » à l’utilisateur. Revenir sur l’application, et vérifier que la rubrique « Organisations » apparaît, une fois logué avec l’utilisateur
 Autre possibilité, se loguer avec son compte CAS depuis l’application « CAS Login » et  depuis l’administration effectuer les mêmes étapes
 
 
