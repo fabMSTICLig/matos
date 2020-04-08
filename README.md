@@ -68,7 +68,7 @@ ouvrir un terminal et se placer à la racine du projet
 ### création d’un administrateur
 > depuis l’interface d’administration, http://localhost:8000/admin
 se loguer avec l’identifiant superutilisateur, puis ajouter des utilisateur depuis  « Users » 
-Ajouter les permissions **Staff status
+Ajouter les permissions __Staff status__.
 
 ### ajout d’un manager
 
