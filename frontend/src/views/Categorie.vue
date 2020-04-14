@@ -36,6 +36,7 @@ export default {
       console.log(val.value.id)
       console.log(this.value)
 
+      // eslint-disable-next-line eqeqeq
       let familyEquipment = this.value.find(family => family.id == val.value.id)
       return familyEquipment ? 'selected' : ''
     },

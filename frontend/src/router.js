@@ -46,8 +46,8 @@ export default new VueRouter({
     },
     {
       name: 'organizationList',
-      path: '/orga/:id',
-      component: () => import('./views/Organization')
+      path: '/organisations/:id',
+      component: () => import('./views/Organizations')
     },
     {
       name: 'login',
@@ -86,10 +86,9 @@ export default new VueRouter({
     },
 
     {
-      name: 'admin-orga',
-      path: '/admin/orgas',
-      component: () => import('./views/Admin'),
-      beforeEnter: requireAuthAdmin
+      name: 'organisations',
+      path: '/organisations',
+      component: () => import('./views/Organizations')
     },
     {
       name: 'admin-manageOrga',
