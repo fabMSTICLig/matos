@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@vue/cli": "^4.2.3",
-    "@vue/devtools": "^5.3.3",
     "@vuex-orm/core": "^0.35.2",
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
