@@ -15,7 +15,7 @@
             <tr v-for="entity in orgas" :key="entity.id">
               <td @click="entityManage(entity.id)" class="clickRow">{{entity.name}}</td>
               <td class="text-right">
-                <a href="#" @click.prevent="editEntity(entity)">Edit</a>
+                <a href="#" v-show="isManager(entity.managed)" @click.prevent="editEntity(entity)">Edit</a>
                 <span v-if='isAdmin'> - </span>
                 <a href="#" @click.prevent="deleteEntity(entity.id)" v-if='isAdmin'>Delete</a>
 
@@ -25,7 +25,7 @@
         </table>
       </b-col>
       <b-col lg="3">
-        <b-card  v-if="update || add">
+        <b-card  v-if="isAdmin || update">
           <b-form @submit.prevent="saveEntity">
             <b-form-group
               id="label-nom"
@@ -112,11 +112,17 @@ export default {
     ...mapGetters([ 'orgas', 'affiliations' ]),
     ...mapState({
       isAdmin: state => state.auth.authUser.is_staff,
-      isManager: state => state.auth.authUser.is_manager
-    })
+      authUser: state => state.auth.authUser
+    }),
 
+    // eslint-disable-next-line vue/return-in-computed-property
   },
   methods: {
+
+    isManager (managers) {
+      // eslint-disable-next-line eqeqeq
+      return managers.find(manager => manager.id == this.authUser.id)
+    },
     async saveEntity (EventForm) {
       this.organization.affiliations = this.affiliates
       this.assignObject(this.organization)

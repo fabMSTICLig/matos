@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 from django.contrib.auth import authenticate, get_user
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
+from django.views.generic import ListView, View
 from rest_framework import viewsets, serializers, status, filters,  generics, mixins, authentication, permissions
-from rest_framework.decorators import api_view,permission_classes, action
+from rest_framework.decorators import api_view,permission_classes, action, renderer_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
@@ -27,6 +28,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.models import Permission
 from django.contrib.auth.decorators import permission_required
 from .permissions import *
+from rest_framework.renderers import JSONRenderer
 
 @api_view(["GET"])
 def index(request):
@@ -175,11 +177,30 @@ class productInstanceListView(viewsets.ModelViewSet):
     serializer_class = ProductInstanceSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
+class organizationManagedListView(generics.ListCreateAPIView):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
    
+    def list(self, request):
+        user = request.user
+        print('## user')
+        print(user.id)
+        queryset = Organization.objects.filter(managed__in=[user.id])
+        serializer = OrganizationSerializer(queryset, many=True)
+        print(serializer.data)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 class organizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     permission_classes = (IsAdminOrIsSelf)
+
+
 
     def retrieve(self, request, pk=None):
         pass

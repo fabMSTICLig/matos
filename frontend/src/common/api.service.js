@@ -15,7 +15,8 @@ const ApiService = {
     return Vue.axios.get(resource, params)
   },
 
-  get (resource, slug = '') {
+  get (resource, slug) {
+    console.log(slug)
     return Vue.axios.get(`${resource}/${slug}`)
   },
 

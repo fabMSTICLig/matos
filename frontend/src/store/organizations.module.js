@@ -40,7 +40,8 @@ export const actions = {
     }
   },
   [GET_ORGA] (context, id) {
-    return ApiService.get('organizations', id).then(({ data }) => {
+    console.log(id)
+    return ApiService.get('/organizations/', id).then(({ data }) => {
       context.commit(SET_ORGA, data)
       return data
     })
