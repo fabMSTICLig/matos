@@ -43,7 +43,6 @@ export const EditorMixin = {
       if (this.update) {
         this.waiting = true
         console.log(this.actions.UPDATE)
-        console.log('>>> object')
         console.log(this.object)
         this.$store
           .dispatch(this.actions.UPDATE, {

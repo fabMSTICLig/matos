@@ -15,14 +15,17 @@
             <tr v-for="entity in orgas" :key="entity.id">
               <td @click="entityManage(entity.id)" class="clickRow">{{entity.name}}</td>
               <td class="text-right">
-                <a href="#" @click.prevent="editEntity(entity)">Edit</a> -
+                <a href="#" @click.prevent="editEntity(entity)">Edit</a>
+                <span v-if='isAdmin'> - </span>
+                <a href="#" @click.prevent="deleteEntity(entity.id)" v-if='isAdmin'>Delete</a>
+
               </td>
             </tr>
           </tbody>
         </table>
       </b-col>
       <b-col lg="3">
-        <b-card  v-if="update">
+        <b-card  v-if="update || add">
           <b-form @submit.prevent="saveEntity">
             <b-form-group
               id="label-nom"
@@ -56,11 +59,15 @@
             </b-form-group>
 
               <b-row id="actions-btn">
-                <b-button type="submit" @click.prevent="saveEntity" variant="primary">Update</b-button>
+                <b-button type="submit" v-show="update" @click.prevent="saveEntity" variant="primary">Update</b-button>
+                <b-button  type="submit" @click.prevent="saveEntity" v-if='isAdmin' v-show="add" variant="primary">Add</b-button>
                 <b-button id="unselect-btn" variant="outline-primary" @click="deselectAffiliates">Deselect all</b-button>
               </b-row>
            </b-form>
         </b-card>
+      </b-col>
+      <b-col lg="2" v-if="isAdmin">
+          <button class="btn btn-info" @click="createLink()" >Add new one</button>
       </b-col>
     </b-row>
   </div>
@@ -97,11 +104,16 @@ export default {
       },
       objectName: 'Entity',
       update: false,
+      add: false,
       affiliates: []
     }
   },
   computed: {
-    ...mapGetters([ 'orgas', 'affiliations' ])
+    ...mapGetters([ 'orgas', 'affiliations' ]),
+    ...mapState({
+      isAdmin: state => state.auth.authUser.is_staff,
+      isManager: state => state.auth.authUser.is_manager
+    })
 
   },
   methods: {
@@ -125,8 +137,11 @@ export default {
       // eslint-disable-next-line no-unused-vars
       let id = entity.id
       // eslint-disable-next-line standard/object-curly-even-spacing
-      this.$router.push({ path: `/manage/${id}` })
+      this.$router.push({ path: `/organisations/${id}` })
       this.update = true
+    },
+    deleteEntity (id) {
+      this.deleteObject(id)
     },
     deselectAffiliates () {
       this.affiliates = []
@@ -134,7 +149,6 @@ export default {
     },
     fetchData () {
       this.$store.dispatch(FETCH_ORGAS)
-      this.update = true
     },
     ownAffiliations (id) {
       // eslint-disable-next-line eqeqeq
@@ -147,9 +161,15 @@ export default {
         return ''
       }
     },
+    createLink () {
+      this.update = false
+      this.add = true
+      this.$router.push({ name: 'organisations' })
+    },
     entityManage (id) {
       this.update = true
-      this.$router.push({ path: `/manage/${id}` })
+      this.add = false
+      this.$router.push({ path: `/organisations/${id}` })
     }
   },
 
@@ -161,28 +181,33 @@ export default {
         this.organization = this.orgas.find(organization => organization.id == idRoute) || {}
         this.object = Object.assign({}, this.organization)
         this.affiliates = this.organization.affiliations
+        this.update = true
+        this.add = false
         // eslint-disable-next-line eqeqeq
         if (to.name == 'manageUsers') {
           alert('manage users')
         }
       } if (!this.$route.params.id) {
-        this.organization = {}
         this.update = false
+        this.add = true
+        this.organization = {}
+        this.deselectAffiliates()
+        this.object = Object.assign({}, this.organization)
       }
-      this.object = Object.assign({}, this.organization)
     }
   },
 
   beforeMount () {
-    this.$store.dispatch(FETCH_ORGAS)
     this.$store.dispatch(FETCH_AFFILIATIONS)
-    this.object = Object.assign({}, this.organization)
 
     // eslint-disable-next-line eqeqeq
     if (!this.$route.params.id) {
-      console.log(this.object)
+      this.add = true
+      this.update = false
     }
     if (this.$route.params.id) {
+      this.add = false
+      this.update = true
       let idRoute = this.$route.params.id
       this.$store.dispatch(FETCH_ORGAS).then(orgas => {
         // eslint-disable-next-line eqeqeq
@@ -195,11 +220,6 @@ export default {
     }
   },
   created () {
-    if (this.$route.params.id) {
-      this.update = true
-      this.add = false
-      this.affiliates = this.organization.affiliations
-    }
   }
 }
 </script>

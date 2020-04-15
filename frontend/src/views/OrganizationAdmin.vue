@@ -129,7 +129,7 @@ export default {
       // eslint-disable-next-line no-unused-vars
       let id = entity.id
       // eslint-disable-next-line standard/object-curly-even-spacing
-      this.$router.push({ path: `/admin/orgas/${id}` })
+      this.$router.push({ path: `/organisations/${id}` })
     },
     deleteEntity (id) {
       this.deleteObject(id)
@@ -141,7 +141,7 @@ export default {
     createLink () {
       this.update = false
       this.add = true
-      this.$router.push({ name: 'admin-orga' })
+      this.$router.push({ path: `/organisations` })
     },
     fetchData () {
       this.$store.dispatch(FETCH_ORGAS)
@@ -161,7 +161,7 @@ export default {
       }
     },
     entityManage (id) {
-      this.$router.push({ path: `/admin/orga/${id}` })
+      this.$router.push({ path: `/organisations/${id}` })
     }
   },
 
@@ -176,6 +176,7 @@ export default {
         this.object = Object.assign({}, this.organization)
         this.affiliates = this.organization.affiliations
       } if (!this.$route.params.id) {
+        console.log(this.organization)
         this.organization = {}
         this.add = true
       }
@@ -186,11 +187,15 @@ export default {
   beforeMount () {
     this.$store.dispatch(FETCH_ORGAS)
     this.$store.dispatch(FETCH_AFFILIATIONS)
-    this.object = Object.assign({}, this.organization)
 
     // eslint-disable-next-line eqeqeq
     if (!this.$route.params.id) {
       this.add = true
+      this.organization = {}
+      this.object = Object.assign({}, this.organization)
+
+      console.log('calcul')
+
       console.log(this.object)
     }
     if (this.$route.params.id) {

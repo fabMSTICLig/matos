@@ -179,39 +179,134 @@ class productInstanceListView(viewsets.ModelViewSet):
 class organizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAdminOrIsSelf)
 
-    def get(self, request, pk, format=None):
-        organization = self.get_organization(pk)
-        serializer = OrganizationSerializer(organization)
-        return Response(serializer.data)
+    def retrieve(self, request, pk=None):
+        pass
 
-
-    def put(self, request, *args, **kwargs):
-        print("put")
-        permission_classes = (IsManager,)
-        user=get_user(request)
-        print(user.has_perm('manage_entity'))
-        return self.update(request, *args,**kwargs) 
-    
-        #Helper method to get a person
+    #Helper method to get a person
     def get_organization(self, pk):
         try:
             return Organization.objects.get(pk=pk)
         except Organization.DoesNotExist:
             raise Http404
-    
-    def patch(self, request, pk):
-        instance_object = self.get_object(pk)
-        print(request)
-        print('patch')
-        permission_classes = (IsManager,)
 
-        serializer = OrganizationSerializer(instance_object, data=request.data, partial=True) # set partial=True to update a data partially
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse({'code':201, 'data':serializer.data})
-        return JsonResponse({'code':400, 'data':"wrong parameters"})
+    def get_permissions(self):
+        print(self.action)
+        if self.action == 'list':
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['update', 'retrieve','create', 'delete']:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAdminUser]
+            
+        return [permission() for permission in permission_classes]
+
+    def update(self, request, *args, **kwargs):
+        """
+        Overload update method in order to limit standard user actions
+        """
+        if(isinstance(request.data, QueryDict)):
+            data = request.data.dict()
+        else:
+            data = dict(request.data)
+        # Auto complete if normal user or admin for own usage by removing user member
+        if(not request.user.is_staff or not 'user' in data):
+            data['user'] = request.user
+            organization = Organization.objects.get(pk=data['id'])
+            organization.name = data['name']
+            organization.contact = data['contact']
+            affiliations = data['affiliations']
+            managers = data["managed"]
+            print(organization.name)
+            print(Organization.objects.filter(name=organization.name))          
+            organization.save()
+          
+            try:
+                organization.save() # Could throw exception
+            except IntegrityError:
+                transaction.rollback()
+
+            organization.affiliations.clear()
+
+            for affiliation in affiliations:
+                affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
+                organization.affiliations.add(affiliation_obj)
+            
+            organization.save()
+            organization.managed.clear()
+
+            for manager in managers :
+                print(manager['id'])
+                manager_obj = User.objects.get(pk=manager['id'])
+                manager_obj.first_name = manager['first_name']
+                manager_obj.last_name = manager['last_name']
+                manager_obj.externe = manager['externe']
+                manager_obj.is_staff = manager['is_staff']
+                manager_obj.username = manager['username']
+
+                print(manager_obj.username)
+
+                manager_obj.save()
+                organization.managed.add(manager_obj)
+
+        organization.save()
+        serialized_class = OrganizationSerializer(organization)
+        print(serialized_class.data)
+        return Response(serialized_class.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Overload create method for auto completing user, date and validated member
+        """
+        if(isinstance(request.data, QueryDict)):
+            data = request.data.dict()
+        else:
+            data = dict(request.data)
+        # Auto complete if normal user or admin for own usage by removing user member
+        if(not request.user.is_staff or not 'user' in data):
+            data['user'] = request.user
+            organization = Organization()
+            organization.name = data['name']
+            organization.contact = data['contact']
+            affiliations = data['affiliations']
+            print(organization.name)
+            print(Organization.objects.filter(name=organization.name))
+            try:
+                organization_existing = Organization.objects.get(name=organization.name)
+                print("existing orga")
+                print(organization_existing)
+                if organization_existing :
+                    return Response("entity already registered with same name", status=status.HTTP_400_BAD_REQUEST)
+            except:
+                pass
+  
+            organization.save()
+          
+            try:
+                organization.save() # Could throw exception
+            except IntegrityError:
+                transaction.rollback()
+
+            organization.affiliations.clear()
+
+            for affiliation in affiliations:
+                affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
+                organization.affiliations.add(affiliation_obj)
+            
+            organization.save()
+               
+        serialized_class = OrganizationSerializer(organization)
+        print(serialized_class.data)
+        return Response(serialized_class.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk, format=None):
+        print('suppression')
+        organization = self.get_organization(pk)
+        id=pk
+        print(pk)
+        organization.delete() 
+        return Response({"id" :id}, status=status.HTTP_200_OK)
     
    
 
@@ -272,40 +367,32 @@ class family_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.Des
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)       
 
-class location_list(generics.ListCreateAPIView):
-    queryset = Location.objects.all()
-    serializer_class = LocationSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+# Create your views here.
+class AffiliationViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Affiliation.objects.all()
+    serializer_class = AffiliationSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
-class location_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
-    queryset = Location.objects.all()
-    serializer_class =  LocationSerializer    
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-class transaction_list(generics.ListCreateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get_serializer_class(self):
+        """
+        Non admin user cannot see private user attribute for privacy reason
+        """
+        if self.action == "list" and not self.request.user.is_staff:
+            permission_classes = (IsAdminOrIsSelf,)
+            return PublicAffiliationSerializer
         
+        elif self.action in ['update', 'partial_update', 'retrieve', 'create']:
+            permission_classes = (IsAdminUser,)
+            return AffiliationSerializer
 
-class transaction_detail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class =  TransactionSerializer
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args,**kwargs)
-    
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args,**kwargs) 
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)  
-
+        else:
+            print("Affiliation Serializer")
+            permission_classes = (IsAdminUser,)
+            return AffiliationSerializer
 
 class UserInstanceView(APIView):
     @csrf_exempt

@@ -24,7 +24,7 @@ export const actions = {
   [FETCH_AFFILIATIONS] (context, force = false) {
     // eslint-disable-next-line eqeqeq
     if (context.state.affiliations.length == 0 || force) {
-      return ApiService.query('gestion/affiliations', {})
+      return ApiService.query('affiliations', {})
         .then(({ data }) => {
           context.commit(SET_AFFILIATIONS, data)
           return data
@@ -37,13 +37,13 @@ export const actions = {
     }
   },
   [UPDATE_AFFILIATION] (context, { id, data }) {
-    return ApiService.update('gestion/affiliations', id, data).then(({ data }) => {
+    return ApiService.update('affiliations', id, data).then(({ data }) => {
       context.commit(SET_AFFILIATION, data)
       return data
     })
   },
   [CREATE_AFFILIATION] (context, { data }) {
-    return ApiService.post('gestion/affiliations', data).then(({ data }) => {
+    return ApiService.post('affiliations', data).then(({ data }) => {
       context.commit(SET_AFFILIATION, data)
       return data
     })

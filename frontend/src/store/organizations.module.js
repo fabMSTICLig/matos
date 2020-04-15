@@ -27,7 +27,7 @@ export const actions = {
   [FETCH_ORGAS] (context, force = false) {
     // eslint-disable-next-line eqeqeq
     if (context.state.orgas.length == 0 || force) {
-      return ApiService.query('gestion/organizations', {})
+      return ApiService.query('organizations', {})
         .then(({ data }) => {
           context.commit(SET_ORGAS, data)
           return data
@@ -40,14 +40,14 @@ export const actions = {
     }
   },
   [GET_ORGA] (context, id) {
-    return ApiService.get('/organizations', id).then(({ data }) => {
+    return ApiService.get('organizations', id).then(({ data }) => {
       context.commit(SET_ORGA, data)
       return data
     })
   },
   [UPDATE_ORGA] (context, { id, data }) {
     console.log('update orga')
-    return ApiService.update('gestion/organizations', id, data).then(({ data }) => {
+    return ApiService.update('organizations', id, data).then(({ data }) => {
       context.commit(SET_ORGA, data)
       console.log(data)
       return data
@@ -55,7 +55,7 @@ export const actions = {
   },
   [DELETE_ORGA] (context, { id }) {
     console.log('update orga')
-    return ApiService.delete('gestion/organizations', id).then(({ data }) => {
+    return ApiService.delete('organizations', id).then(({ data }) => {
       context.commit(DELETE_ORGA, data)
       console.log(data)
       return data
@@ -63,7 +63,7 @@ export const actions = {
   },
 
   [CREATE_ORGA] (context, { data }) {
-    return ApiService.post('gestion/organizations/', data).then(({ data }) => {
+    return ApiService.post('organizations/', data).then(({ data }) => {
       context.commit(SET_ORGA, data)
       console.log(data)
       return data

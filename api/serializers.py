@@ -104,6 +104,12 @@ class AffiliationSerializer(serializers.ModelSerializer):
         model = Affiliation
         fields = ['id', 'name', 'type']
 
+class PublicAffiliationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Affiliation
+        fields = ['id', 'name', 'type']
+        read_only_fields = ('id', 'name', 'type')
+
 class OrganizationSerializer(serializers.ModelSerializer):
     managed = UserSerializer(many=True, read_only=True)
     affiliations = AffiliationSerializer(many=True, read_only=True)
