@@ -150,23 +150,16 @@ class Affiliation(models.Model):
         return self.name
 
 
-class Person(models.Model):
+class Profile(models.Model):
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        unique=True,
-        on_delete=models.CASCADE,
-        related_name='person',
-        default="1"
-    )
+    user =  models.OneToOneField(User, on_delete=models.CASCADE, blank=True,null=True)
     username = models.CharField(max_length=40)
     firstname = models.CharField(max_length=40)
     lastname = models.CharField(max_length=100)
     email = models.CharField(max_length=250)
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="members")
-    #supervisor = models.BooleanField(default=False)
-    superuser = models.BooleanField(default=False)
+    acceptance = models.BooleanField(default=False)
     def __str__(self):
         return self.user.username+"("+self.user.first_name+" "+self.user.last_name+")"
 
@@ -220,7 +213,7 @@ class Reservation():
     created_date = models.DateTimeField(auto_now_add=True)
     commentary = models.CharField(max_length=300, null=True, blank=True)
     user = models.ForeignKey(
-        Person, null=False, blank=False, on_delete=models.SET_NULL)
+        User, null=False, blank=False, on_delete=models.SET_NULL)
         
     def __str__(self):
         return self.user.__str__()+'('+str(self.date)+' '+str(self.end_date)+')'

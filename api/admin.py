@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db import models
-from .models import Person, Family, Product, ProductInstance, Organization, Affiliation
+from .models import Profile, Family, Product, ProductInstance, Organization, Affiliation
 # Register your models here.
 @admin.register(Family)
 class FamilyAdmin(admin.ModelAdmin):
@@ -38,6 +38,6 @@ class ProductInstanceAdmin(admin.ModelAdmin):
         }),
     )
 
-@admin.register(Person)
+@admin.register(Profile)
 class PersonAdmin(admin.ModelAdmin):
    pass

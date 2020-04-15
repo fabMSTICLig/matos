@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from './store'
-import { CHECK_AUTH } from '@/store/actions.type'
 Vue.use(VueRouter)
 
 function requireAuthManager (to, from, next) {
@@ -13,36 +12,12 @@ function requireAuthManager (to, from, next) {
   }
 }
 
-function requireAuthAdmin (to, from, next) {
-  Promise.all([store.dispatch(CHECK_AUTH)])
-    .then(res => {
-      if (store.state.auth.authUser.is_staff) {
-        next()
-      } else {
-        next({ name: 'home' })
-      }
-    })
-    .catch(() => {
-      next('/')
-    })
-}
-
 export default new VueRouter({
   routes: [
     {
       name: 'home',
       path: '/',
       component: () => import('./views/Home')
-    },
-    {
-      name: 'equipment',
-      path: '/equipment',
-      component: () => import('./views/EquipmentCreate')
-    },
-    {
-      name: 'equipmentEdit',
-      path: '/equipment/:id',
-      component: () => import('./views/EquipmentEdit')
     },
     {
       name: 'organizationList',
@@ -55,10 +30,9 @@ export default new VueRouter({
       component: () => import('./views/Login')
     },
     {
-      name: 'manage',
-      path: '/manage',
-      component: () => import('./views/Manage'),
-      beforeEnter: requireAuthManager
+      name: 'editProfile',
+      path: '/profile',
+      component: () => import('./views/Profile')
     },
     {
       name: 'manageEntity',
@@ -72,41 +46,10 @@ export default new VueRouter({
       path: '/manage/:id/users',
       component: () => import('./views/Manage')
     },
-
-    {
-      name: 'family',
-      path: '/families/:id',
-      component: () => import('./views/Categorie')
-    },
-    {
-      name: 'manageEquipment-list',
-      path: '/manage/entity/:id/equipment-list',
-      component: () => import('./views/Manage'),
-      beforeEnter: requireAuthManager
-    },
-
     {
       name: 'organisations',
       path: '/organisations',
       component: () => import('./views/Organizations')
-    },
-    {
-      name: 'admin-manageOrga',
-      path: '/admin/orga/:id',
-      component: () => import('./views/Admin'),
-      beforeEnter: requireAuthAdmin
-    },
-    {
-      name: 'admin-users',
-      path: '/admin/orga/:id/users',
-      component: () => import('./views/Admin'),
-      beforeEnter: requireAuthAdmin
-    },
-    {
-      name: 'update-orga',
-      path: '/admin/orgas/:id',
-      component: () => import('./views/Admin'),
-      beforeEnter: requireAuthAdmin
     }
   ]
 })

@@ -2,27 +2,58 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers, exceptions
-from .models import Location, Family, Product, Transaction, ProductInstance, Organization, Person, Affiliation
+from .models import Location, Family, Product, Transaction, ProductInstance, Organization, Profile, Affiliation
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
-class PersonSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Person
-        fields = ('id','firstname','lastname','username','email')
+        model = Profile
+        fields = ('id','firstname','lastname','username','email','acceptance')
+
+class PasswordSerializer(serializers.Serializer):
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+class NewUserSerializer(serializers.Serializer):
+    """
+    Serializer for create new user endpoint.
+    """
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer class of the User Model
     The class member person is a nested representation
     """
-    #person = PersonSerializer(many=True)
+    profile = ProfileSerializer(many=False)
     externe = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'email',
-                  'first_name', 'last_name', 'is_staff','externe')
+                  'first_name', 'last_name', 'is_staff','profile','externe')
         read_only_fields = ('username',)
+
+    def get_externe(self, obj):
+        return len(obj.password)==0
+
+class UserPublicSerializer(serializers.ModelSerializer):
+    """
+    Serializer class of the User Model
+    The class member person is a nested representation
+    """
+    profile = ProfileSerializer(many=False)
+    externe = serializers.SerializerMethodField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+        read_only_fields = ('username', 'email', 'first_name', 'last_name')
 
     def get_externe(self, obj):
         return len(obj.password)==0

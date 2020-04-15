@@ -1,6 +1,5 @@
 from rest_framework import permissions
 from django.contrib.auth.models import User
-from .models import Person
 
 
 class IsAdminOrIsSelf(permissions.BasePermission):
@@ -8,13 +7,11 @@ class IsAdminOrIsSelf(permissions.BasePermission):
         # Instance must have an attribute named `owner`.
         isself = False
         # can be used for Person or User model
-        if isinstance(obj, Person):
-            isself = request.user == obj.user
-        elif isinstance(obj, User):
+        if isinstance(obj, User):
             isself = request.user == obj
         else:
             isself = request.user == obj.user.user
-        return request.user.is_admin or isself
+        return request.user.is_staff or isself
 
 
 class IsManagerOrReadOnly(permissions.BasePermission):

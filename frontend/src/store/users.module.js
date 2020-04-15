@@ -39,7 +39,7 @@ export const actions = {
     })
   },
   [UPDATE_USER] (context, { id, data }) {
-    return ApiService.update('/users/', id, data).then(({ data }) => {
+    return ApiService.update('/users', id, data).then(({ data }) => {
       context.commit(SET_USER, data)
       return data
     })

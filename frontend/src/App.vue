@@ -4,14 +4,14 @@
           <div class='nav-header'>
             <router-link tag='a' class='button-head' class-active='active' to='/' exact>Réservations</router-link>
             <router-link tag='a' class='button-head' class-active='active' to='/manage' :active="$route.matched.some(({ name }) => name === 'manage')">Gestion</router-link>
-            <router-link tag='a' v-if='isAdmin' class='button-head' class-active='active' to='/organisations' :active="$route.matched.some(({ name }) => name === 'admin')" >Organisations</router-link>
+            <router-link tag='a' v-if='isAdmin' class='button-head' class-active='active' to='/organisations' exact >Organisations</router-link>
           </div>
           <div class='nav-header'>
             <div v-if='!isAuthenticated' class='auth-nav'>
               <b-link href='/api/login'  class='button-head-sub'>login CAS</b-link>
             </div>
             <div v-if='isAuthenticated' class='auth-nav'>
-              <b-link href='/api/self' class='button-head-sub'>{{authUser.username}}</b-link>
+              <router-link tag='a' v-if='isAdmin' class='button-head' class-active='active' to='/profile' exacr>{{authUser.username}}</router-link>
             </div>
             <div v-if='isAuthenticated' class='auth-nav'>
               <b-link :href="authUser.externe ? '/api/logout' : '/auth/logout'" >Log out</b-link>
