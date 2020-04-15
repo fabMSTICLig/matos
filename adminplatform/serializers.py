@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers, exceptions
 from django.contrib.auth import get_user_model
-from api.models import Organization, Affiliation, Person
+from api.models import Organization, Affiliation
 
 
 
@@ -92,14 +92,5 @@ class OrganizationPublicSerializer(OrganizationSerializer):
         fields = ['id', 'name']
         readonly = ['id', 'name']
 
-class PersonSerializer(serializers.ModelSerializer):
-    affiliations = AffiliationSerializer(many=True, read_only=True)
-    class Meta:
-        model = Person
-        fields = ['id', 'firstname','lastname','username', 'email', 'superuser', 'affiliations']
 
-class PersonPublicSerializer(OrganizationSerializer):
-    class Meta:
-        model = Person
-        fields = ['id', 'firstname','lastname','username', 'email']
-        readonly = ['id', 'firstname','lastname','username', 'email']
+

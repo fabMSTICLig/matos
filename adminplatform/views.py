@@ -5,7 +5,7 @@ from .serializers import *
 from rest_framework import filters
 import traceback
 import sys
-from api.models import Organization, Affiliation, Person
+from api.models import Organization, Affiliation
 from .permissions import IsAdminOrIsSelf, IsAdminOrReadOnly
 from rest_framework import viewsets, mixins, status, generics
 from rest_framework.viewsets import ViewSetMixin
@@ -26,34 +26,6 @@ from rest_framework.status import (
 
 from django.db import transaction, DatabaseError
 # Create your views here.
-
-class PersonViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows persons to be viewed or edited.
-    """
-    queryset = Person.objects.all()
-    serializer_class = PersonSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('username', 'email', 'lastname')
-
-    def get_serializer_class(self):
-        """
-        Non admin user cannot see private user attribute for privacy reason
-        """
-        if self.action == "list" and not self.request.user.is_staff:
-            return PersonPublicSerializer
-        else:
-            return PersonSerializer
-
-    def get_permissions(self):
-        print(self.action)
-        if self.action == 'list':
-            permission_classes = [IsAdminOrIsSelf]
-        elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
-            permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
-        else:
-            permission_classes = [IsAdminUser]
-        return [permission() for permission in permission_classes]
 
 
 class UserViewSet(viewsets.ModelViewSet):
