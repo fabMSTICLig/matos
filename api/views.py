@@ -200,11 +200,7 @@ class organizationViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     permission_classes = (IsAdminOrIsSelf)
 
-
-
-    def retrieve(self, request, pk=None):
-        pass
-
+   
     #Helper method to get a person
     def get_organization(self, pk):
         try:
@@ -216,10 +212,12 @@ class organizationViewSet(viewsets.ModelViewSet):
         print(self.action)
         if self.action == 'list':
             permission_classes = [IsAuthenticated]
-        elif self.action in ['update', 'retrieve','create', 'delete']:
+        elif self.action in ['create', 'delete']:
             permission_classes = [IsAdminUser]
+        elif self.action in ['update']:
+            permission_classes = [IsManager,IsAdminUser]
         else:
-            permission_classes = [IsAdminUser]
+            permission_classes = [IsAuthenticatedOrReadOnly]
             
         return [permission() for permission in permission_classes]
 
