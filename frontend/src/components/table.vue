@@ -28,11 +28,6 @@
               -
               </b-button>
             </b-col>
-            <b-col md="2">
-              <b-button :id="'update-user-' + row.index" @click="editMode(row.item)" variant="info" size="sm">
-              Modifier
-            </b-button>
-            </b-col>
           </b-row>
         </b-container>
       </template>

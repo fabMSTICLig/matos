@@ -1,43 +1,41 @@
 
 <template>
-<div>
-      <h2>Liste des entités</h2>
-       <b-row>
+  <b-container>
+      <b-row>
         <b-col lg="5">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>&nbsp;</th>
-              </tr>
-            </thead>
-            <tbody v-if="orgas">
-              <tr v-for="entity in orgas" :key="entity.id">
-                <td @click="entityView(entity)" class="clickRow">{{entity.name}}</td>
-                <td class="text-right">
-                  <b-button @click="entityView(entity)">View</b-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="column">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>&nbsp;</th>
+                </tr>
+              </thead>
+              <tbody v-if="orgas">
+                <tr v-for="entity in orgas" :key="entity.id">
+                  <td @click="entityView(entity)" class="clickRow">{{entity.name}}</td>
+                  <td class="text-right">
+                    <b-button @click="entityView(entity)">View</b-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </b-col>
-        <b-col md="3" v-if="organizationItem">
-          <b-table
-            :borderless="borderless"
-            :items="organizationItem"
-            :fields="fields"
-            :head-variant="headVariant"
-            :table-variant="tableVariant"
-          ></b-table>
+        <b-col md="3" v-if="object.id">
+          <div class="column">
+            <organization :organization="object"  v-on:input="selectOrganization"></organization>
+          </div>
         </b-col>
        </b-row>
-  </div>
+  </b-container>
 </template>
 
 <script>
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from 'vuex'
 import { EditorMixin } from '@/common/mixins'
+import organization from '@/components/organization.vue'
 
 import {
   FETCH_ORGAS,
@@ -51,7 +49,9 @@ import {
 export default {
   mixins: [EditorMixin],
   name: 'OrganizationList',
-  components: {},
+  components: {
+    organization
+  },
 
   data () {
     return {
@@ -63,7 +63,6 @@ export default {
       borderless: true,
       headVariant: 'dark',
       tableVariant: 'light',
-      organizationItem: [],
       organization: this.organization || {},
       actions: {
         GET: GET_ORGA,
@@ -76,6 +75,12 @@ export default {
       affiliates: []
     }
   },
+  props: {
+    viewmode: {
+      type: Boolean,
+      default: false
+    }
+  },
   computed: {
     ...mapGetters([ 'orgas', 'affiliations' ])
 
@@ -83,13 +88,25 @@ export default {
   methods: {
 
     entityView (entity) {
-      this.selectObject(entity)
+      // this.selectObject(entity)
       this.organizationItem = []
-      this.$router.push({ path: `/orga/${entity.id}` })
+      if (!this.viewmode) {
+        this.$router.push({ path: `/organisations/${entity.id}` })
+      }
+      if (this.viewmode) {
+        console.log(entity)
+        this.object = entity
+        console.log(this.object)
+      }
     },
     fetchData () {
       this.$store.dispatch(FETCH_ORGAS)
       this.organization = {}
+    },
+    selectOrganization (entity) {
+      alert('select')
+      this.organization = entity
+      this.object = Object.assign({}, this.organization)
     }
 
   },
@@ -114,15 +131,14 @@ export default {
     this.$store.dispatch(FETCH_ORGAS)
     this.$store.dispatch(FETCH_AFFILIATIONS)
     this.object = Object.assign({}, this.organization)
-
+    let self = this
     if (this.$route.params.id) {
       let idRoute = this.$route.params.id
       this.$store.dispatch(FETCH_ORGAS).then(orgas => {
         // eslint-disable-next-line eqeqeq
-        this.organization = orgas.find(organization => organization.id == idRoute) || {}
-        this.object = Object.assign({}, this.organization)
-        this.affiliates = this.organization.affiliations
-        this.organizationItem.push(this.object)
+        self.organization = orgas.find(organization => organization.id == idRoute) || {}
+        self.object = Object.assign({}, this.organization)
+        self.affiliates = this.organization.affiliations // this.organizationItem.push(this.object)
         console.log(this.object)
       })
     }
@@ -148,4 +164,16 @@ export default {
    width: auto;
    height: 35px;
  }
+ .column {
+   margin-top: 47px;
+ }
+
+ th {
+   border:none;
+  }
+
+  .row > :nth-child(2) {
+    margin-top: 50px;
+  }
+
 </style>

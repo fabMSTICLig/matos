@@ -2,7 +2,7 @@
     <div id='app'>
         <div id='header'>
           <div class='nav-header'>
-            <router-link tag='a' class='button-head' class-active='active' to='/' exact>Réservations</router-link>
+            <router-link tag='a' class='button-head' class-active='active' to='/' exact>Home</router-link>
             <router-link tag='a' class='button-head' class-active='active' to='/organisations' exact >Organisations</router-link>
           </div>
           <div class='nav-header'>

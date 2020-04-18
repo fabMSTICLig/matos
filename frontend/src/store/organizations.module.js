@@ -10,16 +10,21 @@ import {
   DELETE_ORGA
 } from './actions.type'
 
-import { SET_ORGAS, SET_ORGA } from './mutations.type'
+import { SET_ORGAS, SET_ORGA, GET_ORGANIZATION } from './mutations.type'
 
 Vue.config.devtools = true
 
 export const state = {
-  orgas: []
+  orgas: [],
+  orga: ''
 }
 const getters = {
   orgas (state) {
     return state.orgas
+  },
+
+  orga (state) {
+    return state.orga
   }
 }
 
@@ -41,8 +46,8 @@ export const actions = {
   },
   [GET_ORGA] (context, id) {
     console.log(id)
-    return ApiService.get('/organizations/', id).then(({ data }) => {
-      context.commit(SET_ORGA, data)
+    return ApiService.get('/organizations', id).then(({ data }) => {
+      context.commit(GET_ORGANIZATION, data)
       return data
     })
   },
@@ -89,6 +94,9 @@ export const mutations = {
     if ('id' in orga) {
       DataHelper.updateById(state.orgas, orga)
     }
+  },
+  [GET_ORGANIZATION] (state, orga) {
+    state.orga = orga
   },
   [DELETE_ORGA] (state, orga) {
     console.log(orga)

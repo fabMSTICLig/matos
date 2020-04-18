@@ -1,10 +1,9 @@
 
 <template>
-  <div>
-    <organization-list v-if='!isAdmin && !isManager'></organization-list>
-    <organization-manage v-if='isAdmin || isManager'></organization-manage>
-
-  </div>
+    <div>
+      <organization-list v-if='!isAdmin && !isManager'></organization-list>
+      <organization-manage v-if='isAdmin || isManager'></organization-manage>
+    </div>
 </template>
 
 <script>
@@ -37,13 +36,19 @@ export default {
     ...mapState({
       isAdmin: state => state.auth.authUser.is_staff,
       isManager: state => state.auth.authUser.is_manager
-    })
+    }),
+    ...mapGetters(['orgas', 'orga'])
   },
   methods: {
+
   },
 
   watch: {
     $route (to, from) {
+      // eslint-disable-next-line eqeqeq
+      if (to.name == 'organisationsList') {
+        this.viewMode = true
+      }
       if (this.$route.params.id) {
 
       } if (!this.$route.params.id) {
@@ -52,6 +57,7 @@ export default {
   },
   beforeMount () {
     // eslint-disable-next-line no-undef
+
   }
 }
 </script>

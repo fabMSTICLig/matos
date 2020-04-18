@@ -23,7 +23,7 @@ export const actions = {
   [FETCH_USERS] (context, force = false) {
     // eslint-disable-next-line eqeqeq
     if (context.state.users.length == 0 || force) {
-      return ApiService.get('/users')
+      return ApiService.query('users', {})
         .then(({ data }) => {
           context.commit(SET_USERS, data)
           return data

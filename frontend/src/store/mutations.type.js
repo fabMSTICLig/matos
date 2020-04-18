@@ -1,4 +1,5 @@
 export const SET_ORGAS = 'setOrgas'
+export const GET_ORGANIZATION = 'getOrga'
 export const SET_ORGA = 'setOrga'
 export const SET_AUTHUSER = 'setAuthUser'
 export const SET_EQUIPMENTS = 'setEquipments'
