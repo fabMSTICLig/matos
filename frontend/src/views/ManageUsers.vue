@@ -81,17 +81,17 @@ export default {
   },
 
   computed: {
-    ...mapGetters([ 'entity', 'entitys', 'users' ]),
+    ...mapGetters([ 'entity', 'entities', 'users' ]),
     ...mapState({
-      entitynizations: state => state.entitynizations,
-      managers: state => state.entitynizations.entity.managed
+      entities: state => state.entities,
+      managers: state => state.entities.entity.managed
     }),
 
     items () {
       return [
-        { link: '/entitynisations', name: 'Gestion' },
+        { link: '/entities', name: 'Gestion' },
         { link: '/manage-users', name: 'Utilisateurs' },
-        { link: '/entitynisations-list', name: 'entitynisation' }
+        { link: '/entities-list', name: 'Entité' }
       ]
     }
   },

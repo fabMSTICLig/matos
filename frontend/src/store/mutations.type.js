@@ -1,5 +1,5 @@
 export const SET_ENTITIES = 'setEntities'
-export const GET_ENTITY_MUT = 'getEntity'
+export const GET_ENTITY_STATE = 'getEntity'
 export const SET_ENTITY = 'setEntity'
 export const SET_AUTHUSER = 'setAuthUser'
 export const SET_EQUIPMENTS = 'setEquipments'
