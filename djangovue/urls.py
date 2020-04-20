@@ -21,7 +21,6 @@ from django.conf.urls import url, include
 from api.views import  productListViewSet, productInstanceListView, index, organizationManagedListView, AffiliationViewSet, organizationViewSet, UserViewSet, UserInstanceView, productDetailViewSet
 import django_cas_ng.views
 from rest_framework import routers
-from adminplatform.urls import router as adminrouter
 
 router = routers.DefaultRouter()
 router.register(r'api/equipments', productListViewSet)
