@@ -80,9 +80,6 @@ class UserViewSet(viewsets.ModelViewSet):
         print(user)
         print('## patch user ##')
         permission_classes = (IsAuthenticatedOrReadOnly,)
-
-       
-
         serializer = UserSerializer(user, data=request.data, partial=True) # set partial=True to update a data partially
         if serializer.is_valid():
             if(isinstance(request.data, QueryDict)):
@@ -95,7 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
             print(data)
             profile.username = data['username']
             profile.firstname = data['firstname']
-            profile.lastname = data['username']
+            profile.lastname = data['lastname']
             profile.email = data['email']
             profile.acceptance = data['acceptance']
             profile.save()

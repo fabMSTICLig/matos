@@ -48,11 +48,10 @@ class UserPublicSerializer(serializers.ModelSerializer):
     The class member person is a nested representation
     """
     profile = ProfileSerializer(many=False)
-    externe = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name','profile')
         read_only_fields = ('username', 'email', 'first_name', 'last_name')
 
     def get_externe(self, obj):

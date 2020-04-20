@@ -26,7 +26,6 @@ from adminplatform.urls import router as adminrouter
 router = routers.DefaultRouter()
 router.register(r'api/equipments', productListViewSet)
 router.register(r'api/products-instance', productInstanceListView)
-#router.registry.extend(adminrouter.registry)
 router.register(r'api/organizations', organizationViewSet)
 router.register(r'api/users', UserViewSet)
 router.register(r'api/affiliations', AffiliationViewSet)
