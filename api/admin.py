@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db import models
-from .models import Profile, Family, Product, ProductInstance, Organization, Affiliation
+from .models import Profile, Family, Product, ProductInstance, Entity, Affiliation
 # Register your models here.
 @admin.register(Family)
 class FamilyAdmin(admin.ModelAdmin):
@@ -9,16 +9,16 @@ class FamilyAdmin(admin.ModelAdmin):
 class ProductInstanceInline(admin.TabularInline):
     model = ProductInstance
 
-class OrganizationInline(admin.TabularInline):
-    model = Organization
+class EntityInline(admin.TabularInline):
+    model = Entity
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     categories = models.ManyToManyField(Family, limit_choices_to={'available': True})
     list_display = ('title', 'sku', 'categories', 'location')
 
-@admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
+@admin.register(Entity)
+class EntityAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Affiliation)

@@ -11,8 +11,8 @@
                   <th>&nbsp;</th>
                 </tr>
               </thead>
-              <tbody v-if="orgas">
-                <tr v-for="entity in orgas" :key="entity.id">
+              <tbody v-if="entities">
+                <tr v-for="entity in entities" :key="entity.id">
                   <td @click="entityView(entity)" class="clickRow">{{entity.name}}</td>
                   <td class="text-right">
                     <b-button @click="entityView(entity)">View</b-button>
@@ -24,7 +24,7 @@
         </b-col>
         <b-col md="3" v-if="object.id">
           <div class="column">
-            <organization :organization="object"  v-on:input="selectOrganization"></organization>
+            <entity :entity="object"  v-on:input="selectEntity"></entity>
           </div>
         </b-col>
        </b-row>
@@ -35,22 +35,22 @@
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from 'vuex'
 import { EditorMixin } from '@/common/mixins'
-import organization from '@/components/organization.vue'
+import entity from '@/components/entity.vue'
 
 import {
-  FETCH_ORGAS,
+  FETCH_ENTITIES,
   FETCH_AFFILIATIONS,
-  CREATE_ORGA,
-  GET_ORGA,
-  UPDATE_ORGA,
-  DELETE_ORGA
+  CREATE_ENTITY,
+  GET_ENTITY,
+  UPDATE_ENTITY,
+  DELETE_ENTITY
 } from '@/store/actions.type'
 
 export default {
   mixins: [EditorMixin],
-  name: 'OrganizationList',
+  name: 'EntityList',
   components: {
-    organization
+    entity
   },
 
   data () {
@@ -63,13 +63,13 @@ export default {
       borderless: true,
       headVariant: 'dark',
       tableVariant: 'light',
-      organization: this.organization || {},
+      entityObj: this.entityObj || {},
       actions: {
-        GET: GET_ORGA,
-        UPDATE: UPDATE_ORGA,
-        CREATE: CREATE_ORGA,
-        FETCH: FETCH_ORGAS,
-        DELETE: DELETE_ORGA
+        GET: GET_ENTITY,
+        UPDATE: UPDATE_ENTITY,
+        CREATE: CREATE_ENTITY,
+        FETCH: FETCH_ENTITIES,
+        DELETE: DELETE_ENTITY
       },
       objectName: 'Entity',
       affiliates: []
@@ -82,16 +82,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([ 'orgas', 'affiliations' ])
+    ...mapGetters([ 'entities', 'affiliations' ])
 
   },
   methods: {
 
     entityView (entity) {
-      // this.selectObject(entity)
-      this.organizationItem = []
       if (!this.viewmode) {
-        this.$router.push({ path: `/organisations/${entity.id}` })
+        this.$router.push({ path: `/entities/${entity.id}` })
       }
       if (this.viewmode) {
         console.log(entity)
@@ -100,13 +98,13 @@ export default {
       }
     },
     fetchData () {
-      this.$store.dispatch(FETCH_ORGAS)
-      this.organization = {}
+      this.$store.dispatch(FETCH_ENTITIES)
+      this.entityObj = {}
     },
-    selectOrganization (entity) {
+    selectEntity (entity) {
       alert('select')
-      this.organization = entity
-      this.object = Object.assign({}, this.organization)
+      this.entityObj = entity
+      this.object = Object.assign({}, this.entityObj)
     }
 
   },
@@ -115,30 +113,30 @@ export default {
     $route (to, from) {
       if (this.$route.params.id) {
         let idRoute = this.$route.params.id
-        console.log(this.organization)
+        console.log(this.entityObj)
         // eslint-disable-next-line eqeqeq
-        this.organization = this.orgas.find(organization => organization.id == idRoute) || {}
-        this.object = Object.assign({}, this.organization)
-        this.organizationItem.push(this.object)
+        this.entityObj = this.entities.find(entity => entity.id == idRoute) || {}
+        this.object = Object.assign({}, this.entityObj)
+        this.entityObjItem.push(this.object)
       } if (!this.$route.params.id) {
-        this.organization = {}
+        this.entityObj = {}
       }
-      this.object = Object.assign({}, this.organization)
+      this.object = Object.assign({}, this.entityObj)
     }
   },
 
   beforeMount () {
-    this.$store.dispatch(FETCH_ORGAS)
+    this.$store.dispatch(FETCH_ENTITIES)
     this.$store.dispatch(FETCH_AFFILIATIONS)
-    this.object = Object.assign({}, this.organization)
+    this.object = Object.assign({}, this.entityObj)
     let self = this
     if (this.$route.params.id) {
       let idRoute = this.$route.params.id
-      this.$store.dispatch(FETCH_ORGAS).then(orgas => {
+      this.$store.dispatch(FETCH_ENTITIES).then(entities => {
         // eslint-disable-next-line eqeqeq
-        self.organization = orgas.find(organization => organization.id == idRoute) || {}
-        self.object = Object.assign({}, this.organization)
-        self.affiliates = this.organization.affiliations // this.organizationItem.push(this.object)
+        self.entity = entities.find(entity => entity.id == idRoute) || {}
+        self.object = Object.assign({}, this.entityObj)
+        self.affiliates = this.entityObj.affiliations // this.entityObjItem.push(this.object)
         console.log(this.object)
       })
     }
@@ -147,7 +145,7 @@ export default {
     if (this.$route.params.id) {
       this.update = true
       this.add = false
-      this.affiliates = this.organization.affiliations
+      this.affiliates = this.entityObj.affiliations
     }
   }
 }

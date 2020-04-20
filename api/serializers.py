@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers, exceptions
-from .models import Location, Family, Product, Transaction, ProductInstance, Organization, Profile, Affiliation
+from .models import Location, Family, Product, Transaction, ProductInstance, Entity, Profile, Affiliation
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -68,7 +68,6 @@ class FamilySerializer(serializers.ModelSerializer):
         fields = ('id', 'reference', 'title')
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
     categories = FamilySerializer(many=True, read_only=True )
     class Meta:
@@ -109,11 +108,11 @@ class PublicAffiliationSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'type']
         read_only_fields = ('id', 'name', 'type')
 
-class OrganizationSerializer(serializers.ModelSerializer):
+class EntitySerializer(serializers.ModelSerializer):
     managed = UserSerializer(many=True, read_only=True)
     affiliations = AffiliationSerializer(many=True, read_only=True)
     class Meta:
-        model = Organization
+        model = Entity
         fields = ['id', 'name','managed', 'contact', 'affiliations', 'description']
 
 

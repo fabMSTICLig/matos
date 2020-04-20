@@ -2,8 +2,8 @@
 <template>
 <div>
     <navbar :items="items"></navbar>
-    <organization-list v-if="viewMode" :viewmode="viewMode"></organization-list>
-    <b-container v-if="!viewMode">
+    <entity-list v-if="viewMode" :viewmode="viewMode"></entity-list>
+<b-container v-if="!viewMode">
       <b-row>
         <b-col lg="5">
           <div class='column'>
@@ -14,8 +14,8 @@
                   <th>&nbsp;</th>
                 </tr>
               </thead>
-              <tbody v-if="organisations">
-              <tr v-for="entity in organisations" :key="entity.id">
+              <tbody v-if="entitiesObj">
+              <tr v-for="entity in entitiesObj" :key="entity.id">
                   <td @click="selectEntity(entity)" class="clickRow">{{entity.name}}</td>
                   <td class="text-right">
                     <a href="#" @click.prevent="editEntity(entity)">Edit</a>
@@ -40,7 +40,7 @@
                     type="text"
                     id="name-input"
                     name="organame"
-                    v-model="organization.name"
+                    v-model="entityObj.name"
                     placeholder="nom"
                 />
                 </b-form-group>
@@ -59,7 +59,7 @@
                     id="contact-input"
                     type="email"
                     placeholder="email contact"
-                    v-model="organization.contact" />
+                    v-model="entityObj.contact" />
                 </b-form-group>
 
                   <b-row id="actions-btn">
@@ -75,6 +75,7 @@
             </b-card>
           </div>
         </b-col>
+
         <b-col lg="2" v-if="isAdmin">
             <button class="btn btn-info" @click="createLink()" >Add new one</button>
         </b-col>
@@ -88,32 +89,30 @@
 import { mapGetters, mapState } from 'vuex'
 import { EditorMixin } from '@/common/mixins'
 import navbar from '@/components/navbar'
-import OrganizationList from './OrganizationList'
-import Vue from 'vue'
+import EntityList from './EntityList'
 import {
-  FETCH_ORGAS,
+  FETCH_ENTITIES,
   FETCH_AFFILIATIONS,
-  CREATE_ORGA,
-  GET_ORGA,
-  UPDATE_ORGA,
-  DELETE_ORGA
+  CREATE_ENTITY,
+  GET_ENTITY,
+  UPDATE_ENTITY,
+  DELETE_ENTITY
 } from '@/store/actions.type'
-var bus = new Vue({})
 
 export default {
   mixins: [EditorMixin],
-  name: 'OrganizationManage',
-  components: { navbar, OrganizationList },
+  name: 'EntityManage',
+  components: { navbar, EntityList },
 
   data () {
     return {
-      organization: this.organization || {},
+      entityObj: this.entityObj || {},
       actions: {
-        GET: GET_ORGA,
-        UPDATE: UPDATE_ORGA,
-        CREATE: CREATE_ORGA,
-        FETCH: FETCH_ORGAS,
-        DELETE: DELETE_ORGA
+        GET: GET_ENTITY,
+        UPDATE: UPDATE_ENTITY,
+        CREATE: CREATE_ENTITY,
+        FETCH: FETCH_ENTITIES,
+        DELETE: DELETE_ENTITY
       },
       viewMode: false,
       objectName: 'Entity',
@@ -123,35 +122,36 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([ 'orgas', 'affiliations' ]),
+    ...mapGetters([ 'entities', 'affiliations' ]),
     ...mapState({
       isAdmin: state => state.auth.authUser.is_staff,
       authUser: state => state.auth.authUser,
-      orga: state => state.organizations.orga
+      entity: state => state.entities.entity
     }),
-    organisations () {
+    entitiesObj () {
       let self = this
       if (this.isAdmin) {
-        return this.orgas
+        return this.entities
       } else {
-        let orgas = this.orgas.filter(function (orga) {
-          return orga.managed.some(function (user) {
+        console.log(this.entities)
+        let entities = this.entities.filter(function (entity) {
+          return entity.managed.some(function (user) {
             // eslint-disable-next-line eqeqeq
             return user.id == self.authUser.id
           })
         })
-        return orgas
+        return entities
       }
     },
     items () {
       return this.isAdmin ? [
-        { link: '/organisations', name: 'Gestion' },
+        { link: '/entities', name: 'Gestion' },
         { link: '/manage-users', name: 'Utilisateurs' },
-        { link: '/organisations-list', name: 'Organisation' }
+        { link: '/entities-list', name: 'Organisation' }
       ]
         : [
-          { link: '/organisations', name: 'Gestion' },
-          { link: '/organisations-list', name: 'Organisation' }
+          { link: '/entities', name: 'Gestion' },
+          { link: '/entities-list', name: 'Organisation' }
         ]
     }
   },
@@ -161,37 +161,37 @@ export default {
       return managers.find(manager => manager.id == this.authUser.id)
     },
     async saveEntity (EventForm) {
-      this.organization.affiliations = this.affiliates
-      this.assignObject(this.organization)
+      this.entityObj.affiliations = this.affiliates
+      this.assignObject(this.entityObj)
       await this.saveObject(EventForm)
       this.fetchData()
     },
     updateManager (manager) {
-      this.organization.managed = this.managed
+      this.entityObj.managed = this.managed
     },
     updateAffiliations (evt) {
-      if (this.organization) {
+      if (this.entityObj) {
         console.log(evt)
         this.affiliates = evt
       }
     },
     editEntity (entity) {
       this.assignObject(entity)
-      this.$router.push({ path: `/organisations/${entity.id}` })
+      this.$router.push({ path: `/entities/${entity.id}` })
       this.update = true
       this.add = true
     },
     deselectAffiliates () {
       this.affiliates = []
-      this.organization.affiliations = []
+      this.entityObj.affiliations = []
     },
     fetchData () {
-      this.$store.dispatch(FETCH_ORGAS)
+      this.$store.dispatch(FETCH_ENTITIES)
     },
     ownAffiliations (id) {
-      if (this.organization.affiliations) {
+      if (this.entityObj.affiliations) {
       // eslint-disable-next-line eqeqeq
-        let ownAffiliation = this.organization.affiliations.find(affiliation => affiliation.id == id)
+        let ownAffiliation = this.entityObj.affiliations.find(affiliation => affiliation.id == id)
         console.log(ownAffiliation ? 'true' : '')
         return ownAffiliation ? 'true' : ''
       } else {
@@ -201,12 +201,12 @@ export default {
     createLink () {
       this.update = false
       this.add = true
-      this.$router.push({ name: 'organisations' })
+      this.$router.push({ name: 'entities' })
     },
     selectEntity (entity) {
       this.update = true
       this.add = false
-      this.$router.push({ path: `/organisations/${entity.id}` })
+      this.$router.push({ path: `/entities/${entity.id}` })
     }
   },
 
@@ -214,23 +214,23 @@ export default {
     $route (to, from) {
       this.viewMode = false
       // eslint-disable-next-line eqeqeq
-      if (to.name == 'organisationsList') {
+      if (to.name == 'entitiesList') {
         this.viewMode = true
       }
       if (this.$route.params.id) {
         let idRoute = this.$route.params.id
         // eslint-disable-next-line eqeqeq
-        this.organization = this.orgas.find(organization => organization.id == idRoute) || {}
-        this.object = Object.assign({}, this.organization)
-        this.affiliates = this.organization.affiliations
+        this.entityObj = this.entities.find(entity => entity.id == idRoute) || {}
+        this.object = Object.assign({}, this.entityObj)
+        this.affiliates = this.entityObj.affiliations
         this.update = true
         this.add = false
       } if (!this.$route.params.id) {
         this.update = false
         this.add = true
-        this.organization = {}
+        this.entityObj = {}
         this.deselectAffiliates()
-        this.object = Object.assign({}, this.organization)
+        this.object = Object.assign({}, this.entityObj)
       }
     }
   },
@@ -240,7 +240,7 @@ export default {
     this.viewMode = false
 
     // eslint-disable-next-line eqeqeq
-    if (this.$route.name == 'organisationsList') {
+    if (this.$route.name == 'entitiesList') {
       this.viewMode = true
     }
     // eslint-disable-next-line eqeqeq
@@ -252,20 +252,15 @@ export default {
       this.add = false
       this.update = true
       let idRoute = this.$route.params.id
-      this.$store.dispatch(FETCH_ORGAS).then(orgas => {
+      this.$store.dispatch(FETCH_ENTITIES).then(orgas => {
         // eslint-disable-next-line eqeqeq
-        this.organization = orgas.find(organization => organization.id == idRoute) || {}
-        this.object = Object.assign({}, this.organization)
-        this.affiliates = this.organization.affiliations
+        this.entityObj = orgas.find(entity => entity.id == idRoute) || {}
+        this.object = Object.assign({}, this.entityObj)
+        this.affiliates = this.entityObj.affiliations
       })
     }
   },
   created () {
-    bus.$on('organization', entity => {
-      alert('select')
-      this.organization = entity
-      this.object = Object.assign({}, this.organization)
-    })
   }
 }
 </script>

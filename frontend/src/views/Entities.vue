@@ -1,20 +1,20 @@
 
 <template>
     <div>
-      <organization-list v-if='!isAdmin && !isManager'></organization-list>
-      <organization-manage v-if='isAdmin || isManager'></organization-manage>
+      <entity-list v-if='!isAdmin && !isManager'></entity-list>
+      <entity-manage v-if='isAdmin || isManager'></entity-manage>
     </div>
 </template>
 
 <script>
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from 'vuex'
-import OrganizationList from '@/views/OrganizationList.vue'
-import OrganizationManage from '@/views/OrganizationManage.vue'
+import EntityList from '@/views/EntityList.vue'
+import EntityManage from '@/views/EntityManage.vue'
 
 export default {
-  name: 'Organizations',
-  components: { OrganizationList, OrganizationManage },
+  name: 'Entities',
+  components: { EntityList, EntityManage },
 
   data () {
     return {
@@ -26,8 +26,8 @@ export default {
       borderless: true,
       headVariant: 'dark',
       tableVariant: 'light',
-      organizationItem: [],
-      organization: this.organization || {},
+      entityItem: [],
+      entityObj: this.entityObj || {},
       objectName: 'Entity',
       affiliates: []
     }
@@ -37,7 +37,7 @@ export default {
       isAdmin: state => state.auth.authUser.is_staff,
       isManager: state => state.auth.authUser.is_manager
     }),
-    ...mapGetters(['orgas', 'orga'])
+    ...mapGetters(['entities', 'entity'])
   },
   methods: {
 
@@ -46,7 +46,7 @@ export default {
   watch: {
     $route (to, from) {
       // eslint-disable-next-line eqeqeq
-      if (to.name == 'organisationsList') {
+      if (to.name == 'entitiesList') {
         this.viewMode = true
       }
       if (this.$route.params.id) {

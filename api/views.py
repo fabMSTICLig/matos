@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
-from .models import Product , Location ,Family ,Transaction, Organization, Profile
+from .models import Product , Location ,Family ,Transaction, Entity, Profile
 from .serializers import *   
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
@@ -174,9 +174,9 @@ class productInstanceListView(viewsets.ModelViewSet):
     serializer_class = ProductInstanceSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
-class organizationManagedListView(generics.ListCreateAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+class entityManagedListView(generics.ListCreateAPIView):
+    queryset = Entity.objects.all()
+    serializer_class = EntitySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
    
@@ -184,25 +184,25 @@ class organizationManagedListView(generics.ListCreateAPIView):
         user = request.user
         print('## user')
         print(user.id)
-        queryset = Organization.objects.filter(managed__in=[user.id])
-        serializer = OrganizationSerializer(queryset, many=True)
+        queryset = Entity.objects.filter(managed__in=[user.id])
+        serializer = EntitySerializer(queryset, many=True)
         print(serializer.data)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
-class organizationViewSet(viewsets.ModelViewSet):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+class entityViewSet(viewsets.ModelViewSet):
+    queryset = Entity.objects.all()
+    serializer_class = EntitySerializer
     permission_classes = (IsAdminOrIsSelf)
 
    
     #Helper method to get a person
-    def get_organization(self, pk):
+    def get_entity(self, pk):
         try:
-            return Organization.objects.get(pk=pk)
-        except Organization.DoesNotExist:
+            return Entity.objects.get(pk=pk)
+        except Entity.DoesNotExist:
             raise Http404
 
     def get_permissions(self):
@@ -229,28 +229,28 @@ class organizationViewSet(viewsets.ModelViewSet):
         # Auto complete if normal user or admin for own usage by removing user member
         if(not request.user.is_staff or not 'user' in data):
             data['user'] = request.user
-            organization = Organization.objects.get(pk=data['id'])
-            organization.name = data['name']
-            organization.contact = data['contact']
+            entity = Entity.objects.get(pk=data['id'])
+            entity.name = data['name']
+            entity.contact = data['contact']
             affiliations = data['affiliations']
             managers = data["managed"]
-            print(organization.name)
-            print(Organization.objects.filter(name=organization.name))          
-            organization.save()
+            print(entity.name)
+            print(Entity.objects.filter(name=entity.name))          
+            entity.save()
           
             try:
-                organization.save() # Could throw exception
+                entity.save() # Could throw exception
             except IntegrityError:
                 transaction.rollback()
 
-            organization.affiliations.clear()
+            entity.affiliations.clear()
 
             for affiliation in affiliations:
                 affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
-                organization.affiliations.add(affiliation_obj)
+                entity.affiliations.add(affiliation_obj)
             
-            organization.save()
-            organization.managed.clear()
+            entity.save()
+            entity.managed.clear()
 
             for manager in managers :
                 print(manager['id'])
@@ -264,10 +264,10 @@ class organizationViewSet(viewsets.ModelViewSet):
                 print(manager_obj.username)
 
                 manager_obj.save()
-                organization.managed.add(manager_obj)
+                entity.managed.add(manager_obj)
 
-        organization.save()
-        serialized_class = OrganizationSerializer(organization)
+        entity.save()
+        serialized_class = EntitySerializer(entity)
         print(serialized_class.data)
         return Response(serialized_class.data, status=status.HTTP_200_OK)
 
@@ -282,46 +282,46 @@ class organizationViewSet(viewsets.ModelViewSet):
         # Auto complete if normal user or admin for own usage by removing user member
         if(not request.user.is_staff or not 'user' in data):
             data['user'] = request.user
-            organization = Organization()
-            organization.name = data['name']
-            organization.contact = data['contact']
+            entity = Entity()
+            entity.name = data['name']
+            entity.contact = data['contact']
             affiliations = data['affiliations']
-            print(organization.name)
-            print(Organization.objects.filter(name=organization.name))
+            print(entity.name)
+            print(Entity.objects.filter(name=entity.name))
             try:
-                organization_existing = Organization.objects.get(name=organization.name)
+                entity_existing = Entity.objects.get(name=entity.name)
                 print("existing orga")
-                print(organization_existing)
-                if organization_existing :
+                print(entity_existing)
+                if entity_existing :
                     return Response("entity already registered with same name", status=status.HTTP_400_BAD_REQUEST)
             except:
                 pass
   
-            organization.save()
+            entity.save()
           
             try:
-                organization.save() # Could throw exception
+                entity.save() # Could throw exception
             except IntegrityError:
                 transaction.rollback()
 
-            organization.affiliations.clear()
+            entity.affiliations.clear()
 
             for affiliation in affiliations:
                 affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
-                organization.affiliations.add(affiliation_obj)
+                entity.affiliations.add(affiliation_obj)
             
-            organization.save()
+            entity.save()
                
-        serialized_class = OrganizationSerializer(organization)
+        serialized_class = EntitySerializer(entity)
         print(serialized_class.data)
         return Response(serialized_class.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk, format=None):
         print('suppression')
-        organization = self.get_organization(pk)
+        entity = self.get_entity(pk)
         id=pk
         print(pk)
-        organization.delete() 
+        entity.delete() 
         return Response({"id" :id}, status=status.HTTP_200_OK)
     
    

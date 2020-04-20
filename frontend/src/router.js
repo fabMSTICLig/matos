@@ -31,19 +31,19 @@ export default new VueRouter({
       component: () => import('./views/Profile')
     },
     {
-      name: 'organisations',
-      path: '/organisations',
-      component: () => import('./views/Organizations')
+      name: 'entities',
+      path: '/entities',
+      component: () => import('./views/Entities')
     },
     {
-      name: 'organization',
-      path: '/organisations/:id',
-      component: () => import('./views/Organizations')
+      name: 'entity',
+      path: '/entities/:id',
+      component: () => import('./views/Entities')
     },
     {
-      name: 'organisationsList',
-      path: '/organisations-list',
-      component: () => import('./views/Organizations')
+      name: 'entitiesList',
+      path: '/entities-list',
+      component: () => import('./views/Entities')
     },
     {
       name: 'manageUsers',

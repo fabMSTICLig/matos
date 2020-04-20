@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from './auth.module'
-import organizations from './organizations.module'
+import entities from './entities.module'
 import users from './users.module'
 import families from './families.module'
 import equipments from './equipments.module'
@@ -13,7 +13,7 @@ export default new Vuex.Store({
   namespaced: true, // namespaced instead namespace
   modules: {
     auth,
-    organizations,
+    entities,
     affiliations,
     users,
     families,

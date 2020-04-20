@@ -18,14 +18,14 @@ from api import views
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf.urls import url, include
-from api.views import  productListViewSet, productInstanceListView, index, organizationManagedListView, AffiliationViewSet, organizationViewSet, UserViewSet, UserInstanceView, productDetailViewSet
+from api.views import  productListViewSet, productInstanceListView, index, entityManagedListView, AffiliationViewSet, entityViewSet, UserViewSet, UserInstanceView, productDetailViewSet
 import django_cas_ng.views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'api/equipments', productListViewSet)
 router.register(r'api/products-instance', productInstanceListView)
-router.register(r'api/organizations', organizationViewSet)
+router.register(r'api/entities', entityViewSet)
 router.register(r'api/users', UserViewSet)
 router.register(r'api/affiliations', AffiliationViewSet)
 
@@ -39,7 +39,6 @@ urlpatterns = [
     url(r'^api/equipment/(?P<pk>[0-9]+)$', views.productDetailViewSet.as_view()),
     url(r'^api/families/$', views.family_list.as_view()),
     url(r'^api/families/(?P<pk>[0-9]+)$', views.family_detail.as_view()),
-    url(r'^api/organizations-managed', organizationManagedListView.as_view()),
     path('api/self/', UserInstanceView.as_view()),
     path('', include(router.urls)),
 

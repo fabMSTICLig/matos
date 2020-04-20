@@ -163,9 +163,9 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username+"("+self.user.first_name+" "+self.user.last_name+")"
 
-class Organization(models.Model):
+class Entity(models.Model):
     """
-    an Organization
+    an Entity
     """
     
     name = models.CharField(max_length=60)

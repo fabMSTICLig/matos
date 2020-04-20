@@ -1,7 +1,7 @@
 <template>
   <div>
       <navbar :items="items"></navbar>
-      <div v-if="orga">
+      <div v-if="entity">
         <b-container fluid="lg">
           <b-row>
             <b-col md="3">
@@ -29,7 +29,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { FETCH_ORGAS, FETCH_USERS, GET_ORGA, UPDATE_ORGA } from '@/store/actions.type'
+import { FETCH_ENTITIES, FETCH_USERS, GET_ENTITY, UPDATE_ENTITY } from '@/store/actions.type'
 import navbar from '@/components/navbar'
 import tablecomp from '@/components/table'
 import { EditorMixin } from '@/common/mixins'
@@ -40,8 +40,8 @@ export default {
     return {
       selectedUser: '',
       actions: {
-        GET: GET_ORGA,
-        UPDATE: UPDATE_ORGA,
+        GET: GET_ENTITY,
+        UPDATE: UPDATE_ENTITY,
         FETCH: FETCH_USERS
       }
     }
@@ -51,8 +51,8 @@ export default {
       console.log(evt)
     },
     addUser () {
-      this.orga.managed.push(this.selectedUser)
-      this.$store.dispatch(UPDATE_ORGA, { id: this.orga.id, data: this.orga }).then((orga) => {
+      this.entity.managed.push(this.selectedUser)
+      this.$store.dispatch(UPDATE_ENTITY, { id: this.entity.id, data: this.entity }).then((entity) => {
         this.$bvModal.msgBoxOk('Manager added')
           .then(value => {
             this.boxOne = value
@@ -63,7 +63,7 @@ export default {
       })
     },
     async saveEntity (EventForm) {
-      this.assignObject(this.orga)
+      this.assignObject(this.entity)
       await this.saveObject(EventForm)
     }
   },
@@ -81,22 +81,22 @@ export default {
   },
 
   computed: {
-    ...mapGetters([ 'orga', 'orgas', 'users' ]),
+    ...mapGetters([ 'entity', 'entitys', 'users' ]),
     ...mapState({
-      organizations: state => state.organizations,
-      managers: state => state.organizations.orga.managed
+      entitynizations: state => state.entitynizations,
+      managers: state => state.entitynizations.entity.managed
     }),
 
     items () {
       return [
-        { link: '/organisations', name: 'Gestion' },
+        { link: '/entitynisations', name: 'Gestion' },
         { link: '/manage-users', name: 'Utilisateurs' },
-        { link: '/organisations-list', name: 'Organisation' }
+        { link: '/entitynisations-list', name: 'entitynisation' }
       ]
     }
   },
   beforeMount () {
-    this.$store.dispatch(FETCH_ORGAS)
+    this.$store.dispatch(FETCH_ENTITIES)
   }
 }
 </script>
