@@ -14,17 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from api import views
+from core import views
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf.urls import url, include
-from api.views import  productListViewSet, productInstanceListView, index, entityManagedListView, AffiliationViewSet, entityViewSet, UserViewSet, UserInstanceView, productDetailViewSet
+from core.views import index, entityManagedListView, AffiliationViewSet, entityViewSet, UserViewSet, UserInstanceView
 import django_cas_ng.views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'api/equipments', productListViewSet)
-router.register(r'api/products-instance', productInstanceListView)
 router.register(r'api/entities', entityViewSet)
 router.register(r'api/users', UserViewSet)
 router.register(r'api/affiliations', AffiliationViewSet)
@@ -36,9 +34,6 @@ urlpatterns = [
     path('api/login',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
     path('api/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     url(r'^home/', index),
-    url(r'^api/equipment/(?P<pk>[0-9]+)$', views.productDetailViewSet.as_view()),
-    url(r'^api/families/$', views.family_list.as_view()),
-    url(r'^api/families/(?P<pk>[0-9]+)$', views.family_detail.as_view()),
     path('api/self/', UserInstanceView.as_view()),
     path('', include(router.urls)),
 

@@ -29,6 +29,14 @@
               placeholder="Votre prénom"
               ></b-form-input>
           </b-form-group>
+
+         <b-form-group
+                  label="Affiliations"
+                  label-for="select-affiliations"
+                  >
+                  <b-form-select multiple id="select-affiliations" v-model = "affiliates" :options='affiliationsList' v-on:change="updateAffiliations($event)" v-if="affiliationsList" >
+                  </b-form-select>
+                </b-form-group>
           <b-form-group
               id="input-group-1"
               label="Email address:"
@@ -77,20 +85,21 @@ export default {
       },
       show: true,
       add: false,
-      update: true
+      update: true,
+      affiliates: []
     }
   },
   props: {
     object_profile: {
       type: Object,
       default: null
+    },
+    affiliations: {
+      default: null
     }
   },
   watchers: {
-    object_profile (value) {
-      console.log('update value')
-      console.log(value)
-    }
+
   },
   methods: {
     async onSubmit (evt) {
@@ -98,12 +107,18 @@ export default {
       this.assignObject(this.form)
       await this.saveObject(evt)
     },
+
+    updateAffiliations (evt) {
+      console.log(evt)
+      this.form.affiliations = evt
+      console.log(this.form)
+    },
     onReset (evt) {
       evt.preventDefault()
       // Reset our form values
       this.form.email = ''
-      this.form.name = ''
-      this.form.food = null
+      this.form.firstname = ''
+      this.form.lastname = null
       this.form.checked = []
       // Trick to reset/clear native browser form validation state
       this.show = false
@@ -116,7 +131,27 @@ export default {
   computed: {
     form () {
       return this.object_profile || this.emptyForm
+    },
+
+    affiliationsList () {
+      let values = this.affiliations.map(
+        affiliation => {
+          let option = {}
+          option['value'] = affiliation
+          option['text'] = affiliation.name
+          return option
+        })
+      return values
     }
+  },
+  beforeMount () {
+    let self = this
+    this.object_profile.affiliations.forEach(function (affiliation) {
+      self.affiliates.push(affiliation)
+    })
+
+    // eslint-disable-next-line no-unused-expressions
+    this.object_profile.acceptance.length ? this.form.acceptance = true : false
   }
 }
 </script>

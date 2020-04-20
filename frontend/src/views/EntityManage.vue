@@ -147,7 +147,7 @@ export default {
       return this.isAdmin ? [
         { link: '/entities', name: 'Gestion' },
         { link: '/manage-users', name: 'Utilisateurs' },
-        { link: '/entities-list', name: 'Organisation' }
+        { link: '/entities-list', name: 'Entité' }
       ]
         : [
           { link: '/entities', name: 'Gestion' },
@@ -237,6 +237,7 @@ export default {
 
   beforeMount () {
     this.$store.dispatch(FETCH_AFFILIATIONS)
+
     this.viewMode = false
 
     // eslint-disable-next-line eqeqeq

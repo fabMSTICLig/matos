@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-    'api',
+    'core',
     'django.contrib.postgres',
     'django_cas_ng',
     'corsheaders'
