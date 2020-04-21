@@ -1,21 +1,29 @@
 
 <template>
-    <div>
-      <entity-list v-if='!isAdmin && !isManager'></entity-list>
-      <entity-manage v-if='isAdmin || isManager'></entity-manage>
+    <div v-if="entityObj">
+      <entity-manage v-if='isAdmin || isManaged()' :entity="entityObj"></entity-manage>
+      <b-container>
+        <b-row>
+          <b-col lg="5">
+            <div class="column">
+              <entity v-if="!isAdmin && !isManaged()" :entity="entityObj"></entity>
+            </div>
+          </b-col>
+       </b-row>
+    </b-container>
     </div>
 </template>
 
 <script>
 // eslint-disable-next-line no-unused-vars
 import { mapGetters, mapState } from 'vuex'
-import EntityList from '@/views/EntityList.vue'
 import EntityManage from '@/views/EntityManage.vue'
+import Entity from '@/components/entity.vue'
+import { FETCH_ENTITIES } from '@/store/actions.type'
 
 export default {
   name: 'Entities',
-  components: { EntityList, EntityManage },
-
+  components: { EntityManage, Entity },
   data () {
     return {
       fields: [
@@ -27,9 +35,9 @@ export default {
       headVariant: 'dark',
       tableVariant: 'light',
       entityItem: [],
-      entityObj: this.entityObj || {},
       objectName: 'Entity',
-      affiliates: []
+      affiliates: [],
+      detail: true
     }
   },
   computed: {
@@ -37,10 +45,30 @@ export default {
       isAdmin: state => state.auth.authUser.is_staff,
       isManager: state => state.auth.authUser.is_manager
     }),
-    ...mapGetters(['entities', 'entity'])
+    ...mapGetters(['entities', 'entity', 'authUser']),
+
+    entityObj () {
+      console.log(this.entities)
+      // eslint-disable-next-line eqeqeq
+      console.log(this.entities.find(entity => entity.id == this.$route.params.id))
+      // eslint-disable-next-line eqeqeq
+      return this.entities.find(entity => entity.id == this.$route.params.id)
+    }
   },
   methods: {
+    isManaged () {
+      let self = this
+      console.log(this.entityObj)
 
+      // eslint-disable-next-line eqeqeq
+      let managed = this.entityObj.managed.some(function (user) {
+        // eslint-disable-next-line eqeqeq
+        console.log(user.id == self.authUser.id)
+        // eslint-disable-next-line eqeqeq
+        return user.id == self.authUser.id
+      })
+      return managed
+    }
   },
 
   watch: {
@@ -56,8 +84,11 @@ export default {
     }
   },
   beforeMount () {
-    // eslint-disable-next-line no-undef
-
+    this.$store.dispatch(FETCH_ENTITIES)
+    // eslint-disable-next-line eqeqeq
+    if (this.$route.name == 'entity') {
+      this.detail = true
+    }
   }
 }
 </script>
@@ -72,5 +103,8 @@ export default {
  #actions-btn > button {
    width: auto;
    height: 35px;
+ }
+ .column {
+   margin-top: 47px;
  }
 </style>

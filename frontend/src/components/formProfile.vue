@@ -15,7 +15,7 @@
           <b-form-group id="input-group-2" label="Nom:" label-for="input-2">
               <b-form-input
               id="input-2"
-              v-model="form.lastname"
+              v-model="form.last_name"
               required
               placeholder="Votre nom"
               ></b-form-input>
@@ -24,7 +24,7 @@
           <b-form-group id="input-group-2" label="Prénom:" label-for="input-2">
               <b-form-input
               id="input-2"
-              v-model="form.firstname"
+              v-model="form.first_name"
               required
               placeholder="Votre prénom"
               ></b-form-input>
@@ -45,14 +45,14 @@
           >
               <b-form-input
               id="input-1"
-              v-model="form.email"
+              v-model="form.profile.email"
               type="email"
               required
               placeholder="Enter email"
               ></b-form-input>
           </b-form-group>
           <b-form-group id="input-group-4">
-              <b-form-checkbox  v-model="form.acceptance">acceptance RGPD</b-form-checkbox>
+              <b-form-checkbox  v-model="form.profile.acceptance">acceptance RGPD</b-form-checkbox>
           </b-form-group>
             <b-button type="submit" variant="primary">Submit</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
@@ -76,7 +76,8 @@ export default {
         username: '',
         firstname: '',
         lastname: '',
-        acceptance: false
+        acceptance: false,
+        affiliations: []
       },
       actions: {
         GET: GET_USER,
@@ -110,7 +111,7 @@ export default {
 
     updateAffiliations (evt) {
       console.log(evt)
-      this.form.affiliations = evt
+      this.form.profile.affiliations = evt
       console.log(this.form)
     },
     onReset (evt) {
@@ -130,7 +131,7 @@ export default {
 
   computed: {
     form () {
-      return this.object_profile || this.emptyForm
+      return this.object_profile
     },
 
     affiliationsList () {
@@ -146,12 +147,17 @@ export default {
   },
   beforeMount () {
     let self = this
-    this.object_profile.affiliations.forEach(function (affiliation) {
-      self.affiliates.push(affiliation)
-    })
 
-    // eslint-disable-next-line no-unused-expressions
-    this.object_profile.acceptance.length ? this.form.acceptance = true : false
+    this.object_profile.profile.affiliations = this.object_profile.profile.affiliations || {}
+    if (this.object_profile.profile.affiliations.length) {
+      this.object_profile.profile.affiliations.forEach(function (affiliation) {
+        self.affiliates.push(affiliation)
+      })
+    }
+    if (this.object_profile.profile.acceptance) {
+      // eslint-disable-next-line no-unused-expressions
+      this.object_profile.profile.acceptance.length ? this.form.acceptance = true : false
+    }
   }
 }
 </script>

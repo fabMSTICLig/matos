@@ -91,6 +91,7 @@ export const mutations = {
     state.entities = entities
   },
   [SET_ENTITY] (state, entity) {
+    state.entity = entity
     if ('id' in entity) {
       DataHelper.updateById(state.entities, entity)
     }

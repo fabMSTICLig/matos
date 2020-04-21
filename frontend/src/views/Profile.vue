@@ -1,6 +1,6 @@
 <template>
     <div v-if="authUser">
-        <form-profile :object_profile='profile' :affiliations="affiliations"></form-profile>
+        <form-profile :object_profile='user' :affiliations="affiliations"></form-profile>
     </div>
 </template>
 
@@ -17,7 +17,8 @@ export default {
       profile: {
         type: Object,
         default: ''
-      }
+      },
+      user: {}
     }
   },
   components: {
@@ -35,10 +36,14 @@ export default {
     this.$store.dispatch(FETCH_AFFILIATIONS)
     if (this.authUser) {
       console.log(this.authUser)
-      this.profile = this.authUser.profile
-      this.profile.username = this.authUser.username
-      this.profile.lastname = this.authUser.last_name
-      this.profile.firstname = this.authUser.first_name
+      this.user.profile = this.authUser.profile || {}
+      this.user.externe = this.authUser.externe
+      this.user.id = this.authUser.id
+      this.user.email = this.authUser.email
+      this.user.last_name = this.authUser.last_name
+      this.user.first_name = this.authUser.first_name
+      this.user.username = this.authUser.username
+      this.user.is_staff = this.authUser.is_staff
     }
   }
 

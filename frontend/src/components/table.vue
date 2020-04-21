@@ -113,7 +113,7 @@ export default {
     removeObj (item) {
       console.log('removeObje')
       console.log(item)
-      bus.$emit('removeUser', item)
+      bus.$emit('removeItem', item)
     },
 
     editMode () {

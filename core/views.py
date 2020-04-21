@@ -78,8 +78,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         user = request.user
-        print(user)
+        print(user.id)
         print('## patch user ##')
+    
         permission_classes = (IsAuthenticatedOrReadOnly,)
         serializer = UserSerializer(user, data=request.data, partial=True) # set partial=True to update a data partially
         if serializer.is_valid():
@@ -88,34 +89,40 @@ class UserViewSet(viewsets.ModelViewSet):
             else:
                 data = dict(request.data)
 
-            profile = Profile.objects.get(pk=data['id'])
+          
+
             print("## profile ##")
-            print(data)
             username = data['username']
-            firstname = data['firstname']
-            lastname = data['lastname']
-            profile.email = data['email']
-            acceptance = data['acceptance']
+            firstname = data['first_name']
+            lastname = data['last_name']
+            acceptance = data['profile']['acceptance']
+            affiliations = data['profile']['affiliations']
+
+            profile = Profile.objects.get(user=user)
             if(acceptance == True):
                 profile.acceptance = datetime.datetime.now(datetime.timezone.utc).date()
             else:
                 profile.acceptance=None
-            affiliations = data['affiliations']
+
             profile.affiliations.clear()
-            
+            profile.email = data['profile']['email']
+
             for affiliation in affiliations:
                 affiliation_obj = Affiliation.objects.get(pk=affiliation['id'])
                 profile.affiliations.add(affiliation_obj)
-            print(profile.affiliations)
-            profile.save()
+
+            profile.save()          
+            print(profile.acceptance)
             user.profile = profile
             user.username = username
             user.first_name = firstname
             user.last_name = lastname
+
             user.save()
-            print(user)
            
             return JsonResponse({'code':201, 'data':serializer.data})
+        print(serializer.errors)
+
         return JsonResponse({'code':400, 'data':"wrong parameters"})
 
     @action(methods=['put'], detail=True, serializer_class=PasswordSerializer)

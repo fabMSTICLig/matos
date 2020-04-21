@@ -1,32 +1,9 @@
 
 <template>
 <div>
-    <navbar :items="items"></navbar>
-    <entity-list v-if="viewMode" :viewmode="viewMode"></entity-list>
-<b-container v-if="!viewMode">
+    <navbar v-if="isAdmin" :items="items"></navbar>
+    <b-container v-if="manageEntity">
       <b-row>
-        <b-col lg="5">
-          <div class='column'>
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody v-if="entitiesObj">
-              <tr v-for="entity in entitiesObj" :key="entity.id">
-                  <td @click="selectEntity(entity)" class="clickRow">{{entity.name}}</td>
-                  <td class="text-right">
-                    <a href="#" @click.prevent="editEntity(entity)">Edit</a>
-                    <span v-if='isAdmin'> - </span>
-                    <a href="#" @click.prevent="deleteObject(entity.id)" v-show='isAdmin'>Delete</a>
-                  </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </b-col>
         <b-col lg="4">
           <div class="column">
             <b-card  v-if="isAdmin || update && !viewMode">
@@ -75,12 +52,14 @@
             </b-card>
           </div>
         </b-col>
-
-        <b-col lg="2" v-if="isAdmin">
-            <button class="btn btn-info" @click="createLink()" >Add new one</button>
+        <b-col>
+            <div class="column">
+              <entity v-if="entityObj.id" :entity="entityObj"></entity>
+            </div>
         </b-col>
       </b-row>
     </b-container>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -89,7 +68,7 @@
 import { mapGetters, mapState } from 'vuex'
 import { EditorMixin } from '@/common/mixins'
 import navbar from '@/components/navbar'
-import EntityList from './EntityList'
+import entity from '@/components/entity'
 import {
   FETCH_ENTITIES,
   FETCH_AFFILIATIONS,
@@ -102,7 +81,7 @@ import {
 export default {
   mixins: [EditorMixin],
   name: 'EntityManage',
-  components: { navbar, EntityList },
+  components: { navbar, entity },
 
   data () {
     return {
@@ -114,19 +93,24 @@ export default {
         FETCH: FETCH_ENTITIES,
         DELETE: DELETE_ENTITY
       },
-      viewMode: false,
+      manageEntity: true,
       objectName: 'Entity',
       update: false,
       add: false,
       affiliates: []
     }
   },
+  props: {
+    entity: {
+      type: Object,
+      default: null
+    }
+  },
   computed: {
     ...mapGetters([ 'entities', 'affiliations' ]),
     ...mapState({
       isAdmin: state => state.auth.authUser.is_staff,
-      authUser: state => state.auth.authUser,
-      entity: state => state.entities.entity
+      authUser: state => state.auth.authUser
     }),
     entitiesObj () {
       let self = this
@@ -144,15 +128,10 @@ export default {
       }
     },
     items () {
-      return this.isAdmin ? [
-        { link: '/entities', name: 'Gestion' },
-        { link: '/manage-users', name: 'Utilisateurs' },
-        { link: '/entities-list', name: 'Entité' }
+      return [
+        { link: '/entities/' + this.$route.params.id, name: 'Gestion' },
+        { link: '/entities/' + this.$route.params.id + '/users', name: 'Utilisateurs' }
       ]
-        : [
-          { link: '/entities', name: 'Gestion' },
-          { link: '/entities-list', name: 'Organisation' }
-        ]
     }
   },
   methods: {
@@ -214,8 +193,12 @@ export default {
     $route (to, from) {
       this.viewMode = false
       // eslint-disable-next-line eqeqeq
-      if (to.name == 'entitiesList') {
-        this.viewMode = true
+      if (to.name !== 'entity') {
+        this.manageEntity = false
+      }
+      // eslint-disable-next-line eqeqeq
+      if (to.name == 'entity') {
+        this.manageEntity = true
       }
       if (this.$route.params.id) {
         let idRoute = this.$route.params.id
@@ -237,13 +220,12 @@ export default {
 
   beforeMount () {
     this.$store.dispatch(FETCH_AFFILIATIONS)
-
-    this.viewMode = false
-
-    // eslint-disable-next-line eqeqeq
-    if (this.$route.name == 'entitiesList') {
-      this.viewMode = true
+    if (this.$route.name !== 'entity' && this.$route.name !== 'createEntity') {
+      this.manageEntity = false
     }
+    // eslint-disable-next-line eqeqeq
+    this.manageRoute = this.$route.name == 'entity'
+
     // eslint-disable-next-line eqeqeq
     if (!this.$route.params.id) {
       this.add = true
@@ -253,9 +235,9 @@ export default {
       this.add = false
       this.update = true
       let idRoute = this.$route.params.id
-      this.$store.dispatch(FETCH_ENTITIES).then(orgas => {
+      this.$store.dispatch(GET_ENTITY, idRoute).then(entity => {
         // eslint-disable-next-line eqeqeq
-        this.entityObj = orgas.find(entity => entity.id == idRoute) || {}
+        this.entityObj = entity
         this.object = Object.assign({}, this.entityObj)
         this.affiliates = this.entityObj.affiliations
       })

@@ -1,16 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import store from './store'
+import store from './store'
 Vue.use(VueRouter)
 
-/** function requireAuthManager (to, from, next) {
-  if (store.getters.authUser.is_manager) {
+function requireAuthAdmin (to, from, next) {
+  if (store.getters.authUser.is_staff) {
     console.log(store.getters.authUser)
     next()
   } else {
     next({ name: 'home' })
   }
-}**/
+}
 
 export default new VueRouter({
   routes: [
@@ -33,22 +33,26 @@ export default new VueRouter({
     {
       name: 'entities',
       path: '/entities',
-      component: () => import('./views/Entities')
+      component: () => import('./views/EntityList')
+    },
+    {
+      name: 'createEntity',
+      path: '/entities/create',
+      component: () => import('./views/EntityManage'),
+      beforeEnter: requireAuthAdmin
     },
     {
       name: 'entity',
       path: '/entities/:id',
-      component: () => import('./views/Entities')
-    },
-    {
-      name: 'entitiesList',
-      path: '/entities-list',
-      component: () => import('./views/Entities')
-    },
-    {
-      name: 'manageUsers',
-      path: '/manage-users',
-      component: () => import('./views/ManageUsers')
+      component: () => import('./views/Entities'),
+      children: [
+        {
+          name: 'manageUsers',
+          path: '/entities/:id/users',
+          component: () => import('./views/ManageUsers'),
+          beforeEnter: requireAuthAdmin
+        }
+      ]
     }
   ]
 })

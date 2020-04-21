@@ -12,6 +12,8 @@ class AffiliationSerializer(serializers.ModelSerializer):
         
 class ProfileSerializer(serializers.ModelSerializer):
     affiliations = AffiliationSerializer(many=True)
+    acceptance = serializers.BooleanField(required=False)
+
     class Meta:
         model = Profile
         fields = ('id','email','acceptance','affiliations')

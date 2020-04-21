@@ -1,6 +1,5 @@
 <template>
   <div>
-      <navbar :items="items"></navbar>
       <div v-if="entity">
         <b-container fluid="lg">
           <b-row>
@@ -12,7 +11,9 @@
               </div>
             </b-col>
             <b-col md="2">
-                <b-button variant="primary" @click="addUser"> Add</b-button>
+                <div class="column">
+                  <b-button variant="primary" @click="addUser"> Add</b-button>
+                </div>
             </b-col>
           </b-row>
           <b-row>
@@ -30,9 +31,11 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { FETCH_ENTITIES, FETCH_USERS, GET_ENTITY, UPDATE_ENTITY } from '@/store/actions.type'
-import navbar from '@/components/navbar'
 import tablecomp from '@/components/table'
 import { EditorMixin } from '@/common/mixins'
+import { bus } from '@/main'
+import { DataHelper } from '@/common/helpers'
+
 export default {
   name: 'ManageUsers',
   mixins: [EditorMixin],
@@ -43,7 +46,8 @@ export default {
         GET: GET_ENTITY,
         UPDATE: UPDATE_ENTITY,
         FETCH: FETCH_USERS
-      }
+      },
+      messageBox: 'Manager added'
     }
   },
   methods: {
@@ -52,8 +56,11 @@ export default {
     },
     addUser () {
       this.entity.managed.push(this.selectedUser)
+      this.saveEntity()
+    },
+    async saveEntity () {
       this.$store.dispatch(UPDATE_ENTITY, { id: this.entity.id, data: this.entity }).then((entity) => {
-        this.$bvModal.msgBoxOk('Manager added')
+        this.$bvModal.msgBoxOk(this.messageBox)
           .then(value => {
             this.boxOne = value
           })
@@ -62,14 +69,12 @@ export default {
           })
       })
     },
-    async saveEntity (EventForm) {
-      this.assignObject(this.entity)
-      await this.saveObject(EventForm)
+    fetchData () {
+      this.$store.dispatch(FETCH_ENTITIES)
     }
   },
 
   components: {
-    navbar,
     tablecomp
   },
 
@@ -78,6 +83,12 @@ export default {
   },
 
   created () {
+    let self = this
+    bus.$on('removeItem', (item) => {
+      self.messageBox = 'Manager removed'
+      DataHelper.removeById(self.entity.managed, item)
+      self.saveEntity()
+    })
   },
 
   computed: {
@@ -86,12 +97,15 @@ export default {
       entities: state => state.entities,
       managers: state => state.entities.entity.managed
     }),
-
+    entity () {
+      console.log(this.entities)
+      // eslint-disable-next-line eqeqeq
+      return this.entities.entities.find(entity => entity.id == this.$route.params.id)
+    },
     items () {
       return [
         { link: '/entities', name: 'Gestion' },
-        { link: '/manage-users', name: 'Utilisateurs' },
-        { link: '/entities-list', name: 'Entité' }
+        { link: '/entities/' + this.$route.params.id + '/users', name: 'Utilisateurs' }
       ]
     }
   },
