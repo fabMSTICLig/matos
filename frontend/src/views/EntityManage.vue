@@ -1,7 +1,7 @@
 
 <template>
 <div>
-    <navbar v-if="isAdmin" :items="items"></navbar>
+    <navbar v-if="isAdmin && manageEntity" :items="items"></navbar>
     <b-container v-if="manageEntity">
       <b-row>
         <b-col lg="4">
