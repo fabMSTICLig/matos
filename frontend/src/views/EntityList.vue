@@ -15,7 +15,9 @@
                 <tr v-for="entity in entities" :key="entity.id">
                   <td @click="entityView(entity)" class="clickRow">{{entity.name}}</td>
                   <td class="text-right">
-                    <b-button @click="entityView(entity)">View</b-button>
+                    <a href="#" v-if="isManager(entity) || isAdmin" @click.prevent="manageEntity(entity)">Edit</a>
+                    <span v-if='isAdmin'> - </span>
+                    <a href="#" @click.prevent="deleteObject(entity.id)" v-show='isAdmin'>Delete</a>
                   </td>
                 </tr>
               </tbody>
@@ -26,6 +28,9 @@
           <div class="column">
             <entity :entity="object"  v-on:input="selectEntity"></entity>
           </div>
+        </b-col>
+        <b-col lg="2" v-if="isAdmin">
+            <button class="btn btn-info" @click="createLink()" >Add new one</button>
         </b-col>
        </b-row>
   </b-container>
@@ -72,7 +77,8 @@ export default {
         DELETE: DELETE_ENTITY
       },
       objectName: 'Entity',
-      affiliates: []
+      affiliates: [],
+      newEntity: false
     }
   },
   props: {
@@ -82,11 +88,21 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([ 'entities', 'affiliations' ])
-
+    ...mapGetters([ 'entities', 'affiliations' ]),
+    ...mapState({
+      isAdmin: state => state.auth.authUser.is_staff,
+      authUser: state => state.auth.authUser
+    })
   },
   methods: {
-
+    isManager (entity) {
+      let self = this
+      console.log(entity.managed)
+      return entity.managed.find(function (user) {
+        // eslint-disable-next-line eqeqeq
+        return user.id == self.authUser.id
+      })
+    },
     entityView (entity) {
       if (!this.viewmode) {
         this.$router.push({ path: `/entities/${entity.id}` })
@@ -102,9 +118,16 @@ export default {
       this.entityObj = {}
     },
     selectEntity (entity) {
-      alert('select')
       this.entityObj = entity
       this.object = Object.assign({}, this.entityObj)
+    },
+    manageEntity (entity) {
+      this.$router.push({ path: `/entities/${entity.id}` })
+    },
+    createLink () {
+      this.update = false
+      this.add = true
+      this.$router.push({ path: `/entities/create` })
     }
 
   },
