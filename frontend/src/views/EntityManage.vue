@@ -1,8 +1,8 @@
 
 <template>
 <div>
-    <navbar v-if="isAdmin && manageEntity" :items="items"></navbar>
-    <b-container v-if="manageEntity">
+    <navbar v-if="isAdmin && !createEntity" :items="items"></navbar>
+    <b-container v-if="manageEntity || add">
       <b-row>
         <b-col lg="4">
           <div class="column">
@@ -93,11 +93,12 @@ export default {
         FETCH: FETCH_ENTITIES,
         DELETE: DELETE_ENTITY
       },
-      manageEntity: true,
+      manageEntity: false,
       objectName: 'Entity',
       update: false,
       add: false,
-      affiliates: []
+      affiliates: [],
+      createEntity: false
     }
   },
   props: {
@@ -144,6 +145,7 @@ export default {
       this.assignObject(this.entityObj)
       await this.saveObject(EventForm)
       this.fetchData()
+      this.$router.push({ path: `/entities/` })
     },
     updateManager (manager) {
       this.entityObj.managed = this.managed
@@ -195,10 +197,14 @@ export default {
       // eslint-disable-next-line eqeqeq
       if (to.name !== 'entity') {
         this.manageEntity = false
+        this.add = true
+        this.update = false
+        this.createEntity = true
       }
       // eslint-disable-next-line eqeqeq
-      if (to.name == 'entity') {
+      if (to.name == 'entity' || to.name == 'manageUsers') {
         this.manageEntity = true
+        this.createEntity = false
       }
       if (this.$route.params.id) {
         let idRoute = this.$route.params.id
@@ -224,13 +230,23 @@ export default {
       this.manageEntity = false
     }
     // eslint-disable-next-line eqeqeq
-    this.manageRoute = this.$route.name == 'entity'
-
-    // eslint-disable-next-line eqeqeq
-    if (!this.$route.params.id) {
-      this.add = true
+    if (this.$route.name == 'entity' || this.$route.name == 'manageUsers') {
+      this.manageEntity = true
+      this.add = false
       this.update = false
     }
+    // eslint-disable-next-line eqeqeq
+    if (this.$route.name == 'manageUsers') {
+      this.manageEntity = false
+    }
+
+    // eslint-disable-next-line eqeqeq
+    if (this.$route.name == 'createEntity') {
+      this.add = true
+      this.update = false
+      this.createEntity = true
+    }
+
     if (this.$route.params.id) {
       this.add = false
       this.update = true
