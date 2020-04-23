@@ -19,7 +19,7 @@
           <b-row>
             <b-col lg="8">
               <div class="column">
-                <tablecomp v-if="managers" :items="managers" :actions="true"></tablecomp>
+                <tablecomp v-if="entity.managed.length" :items="entity.managed" :actions="true"></tablecomp>
               </div>
             </b-col>
           </b-row>
@@ -56,6 +56,7 @@ export default {
     },
     addUser () {
       this.entity.managed.push(this.selectedUser)
+      this.messageBox = 'Manager added'
       this.saveEntity()
     },
     async saveEntity () {
@@ -70,7 +71,7 @@ export default {
       })
     },
     fetchData () {
-      this.$store.dispatch(FETCH_ENTITIES)
+      // this.$store.dispatch(FETCH_ENTITIES)
     }
   },
 

@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
-from .models import Product , Location ,Family ,Transaction, Entity, Profile
+from .models import Entity, Profile, Affiliation
 from .serializers import *   
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (

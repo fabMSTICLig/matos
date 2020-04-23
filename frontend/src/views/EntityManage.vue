@@ -1,12 +1,12 @@
 
 <template>
 <div>
-    <navbar v-if="isAdmin && !createEntity" :items="items"></navbar>
+    <navbar v-if="isAdmin && !createEntity && items" :items="items"></navbar>
     <b-container v-if="manageEntity || add">
       <b-row>
         <b-col lg="4">
           <div class="column">
-            <b-card  v-if="isAdmin || update && !viewMode">
+            <b-card  v-if="isAdmin || isManaged">
               <b-form @submit.prevent="saveEntity">
                 <b-form-group
                   id="label-nom"
@@ -25,8 +25,7 @@
                   label="Affiliations"
                   label-for="select-affiliations"
                   >
-                  <b-form-select multiple="multiple" id="select-affiliations" v-model = "affiliates" v-on:change="updateAffiliations($event)" v-if="affiliates">
-                    <option v-for="affiliation in affiliations" :key="affiliation.id" :value="affiliation" :selected="ownAffiliations(affiliation.id)">{{affiliation.name}}</option>
+                  <b-form-select multiple id="select-affiliations" v-model = "affiliates" :options='affiliationsList' v-on:change="updateAffiliations($event)" v-if="affiliationsList" >
                   </b-form-select>
                 </b-form-group>
                 <b-form-group
@@ -113,20 +112,22 @@ export default {
       isAdmin: state => state.auth.authUser.is_staff,
       authUser: state => state.auth.authUser
     }),
-    entitiesObj () {
+    isManaged () {
       let self = this
-      if (this.isAdmin) {
-        return this.entities
-      } else {
-        console.log(this.entities)
-        let entities = this.entities.filter(function (entity) {
-          return entity.managed.some(function (user) {
-            // eslint-disable-next-line eqeqeq
-            return user.id == self.authUser.id
-          })
+      return this.entity.managed.some(function (user) {
+        // eslint-disable-next-line eqeqeq
+        return user.id == self.authUser.id
+      })
+    },
+    affiliationsList () {
+      let values = this.affiliations.map(
+        affiliation => {
+          let option = {}
+          option['value'] = affiliation
+          option['text'] = affiliation.name
+          return option
         })
-        return entities
-      }
+      return values
     },
     items () {
       return [
@@ -136,31 +137,17 @@ export default {
     }
   },
   methods: {
-    isManager (managers) {
-      // eslint-disable-next-line eqeqeq
-      return managers.find(manager => manager.id == this.authUser.id)
-    },
     async saveEntity (EventForm) {
       this.entityObj.affiliations = this.affiliates
       this.assignObject(this.entityObj)
       await this.saveObject(EventForm)
-      this.fetchData()
-      this.$router.push({ path: `/entities/` })
-    },
-    updateManager (manager) {
-      this.entityObj.managed = this.managed
+      await this.fetchData()
     },
     updateAffiliations (evt) {
       if (this.entityObj) {
         console.log(evt)
         this.affiliates = evt
       }
-    },
-    editEntity (entity) {
-      this.assignObject(entity)
-      this.$router.push({ path: `/entities/${entity.id}` })
-      this.update = true
-      this.add = true
     },
     deselectAffiliates () {
       this.affiliates = []
@@ -174,51 +161,40 @@ export default {
       // eslint-disable-next-line eqeqeq
         let ownAffiliation = this.entityObj.affiliations.find(affiliation => affiliation.id == id)
         console.log(ownAffiliation ? 'true' : '')
-        return ownAffiliation ? 'true' : ''
+        return ownAffiliation ? 'selected' : ''
       } else {
         return ''
       }
-    },
-    createLink () {
-      this.update = false
-      this.add = true
-      this.$router.push({ name: 'entities' })
-    },
-    selectEntity (entity) {
-      this.update = true
-      this.add = false
-      this.$router.push({ path: `/entities/${entity.id}` })
     }
   },
 
   watch: {
     $route (to, from) {
-      this.viewMode = false
       // eslint-disable-next-line eqeqeq
-      if (to.name !== 'entity') {
+      if (to.name == 'createEntity') {
         this.manageEntity = false
-        this.add = true
-        this.update = false
         this.createEntity = true
       }
       // eslint-disable-next-line eqeqeq
-      if (to.name == 'entity' || to.name == 'manageUsers') {
-        this.manageEntity = true
+      if (to.name == 'manageUsers') {
         this.createEntity = false
+        this.manageEntity = false
       }
+
+      // eslint-disable-next-line eqeqeq
+      if (to.name == 'entity') {
+        this.manageEntity = true
+      }
+
       if (this.$route.params.id) {
-        let idRoute = this.$route.params.id
-        // eslint-disable-next-line eqeqeq
-        this.entityObj = this.entities.find(entity => entity.id == idRoute) || {}
-        this.object = Object.assign({}, this.entityObj)
-        this.affiliates = this.entityObj.affiliations
+        this.object = Object.assign({}, this.entity)
+        this.affiliates = this.entity.affiliations
         this.update = true
         this.add = false
       } if (!this.$route.params.id) {
         this.update = false
         this.add = true
         this.entityObj = {}
-        this.deselectAffiliates()
         this.object = Object.assign({}, this.entityObj)
       }
     }
@@ -226,18 +202,19 @@ export default {
 
   beforeMount () {
     this.$store.dispatch(FETCH_AFFILIATIONS)
+
     if (this.$route.name !== 'entity' && this.$route.name !== 'createEntity') {
       this.manageEntity = false
     }
     // eslint-disable-next-line eqeqeq
-    if (this.$route.name == 'entity' || this.$route.name == 'manageUsers') {
+    if (this.$route.name == 'entity') {
       this.manageEntity = true
-      this.add = false
-      this.update = false
+      this.affiliates = this.entity.affiliations
     }
     // eslint-disable-next-line eqeqeq
     if (this.$route.name == 'manageUsers') {
       this.manageEntity = false
+      this.add = false
     }
 
     // eslint-disable-next-line eqeqeq
@@ -250,16 +227,14 @@ export default {
     if (this.$route.params.id) {
       this.add = false
       this.update = true
-      let idRoute = this.$route.params.id
-      this.$store.dispatch(GET_ENTITY, idRoute).then(entity => {
-        // eslint-disable-next-line eqeqeq
-        this.entityObj = entity
-        this.object = Object.assign({}, this.entityObj)
-        this.affiliates = this.entityObj.affiliations
-      })
+      this.entityObj = this.entity
     }
-  },
-  created () {
+    if (!this.$route.params.id) {
+      this.add = true
+      this.update = false
+      this.entityObj = {}
+      this.object = Object.assign({}, this.entityObj)
+    }
   }
 }
 </script>

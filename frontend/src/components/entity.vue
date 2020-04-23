@@ -14,8 +14,6 @@
         <b-card-text>
             {{entity.description}}
         </b-card-text>
-
-        <b-button href="#" @click="selectEntity" variant="outline-primary">Select</b-button>
     </b-card>
     </div>
 </template>
@@ -47,9 +45,6 @@ export default {
     }
   },
   methods: {
-    selectEntity () {
-      this.selectObject(this.entity)
-    }
   }
 }
 </script>

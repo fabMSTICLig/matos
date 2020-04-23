@@ -59,7 +59,6 @@ export default {
     isManaged () {
       let self = this
       console.log(this.entityObj)
-
       // eslint-disable-next-line eqeqeq
       let managed = this.entityObj.managed.some(function (user) {
         // eslint-disable-next-line eqeqeq
@@ -70,25 +69,9 @@ export default {
       return managed
     }
   },
-
-  watch: {
-    $route (to, from) {
-      // eslint-disable-next-line eqeqeq
-      if (to.name == 'entitiesList') {
-        this.viewMode = true
-      }
-      if (this.$route.params.id) {
-
-      } if (!this.$route.params.id) {
-      }
-    }
-  },
   beforeMount () {
     this.$store.dispatch(FETCH_ENTITIES)
     // eslint-disable-next-line eqeqeq
-    if (this.$route.name == 'entity') {
-      this.detail = true
-    }
   }
 }
 </script>
