@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+
+AUTH_USER_MODEL = 'core.User'
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -21,8 +24,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 with open(BASE_DIR+'/config/secret-key.txt') as f:
     SECRET_KEY = f.read().strip()
-
-print(SECRET_KEY)
 
 
 try:
@@ -40,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
     'django_filters',
     'core',
     'django.contrib.postgres',
@@ -85,7 +85,6 @@ SILENCED_SYSTEM_CHECKS = ["fields.W342"]
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':
         ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-    'PAGE_SIZE': 10,
      'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',

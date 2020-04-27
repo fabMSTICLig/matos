@@ -18,12 +18,12 @@ from core import views
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf.urls import url, include
-from core.views import index, entityManagedListView, AffiliationViewSet, entityViewSet, UserViewSet, UserInstanceView
+from core.views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView
 import django_cas_ng.views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'api/entities', entityViewSet)
+router.register(r'api/entities', EntityViewSet)
 router.register(r'api/users', UserViewSet)
 router.register(r'api/affiliations', AffiliationViewSet)
 
@@ -33,8 +33,7 @@ urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
     path('api/login',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
     path('api/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
-    url(r'^home/', index),
-    path('api/self/', UserInstanceView.as_view()),
+    path('api/self/', SelfView.as_view()),
     path('', include(router.urls)),
 
 ]
