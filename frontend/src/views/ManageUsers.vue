@@ -57,9 +57,9 @@ export default {
     addUser () {
       this.entity.managed.push(this.selectedUser)
       this.messageBox = 'Manager added'
-      this.saveEntity()
+      this.saveManagers()
     },
-    async saveEntity () {
+    async saveManagers () {
       this.$store.dispatch(UPDATE_ENTITY, { id: this.entity.id, data: this.entity }).then((entity) => {
         this.$bvModal.msgBoxOk(this.messageBox)
           .then(value => {
@@ -88,7 +88,7 @@ export default {
     bus.$on('removeItem', (item) => {
       self.messageBox = 'Manager removed'
       DataHelper.removeById(self.entity.managed, item)
-      self.saveEntity()
+      self.saveManagers()
     })
   },
 
