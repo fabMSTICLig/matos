@@ -12,3 +12,4 @@ venv*
 *.log
 .env.local
 local_settings.py
+db.sqlite3
