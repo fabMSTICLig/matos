@@ -13,7 +13,11 @@ class Affiliation(models.Model):
     TYPE_AFFILIATION = (
          ('Labo','Laboratoire'), 
          ('Ecole','Ecole'),
-         ('Platforme','Platforme')       
+         ('Platforme','Platforme'),
+         ('Service','Service'),
+         ('Recherche','Recherche'),
+         ('Composante','Composante Universitaire')       
+              
     )
 
     type = models.CharField(

@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from .models import Entity, Affiliation
 from .serializers import *   
 from .permissions import *
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     """
