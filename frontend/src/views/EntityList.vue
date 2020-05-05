@@ -97,10 +97,12 @@ export default {
   methods: {
     isManager (entity) {
       let self = this
-      console.log(entity.managed)
-      return entity.managed.find(function (user) {
+      console.log(entity.managers)
+      return entity.managers.find(function (user) {
+        console.log(user)
+        console.log(self.authUser.id)
         // eslint-disable-next-line eqeqeq
-        return user.id == self.authUser.id
+        return user == self.authUser.id
       })
     },
     entityView (entity) {
