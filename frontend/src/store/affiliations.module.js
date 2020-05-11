@@ -30,5 +30,4 @@ const affiliations_extra = {
     }
 };
 const affiliations = createCrud('affiliations',affiliations_extra);
-console.log(affiliations)
 export default affiliations;

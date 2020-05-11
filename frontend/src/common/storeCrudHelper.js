@@ -106,14 +106,13 @@ const createCrud = (ressource, source) => {
             },
             destroy({
                 commit,
-            }, {
-                id
-            }) {
+            },id) {
+                console.log(id);
                 return ApiService.delete(ressource, id)
                     .then(({
                         data
                     }) => {
-                        commit("deleteSuccess", id);
+                        commit("destroySuccess", id);
                         return data;
                     }).catch(error => {
                         Promise.reject(error);
@@ -136,6 +135,7 @@ const createCrud = (ressource, source) => {
                 if (data) {
                     const id = data['id'].toString();
                     Vue.set(state.entities, id, data);
+                    state.list.push(id)
                 }
             },
             updateSuccess(state, data) {

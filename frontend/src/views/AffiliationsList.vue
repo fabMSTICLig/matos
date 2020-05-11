@@ -14,24 +14,20 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in affiliations_list" :key="item.id" v-on:click="selected_object=item">
+              <tr v-for="item in objects_paginated" :key="item.id" v-on:click="selected_object=item">
                 <td v-text="affiliation_types[item.type]"></td>
                 <td v-text="item.name"></td>
               </tr>
             </tbody>
           </table>
         </div>
-        <nav v-if="page_count>1"> 
-          <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">4</a></li>
-            <li class="page-item"><a class="page-link" href="#">5</a></li>
-            <li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
-          </ul>
-        </nav>
+        <pagination
+           :total-pages="pages_count"
+           :total="objects_filtered.length"
+           :per-page="10"
+           :current-page="current_page"
+            @pagechanged="onPageChange"
+        />
       </div>
     </div>
   </div>
@@ -53,40 +49,27 @@
 </template>
 
 <script>
+import { ListMixin } from "@/common/mixins";
 // @ is an alias to /src
 import {
     mapGetters
 } from "vuex";
 export default {
     name: "AffiliaionList",
-    components: {},
+    mixins: [ListMixin],
     data(){
         return{
-            search_input:"",
-            selected_object:null,
+            search_fields:['name'],
+            ressource:"affiliations",
         } 
     },
     computed: {
-        ...mapGetters('affiliations', {affiliations:'list', affiliation_types: 'types'}),
-        affiliations_list() {
-            return this.affiliations.filter(item => {
-            return item.name.toLowerCase().indexOf(this.search_input.toLowerCase()) > -1;
-            });
-        },
-        page_count(){
-            return Math.floor(this.affiliations_list.length/10)+1;
-        }
+        ...mapGetters('affiliations', {affiliation_types: 'types'}),
     },
-    beforeMount() {
-      this.$store.dispatch('affiliations/fetchTypes').then(()=>{
-        this.$store.dispatch('affiliations/fetchList').then(()=>{
-            if(this.affiliations.length>0)
-            {   
-               this.selected_object=this.affiliations[0];
-            }
-        });
-      });
-    }
-
+    methods:{
+        initComponent(){
+            return this.$store.dispatch("affiliations/fetchTypes")
+        },
+    },
 };
 </script>
