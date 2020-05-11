@@ -91,6 +91,8 @@ class UserViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST)
 
 class SelfView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
         instance = UserSerializer(request.user, context={'request': request})
         return Response({"user": instance.data})
@@ -107,4 +109,7 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
     permission_classes = (IsAdminOrReadOnly,)
-
+    
+    @action(methods=['get'], detail=False)
+    def types(self, request):
+        return Response(dict((x, y) for x, y in Affiliation.TYPE_AFFILIATION), status=status.HTTP_200_OK)

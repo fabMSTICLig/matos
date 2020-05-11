@@ -1,18 +1,15 @@
-export const SET_ENTITIES = 'setEntities'
-export const GET_ENTITY_STATE = 'getEntity'
-export const SET_ENTITY = 'setEntity'
-export const SET_AUTHUSER = 'setAuthUser'
-export const SET_EQUIPMENTS = 'setEquipments'
-export const SET_EQUIPMENT = 'setEquipment'
-export const SET_FAMILIES = 'setFamilies'
-export const SET_FAMILY = 'setFamily'
-export const SET_USERS = 'setUsers'
-export const SET_USER = 'setUser'
-export const ADD_USER = 'addUser'
-export const SET_AUTHUSER_MANAGER = 'setManager'
-export const SET_AFFILIATIONS = 'setAffiliations'
-export const SET_AFFILIATION = 'setAffiliation'
-export const SET_AFFILIATES = 'setAffiliates'
-export const PURGE_AUTH = 'logOut'
-export const SET_ERROR = 'setError'
-export const UPDATE_AUTHUSER = 'updateAuthUser'
+
+export const PUSH_BREADCUMB_MUT = "pushBreadcumb";
+export const POP_BREADCUMB_MUT = "popBreadcumb";
+
+export const PURGE_AUTH = "logOut";
+export const SET_AUTHUSER = "setAuthUser";
+export const SET_PASSWORD = "setPassword";
+export const SET_USERS = "setUsers";
+export const SET_USER = "setUser";
+export const ADD_USER = "addUser";
+
+export const SET_AFFILIATION_TYPES = "setAffiliationType";
+export const SET_AFFILIATIONS = "setAffiliations";
+export const SET_AFFILIATION = "setAffiliation";
+export const ADD_AFFILIATION = "addAffiliation";
