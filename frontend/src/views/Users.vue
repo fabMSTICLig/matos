@@ -1,5 +1,5 @@
 <template>
-<div id="affiliations">
+<div id="users">
     <Breadcumb />
 <router-view></router-view>
 </div>
@@ -9,7 +9,7 @@
 import Breadcumb from "@/components/Breadcumb";
 import { PUSH_BREADCUMB, POP_BREADCUMB} from "@/store/actions.type";
   export default {
-    name: "Affiliations",
+    name: "Users",
     components: {
       Breadcumb,
     },
@@ -24,12 +24,12 @@ import { PUSH_BREADCUMB, POP_BREADCUMB} from "@/store/actions.type";
 
     },
     beforeMount(){
-      this.$store.dispatch(PUSH_BREADCUMB, {label: 'Affiliations', url: this.$route.matched[0].path})
+      this.$store.dispatch(PUSH_BREADCUMB, {label: 'Utilisateurs', url: this.$route.matched[0].path})
     },
     beforeRouteLeave(to, from , next){
         this.$store.dispatch(POP_BREADCUMB)
         next()
-    }
+    },
 
 
   };

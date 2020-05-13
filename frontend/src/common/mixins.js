@@ -144,12 +144,14 @@ export const EditMixin = {
         this.initObject(this.$route);
       });
   },
-  beforeDestroy() {
-    this.$store.dispatch(POP_BREADCUMB)
-  },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch(POP_BREADCUMB)
     this.initObject(to);
     next()
-  }
+  },
+  beforeRouteLeave(to, from , next){
+        this.$store.dispatch(POP_BREADCUMB)
+        next()
+  },
+
 }

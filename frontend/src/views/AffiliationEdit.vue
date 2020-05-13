@@ -19,8 +19,7 @@
                 </div>
               </div>
               <div class="btn-group" role="group">
-                 <button v-if="is_new" class="btn btn-primary" type="button" v-on:click="create">Ajouter</button>
-            
+                <button v-if="is_new" class="btn btn-primary" type="button" v-on:click="create">Ajouter</button>
                 <button v-if="!is_new" class="btn btn-primary" type="button" v-on:click="update">Modifier</button>
                 <button v-if="!is_new" class="btn btn-danger" type="button" v-on:click="destroy">Supprimer</button>
               </div>

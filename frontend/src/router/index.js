@@ -41,7 +41,8 @@ const routes = [{
     },
     {
         path: "/profile",
-        name: "Profile",
+        name: "profile",
+        beforeEnter: requireAuth,
         component: () =>
             import ( /* webpackChunkName: "profile" */ "../views/Profile.vue")
     },
@@ -62,6 +63,26 @@ const routes = [{
                 name : "affiliation",
                 component: () =>
                     import (/* webpackChunkName: "affiliationedit" */ "../views/AffiliationEdit.vue"),
+            },
+        ],
+    },
+    {
+        path: "/users",
+        component: () =>
+            import (/* webpackChunkName: "user" */ "../views/Users.vue"),
+        beforeEnter: requireAdmin,
+        children :[
+            {
+                path: "",
+                name: "users",
+                component: () =>
+                    import (/* webpackChunkName: "userlist" */"../views/UsersList.vue"),
+            },
+            {
+                path: ":id",
+                name : "user",
+                component: () =>
+                    import (/* webpackChunkName: "useredit" */ "../views/UserEdit.vue"),
             },
         ],
     },
