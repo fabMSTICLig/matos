@@ -12,48 +12,28 @@
                 <fieldset>
                   <legend>Informations</legend>
                   <div class="form-group">
-                    <label>Username</label
-                    ><input
-                      class="form-control"
-                      type="text"
-                      v-model="object.username"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>Prénom</label
-                    ><input
-                      class="form-control"
-                      type="text"
-                      v-model="object.first_name"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
                     <label>Nom</label
                     ><input
                       class="form-control"
                       type="text"
-                      v-model="object.last_name"
+                      v-model="object.name"
                       required
                     />
                   </div>
                   <div class="form-group">
-                    <label>Email</label
+                    <label>Description</label
+                    ><textarea
+                      class="form-control"
+                      v-model="object.description"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Contact</label
                     ><input
                       class="form-control"
                       type="email"
-                      v-model="object.email"
+                      v-model="object.contact"
                       required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>RGPD accept date</label
-                    ><input
-                      class="form-control"
-                      type="date"
-                      readonly
-                      v-model="object.rgpd_accept"
                     />
                   </div>
                 </fieldset>
@@ -71,12 +51,19 @@
               </div>
               <div class="col col-12 col-md-6 col-xl-4">
                 <fieldset>
-                  <legend>Entities</legend>
+                  <legend>Managers</legend>
                   <div class="form-group">
                     <DynList
-                      ressource="entities"
-                      v-model="object.entities"
-                    ></DynList>
+                      ressource="users"
+                      v-model="object.managers"
+                      :makeLabel="makeManagerLabel"
+                    >
+                      <template v-slot:default="slotProps">
+                        <strong>@{{ slotProps.item.username }} :</strong>
+                        {{ slotProps.item.first_name }}
+                        {{ slotProps.item.last_name }}
+                      </template>
+                    </DynList>
                   </div>
                 </fieldset>
               </div>
@@ -118,31 +105,34 @@
 import { EditMixin } from "@/common/mixins";
 import DynList from "@/components/DynList";
 export default {
-  name: "UserEdit",
+  name: "EntityEdit",
   mixins: [EditMixin],
   components: {
     DynList
   },
   data() {
     return {
-      ressource: "users",
-      new_label: "Nouvel Utilisateur",
-      object_name: "User"
+      ressource: "entities",
+      new_label: "Nouvelle Entité",
+      object_name: "Entité"
     };
   },
   computed: {},
   methods: {
     get_empty() {
       return {
-        username: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        affiliations: []
+        name: "",
+        description: "",
+        contact: "",
+        affiliations: [],
+        managers: []
       };
     },
     make_label() {
-      return this.object.username;
+      return this.object.name;
+    },
+    makeManagerLabel(item) {
+      return item.first_name + " " + item.last_name;
     }
   }
 };

@@ -117,31 +117,42 @@ export const EditMixin = {
       }
     },
     update() {
-      this.$store
-        .dispatch(this.ressource + "/update", {
-          id: this.object.id,
-          data: this.object
-        })
-        .then(data => {
-          this.object = Object.assign({}, data);
-          console.log(this.object_name + " updated");
-          this.breadcumb.label = this.make_label();
-          this.$bvModal.msgBoxOk(this.object_name + " updated");
-        });
+      if (document.querySelector("#editor-form").checkValidity()) {
+        this.$store
+          .dispatch(this.ressource + "/update", {
+            id: this.object.id,
+            data: this.object
+          })
+          .then(data => {
+            this.object = Object.assign({}, data);
+            console.log(this.object_name + " updated");
+            this.breadcumb.label = this.make_label();
+            this.$bvModal.msgBoxOk(this.object_name + " updated");
+          });
+      } else {
+        document.querySelector("#editor-form").reportValidity();
+      }
     },
     create() {
-      this.$store
-        .dispatch(this.ressource + "/create", this.object)
-        .then(data => {
-          console.log(this.object_name + " created");
-          this.$bvModal.msgBoxOk(this.object_name + " created");
-          this.$router.push({
-            name: this.$route.name,
-            params: {
-              id: data.id
-            }
+      if (document.querySelector("#editor-form").checkValidity()) {
+        this.$store
+          .dispatch(this.ressource + "/create", this.object)
+          .then(data => {
+            console.log(this.object_name + " created");
+            this.$bvModal.msgBoxOk(this.object_name + " created");
+            this.$router.push({
+              name: this.$route.name,
+              params: {
+                id: data.id
+              }
+            });
+          })
+          .catch(error => {
+            console.log(error.response);
           });
-        });
+      } else {
+        document.querySelector("#editor-form").reportValidity();
+      }
     },
     destroy() {
       this.$store

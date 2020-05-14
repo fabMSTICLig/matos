@@ -6,7 +6,7 @@
           <h3 v-text="cardName"></h3>
         </div>
         <div class="card-body">
-          <form>
+          <form id="editor-form">
             <div class="form-row">
               <div class="col">
                 <div class="form-group">
@@ -15,6 +15,7 @@
                     v-model="object.name"
                     class="form-control"
                     type="text"
+                    required
                   />
                 </div>
 

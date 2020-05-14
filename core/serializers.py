@@ -35,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'email',
-                  'first_name', 'last_name', 'is_staff','rgpd_accept','affiliations','externe')
+                  'first_name', 'last_name', 'is_staff', 'rgpd_accept', 'affiliations', 'entities', 'externe')
         read_only_fields = ('username',)
 
     def get_externe(self, obj):

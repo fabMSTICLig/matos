@@ -4,7 +4,7 @@
       <h3>Votre profile</h3>
     </div>
     <div class="card-body">
-      <form>
+      <form id="editor-form">
         <div class="form-group">
           <label>Username</label
           ><input
@@ -20,6 +20,7 @@
             class="form-control"
             type="text"
             v-model="authUser.first_name"
+            required
           />
         </div>
         <div class="form-group">
@@ -28,11 +29,17 @@
             class="form-control"
             type="text"
             v-model="authUser.last_name"
+            required
           />
         </div>
         <div class="form-group">
           <label>Email</label
-          ><input class="form-control" type="email" v-model="authUser.email" />
+          ><input
+            class="form-control"
+            type="email"
+            v-model="authUser.email"
+            required
+          />
         </div>
         <div class="form-group">
           <label>Affiliations</label>
@@ -67,11 +74,15 @@ export default {
   },
   methods: {
     update() {
-      this.$store.dispatch(UPDATE_AUTHUSER, this.authUser).then(() => {
-        console.log("Profile updated");
-        this.$bvModal.msgBoxOk("Profile updated");
-        this.$store.dispatch("affiliations/fetchList");
-      });
+      if (document.querySelector("#editor-form").checkValidity()) {
+        this.$store.dispatch(UPDATE_AUTHUSER, this.authUser).then(() => {
+          console.log("Profile updated");
+          this.$bvModal.msgBoxOk("Profile updated");
+          this.$store.dispatch("affiliations/fetchList");
+        });
+      } else {
+        document.querySelector("#editor-form").reportValidity();
+      }
     }
   }
 };

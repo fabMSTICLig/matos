@@ -46,7 +46,7 @@ const createCrud = (ressource, source) => {
               return getters.list;
             })
             .catch(error => {
-              Promise.reject(error);
+              return Promise.reject(error);
             });
         } else {
           return Promise.resolve(getters.list);
@@ -59,7 +59,7 @@ const createCrud = (ressource, source) => {
             return data;
           })
           .catch(error => {
-            Promise.reject(error);
+            return Promise.reject(error);
           });
       },
       create({ commit }, data) {
@@ -69,7 +69,7 @@ const createCrud = (ressource, source) => {
             return data;
           })
           .catch(error => {
-            Promise.reject(error);
+            return Promise.reject(error);
           });
       },
       update({ commit }, { id, data }) {
@@ -79,18 +79,17 @@ const createCrud = (ressource, source) => {
             return data;
           })
           .catch(error => {
-            Promise.reject(error);
+            return Promise.reject(error);
           });
       },
       destroy({ commit }, id) {
-        console.log(id);
         return ApiService.delete(ressource, id)
           .then(({ data }) => {
             commit("destroySuccess", id);
             return data;
           })
           .catch(error => {
-            Promise.reject(error);
+            return Promise.reject(error);
           });
       }
     },

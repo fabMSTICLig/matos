@@ -1,19 +1,22 @@
 <template>
   <div>
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Ajouter</span>
+    <form :id="_uid" @submit="addObject">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Ajouter</span>
+        </div>
+        <input-datalist
+          v-model="new_object_id"
+          :ressource="ressource"
+          :makeLabel="makeLabel"
+        ></input-datalist>
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit">
+            Valider
+          </button>
+        </div>
       </div>
-      <input-datalist
-        v-model="new_object_id"
-        :ressource="ressource"
-      ></input-datalist>
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button" @click="addObject">
-          Valider
-        </button>
-      </div>
-    </div>
+    </form>
     <ul class="list-group">
       <li
         class="list-group-item d-flex justify-content-between align-items-center"
@@ -49,6 +52,10 @@ export default {
     value: {
       type: Array,
       required: true
+    },
+    makeLabel: {
+      type: Function,
+      required: false
     }
   },
   components: {
@@ -70,8 +77,11 @@ export default {
     }
   },
   methods: {
-    addObject() {
-      if (
+    addObject(e) {
+      e.preventDefault();
+      if (this.value.indexOf(this.new_object_id) > -1) {
+        this.new_object_id = 0;
+      } else if (
         this.value.indexOf(this.new_object_id) == -1 &&
         this.objects_list.some(item => item.id == this.new_object_id)
       ) {

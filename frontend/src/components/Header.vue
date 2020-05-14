@@ -19,7 +19,7 @@
               class="nav-link"
               active-class="active"
               exact
-              :to="{ name: 'Home' }"
+              :to="{ name: 'home' }"
               >Home</router-link
             >
           </li>
@@ -28,7 +28,7 @@
               class="nav-link"
               active-class="active"
               exact
-              :to="{ name: 'Home' }"
+              :to="{ name: 'entities' }"
               >Entités</router-link
             >
           </li>

@@ -36,12 +36,12 @@ function requireAdmin(to, from, next) {
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "home",
     component: Home
   },
   {
     path: "/about",
-    name: "About",
+    name: "about",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue")
   },
@@ -93,6 +93,28 @@ const routes = [
         name: "user",
         component: () =>
           import(/* webpackChunkName: "useredit" */ "../views/UserEdit.vue")
+      }
+    ]
+  },
+  {
+    path: "/entities",
+    component: () =>
+      import(/* webpackChunkName: "entity" */ "../views/Entities.vue"),
+    beforeEnter: requireAuth,
+    children: [
+      {
+        path: "",
+        name: "entities",
+        component: () =>
+          import(
+            /* webpackChunkName: "entitylist" */ "../views/EntitiesList.vue"
+          )
+      },
+      {
+        path: ":id",
+        name: "entity",
+        component: () =>
+          import(/* webpackChunkName: "entityedit" */ "../views/EntityEdit.vue")
       }
     ]
   }
