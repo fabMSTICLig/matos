@@ -23,7 +23,7 @@
               >Home</router-link
             >
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" v-if="isAuthenticated" >
             <router-link
               class="nav-link"
               active-class="active"
@@ -55,14 +55,14 @@
           <li class="nav-item" role="presentation">
             <a
               class="nav-link"
-              :href="authUser.externe ? '/accounts/logout' : '/auth/logout'"
+              :href="authUser.externe ? '/cas/logout' : '/auth/logout'"
               >Logout</a
             >
           </li>
         </ul>
         <ul v-else class="nav navbar-nav">
           <li class="nav-item" role="presentation">
-            <a class="nav-link" v-if="cas" href="/accounts/login">{{ cas }}</a>
+            <a class="nav-link" v-if="cas" href="/cas/login">{{ cas }}</a>
           </li>
           <li class="nav-item" role="presentation">
             <a class="nav-link" href="/auth/login">Login</a>

@@ -13,19 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path, include
-from django.urls import path, include, re_path
-from django.views.generic import TemplateView
-import django_cas_ng.views
+from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'entities', EntityViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'affiliations', AffiliationViewSet)
 
 urlpatterns = [
-    re_path(r'^$', view=TemplateView.as_view(template_name='index.html')),
-    path('admin/', admin.site.urls),
-    path('auth/', include('django.contrib.auth.urls')),
-    path('cas/login/',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
-    path('cas/logout/', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
-    path('api/', include('core.urls')),
+    path('self/', SelfView.as_view()),
+    path('', include(router.urls)),
+
 ]
 
 
