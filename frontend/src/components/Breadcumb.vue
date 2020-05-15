@@ -1,10 +1,16 @@
 <template>
   <ol class="breadcrumb">
-    <li class="breadcrumb-item" v-for="item in breadcumb_list" :key="item.url">
-      <router-link :to="item.url"
-        ><span v-text="item.label"></span
-      ></router-link>
-    </li>
+    <router-link v-for="(item, index) in breadcumb_list" :key="item.url"
+      :to="item.url"
+      v-slot="{ href, route, navigate, isActive, isExactActive }"
+      >
+        <li class="breadcrumb-item" :class="[isExactActive && 'active']" >
+            <a v-if="!isExactActive" :href="href" @click="navigate">
+                <span v-text="item.label"></span>
+            </a>
+            <span v-else v-text="item.label"></span>
+        </li>
+    </router-link>
   </ol>
 </template>
 
