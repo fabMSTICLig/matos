@@ -14,11 +14,9 @@
             </div>
             <div class="card-body">
                 {% if form.non_field_errors %}
-                    {% for error in form.non_field_errors %}
-                        <p class="text-danger">
-                            {{ error }}
-                        </p>
-                    {% endfor %}
+                    <p class="text-danger">
+                    Identifiants incorrects. Vous êtes peut être un utilisateur du <a href="/cas/login">CAS</a>
+                    </p>
                 {% endif %}
                 <form action="{% url 'login' %}" method="post" id="login-form">
                     {% csrf_token %}

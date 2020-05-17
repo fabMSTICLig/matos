@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import datetime
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
@@ -55,6 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 # set_password also hashes the password that the user will get
                 user.set_password(serializer.data.get('new_password'))
                 user.save()
+                update_session_auth_hash(request,user)
                 return Response({'status': 'password set'}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors,

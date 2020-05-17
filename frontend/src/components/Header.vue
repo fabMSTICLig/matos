@@ -14,25 +14,27 @@
       </button>
       <div class="collapse navbar-collapse" id="navcol-1">
         <ul class="nav navbar-nav mr-auto">
-          <li class="nav-item" role="presentation">
-            <router-link
-              class="nav-link"
-              active-class="active"
-              exact
-              :to="{ name: 'home' }"
-              >Home</router-link
-            >
-          </li>
-          <li class="nav-item" role="presentation" v-if="isAuthenticated" >
-            <router-link
-              class="nav-link"
-              active-class="active"
-              exact
-              :to="{ name: 'entities' }"
-              >Entités</router-link
-            >
-          </li>
-          <li class="nav-item" role="presentation"></li>
+          <router-link
+            active-class="active"
+            exact
+            :to="{ name: 'home' }"
+            v-slot="{ href, route, navigate }"
+          >
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" :href="href" @click="navigate">Home</a>
+            </li>
+          </router-link>
+          <router-link
+            v-if="isAuthenticated"
+            active-class="active"
+            exact
+            :to="{ name: 'entities' }"
+            v-slot="{ href, route, navigate }"
+          >
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" :href="href" @click="navigate">Entités</a>
+            </li>
+          </router-link>
           <b-nav-item-dropdown text="Admin" v-if="isAdmin">
             <b-dropdown-item :to="{ name: 'users' }"
               >Utilisateurs</b-dropdown-item
