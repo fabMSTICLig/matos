@@ -3,16 +3,19 @@ from __future__ import unicode_literals
 import datetime
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
-from .models import Entity, Affiliation
+from .models import Entity, Affiliation, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
+
 from .serializers import *   
-from .permissions import *
+from .permissions import EntityPermission, IsManager, IsAdminOrIsSelf, IsAdminOrReadOnly 
 from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -101,7 +104,7 @@ class SelfView(APIView):
 class EntityViewSet(viewsets.ModelViewSet):
     queryset = Entity.objects.all()
     serializer_class = EntitySerializer
-    permission_classes = (IsManagerOrReadOnly,)
+    permission_classes = (EntityPermission,)
 
 class AffiliationViewSet(viewsets.ModelViewSet):
     """
@@ -114,3 +117,59 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def types(self, request):
         return Response(dict((x, y) for x, y in Affiliation.TYPE_AFFILIATION), status=status.HTTP_200_OK)
+
+class EntityMaterialMixin:
+    def get_queryset(self):
+        entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
+        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
+            raise PermissionDenied("Your are not a manager of this entity")
+        return self.queryset.filter(entity=entity)
+    def create(self, request, *args, **kwargs):
+        entity = Entity.objects.get(pk=self.kwargs['entity_pk'])
+        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
+            raise PermissionDenied("Your are not a manager of this entity")
+        request.data.update({'entity':self.kwargs['entity_pk']})
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class EntityGenericMaterialViewSet(viewsets.ModelViewSet, EntityMaterialMixin):
+    queryset = GenericMaterial.objects.all()
+    permission_classes = (IsManager,)
+    serializer_class = GenericMaterialSerializer
+
+class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
+    queryset = SpecificMaterial.objects.all()
+    permission_classes = (IsManager,)
+    serializer_class = SpecificMaterialSerializer
+
+class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
+    queryset = SpecificMaterialInstance.objects.all()
+    permission_classes = (IsManager,)
+    serializer_class = SpecificMaterialInstanceSerializer
+    def get_queryset(self):
+        print(self.kwargs)
+        entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
+        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
+            raise PermissionDenied("Your are not a manager of this entity")
+        if not entity.specificmaterials.filter(id=self.kwargs['specificmaterial_pk']).exists():
+            raise PermissionDenied("This material does not belong to your entity")
+        return self.queryset.filter(model__entity=entity, model=self.kwargs['specificmaterial_pk'])
+
+    def create(self, request, *args, **kwargs):
+        entity = Entity.objects.get(pk=self.kwargs['entity_pk'])
+        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
+            raise PermissionDenied("Your are not a manager of this entity")
+        if not entity.specificmaterials.filter(id=self.kwargs['specificmaterial_pk']).exists():
+            raise PermissionDenied("This material does not belong to your entity")
+        request.data.update({'model':self.kwargs['specificmaterial_pk']})
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+

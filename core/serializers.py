@@ -1,8 +1,7 @@
-from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
-
 from rest_framework import serializers, exceptions
-from .models import Entity, User, Affiliation
+from .models import Entity, User, Affiliation, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
+
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
 class AffiliationSerializer(serializers.ModelSerializer):
@@ -57,7 +56,22 @@ class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = '__all__'
-        #fields = ['id', 'name','managers', 'contact', 'affiliations', 'description']
 
+class GenericMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericMaterial
+        fields = '__all__'
+        read_only_fields = ['entity']
 
+class SpecificMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecificMaterial
+        fields = '__all__'
+        read_only_fields = ['entity']
+
+class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecificMaterialInstance
+        fields = '__all__'
+        read_only_fields = ['model']
 
