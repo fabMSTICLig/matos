@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers, exceptions
-from .models import Entity, User, Affiliation, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
+from .models import Entity, User, Affiliation, Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
 
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
@@ -55,6 +55,11 @@ class UserPublicSerializer(serializers.ModelSerializer):
 class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
+        fields = '__all__'
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
         fields = '__all__'
 
 class GenericMaterialSerializer(serializers.ModelSerializer):

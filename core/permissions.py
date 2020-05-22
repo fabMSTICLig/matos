@@ -22,7 +22,8 @@ class EntityPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and (request.user.is_staff or (request.user.is_authenticated and request.method != "POST"))
 
-class IsManager(permissions.BasePermission):
+class IsManagerOf(permissions.BasePermission):
+
     def has_object_permission(self, request, view, obj):
         if request.user.is_staff:
             return True
@@ -35,3 +36,13 @@ class IsManager(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated
+
+class IsManagerCreateOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        #LIST GET authenticated
+        #POST PUT PATCH manager of at least one entity
+        #DELETE Admin
+        return (request.user and
+            (request.user.is_staff or
+            request.method in permissions.SAFE_METHODS or
+            request.user.is_authenticated and request.user.entities.all().count()>0 and request.method == "POST"))

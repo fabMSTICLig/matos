@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Entity, Affiliation, SpecificMaterial, GenericMaterial, SpecificMaterialInstance
+from .models import User, Entity, Affiliation, Tag, SpecificMaterial, GenericMaterial, SpecificMaterialInstance
 
 
 class CustomUserAdmin(UserAdmin):
@@ -21,6 +21,10 @@ class EntityAdmin(admin.ModelAdmin):
 
 @admin.register(Affiliation)
 class AffiliationAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
     pass
 
 class SpecificMaterialInstanceAdmin(admin.TabularInline):

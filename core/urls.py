@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView, EntityGenericMaterialViewSet, EntitySpecificMaterialViewSet, EntitySpecificMaterialInstanceViewSet
+from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView, TagViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialViewSet, EntitySpecificMaterialInstanceViewSet
 
 from rest_framework_nested import routers
 
@@ -22,6 +22,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'affiliations', AffiliationViewSet)
 router.register(r'entities', EntityViewSet)
+router.register(r'tags', TagViewSet)
 
 router_entities = routers.NestedSimpleRouter(router, r'entities', lookup='entity')
 router_entities.register(r'genericmaterials',EntityGenericMaterialViewSet,basename='genericmaterials')

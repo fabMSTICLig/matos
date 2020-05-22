@@ -12,10 +12,10 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
-from .models import Entity, Affiliation, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
+from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
 
 from .serializers import *   
-from .permissions import EntityPermission, IsManager, IsAdminOrIsSelf, IsAdminOrReadOnly 
+from .permissions import EntityPermission, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly 
 from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -118,6 +118,27 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     def types(self, request):
         return Response(dict((x, y) for x, y in Affiliation.TYPE_AFFILIATION), status=status.HTTP_200_OK)
 
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    permission_classes = (IsManagerCreateOrReadOnly,)
+    serializer_class = TagSerializer
+
+    @action(methods=['delete'], detail=False)
+    def delete_unused(self, request):
+        """
+        Special end point for deleteing unused tag
+        return list of ids of deleted tags
+        """
+        if request.user.is_staff:
+            unusedtags = Tag.objects.filter(genericmaterials=None, specificmaterials=None)
+            ids = list(unusedtags.values_list('id', flat=True))
+            unusedtags.delete()
+            return Response(ids, status=status.HTTP_200_OK)
+        else:
+            raise PermissionDenied()
+
+
+
 class EntityMaterialMixin:
     def get_queryset(self):
         entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
@@ -137,17 +158,17 @@ class EntityMaterialMixin:
 
 class EntityGenericMaterialViewSet(viewsets.ModelViewSet, EntityMaterialMixin):
     queryset = GenericMaterial.objects.all()
-    permission_classes = (IsManager,)
+    permission_classes = (IsManagerOf,)
     serializer_class = GenericMaterialSerializer
 
 class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     queryset = SpecificMaterial.objects.all()
-    permission_classes = (IsManager,)
+    permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialSerializer
 
 class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     queryset = SpecificMaterialInstance.objects.all()
-    permission_classes = (IsManager,)
+    permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         print(self.kwargs)
