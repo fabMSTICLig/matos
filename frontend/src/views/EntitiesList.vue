@@ -10,7 +10,7 @@
           /><router-link
             class="btn btn-primary float-right"
             role="button"
-            :to="{ name: 'entity', params: { id: 'new' } }"
+            :to="{ name: 'entityedit', params: { entityid: 'new' } }"
             v-if="authUser.is_staff"
             >Ajouter</router-link
           >
@@ -52,13 +52,23 @@
             <router-link
               class="btn btn-primary"
               role="button"
-              :to="{ name: 'entity', params: { id: selected_object.id } }"
+              :to="{
+                name: 'entityedit',
+                params: { entityid: selected_object.id }
+              }"
               v-show="isManager"
               >Edit</router-link
             >
-            <button class="btn btn-primary d-block d-md-none" type="button">
-              Back
-            </button>
+            <router-link
+              class="btn btn-primary"
+              role="button"
+              :to="{
+                name: 'materialslist',
+                params: { entityid: selected_object.id }
+              }"
+              v-show="isManager"
+              >Materials</router-link
+            >
           </div>
         </div>
         <div class="card-body">

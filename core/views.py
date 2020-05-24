@@ -155,6 +155,20 @@ class EntityMaterialMixin:
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        request.data.update({'entity':instance.entity.id})
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
 class EntityGenericMaterialViewSet(viewsets.ModelViewSet, EntityMaterialMixin):
     queryset = GenericMaterial.objects.all()
@@ -171,7 +185,6 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
-        print(self.kwargs)
         entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
             raise PermissionDenied("Your are not a manager of this entity")
@@ -185,12 +198,25 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Your are not a manager of this entity")
         if not entity.specificmaterials.filter(id=self.kwargs['specificmaterial_pk']).exists():
             raise PermissionDenied("This material does not belong to your entity")
-        request.data.update({'model':self.kwargs['specificmaterial_pk']})
+        request.data.update({'model':int(self.kwargs['specificmaterial_pk'])})
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        request.data.update({'model':instance.model.id})
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
 
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 

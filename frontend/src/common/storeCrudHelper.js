@@ -38,22 +38,18 @@ const createCrud = (ressource, source) => {
       }
     },
     actions: {
-      fetchList({ commit, state, getters }, force = false) {
-        if (state.list.length == 0 || force) {
-          return ApiService.query(ressource, {})
-            .then(({ data }) => {
-              commit("fetchListSuccess", data);
-              return getters.list;
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
-        } else {
-          return Promise.resolve(getters.list);
-        }
+      fetchList({ commit, getters }, { prefix = "" } = {}) {
+        return ApiService.query(prefix + ressource, {})
+          .then(({ data }) => {
+            commit("fetchListSuccess", data);
+            return getters.list;
+          })
+          .catch(error => {
+            return Promise.reject(error);
+          });
       },
-      fetchSingle({ commit }, id) {
-        return ApiService.get(ressource, id)
+      fetchSingle({ commit }, { id, prefix = "" }) {
+        return ApiService.get(prefix + ressource, id)
           .then(({ data }) => {
             commit("fetchSingleSuccess", data);
             return data;
@@ -62,8 +58,9 @@ const createCrud = (ressource, source) => {
             return Promise.reject(error);
           });
       },
-      create({ commit }, data) {
-        return ApiService.post(ressource, data)
+      create({ commit }, { data, prefix = "" }) {
+        console.log(data);
+        return ApiService.post(prefix + ressource, data)
           .then(({ data }) => {
             commit("createSuccess", data);
             return data;
@@ -72,8 +69,8 @@ const createCrud = (ressource, source) => {
             return Promise.reject(error);
           });
       },
-      update({ commit }, { id, data }) {
-        return ApiService.update(ressource, id, data)
+      update({ commit }, { id, data, prefix = "" }) {
+        return ApiService.update(prefix + ressource, id, data)
           .then(({ data }) => {
             commit("updateSuccess", data);
             return data;
@@ -82,8 +79,8 @@ const createCrud = (ressource, source) => {
             return Promise.reject(error);
           });
       },
-      destroy({ commit }, id) {
-        return ApiService.delete(ressource, id)
+      destroy({ commit }, { id, prefix = "" }) {
+        return ApiService.delete(prefix + ressource, id)
           .then(({ data }) => {
             commit("destroySuccess", id);
             return data;

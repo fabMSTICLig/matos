@@ -10,7 +10,7 @@
           /><router-link
             class="btn btn-primary float-right"
             role="button"
-            :to="{ name: 'affiliation', params: { id: 'new' } }"
+            :to="{ name: 'affiliation', params: { affid: 'new' } }"
             >Ajouter</router-link
           >
         </div>
@@ -53,7 +53,10 @@
             <router-link
               class="btn btn-primary"
               role="button"
-              :to="{ name: 'affiliation', params: { id: selected_object.id } }"
+              :to="{
+                name: 'affiliation',
+                params: { affid: selected_object.id }
+              }"
               >Edit</router-link
             >
             <button class="btn btn-primary d-block d-md-none" type="button">

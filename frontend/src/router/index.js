@@ -57,6 +57,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "affiliation" */ "../views/Affiliations.vue"),
     beforeEnter: requireAdmin,
+    meta: {
+      breadcumb: {
+        label: "Affiliations",
+        name: "affiliations"
+      }
+    },
     children: [
       {
         path: "",
@@ -67,8 +73,19 @@ const routes = [
           )
       },
       {
-        path: ":id",
+        path: ":affid",
         name: "affiliation",
+        meta: {
+          routeparam: "affid",
+          routedelete: "affiliations",
+          breadcumb: {
+            label: {
+              ressource: "affiliations",
+              labelprop: "name"
+            },
+            name: "affiliation"
+          }
+        },
         component: () =>
           import(
             /* webpackChunkName: "affiliationedit" */ "../views/AffiliationEdit.vue"
@@ -81,6 +98,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "user" */ "../views/Users.vue"),
     beforeEnter: requireAdmin,
+    meta: {
+      breadcumb: {
+        label: "Utilisateurs",
+        name: "users"
+      }
+    },
     children: [
       {
         path: "",
@@ -89,8 +112,19 @@ const routes = [
           import(/* webpackChunkName: "userlist" */ "../views/UsersList.vue")
       },
       {
-        path: ":id",
+        path: ":userid",
         name: "user",
+        meta: {
+          routeparam: "userid",
+          routedelete: "users",
+          breadcumb: {
+            label: {
+              ressource: "users",
+              labelprop: "username"
+            },
+            name: "user"
+          }
+        },
         component: () =>
           import(/* webpackChunkName: "useredit" */ "../views/UserEdit.vue")
       }
@@ -101,20 +135,122 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "entity" */ "../views/Entities.vue"),
     beforeEnter: requireAuth,
+    meta: {
+      breadcumb: {
+        label: "Entités",
+        name: "entitieslist"
+      }
+    },
     children: [
       {
         path: "",
-        name: "entities",
+        name: "entitieslist",
         component: () =>
           import(
             /* webpackChunkName: "entitylist" */ "../views/EntitiesList.vue"
           )
       },
       {
-        path: ":id",
-        name: "entity",
+        path: ":entityid",
         component: () =>
-          import(/* webpackChunkName: "entityedit" */ "../views/EntityEdit.vue")
+          import(/* webpackChunkName: "entity" */ "../views/Entity.vue"),
+        meta: {
+          routeparam: "entityid",
+          breadcumb: {
+            label: {
+              ressource: "entities",
+              labelprop: "name"
+            },
+            name: "entityedit"
+          }
+        },
+        children: [
+          {
+            path: "",
+            name: "entityedit",
+            meta: {
+              routeparam: "entityid",
+              routedelete: "entities"
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "entityedit" */ "../views/EntityEdit.vue"
+              )
+          },
+          {
+            path: "materials",
+            meta: {
+              breadcumb: {
+                label: "Materiels",
+                name: "materialslist"
+              }
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "materials" */ "../views/Materials.vue"
+              ),
+            children: [
+              {
+                path: "",
+                name: "materialslist",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "materialslist" */ "../views/MaterialsList.vue"
+                  )
+              },
+              {
+                path: "g/:matid",
+                name: "genericmaterial",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "genmaterial" */ "../views/GenericMaterialEdit.vue"
+                  ),
+                meta: {
+                  routeparam: "matid",
+                  routedelete: "materialslist",
+                  breadcumb: {
+                    label: {
+                      ressource: "entities/genericMaterials",
+                      prefix: [
+                        {
+                          ressource: "entities",
+                          param: "entityid"
+                        }
+                      ],
+                      labelprop: "name"
+                    },
+                    name: "genericmaterial"
+                  }
+                }
+              },
+              {
+                path: "s/:matid",
+                name: "specificmaterial",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "spematerial" */ "../views/SpecificMaterialEdit.vue"
+                  ),
+                meta: {
+                  routeparam: "matid",
+                  routedelete: "materialslist",
+                  breadcumb: {
+                    label: {
+                      ressource: "entities/specificMaterials",
+                      prefix: [
+                        {
+                          ressource: "entities",
+                          param: "entityid"
+                        }
+                      ],
+                      labelprop: "name"
+                    },
+                    name: "specificmaterial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
   }

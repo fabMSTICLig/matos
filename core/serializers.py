@@ -66,17 +66,14 @@ class GenericMaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = GenericMaterial
         fields = '__all__'
-        read_only_fields = ['entity']
 
 class SpecificMaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecificMaterial
         fields = '__all__'
-        read_only_fields = ['entity']
 
 class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecificMaterialInstance
         fields = '__all__'
-        read_only_fields = ['model']
 

@@ -1,6 +1,3 @@
-export const PUSH_BREADCUMB_MUT = "pushBreadcumb";
-export const POP_BREADCUMB_MUT = "popBreadcumb";
-
 export const PURGE_AUTH = "logOut";
 export const SET_AUTHUSER = "setAuthUser";
 export const SET_PASSWORD = "setPassword";

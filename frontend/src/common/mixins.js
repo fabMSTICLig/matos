@@ -1,5 +1,4 @@
 import Pagination from "@/components/Pagination";
-import { PUSH_BREADCUMB, POP_BREADCUMB } from "@/store/actions.type";
 
 export const ListMixin = {
   components: {
@@ -16,6 +15,9 @@ export const ListMixin = {
     };
   },
   computed: {
+    prefix() {
+      return "";
+    },
     objects_list() {
       return this.$store.getters[this.ressource + "/list"];
     },
@@ -51,11 +53,13 @@ export const ListMixin = {
       this.current_page = page;
     },
     initList() {
-      this.$store.dispatch(this.ressource + "/fetchList").then(() => {
-        if (this.objects_list.length > 0) {
-          this.selected_object = this.objects_list[0];
-        }
-      });
+      this.$store
+        .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
+        .then(() => {
+          if (this.objects_list.length > 0) {
+            this.selected_object = this.objects_list[0];
+          }
+        });
     },
     initComponent() {
       return Promise.resolve();
@@ -72,18 +76,20 @@ export const EditMixin = {
   data() {
     return {
       ressource: "",
-      breadcumb: {},
       object: null,
       new_label: "",
       object_name: ""
     };
   },
   computed: {
+    prefix() {
+      return "";
+    },
     is_new() {
-      return this.$route.path.indexOf("new") > -1;
+      return this.$route.params[this.$route.meta.routeparam] == "new";
     },
     cardName() {
-      return this.is_new ? this.new_label : this.breadcumb.label;
+      return this.is_new ? this.new_label : this.make_label();
     }
   },
   methods: {
@@ -97,22 +103,16 @@ export const EditMixin = {
       return Promise.resolve();
     },
     initObject(route) {
-      if (route.params.id == "new") {
+      if (route.params[route.meta.routeparam] == "new") {
         this.object = this.get_empty();
-        this.$store.dispatch(PUSH_BREADCUMB, {
-          label: "Création",
-          url: route.path
-        });
-      } else if (parseInt(route.params.id, -1) != -1) {
+      } else if (parseInt(route.params[route.meta.routeparam], -1) != -1) {
         this.$store
-          .dispatch(this.ressource + "/fetchSingle", route.params.id)
+          .dispatch(this.ressource + "/fetchSingle", {
+            id: route.params[route.meta.routeparam],
+            prefix: this.prefix
+          })
           .then(data => {
             this.object = Object.assign({}, data);
-            this.breadcumb = {
-              label: this.make_label(),
-              url: route.path
-            };
-            this.$store.dispatch(PUSH_BREADCUMB, this.breadcumb);
           });
       }
     },
@@ -121,12 +121,12 @@ export const EditMixin = {
         this.$store
           .dispatch(this.ressource + "/update", {
             id: this.object.id,
-            data: this.object
+            data: this.object,
+            prefix: this.prefix
           })
           .then(data => {
             this.object = Object.assign({}, data);
             console.log(this.object_name + " updated");
-            this.breadcumb.label = this.make_label();
             this.$bvModal.msgBoxOk(this.object_name + " updated");
           });
       } else {
@@ -136,19 +136,22 @@ export const EditMixin = {
     create() {
       if (document.querySelector("#editor-form").checkValidity()) {
         this.$store
-          .dispatch(this.ressource + "/create", this.object)
+          .dispatch(this.ressource + "/create", {
+            data: this.object,
+            prefix: this.prefix
+          })
           .then(data => {
             console.log(this.object_name + " created");
             this.$bvModal.msgBoxOk(this.object_name + " created");
+            var params = this.$route.params;
+            params[this.$route.meta.routeparam] = data.id;
             this.$router.push({
               name: this.$route.name,
-              params: {
-                id: data.id
-              }
+              params: params
             });
           })
           .catch(error => {
-            console.log(error.response);
+            console.log(JSON.stringify(error));
           });
       } else {
         document.querySelector("#editor-form").reportValidity();
@@ -156,10 +159,13 @@ export const EditMixin = {
     },
     destroy() {
       this.$store
-        .dispatch(this.ressource + "/destroy", this.object.id)
+        .dispatch(this.ressource + "/destroy", {
+          id: this.object.id,
+          prefix: this.prefix
+        })
         .then(() => {
           this.$router.push({
-            name: this.ressource
+            name: this.$route.meta.routedelete
           });
         });
     }
@@ -170,12 +176,9 @@ export const EditMixin = {
     });
   },
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch(POP_BREADCUMB);
-    this.initObject(to);
-    next();
-  },
-  beforeRouteLeave(to, from, next) {
-    this.$store.dispatch(POP_BREADCUMB);
-    next();
+    this.initComponent().then(() => {
+      this.initObject(to);
+      next();
+    });
   }
 };

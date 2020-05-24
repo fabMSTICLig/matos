@@ -46,7 +46,7 @@
             <router-link
               class="btn btn-primary"
               role="button"
-              :to="{ name: 'user', params: { id: selected_object.id } }"
+              :to="{ name: 'user', params: { userid: selected_object.id } }"
               >Edit</router-link
             >
             <button class="btn btn-primary d-block d-md-none" type="button">

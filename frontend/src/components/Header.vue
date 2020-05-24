@@ -28,7 +28,7 @@
             v-if="isAuthenticated"
             active-class="active"
             exact
-            :to="{ name: 'entities' }"
+            :to="{ name: 'entitieslist' }"
             v-slot="{ href, route, navigate }"
           >
             <li class="nav-item" role="presentation">

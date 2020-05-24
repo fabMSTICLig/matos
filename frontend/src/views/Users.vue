@@ -7,7 +7,6 @@
 
 <script>
 import Breadcumb from "@/components/Breadcumb";
-import { PUSH_BREADCUMB, POP_BREADCUMB } from "@/store/actions.type";
 export default {
   name: "Users",
   components: {
@@ -18,16 +17,6 @@ export default {
   },
 
   computed: {},
-  methods: {},
-  beforeMount() {
-    this.$store.dispatch(PUSH_BREADCUMB, {
-      label: "Utilisateurs",
-      url: this.$route.matched[0].path
-    });
-  },
-  beforeRouteLeave(to, from, next) {
-    this.$store.dispatch(POP_BREADCUMB);
-    next();
-  }
+  methods: {}
 };
 </script>

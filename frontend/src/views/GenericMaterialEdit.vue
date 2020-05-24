@@ -3,23 +3,12 @@
     <div class="col-12">
       <div class="card" v-if="object">
         <div class="card-header">
-          <h3 class="float-left" v-text="cardName"></h3>
-          <div class="btn-group float-right" role="group">
-            <router-link
-              class="btn btn-primary"
-              role="button"
-              :to="{
-                name: 'materialslist',
-                params: { entityid: object.id }
-              }"
-              >Materials</router-link
-            >
-          </div>
+          <h3 v-text="cardName"></h3>
         </div>
         <div class="card-body">
           <form id="editor-form">
             <div class="form-row">
-              <div class="col col-12 col-md-6 col-xl-4">
+              <div class="col col-12">
                 <fieldset>
                   <legend>Informations</legend>
                   <div class="form-group">
@@ -32,49 +21,43 @@
                     />
                   </div>
                   <div class="form-group">
+                    <label>Référence interne</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.ref_int"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Référence fabriquant</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.ref_mat"
+                    />
+                  </div>
+                  <div class="form-group">
                     <label>Description</label
                     ><textarea
                       class="form-control"
                       v-model="object.description"
-                    ></textarea>
-                  </div>
-                  <div class="form-group">
-                    <label>Contact</label
-                    ><input
-                      class="form-control"
-                      type="email"
-                      v-model="object.contact"
-                      required
                     />
                   </div>
-                </fieldset>
-              </div>
-              <div class="col col-12 col-md-6 col-xl-4">
-                <fieldset>
-                  <legend>Affiliations</legend>
                   <div class="form-group">
-                    <DynList
-                      ressource="affiliations"
-                      v-model="object.affiliations"
-                    ></DynList>
+                    <label>Localisation</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.localisation"
+                    />
                   </div>
-                </fieldset>
-              </div>
-              <div class="col col-12 col-md-6 col-xl-4">
-                <fieldset>
-                  <legend>Managers</legend>
                   <div class="form-group">
-                    <DynList
-                      ressource="users"
-                      v-model="object.managers"
-                      :makeLabel="makeManagerLabel"
-                    >
-                      <template v-slot:default="slotProps">
-                        <strong>@{{ slotProps.item.username }} :</strong>
-                        {{ slotProps.item.first_name }}
-                        {{ slotProps.item.last_name }}
-                      </template>
-                    </DynList>
+                    <label>Quantité</label
+                    ><input
+                      class="form-control"
+                      type="number"
+                      v-model="object.quantity"
+                    />
                   </div>
                 </fieldset>
               </div>
@@ -114,36 +97,36 @@
 
 <script>
 import { EditMixin } from "@/common/mixins";
-import DynList from "@/components/DynList";
 export default {
-  name: "EntityEdit",
+  name: "GenericMaterialEdit",
   mixins: [EditMixin],
-  components: {
-    DynList
-  },
   data() {
     return {
-      ressource: "entities",
-      new_label: "Nouvelle Entité",
-      object_name: "Entité"
+      ressource: "entities/genericMaterials",
+      new_label: "Nouvel Matériel Générique",
+      object_name: "Matériel"
     };
   },
-  computed: {},
+  computed: {
+    prefix() {
+      return "entities/" + this.$route.params.entityid + "/";
+    }
+  },
   methods: {
     get_empty() {
       return {
         name: "",
+        ref_int: null,
+        ref_man: null,
+        localisation: null,
         description: "",
-        contact: "",
-        affiliations: [],
-        managers: []
+        quantity: 0,
+        entity: this.$route.params["entityid"],
+        tags: []
       };
     },
     make_label() {
       return this.object.name;
-    },
-    makeManagerLabel(item) {
-      return item.first_name + " " + item.last_name;
     }
   }
 };
