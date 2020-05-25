@@ -1,0 +1,277 @@
+<template>
+  <div class="row">
+    <div class="col-12">
+      <div class="card" v-if="object">
+        <div class="card-header">
+          <h3 v-text="cardName"></h3>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="col col-12 col-md-6 col-xl-4">
+              <form id="editor-form">
+                <fieldset>
+                  <legend>Informations</legend>
+                  <div class="form-group">
+                    <label>Nom</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.name"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Référence interne</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.ref_int"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Référence fabriquant</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.ref_mat"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label
+                    ><textarea
+                      class="form-control"
+                      v-model="object.description"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Localisation</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="object.localisation"
+                    />
+                  </div>
+                </fieldset>
+                <div class="btn-group" role="group">
+                  <button
+                    v-if="is_new"
+                    class="btn btn-primary"
+                    type="button"
+                    v-on:click="create"
+                  >
+                    Ajouter
+                  </button>
+                  <button
+                    v-if="!is_new"
+                    class="btn btn-primary"
+                    type="button"
+                    v-on:click="update"
+                  >
+                    Modifier
+                  </button>
+                  <button
+                    v-if="!is_new"
+                    class="btn btn-danger"
+                    type="button"
+                    v-on:click="destroy"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div v-if="!is_new" class="col col-12 col-md-6 col-xl-4">
+              <fieldset>
+                <legend>Instances</legend>
+                <form @submit="addObject">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Ajouter</span>
+                    </div>
+                    <input v-model="new_object_name" class="form-control" />
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="submit">
+                        Valider
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                <ul class="list-group">
+                  <li
+                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                    v-for="item in objects_list"
+                    :key="item.id"
+                    v-on:click="selectObject(item)"
+                    :class="{
+                      active: selected_object && item.id == selected_object.id
+                    }"
+                  >
+                    <span>
+                      {{ item.name }}
+                    </span>
+                    <button
+                      class="btn btn-danger"
+                      type="button"
+                      @click="removeObject(item)"
+                    >
+                      X
+                    </button>
+                  </li>
+                </ul>
+              </fieldset>
+            </div>
+            <div
+              v-if="!is_new && selected_object"
+              class="col col-12 col-md-6 col-xl-4"
+            >
+              <form @submit="updateInstance">
+                <fieldset>
+                  <legend>Instance</legend>
+                  <div class="form-group">
+                    <label>Nom</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="selected_object.name"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Numéro série</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      v-model="selected_object.serial_num"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label
+                    ><textarea
+                      class="form-control"
+                      v-model="selected_object.description"
+                    />
+                  </div>
+                </fieldset>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-primary" type="submit">
+                    Modifier
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { EditMixin } from "@/common/mixins";
+export default {
+  name: "SpecificMaterialEdit",
+  mixins: [EditMixin],
+  data() {
+    return {
+      ressource: "entities/specificMaterials",
+      new_label: "Nouvel Matériel Spécifique",
+      object_name: "Matériel",
+      selected_object: null,
+      new_object_name: ""
+    };
+  },
+  computed: {
+    prefix() {
+      return "entities/" + this.$route.params.entityid + "/";
+    },
+    objects_list() {
+      return this.$store.getters["entities/specificMaterials/instances/list"];
+    },
+    instancePrefix() {
+      return (
+        "entities/" +
+        this.$route.params.entityid +
+        "/specificmaterials/" +
+        this.$route.params.matid +
+        "/"
+      );
+    }
+  },
+  methods: {
+    get_empty() {
+      return {
+        name: "",
+        ref_int: null,
+        ref_man: null,
+        localisation: null,
+        description: "",
+        entity: this.$route.params.entityid,
+        tags: []
+      };
+    },
+    make_label() {
+      return this.object.name;
+    },
+    initComponent() {
+      if (this.is_new) {
+        return Promise.resolve();
+      } else {
+        return this.$store
+          .dispatch("entities/specificMaterials/instances/fetchList", {
+            prefix: this.instancePrefix
+          })
+          .then(() => {
+            if (this.objects_list.length > 0) {
+              this.selectObject(this.objects_list[0]);
+            }
+          });
+      }
+    },
+    removeObject(item) {
+      this.$store
+        .dispatch("entities/specificMaterials/instances/destroy", {
+          id: item.id,
+          prefix: this.instancePrefix
+        })
+        .then(() => {
+          if (this.selected_object && this.selected_object.id == item.id)
+            this.selected_object = null;
+        });
+    },
+    addObject(e) {
+      e.preventDefault();
+      if (this.new_object_name != "") {
+        this.$store
+          .dispatch("entities/specificMaterials/instances/create", {
+            data: {
+              name: this.new_object_name,
+              model: this.object.id,
+              serial_num: null
+            },
+            prefix: this.instancePrefix
+          })
+          .then(data => {
+            this.new_object_name = "";
+            this.selectObject(data);
+          });
+      }
+    },
+    selectObject(item) {
+      this.selected_object = Object.assign({}, item);
+    },
+    updateInstance(e) {
+      e.preventDefault();
+      this.$store
+        .dispatch("entities/specificMaterials/instances/update", {
+          data: this.selected_object,
+          id: this.selected_object.id,
+          prefix: this.instancePrefix
+        })
+        .then(data => {
+          this.selectObject(data);
+          this.$bvModal.msgBoxOk("Instance mise à jour");
+        });
+    }
+  }
+};
+</script>

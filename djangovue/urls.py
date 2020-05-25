@@ -14,28 +14,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from core import views
 from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import TemplateView
-from django.conf.urls import url, include
-from core.views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView
 import django_cas_ng.views
-from rest_framework import routers
-
-router = routers.DefaultRouter()
-router.register(r'api/entities', EntityViewSet)
-router.register(r'api/users', UserViewSet)
-router.register(r'api/affiliations', AffiliationViewSet)
 
 urlpatterns = [
-    url(r'^$', view=TemplateView.as_view(template_name='index.html')),
+    re_path(r'^$', view=TemplateView.as_view(template_name='index.html')),
     path('admin/', admin.site.urls),
     path('auth/', include('django.contrib.auth.urls')),
-    path('api/login',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
-    path('api/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
-    path('api/self/', SelfView.as_view()),
-    path('', include(router.urls)),
-
+    path('cas/login/',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
+    path('cas/logout/', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
+    path('api/', include('core.urls')),
 ]
 
 

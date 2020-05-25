@@ -1,26 +1,22 @@
 <template>
-  <ul class="list-group" v-if="users">
-    <li class="list-group-item" v-for="user in users" :key="user.id">{{user.username}}</li>
-  </ul>
+  <div id="users">
+    <Breadcumb />
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-
-import { mapState } from 'vuex'
-import { FETCH_USERS } from '@/store/actions.type'
-
+import Breadcumb from "@/components/Breadcumb";
 export default {
-  name: 'Users',
-  methods: {
+  name: "Users",
+  components: {
+    Breadcumb
+  },
+  data() {
+    return {};
+  },
 
-  },
-  computed: {
-    ...mapState({
-      users: state => state.users.users
-    })
-  },
-  beforeMount () {
-    this.$store.dispatch(FETCH_USERS)
-  }
-}
+  computed: {},
+  methods: {}
+};
 </script>

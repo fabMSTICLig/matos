@@ -11,13 +11,13 @@ from django.contrib.auth.models import AbstractUser
 class Affiliation(models.Model):
     name = models.CharField(max_length=50)
     TYPE_AFFILIATION = (
-         ('Labo','Laboratoire'), 
+         ('Labo','Laboratoire'),
          ('Ecole','Ecole'),
          ('Platforme','Platforme'),
          ('Service','Service'),
          ('Recherche','Recherche'),
-         ('Composante','Composante Universitaire')       
-              
+         ('Composante','Composante Universitaire')
+
     )
 
     type = models.CharField(
@@ -43,7 +43,7 @@ class Entity(models.Model):
     """
     an Entity
     """
-    
+
     name = models.CharField(max_length=60, unique=True)
     contact = models.EmailField(max_length=100)
     managers = models.ManyToManyField(User,blank=True, related_name="entities")
@@ -51,6 +51,40 @@ class Entity(models.Model):
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="entities")
     def __str__(self):
-        return self.name   
+        return self.name
     class Meta:
         verbose_name_plural = "entities"
+
+class Tag(models.Model):
+    name = models.CharField(max_length=20)
+    def __str__(self):
+        return self.name
+
+class Material(models.Model):
+    name = models.CharField(max_length=30)
+    ref_int = models.CharField(max_length=50, null=True, blank=True)
+    ref_man = models.CharField(max_length=50, null=True, blank=True)
+    localisation = models.CharField(max_length=50, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, related_name="%(class)ss")
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="%(class)ss")
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+class GenericMaterial(Material):
+    quantity = models.PositiveSmallIntegerField()
+
+class SpecificMaterial(Material):
+    pass
+
+class SpecificMaterialInstance(models.Model):
+    name = models.CharField(max_length=30)
+    ref_int = models.CharField(max_length=50, null=True, blank=True)
+    serial_num = models.CharField(max_length=50, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    model = models.ForeignKey(SpecificMaterial, on_delete=models.CASCADE, related_name="instances")
+    def __str__(self):
+        return self.model.name +"(" + self.name + ")"

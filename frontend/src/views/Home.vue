@@ -1,27 +1,12 @@
 <template>
-  <div class="home">
-    <hr />
-    <h4 class="text-center font-weight-bold">Réservation</h4>
-  </div>
+  <div class="home"></div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+// @ is an alias to /src
 
 export default {
-  name: 'Home',
-  data () {
-    return {
-
-    }
-  },
-  components: {
-  },
-
-  computed: {
-    ...mapGetters(['authUser', 'isAuthenticated', 'isAdmin'])
-
-  }
-
-}
+  name: "Home",
+  components: {}
+};
 </script>

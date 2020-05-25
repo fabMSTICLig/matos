@@ -1,61 +1,30 @@
 <template>
-    <div id='app'>
-        <div id='header'>
-          <div class='nav-header'>
-            <router-link tag='a' class='button-head' class-active='active' to='/' exact>Home</router-link>
-            <router-link tag='a' class='button-head' class-active='active' to='/entities' exact >Entités</router-link>
-          </div>
-          <div class='nav-header'>
-            <div v-if='!isAuthenticated' class='auth-nav'>
-              <b-link href='/api/login'  class='button-head'>login CAS</b-link>
-            </div>
-            <div v-if='isAuthenticated' class='auth-nav'>
-              <router-link tag='a' class='button-head' class-active='active' to='/profile' exact>{{authUser.username}}</router-link>
-            </div>
-            <div v-if='isAuthenticated' class='auth-nav'>
-              <b-link :href="authUser.externe ? '/api/logout' : '/auth/logout'" >Log out</b-link>
-            </div>
-            <div v-if='!isAuthenticated' class='auth-nav'>
-              <b-link href='/auth/login' class='button-head-sub'>login</b-link>
-            </div>
-          </div>
-        </div>
-
-    <router-view></router-view>
+  <div id="app" class="container">
+    <Header />
+    <router-view />
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import "./assets/bootstrap.min.css";
+import Header from "@/components/Header";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
+    Header
   },
-  data () {
-    return {
-      logged: false
-    }
-  },
-  beforeMount () {
-  },
-  computed: {
-
-    ...mapGetters(['authUser', 'isAuthenticated', 'isAdmin'])
-
+  mounted() {
+    document.title = process.env.VUE_APP_TITLE;
   }
-
-}
+};
 </script>
 
 <style>
-@import './assets/css/main.css';
-@import './assets/css/bootstrap/bootstrap.min.css';
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+@media only screen and (min-width: 1200px) {
+  .container {
+    max-width: 1500px;
+  }
 }
 </style>

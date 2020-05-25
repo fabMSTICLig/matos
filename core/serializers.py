@@ -1,8 +1,7 @@
-from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
-
 from rest_framework import serializers, exceptions
-from .models import Entity, User, Affiliation
+from .models import Entity, User, Affiliation, Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
+
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
 class AffiliationSerializer(serializers.ModelSerializer):
@@ -35,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'email',
-                  'first_name', 'last_name', 'is_staff','rgpd_accept','affiliations','externe')
+                  'first_name', 'last_name', 'is_staff', 'rgpd_accept', 'affiliations', 'entities', 'externe')
         read_only_fields = ('username',)
 
     def get_externe(self, obj):
@@ -57,7 +56,24 @@ class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = '__all__'
-        #fields = ['id', 'name','managers', 'contact', 'affiliations', 'description']
 
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
 
+class GenericMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GenericMaterial
+        fields = '__all__'
+
+class SpecificMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecificMaterial
+        fields = '__all__'
+
+class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecificMaterialInstance
+        fields = '__all__'
 
