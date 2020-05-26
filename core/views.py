@@ -170,7 +170,7 @@ class EntityMaterialMixin:
 
         return Response(serializer.data)
 
-class EntityGenericMaterialViewSet(viewsets.ModelViewSet, EntityMaterialMixin):
+class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     queryset = GenericMaterial.objects.all()
     permission_classes = (IsManagerOf,)
     serializer_class = GenericMaterialSerializer

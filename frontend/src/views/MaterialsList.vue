@@ -48,14 +48,14 @@
     <div class="col-12 col-md-6">
       <div class="card" v-if="selected_object">
         <div class="card-header">
-          <h3 class="float-left" v-text="selected_object.name"></h3>
+          <h3 class="float-left">
+            ({{ isGeneric ? "Générique" : "Spécifique" }})
+            {{ selected_object.name }}
+          </h3>
           <div class="btn-group float-right" role="group">
             <router-link class="btn btn-primary" role="button" :to="editRoute"
               >Edit</router-link
             >
-            <button class="btn btn-primary d-block d-md-none" type="button">
-              Back
-            </button>
           </div>
         </div>
         <div class="card-body">
@@ -78,6 +78,14 @@
             <span><strong>Quantity :&nbsp;</strong></span>
             {{ selected_object.quantity }}
           </p>
+          <p>
+            <span><strong>Tags :&nbsp;</strong></span>
+            <DisplayIdList
+              fieldName="tags"
+              :object="selected_object"
+              ressource="tags"
+            />
+          </p>
         </div>
       </div>
     </div>
@@ -86,9 +94,13 @@
 
 <script>
 import { ListMixin } from "@/common/mixins";
+import DisplayIdList from "@/components/DisplayIdList";
 export default {
   name: "MaterialsList",
   mixins: [ListMixin],
+  components: {
+    DisplayIdList
+  },
   data() {
     return {
       search_fields: ["name"],

@@ -59,6 +59,14 @@
                       v-model="object.quantity"
                     />
                   </div>
+                  <div class="form-group">
+                    <label>Tags</label>
+                    <TagsInput
+                      fieldName="tags"
+                      :object="object"
+                      ressource="tags"
+                    />
+                  </div>
                 </fieldset>
               </div>
             </div>
@@ -97,9 +105,13 @@
 
 <script>
 import { EditMixin } from "@/common/mixins";
+import TagsInput from "@/components/TagsInput";
 export default {
   name: "GenericMaterialEdit",
   mixins: [EditMixin],
+  components: {
+    TagsInput
+  },
   data() {
     return {
       ressource: "entities/genericMaterials",

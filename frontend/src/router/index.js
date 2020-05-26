@@ -94,6 +94,42 @@ const routes = [
     ]
   },
   {
+    path: "/tags",
+    component: () => import(/* webpackChunkName: "tag" */ "../views/Tags.vue"),
+    beforeEnter: requireAdmin,
+    meta: {
+      breadcumb: {
+        label: "Tags",
+        name: "tags"
+      }
+    },
+    children: [
+      {
+        path: "",
+        name: "tags",
+        component: () =>
+          import(/* webpackChunkName: "taglist" */ "../views/TagsList.vue")
+      },
+      {
+        path: ":tagid",
+        name: "tag",
+        meta: {
+          routeparam: "tagid",
+          routedelete: "tags",
+          breadcumb: {
+            label: {
+              ressource: "tags",
+              labelprop: "name"
+            },
+            name: "tag"
+          }
+        },
+        component: () =>
+          import(/* webpackChunkName: "tagedit" */ "../views/TagEdit.vue")
+      }
+    ]
+  },
+  {
     path: "/users",
     component: () =>
       import(/* webpackChunkName: "user" */ "../views/Users.vue"),

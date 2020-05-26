@@ -42,6 +42,7 @@
             <b-dropdown-item :to="{ name: 'affiliations' }"
               >Affiliations</b-dropdown-item
             >
+            <b-dropdown-item :to="{ name: 'tags' }">Tags</b-dropdown-item>
           </b-nav-item-dropdown>
         </ul>
         <ul v-if="isAuthenticated" class="nav navbar-nav">
