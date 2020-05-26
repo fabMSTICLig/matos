@@ -1,6 +1,10 @@
 <template>
-  <ul class="list-group list-group-horizontal">
-    <li class="list-group-item" v-for="item in objects_filtered" :key="item.id">
+  <ul class="list-group list-group-horizontal d-flew flex-wrap">
+    <li
+      class="list-group-item border rounded"
+      v-for="item in objects_filtered"
+      :key="item.id"
+    >
       {{ item.name }}
     </li>
   </ul>

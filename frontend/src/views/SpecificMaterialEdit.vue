@@ -51,6 +51,14 @@
                       v-model="object.localisation"
                     />
                   </div>
+                  <div class="form-group">
+                    <label>Tags</label>
+                    <TagsInput
+                      fieldName="tags"
+                      :object="object"
+                      ressource="tags"
+                    />
+                  </div>
                 </fieldset>
                 <div class="btn-group" role="group">
                   <button
@@ -168,9 +176,13 @@
 
 <script>
 import { EditMixin } from "@/common/mixins";
+import TagsInput from "@/components/TagsInput";
 export default {
   name: "SpecificMaterialEdit",
   mixins: [EditMixin],
+  components: {
+    TagsInput
+  },
   data() {
     return {
       ressource: "entities/specificMaterials",
