@@ -128,14 +128,14 @@ class UsersTests(APITestCase):
         """
         Test de la date envoyée au bon format
         """
-        data = { 'rgpd_accept' : datetime.date(2020,5,27) }
+        data = { 'rgpd_accept' : self.rgpd_accept_date }
         request = self.apiFactory.patch(reverse('user-detail', args=(2, 'pk')),data)
         force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.user.id)
         response.render()
         print(response)
         self.assertEquals(response.status_code,200)
-
+        
     def test_add_manager(self):
         """
         Test de l'ajout d'un manager par un admin

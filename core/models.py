@@ -63,7 +63,7 @@ class Tag(models.Model):
 class Material(models.Model):
     name = models.CharField(max_length=30)
     ref_int = models.CharField(max_length=50, null=True, blank=True)
-    ref_man = models.CharField(max_length=50, null=True, blank=True)
+    ref_mat = models.CharField(max_length=50, null=True, blank=True)
     localisation = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name="%(class)ss")
