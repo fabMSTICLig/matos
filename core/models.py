@@ -9,6 +9,14 @@ import uuid # Required for unique book instances
 from django.contrib.auth.models import AbstractUser
 
 class Affiliation(models.Model):
+    """
+    Represent the institutinal affiliation of an entity
+    ----------
+    name : str
+        Name of the institution
+    type : str
+        Type of the institution
+    """
     name = models.CharField(max_length=50)
     TYPE_AFFILIATION = (
          ('Labo','Laboratoire'),
@@ -33,6 +41,14 @@ class Affiliation(models.Model):
 
 
 class User(AbstractUser):
+    """
+    Custom user model for the application
+    ----------
+    affiliations : Affiliation[]
+        Institutional affiliations of the user
+    rgpd_accpet : date
+        Date at when the user has accepted the rgpd notice, null if not accpeted
+    """
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="members")
     rgpd_accept =  models.DateField(null=True, blank=True)
@@ -41,9 +57,20 @@ class User(AbstractUser):
 
 class Entity(models.Model):
     """
-    an Entity
+    Represent a lending entity
+    It can be a school, a lab, a service, ....
+    ----------
+    name : str
+        Name of the entity
+    contact : email
+        email to contact the entity
+    description : str
+        description of the entity
+    affiliations : Affiliation[]
+        Institutional affiliations of the entity
+    managers : User[]
+        managers of the entity
     """
-
     name = models.CharField(max_length=60, unique=True)
     contact = models.EmailField(max_length=100)
     managers = models.ManyToManyField(User,blank=True, related_name="entities")
@@ -56,11 +83,35 @@ class Entity(models.Model):
         verbose_name_plural = "entities"
 
 class Tag(models.Model):
+    """
+    Represent a tag used to help material search
+    ----------
+    name : str
+        Name of the tag
+    """
     name = models.CharField(max_length=20)
     def __str__(self):
         return self.name
 
 class Material(models.Model):
+    """
+    Abstract class for commom information beetween Generic and Specific material
+    ----------
+    name : str
+        Name of the material
+    description : str
+        description of the material
+    entity : Entity
+        Entity owning of the material
+    ref_int : str
+        Reference intern at the entity of the material
+    ref_man : str
+        Reference of the manufacturer
+    localisation : str
+        localisation of the material Ex /Room33/Storage2/shelf3 (visible only to managers and admins)
+    tags : Tag[]
+        list of tag of the material (Ex, electronic, linux, arduino)
+    """
     name = models.CharField(max_length=30)
     ref_int = models.CharField(max_length=50, null=True, blank=True)
     ref_man = models.CharField(max_length=50, null=True, blank=True)
@@ -75,14 +126,35 @@ class Material(models.Model):
         abstract = True
 
 class GenericMaterial(Material):
+    """
+    Class for generic material most of the time small material
+    ----------
+    quantity : +int
+        Quantity of the material 0 mean infinity
+    """
     quantity = models.PositiveSmallIntegerField()
 
 class SpecificMaterial(Material):
+    """
+    Class for specific material with a set of intances (material with serial number)
+    ----------
+    """
     pass
 
 class SpecificMaterialInstance(models.Model):
-    name = models.CharField(max_length=30)
-    ref_int = models.CharField(max_length=50, null=True, blank=True)
+    """
+    Instance of specific material
+    ----------
+    name : str
+        Name of the instance, can be an internal reference
+    serial_num : str
+        Serial number of the instance
+    description : str
+        description of the instance, can be use to note the state of wear
+    model : SpecificMaterial
+        material model of the instance
+    """
+    name = models.CharField(max_length=50)
     serial_num = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     model = models.ForeignKey(SpecificMaterial, on_delete=models.CASCADE, related_name="instances")

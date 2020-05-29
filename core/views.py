@@ -47,6 +47,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=True, serializer_class=PasswordSerializer)
     def set_password(self, request, pk):
+        """
+        Special endpoint to change password
+        """
         serializer = PasswordSerializer(data=request.data)
         user = get_user_model().objects.get(pk=pk)
         # only an admin or the own user can change the password
@@ -69,7 +72,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Special end point for creating user
 
-        Only need first_name, ViewSetMixinlast_name and email
+        Only need first_name, last_name and email
 
         Generate a unique usermane and a password
         """
@@ -95,6 +98,9 @@ class UserViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST)
 
 class SelfView(APIView):
+    """
+    Endpoint to see personals informations/profile
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -102,6 +108,9 @@ class SelfView(APIView):
         return Response({"user": instance.data})
 
 class EntityViewSet(viewsets.ModelViewSet):
+    """
+    Endpoint for the entities
+    """
     queryset = Entity.objects.all()
     serializer_class = EntitySerializer
     permission_classes = (EntityPermission,)
@@ -116,9 +125,15 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     
     @action(methods=['get'], detail=False)
     def types(self, request):
+        """
+        Return the affiliation types
+        """
         return Response(dict((x, y) for x, y in Affiliation.TYPE_AFFILIATION), status=status.HTTP_200_OK)
 
 class TagViewSet(viewsets.ModelViewSet):
+    """
+    Endpoint for the material tags
+    """
     queryset = Tag.objects.all()
     permission_classes = (IsManagerCreateOrReadOnly,)
     serializer_class = TagSerializer
@@ -140,12 +155,23 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class EntityMaterialMixin:
+    """
+    Mixin used for common methods beetween Specific and Generic material
+    """
     def get_queryset(self):
+        """
+        Limit material to a specific entity using the nested route system
+        Check if the current user is an admin or if he is a manager of the entity
+        """
         entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
             raise PermissionDenied("Your are not a manager of this entity")
         return self.queryset.filter(entity=entity)
     def create(self, request, *args, **kwargs):
+        """
+        Check if the current user is an admin or if he is a manager of the entity
+        Overide the entity props of the material to the one in the url
+        """
         entity = Entity.objects.get(pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
             raise PermissionDenied("Your are not a manager of this entity")
@@ -156,6 +182,9 @@ class EntityMaterialMixin:
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     def update(self, request, *args, **kwargs):
+        """
+        Avoid the entity prop to be updated (transfert of material beetween entities)
+        """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         request.data.update({'entity':instance.entity.id})
@@ -171,20 +200,37 @@ class EntityMaterialMixin:
         return Response(serializer.data)
 
 class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
+    """
+    Endpoints for generic material
+    Use nested router params
+    """
     queryset = GenericMaterial.objects.all()
     permission_classes = (IsManagerOf,)
     serializer_class = GenericMaterialSerializer
 
 class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
+    """
+    Endpoints for specific material
+    Use nested router params
+    """
     queryset = SpecificMaterial.objects.all()
     permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialSerializer
 
 class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
+    """
+    Endpoints for instance of specific material
+    Use nested router params
+    """
     queryset = SpecificMaterialInstance.objects.all()
     permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
+        """
+        Filter the queryset using entity_pk and specificmaterial_pk of the nested router
+        Check if the current user is an admin or if he is a manager of the entity owning the material
+        Check if the instance belongs to the specific material id in the nested router params
+        """
         entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
             raise PermissionDenied("Your are not a manager of this entity")
@@ -193,6 +239,10 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(model__entity=entity, model=self.kwargs['specificmaterial_pk'])
 
     def create(self, request, *args, **kwargs):
+        """
+        Check if the current user is an admin or if he is a manager of the entity owning the material
+        Check if the instance belongs to the specific material id in the nested router params
+        """
         entity = Entity.objects.get(pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
             raise PermissionDenied("Your are not a manager of this entity")
@@ -206,6 +256,9 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
+        """
+        Avoid the model prop to be updated (transfert of instance beetween material)
+        """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         request.data.update({'model':instance.model.id})

@@ -5,6 +5,9 @@ from .models import Entity, User, Affiliation, Tag, SpecificMaterial, SpecificMa
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
 
 class AffiliationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Affiliation objects.
+    """
     class Meta:
         model = Affiliation
         fields = ['id', 'name', 'type']
@@ -42,7 +45,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserPublicSerializer(serializers.ModelSerializer):
     """
-    Serializer class of the User Model
+    Public Serializer class for User objects
+    Only visible to manager and only show username first_name and last_name and email
     """
     class Meta:
         model = get_user_model()
@@ -53,26 +57,41 @@ class UserPublicSerializer(serializers.ModelSerializer):
         return len(obj.password)==0
 
 class EntitySerializer(serializers.ModelSerializer):
+    """
+    Serializer for Entity objects.
+    """
     class Meta:
         model = Entity
         fields = '__all__'
 
 class TagSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Tag objects.
+    """
     class Meta:
         model = Tag
         fields = '__all__'
 
 class GenericMaterialSerializer(serializers.ModelSerializer):
+    """
+    Serializer for generic material objects.
+    """
     class Meta:
         model = GenericMaterial
         fields = '__all__'
 
 class SpecificMaterialSerializer(serializers.ModelSerializer):
+    """
+    Serializer for specific material objects.
+    """
     class Meta:
         model = SpecificMaterial
         fields = '__all__'
 
 class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for instance of specific material.
+    """
     class Meta:
         model = SpecificMaterialInstance
         fields = '__all__'
