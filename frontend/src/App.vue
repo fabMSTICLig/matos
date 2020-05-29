@@ -8,6 +8,7 @@
 <script>
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "./assets/bootstrap.min.css";
+import "./assets/style.css";
 import Header from "@/components/Header";
 
 export default {

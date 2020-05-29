@@ -57,11 +57,8 @@
                 name: 'affiliation',
                 params: { affid: selected_object.id }
               }"
-              >Edit</router-link
+              >Modifier</router-link
             >
-            <button class="btn btn-primary d-block d-md-none" type="button">
-              Back
-            </button>
           </div>
         </div>
         <div class="card-body">
