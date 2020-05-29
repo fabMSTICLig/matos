@@ -3,6 +3,10 @@ from .models import Entity, SpecificMaterial,SpecificMaterialInstance, GenericMa
 
 
 class IsAdminOrIsSelf(permissions.BasePermission):
+    """
+    Permission checking if user is admin or if the object belongs to the current user.
+    The object field must be 'user'
+    """
     def has_object_permission(self, request, view, obj):
         # Instance must have an attribute named `owner`.
         isself = request.user == obj
@@ -13,6 +17,13 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return request.user.is_staff or request.method in permissions.SAFE_METHODS
 
 class EntityPermission(permissions.BasePermission):
+    """
+    Special permission for an entity
+    User must be anthentificated
+    GET all user
+    PUT PATCH managers on the entity
+    POST and DELETE only admin
+    """
     def has_object_permission(self, request, view, obj):
         ismanager = False
         if isinstance(obj, Entity):
@@ -23,6 +34,12 @@ class EntityPermission(permissions.BasePermission):
         return request.user and (request.user.is_staff or (request.user.is_authenticated and request.method != "POST"))
 
 class IsManagerOf(permissions.BasePermission):
+    """
+    Permission used for material
+    User must be anthentificated
+    GET all user
+    PUT PATCH POST DELETE managers on the entity or admin
+    """
 
     def has_object_permission(self, request, view, obj):
         if request.user.is_staff:
@@ -38,10 +55,14 @@ class IsManagerOf(permissions.BasePermission):
         return request.user and request.user.is_authenticated
 
 class IsManagerCreateOrReadOnly(permissions.BasePermission):
+    """
+    Permission readonly or create for entity manager, used for tag
+    User must be anthentificated
+    LIST GET authenticated
+    POST manager of at least one entity
+    DELETE PUT PATCH Admin
+    """
     def has_permission(self, request, view):
-        #LIST GET authenticated
-        #POST PUT PATCH manager of at least one entity
-        #DELETE Admin
         return (request.user and
             (request.user.is_staff or
             request.method in permissions.SAFE_METHODS or
