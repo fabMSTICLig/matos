@@ -5,8 +5,8 @@ from django.test import RequestFactory
 import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from rest_framework.test import APIRequestFactory, APITestCase, RequestsClient, force_authenticate
-from .views import EntityViewSet, UserViewSet, AffiliationViewSet
+from rest_framework.test import APIRequestFactory, APIClient, APITestCase, RequestsClient, force_authenticate
+from .views import EntityViewSet, UserViewSet, AffiliationViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialInstanceViewSet, EntitySpecificMaterialViewSet
 from .models import *
 
 
@@ -183,3 +183,63 @@ class AffiliationsTests(APITestCase):
         response = view(request, pk=1)
         response.render()
         self.assertEqual(response.status_code, 200)
+
+class GenericMeterialsTests(APITestCase):
+
+    def api_factory(self):
+        return APIRequestFactory(enforce_csrf_checks=True)
+
+    def setUp(self):
+        self.apiFactory = self.api_factory()
+        #ajout de managers
+        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
+        self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
+        self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
+        self.entity.managers.add(self.manager1)
+        self.entity.save()
+        self.materials_generic = GenericMaterial.objects.create(name="Module RF433,",ref_int="MHZRF433",ref_man="SparkFunMZ433",localisation="FabMSTIC",description="Module radio 433MHZ",quantity="20",entity=self.entity)
+        self.client = APIClient()
+
+    def testViewMaterial(self):
+        """
+        Test de la consultation de materiels par un utilisateur lambda
+        """
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(reverse('genericmaterials-list', kwargs={'entity_pk':1}))
+        response.render()
+        print(response.data)
+        # KO , correction sur la vue MaterialMixin, get_queryset à faire 
+        self.assertEquals(response.status_code,200)
+    
+    def testModifyMaterial(self):
+        """
+        Test de la modification d'un équipement par un manager
+        """
+        self.client.force_authenticate(user=self.manager1)
+        data = {'name':'Série SC-1608'}
+        response = self.client.patch(reverse('genericmaterials-detail', kwargs={'entity_pk':1, 'pk' : 1}), data)
+        response.render()
+        # OK 
+        self.assertEquals(response.status_code,200)
+
+    def testAddMaterial(self):
+        """
+        Test de l'ajout d'un équipement par un manager
+        """
+        self.client.force_authenticate(user=self.manager1)
+        data = {'name':'iSAFT SpW', 'ref_int':'iSAFT-PCIE-FabMSTIC', 'ref_man':'TELETEL', 'localisation':'FabMSTIC', 'description':'Cartes d’interface PCIe iSAFT à 4 ou 8 ports SpaceWire','quantity':'5', 'entity': 1}
+        response = self.client.post(reverse('genericmaterials-list', kwargs={'entity_pk':1}), data)
+        response.render()
+        # OK
+        self.assertEquals(response.status_code,201)
+
+    def testDeleteMaterial(self):
+        """
+        Test de la suppression d'un équipement par un manager
+        """
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.delete(reverse('genericmaterials-detail', kwargs={'entity_pk':1, 'pk':1}))
+        response.render()
+        print(response)
+        # OK
+        self.assertEquals(response.status_code,204)
