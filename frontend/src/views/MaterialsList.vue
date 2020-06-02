@@ -38,7 +38,7 @@
           <pagination
             :total-pages="pages_count"
             :total="objects_filtered.length"
-            :per-page="10"
+            :per-page="per_page"
             :current-page="current_page"
             @pagechanged="onPageChange"
           />
