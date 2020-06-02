@@ -61,7 +61,7 @@
                 name: 'tag',
                 params: { tagid: selected_object.id }
               }"
-              >Edit</router-link
+              >Modifier</router-link
             >
           </div>
         </div>

@@ -49,35 +49,39 @@
       <div class="card" v-if="selected_object">
         <div class="card-header">
           <h3 class="float-left">
-            ({{ isGeneric ? "Générique" : "Spécifique" }})
-            {{ selected_object.name }}
+            Matériel {{ isGeneric ? "Générique" : "Spécifique" }}
           </h3>
           <div class="btn-group float-right" role="group">
             <router-link class="btn btn-primary" role="button" :to="editRoute"
-              >Edit</router-link
+              >Modifier</router-link
             >
           </div>
         </div>
         <div class="card-body">
+          <h3>
+            {{ selected_object.name }}
+          </h3>
           <p class="card-text">
             {{ selected_object.description }}
           </p>
-          <p>
-            <span><strong>Ref interne :&nbsp;</strong></span>
-            {{ selected_object.ref_int }}
-          </p>
-          <p>
-            <span><strong>Ref fabricant :&nbsp;</strong></span>
-            {{ selected_object.ref_man }}
-          </p>
-          <p>
-            <span><strong>Localisation :&nbsp;</strong></span>
-            {{ selected_object.localisation }}
-          </p>
-          <p v-if="isGeneric">
-            <span><strong>Quantity :&nbsp;</strong></span>
-            {{ selected_object.quantity }}
-          </p>
+          <table class="table">
+            <tr>
+              <th scope="row">Ref interne</th>
+              <td>{{ selected_object.ref_int }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Ref fabricant</th>
+              <td>{{ selected_object.ref_man }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Localisation</th>
+              <td>{{ selected_object.localisation }}</td>
+            </tr>
+            <tr v-if="isGeneric">
+              <th scope="row">Quantité</th>
+              <td>{{ selected_object.quantity }}</td>
+            </tr>
+          </table>
           <p>
             <span><strong>Tags :&nbsp;</strong></span>
             <DisplayIdList

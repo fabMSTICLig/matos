@@ -57,7 +57,7 @@
                 params: { entityid: selected_object.id }
               }"
               v-show="isManager"
-              >Edit</router-link
+              >Modifier</router-link
             >
             <router-link
               class="btn btn-primary"
@@ -67,7 +67,7 @@
                 params: { entityid: selected_object.id }
               }"
               v-show="isManager"
-              >Materials</router-link
+              >Matériels</router-link
             >
           </div>
         </div>

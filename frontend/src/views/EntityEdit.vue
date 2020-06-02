@@ -12,7 +12,7 @@
                 name: 'materialslist',
                 params: { entityid: object.id }
               }"
-              >Materials</router-link
+              >Matériels</router-link
             >
           </div>
         </div>
