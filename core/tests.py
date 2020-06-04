@@ -8,7 +8,10 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIRequestFactory, APIClient, APITestCase, RequestsClient, force_authenticate
 from .views import EntityViewSet, UserViewSet, AffiliationViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialInstanceViewSet, EntitySpecificMaterialViewSet
 from .models import *
-
+from rest_framework import status
+from django.core.exceptions import ValidationError
+from django.core import serializers
+import json
 
 class EntitiesTests(APITestCase):
 
@@ -40,7 +43,7 @@ class EntitiesTests(APITestCase):
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.lig_entity.pk)
         response.render()
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_manager_update(self):
        
@@ -55,7 +58,7 @@ class EntitiesTests(APITestCase):
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.lig_entity.pk)
         response.render()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
    
     def test_add_entity(self):
         """
@@ -80,7 +83,62 @@ class EntitiesTests(APITestCase):
         response = view(request, pk=1)
         response.render()
         data = response.data
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    
+    
+    def test_add_manager(self):
+        """
+        Test de l'ajout d'un manager par un admin
+        """
+        data = { 'managers' : [self.manager2.pk]}
+        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
+        request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
+        force_authenticate(request, user=self.superuser)
+        response = view(request, pk=self.lig_entity.pk)
+        response.render()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_user_cant_update_entity(self):
+        """
+        Vérification qu'un utilisateur non manager ne peut modifier une entité
+        """
+        data = { 'name' : 'nouvelle entité'}
+        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
+        request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
+        force_authenticate(request, user=self.manager2)
+        response = view(request, pk=self.lig_entity.pk)
+        response.render()
+        print(response.status_code)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_manager_not_add_entity(self):
+        """
+        Vérification qu'un utilisateur non manager ne peut modifier une entité
+        """
+        data =  { 'name' : 'Ginova', 'description' : ' Une plateforme en libre accès pour expérimenter', 'contact': 'alain-di-donato@grenoble-inp.fr' } 
+        view = EntityViewSet.as_view(actions={'post': 'create'}) 
+        request = self.apiFactory.post(reverse('entity-list'),data)
+        force_authenticate(request, user=self.manager1)
+        response = view(request)
+        response.render()
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_manager_can_add_manager(self):
+        """
+        Vérification qu'un manager d'une entité peut rajouter un manager
+        """
+        data =  { 'managers' : [1, 2] } 
+        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
+        request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
+        force_authenticate(request, user=self.manager1)
+        response = view(request, pk=self.lig_entity.pk)
+        response.render()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        managers_lig_obj = self.lig_entity.managers.all()
+        list_result = [entry for entry in managers_lig_obj]
+        print(list_result)
+        self.assertEqual(list_result,[self.manager1, self.manager2])
+
 
 class UsersTests(APITestCase):
 
@@ -90,9 +148,13 @@ class UsersTests(APITestCase):
     def setUp(self):
         self.apiFactory = self.api_factory()
         self.user = get_user_model().objects.create(username='etudiant1', first_name='etudiant1', email='etudiant@gem-univ-grenoble.fr', password='etudiant1')
+        self.user2 = get_user_model().objects.create(username='ensiinfo1', first_name='michel', email='support@ensimag-info.fr', password='matriochka')
+        self.affiliation2 = Affiliation.objects.create(name="Grenoble INP", type="Ecole")       
+        self.user2.affiliations.add(self.affiliation2)
+        self.user2.save()
         self.affiliation = Affiliation.objects.create(name='cnrs', type='Recherche' )
         self.view = UserViewSet.as_view(actions={'patch': 'partial_update'}) 
-        self.rgpd_accept_date = datetime.date(2020,5,24)
+        self.rgpd_accept_date = datetime.date(2020,6,24)
         self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr') 
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
     
@@ -102,16 +164,22 @@ class UsersTests(APITestCase):
         force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.user.id)
         response.render()
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
          
-    def test_update_self_affiliations_admin(self):
-        data = { 'affiliations' : [self.affiliation.pk] }
-        request = self.apiFactory.patch(reverse('user-detail', args=(2, 'pk')),data)
-        force_authenticate(request, user=self.superuser)
+    def test_not_update_user_affiliation(self):
+        """
+        Test de la protection de l'affiliation d'un autre utilisateur
+        """
+        data = { 'affiliations' : [self.affiliation2.pk] }
+        request = self.apiFactory.patch(reverse('user-detail', args=(1, 'pk')),data)
+        force_authenticate(request, user=self.user2)
         response = self.view(request, pk=self.user.id)
+        print(self.user.id)
+        print(request)
         response.render()
-        self.assertEquals(response.status_code, 200)
-    
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
     def test_rgpd_acceptance_input(self):
         """
         Test du format de la date envoyée
@@ -121,32 +189,9 @@ class UsersTests(APITestCase):
         force_authenticate(request, user=self.superuser)
         response = self.view(request, pk=self.user.id)
         response.render()
-        print(response)
-        self.assertEquals(response.status_code,400)
-
-    def test_rgpd_acceptance_date(self):
-        """
-        Test de la date envoyée au bon format
-        """
-        data = { 'rgpd_accept' : self.rgpd_accept_date }
-        request = self.apiFactory.patch(reverse('user-detail', args=(2, 'pk')),data)
-        force_authenticate(request, user=self.user)
-        response = self.view(request, pk=self.user.id)
-        response.render()
-        print(response)
-        self.assertEquals(response.status_code,200)
-        
-    def test_add_manager(self):
-        """
-        Test de l'ajout d'un manager par un admin
-        """
-        data = { 'managers' : [self.user.pk]}
-        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
-        request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
-        force_authenticate(request, user=self.superuser)
-        response = view(request, pk=self.lig_entity.pk)
-        response.render()
-        self.assertEqual(response.status_code, 200)
+        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+      
+   
 
 class AffiliationsTests(APITestCase):
 
@@ -157,7 +202,7 @@ class AffiliationsTests(APITestCase):
         self.apiFactory = self.api_factory()
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
         self.affiliation = Affiliation.objects.create(name='Grenoble INP', type='Ecole')
-    
+        self.user =  get_user_model().objects.create(username="max", first_name="max", email='max@univ-grenoble.fr', password='1ngF@b')
     def test_affiliation_add(self):
         data = { 'name': 'CNRS', 'type': 'Recherche' }
         view = AffiliationViewSet.as_view(actions={'post': 'create'})
@@ -165,16 +210,8 @@ class AffiliationsTests(APITestCase):
         force_authenticate(request, user=self.superuser)
         response = view(request)
         response.render()
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
-    def test_affiliation_delete(self):
-        view = AffiliationViewSet.as_view(actions={'delete': 'destroy'})
-        request = self.apiFactory.delete(reverse('affiliation-detail', args=(1, 'pk')))
-        force_authenticate(request, user=self.superuser)
-        response = view(request, pk=1)
-        response.render()
-        self.assertEqual(response.status_code, 204)
-
     def test_affiliation_update(self):
         data = { 'name' : 'UGA' }
         view = AffiliationViewSet.as_view(actions={'patch': 'partial_update'})
@@ -182,17 +219,34 @@ class AffiliationsTests(APITestCase):
         force_authenticate(request, user=self.superuser)
         response = view(request, pk=1)
         response.render()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-class GenericMeterialsTests(APITestCase):
+    def test_user_cant_update_affiliation(self):
+        data = { 'name' : 'Grenoble INP' }
+        view = AffiliationViewSet.as_view(actions={'patch': 'partial_update'})
+        request = self.apiFactory.patch(reverse('affiliation-detail', args=(1, 'pk')),data)
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.user.pk)
+        response.render()
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+    
+    def test_user_cant_add_affiliation(self):
+        data = { 'name' : 'Inria Grenoble', 'type':'Recherche' }
+        view = AffiliationViewSet.as_view(actions={'post': 'create'})
+        request = self.apiFactory.post(reverse('affiliation-list'),data)
+        force_authenticate(request, user=self.user)
+        response = view(request)
+        response.render()
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def api_factory(self):
-        return APIRequestFactory(enforce_csrf_checks=True)
+
+class GenericMaterialsTests(APITestCase):
 
     def setUp(self):
-        self.apiFactory = self.api_factory()
         #ajout de managers
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
+        self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
+        
         self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
         self.entity.managers.add(self.manager1)
@@ -200,18 +254,17 @@ class GenericMeterialsTests(APITestCase):
         self.materials_generic = GenericMaterial.objects.create(name="Module RF433,",ref_int="MHZRF433",ref_man="SparkFunMZ433",localisation="FabMSTIC",description="Module radio 433MHZ",quantity="20",entity=self.entity)
         self.client = APIClient()
 
-    def testViewMaterial(self):
+    def test_view_material(self):
         """
-        Test de la consultation de materiels par un utilisateur lambda
+        Test de l'accès bloqué à la liste de matériels pour un utilisateur sans droits
         """
         self.client.force_authenticate(user=self.user)
         response = self.client.get(reverse('genericmaterials-list', kwargs={'entity_pk':1}))
         response.render()
-        print(response.data)
-        # KO , correction sur la vue MaterialMixin, get_queryset à faire 
-        self.assertEquals(response.status_code,200)
+        # OK 
+        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
     
-    def testModifyMaterial(self):
+    def test_modify_material(self):
         """
         Test de la modification d'un équipement par un manager
         """
@@ -220,9 +273,9 @@ class GenericMeterialsTests(APITestCase):
         response = self.client.patch(reverse('genericmaterials-detail', kwargs={'entity_pk':1, 'pk' : 1}), data)
         response.render()
         # OK 
-        self.assertEquals(response.status_code,200)
+        self.assertEquals(response.status_code,status.HTTP_200_OK)
 
-    def testAddMaterial(self):
+    def test_add_material(self):
         """
         Test de l'ajout d'un équipement par un manager
         """
@@ -231,15 +284,50 @@ class GenericMeterialsTests(APITestCase):
         response = self.client.post(reverse('genericmaterials-list', kwargs={'entity_pk':1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,201)
+        self.assertEquals(response.status_code,status.HTTP_201_CREATED)
 
-    def testDeleteMaterial(self):
+    def test_not_add_material(self):
+        self.client.force_authenticate(user=self.user)
+        data = {'name':'iSAFT SpW', 'ref_int':'iSAFT-PCIE-FabMSTIC', 'ref_man':'TELETEL', 'localisation':'FabMSTIC', 'description':'Cartes d’interface PCIe iSAFT à 4 ou 8 ports SpaceWire','quantity':'5', 'entity': 1}
+        response = self.client.post(reverse('genericmaterials-list', kwargs={'entity_pk':1}), data)
+        response.render()
+        # OK
+        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+
+    def test_not_update_material(self):
+        self.client.force_authenticate(user=self.manager2)
+        data = {'name':'Ensimag'}
+        response = self.client.patch(reverse('genericmaterials-detail', kwargs={'pk': 1, 'entity_pk':1}), data)
+        response.render()
+        # OK
+        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+
+class SpecificMaterialsTests(APITestCase):
+    
+    def setUp(self):
+        #ajout de managers
+        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
+        self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
+        
+        self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
+        self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
+        self.entity.managers.add(self.manager1)
+        self.entity.save()
+        self.entity2 = Entity.objects.create(name="Phelma", description="Ecole Ingénieurs Electronique / Physique",contact="contact-phelma@grenoble-inp.fr")
+        self.materials_specific = SpecificMaterial.objects.create(name="Zybo ARM/FPGA SoC",ref_int="410-279-RET-PHELMA1",ref_man="410-279-RET",localisation="Etagere 2 - box 4",description="Plateforme programmable FPGA",entity=self.entity)
+        self.client = APIClient()
+
+    def test_add_material(self):
         """
-        Test de la suppression d'un équipement par un manager
+        Test de l'ajout d'un équipement spécifique par un manager
         """
         self.client.force_authenticate(user=self.manager1)
-        response = self.client.delete(reverse('genericmaterials-detail', kwargs={'entity_pk':1, 'pk':1}))
+        data = serializers.serialize('json', [ self.materials_specific, ])
+        struct = json.loads(data)
+        material = struct[0]['fields']
+        print(struct[0]['fields'])
+        response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), material)
         response.render()
-        print(response)
+        print(response.data)
         # OK
-        self.assertEquals(response.status_code,204)
+        self.assertEquals(response.status_code,status.HTTP_201_CREATED)
