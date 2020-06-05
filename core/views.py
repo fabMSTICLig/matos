@@ -4,6 +4,7 @@ import datetime
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
@@ -12,10 +13,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
-from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial
 
-from .serializers import *   
-from .permissions import EntityPermission, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly 
+from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
+
+
+from .serializers import *
+from .permissions import EntityPermission, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
 from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -122,7 +125,7 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    
+
     @action(methods=['get'], detail=False)
     def types(self, request):
         """
@@ -201,12 +204,20 @@ class EntityMaterialMixin:
 
 class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     """
-    Endpoints for generic material
+    Manager endpoints for generic material
     Use nested router params
     """
     queryset = GenericMaterial.objects.all()
     permission_classes = (IsManagerOf,)
     serializer_class = GenericMaterialSerializer
+
+class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Public endpoints for generic material
+    """
+    queryset = GenericMaterial.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = GenericMaterialPublicSerializer
 
 class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     """
@@ -216,6 +227,15 @@ class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     queryset = SpecificMaterial.objects.all()
     permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialSerializer
+
+class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Public endpoints for specific material
+    """
+    queryset = SpecificMaterial.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SpecificMaterialPublicSerializer
+
 
 class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     """
@@ -272,4 +292,65 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Public endpoints for specific material instance
+    """
+    queryset = SpecificMaterialInstance.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SpecificMaterialInstanceSerializer
+
+
+class LoanViewSet(viewsets.ModelViewSet):
+    """
+    Endpoints for loans
+    """
+    queryset = Loan.objects.all()
+    permission_classes = (LoanPermission,)
+    serializer_class = LoanSerializer
+
+    def get_queryset(self):
+        """
+        """
+        if(self.request.user.is_staff):
+            return self.queryset
+        return self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()
+
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
+            if serializer.validated_data['user']!=request.user:
+                serializer.validated_data['user']=request.user
+            if serializer.validated_data['status'] != Loan.Status.PENDING or serializer.validated_data['status'] != Loan.Status.REQUESTED:
+                serializer.validated_data['status']=Loan.Status.REQUESTED
+            if serializer.validated_data['return_date']:
+                serializer.validated_data['return_date']=None
+            serializer.validated_data['parent']=None
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
+            if serializer.validated_data['status'] != Loan.Status.PENDING or serializer.validated_data['status'] != Loan.Status.REQUESTED:
+                raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
+            request.data.update({'user':instance.user.id})
+            request.data.update({'return_date':instance.return_date})
+            request.data.update({'parent':instance.parent.id if instance.parent else instance.parent})
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
 
