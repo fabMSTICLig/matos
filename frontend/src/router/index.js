@@ -53,6 +53,20 @@ const routes = [
       import(/* webpackChunkName: "profile" */ "../views/Profile.vue")
   },
   {
+    path: "/search",
+    name: "search",
+    beforeEnter: requireAuth,
+    component: () =>
+      import(/* webpackChunkName: "search" */ "../views/Search.vue")
+  },
+  {
+    path: "/loan",
+    name: "loan",
+    beforeEnter: requireAuth,
+    component: () =>
+      import(/* webpackChunkName: "loan" */ "../views/Loan.vue")
+  },
+  {
     path: "/affiliations",
     component: () =>
       import(/* webpackChunkName: "affiliation" */ "../views/Affiliations.vue"),

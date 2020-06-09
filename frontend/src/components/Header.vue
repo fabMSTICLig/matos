@@ -28,6 +28,18 @@
             v-if="isAuthenticated"
             active-class="active"
             exact
+            :to="{ name: 'search' }"
+            v-slot="{ href, route, navigate }"
+          >
+            <li class="nav-item" role="presentation">
+              <a class="nav-link" :href="href" @click="navigate">Search</a>
+            </li>
+          </router-link>
+
+          <router-link
+            v-if="isAuthenticated"
+            active-class="active"
+            exact
             :to="{ name: 'entitieslist' }"
             v-slot="{ href, route, navigate }"
           >
@@ -48,6 +60,15 @@
         <ul v-if="isAuthenticated" class="nav navbar-nav">
           <li class="nav-item" role="presentation">
             <router-link
+              v-if="isAuthenticated"
+              class="nav-link"
+              active-class="active"
+              exact
+              :to="{ name: 'loan' }"
+            >Prêt ({{ loanQuantity}})</router-link>
+          </li>
+          <li class="nav-item" role="presentation">
+            <router-link
               class="nav-link"
               active-class="active"
               exact
@@ -55,6 +76,7 @@
               v-text="authUser.username"
             ></router-link>
           </li>
+
           <li class="nav-item" role="presentation">
             <a
               class="nav-link"
@@ -88,7 +110,13 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["authUser", "isAuthenticated", "isAdmin"])
+    ...mapGetters(["authUser", "isAuthenticated", "isAdmin"]),
+    ...mapGetters({pending_loan:"loans/pending_loan"}),
+    loanQuantity(){
+        if(this.pending_loan)
+            return this.pending_loan.genericmaterials.length + this.pending_loan.specificmaterials.length
+        else return ""
+    }
   },
   methods: {}
 };

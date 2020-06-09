@@ -300,6 +300,9 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SpecificMaterialInstance.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = SpecificMaterialInstanceSerializer
+    def get_queryset(self):
+        return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
+
 
 
 class LoanViewSet(viewsets.ModelViewSet):
@@ -354,5 +357,13 @@ class LoanViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def status(self, request):
+        """
+        Return the affiliation types
+        """
+        return Response(dict((x, y) for x, y in Loan.Status.choices), status=status.HTTP_200_OK)
+
 
 

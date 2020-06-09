@@ -20,9 +20,11 @@ router.register(r'affiliations', AffiliationViewSet)
 router.register(r'entities', EntityViewSet)
 router.register(r'genericmaterials', GenericMaterialViewSet, basename="public-genericmaterials")
 router.register(r'specificmaterials', SpecificMaterialViewSet, basename="public-specificmaterials")
-router.register(r'specificmaterialinstances', SpecificMaterialInstanceViewSet, basename="public-specificmaterialinstances")
 router.register(r'tags', TagViewSet)
 router.register(r'loans', LoanViewSet)
+
+router_publicspecificmaterials = routers.NestedSimpleRouter(router, r'specificmaterials', lookup='specificmaterial')
+router_publicspecificmaterials.register(r'instances', SpecificMaterialInstanceViewSet, basename='public-instances')
 
 router_entities = routers.NestedSimpleRouter(router, r'entities', lookup='entity')
 router_entities.register(r'genericmaterials',EntityGenericMaterialViewSet,basename='genericmaterials')
@@ -36,6 +38,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include(router_entities.urls)),
     path('', include(router_specific_materials.urls)),
+    path('', include(router_publicspecificmaterials.urls)),
 
 ]
 

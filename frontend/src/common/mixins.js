@@ -9,7 +9,6 @@ export const ListMixin = {
     return {
       ressource: "",
       search_input: "",
-      search_fields: [],
       current_page: 1,
       selected_object: null
     };

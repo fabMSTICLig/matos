@@ -18,7 +18,10 @@ export default {
   },
   mounted() {
     document.title = process.env.VUE_APP_TITLE;
-  }
+  },
+  beforeCreate(){
+    this.$store.commit('loans/onLoad')
+  },
 };
 </script>
 

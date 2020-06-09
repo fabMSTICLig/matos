@@ -105,7 +105,6 @@ export default {
   },
   data() {
     return {
-      search_fields: ["name"],
       ressource: "entities"
     };
   },
@@ -119,6 +118,24 @@ export default {
       );
     }
   },
-  methods: {}
+  methods: {
+    search_fields(objects_list, search_input){
+        return objects_list.filter(item => {
+          return ['name'].some(field => {
+            return (
+              item[field]
+                .toLowerCase()
+                .indexOf(search_input.toLowerCase()) > -1
+            );
+          });
+        }).sort((a,b)=>{
+            var owna = (this.authUser.entities.indexOf(a.id) > -1)
+            var ownb = (this.authUser.entities.indexOf(b.id) > -1)
+            if(owna && !ownb) return -1;
+            if(!owna && ownb) return 1;
+            return 0;
+        });
+    }
+  }
 };
 </script>
