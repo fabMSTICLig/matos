@@ -160,3 +160,36 @@ class SpecificMaterialInstance(models.Model):
     model = models.ForeignKey(SpecificMaterial, on_delete=models.CASCADE, related_name="instances")
     def __str__(self):
         return self.model.name +"(" + self.name + ")"
+
+class Loan(models.Model):
+    class Status(models.IntegerChoices):
+        PENDING = 1, 'En Attente'
+        REQUESTED = 2, 'Demandé'
+        ACCEPTED = 3, 'Accecpté'
+        DENIED = 4, 'Refusé'
+
+    status = models.PositiveSmallIntegerField(
+        choices=Status.choices,
+    )
+    checkout_date =  models.DateField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="loans")
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="loans")
+    due_date =  models.DateField()
+    return_date =  models.DateField(null=True, blank=True)
+    comments = models.TextField(null=True, blank=True)
+    specific_materials = models.ManyToManyField(
+        SpecificMaterialInstance, blank=True, related_name="loans")
+    generic_materials = models.ManyToManyField(
+        GenericMaterial, blank=True, related_name="loans",through="LoanGenericItem")
+    parent = models.OneToOneField('Loan', null=True, blank=True, on_delete=models.SET_NULL, related_name="child")
+    def __str__(self):
+        return self.user.username +"(" + self.checkout_date.isoformat() + ")"
+
+
+class LoanGenericItem(models.Model):
+    loan = models.ForeignKey(Loan, on_delete=models.CASCADE)
+    material = models.ForeignKey(GenericMaterial, on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField(default=1)
+
+    class Meta:
+        unique_together = ['loan', 'material']

@@ -10,7 +10,7 @@ entities/(entity_pk)/specificmaterials/
 entities/(entity_pk)/specificmaterials/(specificmaterial_pk)/instances
 """
 from django.urls import path, include
-from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView, TagViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialViewSet, EntitySpecificMaterialInstanceViewSet
+from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView, TagViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialViewSet, EntitySpecificMaterialInstanceViewSet, GenericMaterialViewSet, SpecificMaterialViewSet, SpecificMaterialInstanceViewSet, LoanViewSet
 
 from rest_framework_nested import routers
 
@@ -18,7 +18,11 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'affiliations', AffiliationViewSet)
 router.register(r'entities', EntityViewSet)
+router.register(r'genericmaterials', GenericMaterialViewSet, basename="public-genericmaterials")
+router.register(r'specificmaterials', SpecificMaterialViewSet, basename="public-specificmaterials")
+router.register(r'specificmaterialinstances', SpecificMaterialInstanceViewSet, basename="public-specificmaterialinstances")
 router.register(r'tags', TagViewSet)
+router.register(r'loans', LoanViewSet)
 
 router_entities = routers.NestedSimpleRouter(router, r'entities', lookup='entity')
 router_entities.register(r'genericmaterials',EntityGenericMaterialViewSet,basename='genericmaterials')

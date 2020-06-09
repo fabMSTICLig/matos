@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Entity, Affiliation, Tag, SpecificMaterial, GenericMaterial, SpecificMaterialInstance
+from .models import User, Entity, Affiliation, Tag, SpecificMaterial, GenericMaterial, SpecificMaterialInstance, Loan, LoanGenericItem
 
 
 class CustomUserAdmin(UserAdmin):
@@ -37,3 +37,10 @@ class SpecificMaterialAdmin(admin.ModelAdmin):
 @admin.register(GenericMaterial)
 class GenericMaterialAdmin(admin.ModelAdmin):
     pass
+
+class LoanGenericItemAdmin(admin.TabularInline):
+    model = LoanGenericItem
+
+@admin.register(Loan)
+class LoanAdmin(admin.ModelAdmin):
+    inlines = [LoanGenericItemAdmin]
