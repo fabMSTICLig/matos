@@ -27,12 +27,10 @@ class AffiliationAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     pass
 
-class SpecificMaterialInstanceAdmin(admin.TabularInline):
-    model = SpecificMaterialInstance
 
 @admin.register(SpecificMaterial)
 class SpecificMaterialAdmin(admin.ModelAdmin):
-    inlines = [SpecificMaterialInstanceAdmin]
+    model = SpecificMaterial
 
 @admin.register(GenericMaterial)
 class GenericMaterialAdmin(admin.ModelAdmin):
@@ -43,4 +41,6 @@ class LoanGenericItemAdmin(admin.TabularInline):
 
 @admin.register(Loan)
 class LoanAdmin(admin.ModelAdmin):
+    model = Loan
     inlines = [LoanGenericItemAdmin]
+    filter_horizontal  = ('specific_materials',)
