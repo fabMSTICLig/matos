@@ -33,7 +33,7 @@
                     ><input
                       class="form-control"
                       type="text"
-                      v-model="object.ref_mat"
+                      v-model="object.ref_man"
                     />
                   </div>
                   <div class="form-group">

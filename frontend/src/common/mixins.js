@@ -46,6 +46,9 @@ export const ListMixin = {
       return Math.ceil(
         this.objects_filtered.length / process.env.VUE_APP_MAXLIST
       );
+    },
+    per_page() {
+      return parseInt(process.env.VUE_APP_MAXLIST)
     }
   },
   methods: {
