@@ -174,7 +174,7 @@ class LoanSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if(data['checkout_date'] > data['due_date']):
             raise serializers.ValidationError("La date de rendu doit être après la date de sortie")
-        if(data['return_date'] and data['checkout_date'] > data['return_date']):
+        if(data['checkout_date'] > data['return_date']):
             raise serializers.ValidationError("La date de retour doit être après la date de sortie")
         entity = data['entity']
         for mat in data['specific_materials']:

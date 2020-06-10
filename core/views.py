@@ -336,6 +336,8 @@ class LoanViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
             if serializer.validated_data['status'] != Loan.Status.PENDING or serializer.validated_data['status'] != Loan.Status.REQUESTED:
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
