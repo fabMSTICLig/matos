@@ -405,15 +405,29 @@ class LoanMaterialsTests(APITestCase):
         self.client = APIClient()
     
     def test_return_date(self):
-        self.assertGreater(self.loan.return_date, self.loan.checkout_date)
-        self.assertGreater(self.loan.due_date, self.loan.checkout_date)
-    
+        """
+           date de retour et date de rendu doivent être après la date de sortie
+        """   
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,10,8), "user" : self.user.pk , "entity" : 1, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(reverse('loan-detail', kwargs={'pk': 1}), data)
+        response.render()
+        self.assertEquals(response.status_code, 400)
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,10,8), "user" : self.user.pk , "entity" : 1, "due_date" : datetime.date(2020,10,18), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(reverse('loan-detail', kwargs={'pk': 1}), data)
+        response.render()
+        print(response.data)
+        self.assertEquals(response.status_code, 400)
+
     def test_entity_loan(self):
+        """
+            tous les matériels rattachés à un prêt doivent appartenir à l'entité rattaché à ce prêt
+        """
         self.client.force_authenticate(user=self.manager1)
         response = self.client.get(reverse('specificmaterials-list', kwargs={'entity_pk': self.entity.pk}), format='json')
         response.render()
-
-        
+       
         try:
             data = serializers.serialize('json', [ self.materials_specific, ])
             struct = json.loads(data)
@@ -424,8 +438,16 @@ class LoanMaterialsTests(APITestCase):
         for key, value in enumerate(struct):
             if not 'instances' in value['fields']:
                 self.assertEquals(value['fields']['entity'], self.entity.pk)
-        print(response.data)
 
-        #loan_specific_materials = serializers.serialize('json', [self.loan.specific_materials,])
-        #loan_specific_materials_data = json.dumps({'responce_data': responce_data}
+    def test_create_loan_status(self):
+        """
+            un utilisateur peut uniquement créer des prêts avec le status requested
+        """
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : 1, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(reverse('loan-list'), data, format='json')
+        response.render()
+        print(response.status_code)
+        self.assertEquals(response.data['status'], 2)
 
+       
