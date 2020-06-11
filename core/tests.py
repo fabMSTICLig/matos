@@ -523,3 +523,16 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
+    
+    def test_specific_material_instance(self):
+        """
+            une intance de matériel spécifique ne peut pas appartenir à deux prêts
+            qui se chevauche (checkout_date1 < checkout_date2 < return_date1 et vice
+            versa)
+        """
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,6,9), "user" : self.manager1.pk , "entity" : 1, "due_date" : datetime.date(2020,10,18), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.post(reverse('loan-list'), data)
+        response.render()
+        print(response.data)
+        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
