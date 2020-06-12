@@ -180,6 +180,17 @@ class LoanSerializer(serializers.ModelSerializer):
         for mat in data['specific_materials']:
             if mat.model.entity != entity:
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité preteuse.")
+            # Get loans with specific_materials and allow new loan after return date
+            loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], entity=data['entity'])
+            for loan in loans:
+                if data['checkout_date'] < loan.checkout_date:
+                    if data['return_date'] > loan.checkout_date:
+                        raise serializers.ValidationError("Matériel en cours de prêt")
+               
+                if data['checkout_date'] > loan.checkout_date:
+                    if loan.return_date > data['checkout_date']:
+                        raise serializers.ValidationError("Prêt en cours pour ce matériel")
+                    
         for item in data['loangenericitem_set']:
             if item['material'].entity != entity:
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité preteuse.")
