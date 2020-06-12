@@ -398,17 +398,19 @@ class LoanMaterialsTests(APITestCase):
         self.materials_specific = SpecificMaterial.objects.create(name="Zybo ARM/FPGA SoC",ref_int="410-279-RET-PHELMA1",ref_man="410-279-RET",localisation="Etagere 2 - box 4",description="Plateforme programmable FPGA",entity=self.entity)
         self.materials_specific_instance = SpecificMaterialInstance.objects.create(model=self.materials_specific, name="carte ARM/FPGA Soc 1", serial_num="002234", description='instance carte FPGA Phelma' )
         self.materials_generic = GenericMaterial.objects.create(name="Module RF433,",ref_int="MHZRF433",ref_man="SparkFunMZ433",localisation="FabMSTIC",description="Module radio 433MHZ",quantity="20",entity=self.entity)
-        self.materials_specific2 = SpecificMaterial.objects.create(name="Camera HDC 5300,",ref_int="HDC5300_perForm",ref_man="HDC5300",localisation="perForm - salle matériels video - 1er etage",description="Caméra Multi Format vidéo HD / SD",entity=self.entity)
+        self.materials_specific2 = SpecificMaterial.objects.create(name="Epson projector EBS31 RM1250,",ref_int="EBS31-RM1250_ensag",ref_man="EBS31-RM1250",localisation="perForm - salle matériels video - 1er etage",description="Besoin d'un adaptateur screenbeam pour fonctionner",entity=self.entity)        
+        self.materials_specific_instance2 = SpecificMaterialInstance.objects.create(model=self.materials_specific2, name="Epson projector EBS31 RM1250", serial_num="002234", description='instance Epson projector EBS31 RM1250 Ensag' )
         self.loan = Loan.objects.create(status=2, checkout_date = datetime.date(2020,6,8), user=self.user,entity=self.entity, due_date=datetime.date(2020,6,24), return_date=datetime.date(2020,6,24), comments='demande de prêt cours arts visuel')
         self.loan.specific_materials.add(self.materials_specific_instance)
         self.loan.save()
-        self.loan_manager = Loan.objects.create(status=2, checkout_date = datetime.date(2020,6,8), user=self.manager1,entity=self.entity, due_date=datetime.date(2020,6,24), return_date=datetime.date(2020,6,24), comments='demande de prêt camera pour cours à distance')
-        self.loan_manager.specific_materials.add(self.materials_specific_instance)
-        self.loan_manager.save()
+      
         self.entity2 = Entity.objects.create(name="UGA", description="Univ Grenoble Alpes",contact="contact@univ-grenoble.alpes.fr")
         self.entity2.managers.add(self.user)
         self.entity2.save()
-        self.loan_user = Loan.objects.create(status=3, checkout_date = datetime.date(2020,6,8), user=self.user,entity=self.entity, due_date=datetime.date(2020,7,24), return_date=datetime.date(2020,8,24), comments='demande de prêt tablettes info')
+        self.loan_manager = Loan.objects.create(status=2, checkout_date = datetime.date(2020,10,8), user=self.manager1,entity=self.entity, due_date=datetime.date(2020,10,24), return_date=datetime.date(2020,10,24), comments='demande de prêt tablettes info')
+        self.loan_manager.specific_materials.add(self.materials_specific_instance2)
+        self.loan_manager.save()
+        self.loan_user = Loan.objects.create(status=2, checkout_date = datetime.date(2020,6,8), user=self.user,entity=self.entity, due_date=datetime.date(2020,7,24), return_date=datetime.date(2020,8,24), comments='demande de prêt tablettes info', parent=self.loan)
         self.loan_user.specific_materials.add(self.materials_specific_instance)
         self.loan_user.save()
         self.client = APIClient()
@@ -466,7 +468,6 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk}),data)
         response.render()
-        print(response.data)
         self.assertEquals(response.data['status'], 1)
 
     def test_indem_user_loan(self):
@@ -544,3 +545,58 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.post(reverse('loan-list'), data)
         response.render()
         self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+    
+    def test_child_loan(self):
+        """
+            Seul un manager peut créer un prêt enfant d'un autre pret
+            Vérification de la même entité pour la copie du prêt
+        """
+        parent = self.loan_user.pk
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,8,30), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,10), "return_date" : datetime.date(2020,9,15), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [self.materials_specific_instance.pk, self.materials_specific_instance2.pk], 'generic_materials': [], 'parent': self.loan_user.pk }
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.post(reverse('loan-list'), data)
+        response.render()
+        self.assertTrue(response.data['parent'])
+        self.assertEquals(response.data['parent'], self.loan_user.pk)  
+
+    def test_child_loan_not_created(self):    
+        parent = self.loan.pk
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,8,30), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,10), "return_date" : datetime.date(2020,9,15), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [self.materials_specific_instance.pk, self.materials_specific_instance2.pk], 'generic_materials': [], 'parent': self.loan_user.pk }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(reverse('loan-list'), data)
+        response.render()
+        self.assertIsNone(response.data['parent'])
+    
+    def test_protected_loan_return_date(self):    
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': []}
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
+        response.render()
+        self.assertEquals(response.data['return_date'], "2020-08-24")
+    
+    def test_protected_loan_parent(self):    
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [],  'parent': self.loan_manager.pk}
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
+        response.render()
+        self.assertEquals(response.data['parent'], self.loan.pk)
+
+    def test_protected_loan_user(self): 
+        """
+            un utilisateur ne peut modifier les champs, parent, return_date et
+            user (transfert vers un autre utilisateur)
+        """
+        print('====')
+        print(self.loan_user.user.pk)
+        # test protection utilisateur
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : 1 , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [], 'generic_materials': [{"material": 1, "quantity": 10}] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.put(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
+        response.render()
+        print('======')
+        print(response.data)
+        print('-----')
+        print(self.manager1.pk)
+        print(self.user.pk)
+        self.assertEquals(response.data['user'], 2)
+      
