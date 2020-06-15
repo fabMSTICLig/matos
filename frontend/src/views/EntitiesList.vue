@@ -69,6 +69,16 @@
               v-show="isManager"
               >Matériels</router-link
             >
+            <router-link
+              class="btn btn-primary"
+              role="button"
+              :to="{
+                name: 'entityloans',
+                params: { entityid: selected_object.id }
+              }"
+              v-show="isManager"
+              >Prêts</router-link
+            >
           </div>
         </div>
         <div class="card-body">
@@ -119,21 +129,21 @@ export default {
     }
   },
   methods: {
-    search_fields(objects_list, search_input){
-        return objects_list.filter(item => {
-          return ['name'].some(field => {
+    search_fields(objects_list, search_input) {
+      return objects_list
+        .filter(item => {
+          return ["name"].some(field => {
             return (
-              item[field]
-                .toLowerCase()
-                .indexOf(search_input.toLowerCase()) > -1
+              item[field].toLowerCase().indexOf(search_input.toLowerCase()) > -1
             );
           });
-        }).sort((a,b)=>{
-            var owna = (this.authUser.entities.indexOf(a.id) > -1)
-            var ownb = (this.authUser.entities.indexOf(b.id) > -1)
-            if(owna && !ownb) return -1;
-            if(!owna && ownb) return 1;
-            return 0;
+        })
+        .sort((a, b) => {
+          var owna = this.authUser.entities.indexOf(a.id) > -1;
+          var ownb = this.authUser.entities.indexOf(b.id) > -1;
+          if (owna && !ownb) return -1;
+          if (!owna && ownb) return 1;
+          return 0;
         });
     }
   }

@@ -109,7 +109,6 @@ class EntitiesTests(APITestCase):
         force_authenticate(request, user=self.manager2)
         response = view(request, pk=self.lig_entity.pk)
         response.render()
-        print(response.status_code)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_manager_not_add_entity(self):
@@ -137,7 +136,6 @@ class EntitiesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         managers_lig_obj = self.lig_entity.managers.all()
         list_result = [entry for entry in managers_lig_obj]
-        print(list_result)
         self.assertEqual(list_result,[self.manager1, self.manager2])
 
 
@@ -175,8 +173,6 @@ class UsersTests(APITestCase):
         request = self.apiFactory.patch(reverse('user-detail', args=(1, 'pk')),data)
         force_authenticate(request, user=self.user2)
         response = self.view(request, pk=self.user.id)
-        print(self.user.id)
-        print(request)
         response.render()
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -527,25 +523,6 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
     
-    def test_specific_material_instance(self):
-        """
-            une intance de matériel spécifique ne peut pas appartenir à deux prêts
-            qui se chevauche (checkout_date1 < checkout_date2 < return_date1 et vice
-            versa)
-        """
-  
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,5,22), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,18), "return_date" : datetime.date(2020,8,28), "comments" : 'prêt en cours TP embarqué ens3', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post(reverse('loan-list'), data)
-        response.render()
-        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
-
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,8,10), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,8,20), "return_date" : datetime.date(2020,9,1), "comments" : 'demande de prêt matériel embarqué', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post(reverse('loan-list'), data)
-        response.render()
-        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
-    
     def test_child_loan(self):
         """
             Seul un manager peut créer un prêt enfant d'un autre pret
@@ -586,17 +563,32 @@ class LoanMaterialsTests(APITestCase):
             un utilisateur ne peut modifier les champs, parent, return_date et
             user (transfert vers un autre utilisateur)
         """
-        print('====')
-        print(self.loan_user.user.pk)
         # test protection utilisateur
         data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : 1 , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [], 'generic_materials': [{"material": 1, "quantity": 10}] }
         self.client.force_authenticate(user=self.user)
         response = self.client.put(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        print('======')
-        print(response.data)
-        print('-----')
-        print(self.manager1.pk)
-        print(self.user.pk)
         self.assertEquals(response.data['user'], 2)
-      
+     
+    def test_specific_material_instance(self):
+        """
+        un material spécifique ne peut être emprumter en meme temps
+        """
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,5,2), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,5,5), "return_date" : None, "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.post(reverse('loan-list'), data, format='json')
+        response.render()
+        
+        data = {"status" : 2, "checkout_date" : datetime.date(2020,5,3), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,5,6), "return_date" : None, "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.post(reverse('loan-list'), data, format='json')
+        response.render()
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        data = {"status" : 2, "checkout_date" : datetime.date(2020,5,1), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,5,4), "return_date" : datetime.date(2020,5,5), "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(reverse('loan-list'), data, format='json')
+        response.render()
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+ 

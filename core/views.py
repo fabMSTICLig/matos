@@ -317,7 +317,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         """
         if(self.request.user.is_staff):
-            return self.queryset
+            return self.queryset.all()
         return self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()
 
 
@@ -327,7 +327,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
             if serializer.validated_data['user']!=request.user:
                 serializer.validated_data['user']=request.user
-            if serializer.validated_data['status'] != Loan.Status.PENDING or serializer.validated_data['status'] != Loan.Status.REQUESTED:
+            if serializer.validated_data['status'] != Loan.Status.REQUESTED:
                 serializer.validated_data['status']=Loan.Status.REQUESTED
             if serializer.validated_data['return_date']:
                 serializer.validated_data['return_date']=None
@@ -342,7 +342,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
-            if serializer.validated_data['status'] != Loan.Status.PENDING or serializer.validated_data['status'] != Loan.Status.REQUESTED:
+            if serializer.validated_data['status'] != Loan.Status.PENDING and serializer.validated_data['status'] != Loan.Status.REQUESTED:
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})

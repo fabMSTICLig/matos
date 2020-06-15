@@ -14,6 +14,16 @@
               }"
               >Matériels</router-link
             >
+            <router-link
+              class="btn btn-primary"
+              role="button"
+              :to="{
+                name: 'entityloans',
+                params: { entityid: object.id }
+              }"
+              >Prêts</router-link
+            >
+
           </div>
         </div>
         <div class="card-body">

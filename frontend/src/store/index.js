@@ -7,7 +7,7 @@ import tags from "./tags.module";
 import users from "./users.module";
 import entities from "./entities.module";
 import loans from "./loans.module";
-import  {genericmaterials, specificmaterials} from "./materials.module";
+import { genericmaterials, specificmaterials } from "./materials.module";
 
 Vue.use(Vuex);
 

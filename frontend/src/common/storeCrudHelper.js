@@ -34,7 +34,7 @@ const createCrud = (ressource, source) => {
         return state.list.map(id => state.entities[id.toString()]);
       },
       byId(state) {
-        return id => state.entities[id.toString()];
+        return id => (id ? state.entities[id.toString()] : null);
       }
     },
     actions: {
@@ -42,7 +42,7 @@ const createCrud = (ressource, source) => {
         return ApiService.query(prefix + ressource, {})
           .then(({ data }) => {
             commit("fetchListSuccess", data);
-            return getters.list;
+            return Promise.resolve(getters.list);
           })
           .catch(error => {
             return Promise.reject(error);
@@ -59,7 +59,6 @@ const createCrud = (ressource, source) => {
           });
       },
       create({ commit }, { data, prefix = "" }) {
-        console.log(data);
         return ApiService.post(prefix + ressource, data)
           .then(({ data }) => {
             commit("createSuccess", data);

@@ -12,6 +12,11 @@ Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.use(DropdownPlugin);
 
+Vue.filter("field", function(value, field) {
+  if (!value || ! (field in value)) return "";
+  return value[field];
+});
+
 ApiService.init();
 
 router.beforeEach((to, from, next) => {

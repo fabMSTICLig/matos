@@ -17,11 +17,11 @@ export default {
   name: "input-datalist",
   props: {
     value: {
-      type: [String, Number],
+      type: null,
       required: true
     },
     ressource: {
-      type: String,
+      type: [String, Array],
       required: true
     },
     makeLabel: {
@@ -45,14 +45,19 @@ export default {
   },
   computed: {
     objects_list() {
-      return this.$store.getters[this.ressource + "/list"];
+      if (typeof this.ressource == "string")
+        return this.$store.getters[this.ressource + "/list"];
+      else return this.ressource;
     },
 
     inputValue: {
       get() {
-        var item = this.objects_list.find(
-          item => item.id.toString() == this.value.toString()
-        );
+        if(this.value)
+        {
+            var item = this.objects_list.find(
+                item => item.id.toString() == this.value.toString()
+            );
+        }
         if (item != undefined) {
           return this.makeLabelOrName(item);
         } else {
@@ -81,7 +86,8 @@ export default {
     }
   },
   beforeMount() {
-    this.$store.dispatch(this.ressource + "/fetchList");
+    if (typeof this.ressource == "string")
+      this.$store.dispatch(this.ressource + "/fetchList");
   }
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form :id="_uid" @submit="addObject">
+    <form v-if="!readonly" :id="_uid" @submit="addObject">
       <div class="input-group">
         <div class="input-group-prepend">
           <span class="input-group-text">Ajouter</span>
@@ -32,6 +32,7 @@
           class="btn btn-danger"
           type="button"
           @click="removeObject(item.id)"
+          v-if="!readonly"
         >
           X
         </button>
@@ -46,7 +47,7 @@ export default {
   name: "DynList",
   props: {
     ressource: {
-      type: String,
+      type: [String, Array],
       required: true
     },
     value: {
@@ -56,6 +57,11 @@ export default {
     makeLabel: {
       type: Function,
       required: false
+    },
+    readonly: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   components: {
@@ -68,7 +74,9 @@ export default {
   },
   computed: {
     objects_list() {
-      return this.$store.getters[this.ressource + "/list"];
+      if (typeof this.ressource == "string")
+        return this.$store.getters[this.ressource + "/list"];
+      else return this.ressource;
     },
     objects_filtered() {
       return this.objects_list.filter(item => {

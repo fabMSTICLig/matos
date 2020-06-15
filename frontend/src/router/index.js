@@ -63,8 +63,14 @@ const routes = [
     path: "/loan",
     name: "loan",
     beforeEnter: requireAuth,
+    component: () => import(/* webpackChunkName: "loan" */ "../views/Loan.vue")
+  },
+  {
+    path: "/loans",
+    name: "authloans",
+    beforeEnter: requireAuth,
     component: () =>
-      import(/* webpackChunkName: "loan" */ "../views/Loan.vue")
+      import(/* webpackChunkName: "loans" */ "../views/LoansList.vue")
   },
   {
     path: "/affiliations",
@@ -299,7 +305,22 @@ const routes = [
                 }
               }
             ]
-          }
+          },
+          {
+            path: "loans",
+            name: "entityloans",
+            meta: {
+              routeparam: "entityid",
+              breadcumb: {
+                label: "Prêts",
+                name: "entityloans"
+              }
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "entityloanlist" */ "../views/EntityLoansList.vue"
+              )
+          },
         ]
       }
     ]

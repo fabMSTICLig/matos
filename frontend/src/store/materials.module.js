@@ -8,8 +8,10 @@ const specific_extra = {
     instances: instances
   }
 };
-export const specificmaterials = createCrud("specificmaterials", specific_extra);
+export const specificmaterials = createCrud(
+  "specificmaterials",
+  specific_extra
+);
 
 const generic_extra = {};
 export const genericmaterials = createCrud("genericmaterials", generic_extra);
-

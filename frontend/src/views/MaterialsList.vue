@@ -82,6 +82,7 @@
               <td>{{ selected_object.quantity }}</td>
             </tr>
           </table>
+
           <p>
             <span><strong>Tags :&nbsp;</strong></span>
             <DisplayIdList

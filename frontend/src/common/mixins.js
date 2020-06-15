@@ -47,7 +47,7 @@ export const ListMixin = {
       );
     },
     per_page() {
-      return parseInt(process.env.VUE_APP_MAXLIST)
+      return parseInt(process.env.VUE_APP_MAXLIST);
     }
   },
   methods: {
@@ -58,7 +58,7 @@ export const ListMixin = {
       this.$store
         .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
         .then(() => {
-          if (this.objects_list.length > 0) {
+          if (this.objects_filtered.length > 0) {
             this.selected_object = this.objects_list[0];
           }
         });

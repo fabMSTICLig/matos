@@ -65,18 +65,15 @@
               active-class="active"
               exact
               :to="{ name: 'loan' }"
-            >Prêt ({{ loanQuantity}})</router-link>
+              >Prêt ({{ loanQuantity }})</router-link
+            >
           </li>
-          <li class="nav-item" role="presentation">
-            <router-link
-              class="nav-link"
-              active-class="active"
-              exact
-              :to="{ name: 'profile' }"
-              v-text="authUser.username"
-            ></router-link>
-          </li>
-
+          <b-nav-item-dropdown :text="authUser.username">
+            <b-dropdown-item :to="{ name: 'profile' }">Profile</b-dropdown-item>
+            <b-dropdown-item :to="{ name: 'authloans' }"
+              >Mes prêts</b-dropdown-item
+            >
+          </b-nav-item-dropdown>
           <li class="nav-item" role="presentation">
             <a
               class="nav-link"
@@ -111,11 +108,14 @@ export default {
 
   computed: {
     ...mapGetters(["authUser", "isAuthenticated", "isAdmin"]),
-    ...mapGetters({pending_loan:"loans/pending_loan"}),
-    loanQuantity(){
-        if(this.pending_loan)
-            return this.pending_loan.genericmaterials.length + this.pending_loan.specificmaterials.length
-        else return ""
+    ...mapGetters({ pending_loan: "loans/pending_loan" }),
+    loanQuantity() {
+      if (this.pending_loan)
+        return (
+          this.pending_loan.generic_materials.length +
+          this.pending_loan.models.length
+        );
+      else return "";
     }
   },
   methods: {}

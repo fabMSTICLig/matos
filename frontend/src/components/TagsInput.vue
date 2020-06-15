@@ -50,8 +50,8 @@ export default {
       required: true
     },
     forbidAdd: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -84,7 +84,7 @@ export default {
       if (tag) {
         this.object[this.fieldName].push(tag.id);
         this.input_value = "";
-      } else if(!this.forbidAdd) {
+      } else if (!this.forbidAdd) {
         tag = this.objects_filtered.find(item => item.name == this.input_value);
         if (tag) this.input_value = "";
         else {

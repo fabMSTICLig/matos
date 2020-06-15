@@ -1,6 +1,6 @@
 <!-- Component inspired from https://alligator.io/vuejs/vue-pagination-component/ -->
 <template>
-  <nav v-if="!(isInFirstPage && isInLastPage)">
+  <nav v-if="!(isInFirstPage && isInLastPage) && totalPages!=0">
     <ul class="pagination">
       <li class="page-item" :class="{ disabled: isInFirstPage }">
         <button
