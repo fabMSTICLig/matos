@@ -1,0 +1,338 @@
+<template>
+  <div v-if="loaded">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="float-left">{{ title }}</h4>
+            <div class="btn-group float-right" role="group">
+              <router-link
+                class="btn btn-primary"
+                role="button"
+                :to="{
+                  name: 'entityloans',
+                  params: { entityid: pending_loan.entity }
+                }"
+                v-if="updateMode && canManage"
+                >Retour liste</router-link
+              >
+            </div>
+          </div>
+          <div class="card-body">
+            <form class="form" @submit="submitLoan">
+              <div class="form-group" v-if="canManage">
+                <label>Utilisateur :</label>
+                <input-datalist
+                  v-model="pending_loan.user"
+                  ressource="users"
+                  :makeLabel="makeUserLabel"
+                ></input-datalist>
+              </div>
+              <div class="form-group">
+                <label>Entité :</label
+                ><input
+                  type="text"
+                  class="form-control"
+                  :value="entityById(pending_loan.entity) | field('name')"
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label>Status :</label>
+                <select
+                  class="form-control"
+                  v-model="pending_loan.status"
+                  :disabled="!canManage"
+                >
+                  <option
+                    v-for="(val, key) in status"
+                    v-text="val"
+                    :key="key"
+                    :value="key"
+                  ></option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Date sortie :</label
+                ><input
+                  class="form-control"
+                  type="date"
+                  v-model="pending_loan.checkout_date"
+                  required
+                  :disabled="readOnly"
+                />
+              </div>
+              <div class="form-group">
+                <label>Date retour prévue:</label
+                ><input
+                  class="form-control"
+                  type="date"
+                  v-model="pending_loan.due_date"
+                  required
+                  :disabled="readOnly"
+                />
+              </div>
+              <div class="form-group" v-if="canManage">
+                <label>Date retour:</label
+                ><input
+                  class="form-control"
+                  type="date"
+                  v-model="pending_loan.return_date"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Commentaire :</label
+                ><textarea
+                  class="form-control"
+                  v-model="pending_loan.comments"
+                  :disabled="readOnly"
+                ></textarea>
+              </div>
+              <p class="text-danger" v-show="emptyLoan">
+                Votre prêt doit contenir au moins un matériel. Pour un material
+                spécific veuillez choisir une instance
+              </p>
+              <ul class="text-danger" v-show="errors.length != 0">
+                <li v-for="error in errors" :key="error" v-text="error"></li>
+              </ul>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr class="d-flex">
+                      <th class="col-7">Matériels</th>
+                      <th class="col-4">Quantité</th>
+                      <th class="col-1"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="d-flex"
+                      v-for="item in pending_loan.generic_materials"
+                      :key="'g' + item.material"
+                    >
+                      <td class="col-7">
+                        {{ gmById(item.material) | field("name") }}
+                      </td>
+                      <td class="col-4">
+                        <input
+                          type="number"
+                          class="form-control form-control"
+                          v-model="item.quantity"
+                          :disabled="readOnly"
+                        />
+                      </td>
+                      <td class="col-1">
+                        <button
+                          v-if="!readOnly"
+                          class="btn btn-primary"
+                          type="button"
+                          @click="removeMaterial(gmById(item.material))"
+                        >
+                          X
+                        </button>
+                      </td>
+                    </tr>
+                    <tr
+                      class="d-flex"
+                      v-for="item in pending_loan.models"
+                      :key="'s' + item"
+                    >
+                      <td class="col-7">{{ smById(item) | field("name") }}</td>
+                      <td class="col-4">
+                        <DynList
+                          :ressource="specificinstances[item]"
+                          v-model="pending_loan.specific_materials"
+                          :readonly="readOnly"
+                        ></DynList>
+                      </td>
+                      <td class="col-1">
+                        <button
+                          v-if="!readOnly"
+                          class="btn btn-primary"
+                          type="button"
+                          @click="removeMaterial(smById(item))"
+                        >
+                          X
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div role="group" class="btn-group">
+                <button class="btn btn-primary" type="submit" v-if="!readOnly">
+                  {{ updateMode ? "Modifier" : "Envoyer la demande" }}
+                </button>
+                <button
+                  v-if="!updateMode"
+                  class="btn btn-danger"
+                  type="button"
+                  @click="cleanMaterials"
+                >
+                  Vider
+                </button>
+                <button
+                  v-if="updateMode"
+                  class="btn btn-danger"
+                  type="button"
+                  @click="newLoan"
+                >
+                  Nouveau prêt
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Vue from "vue";
+import { mapGetters, mapMutations } from "vuex";
+import DynList from "@/components/DynList";
+import InputDatalist from "@/components/InputDatalist";
+export default {
+  name: "Loan",
+  components: {
+    DynList,
+    InputDatalist
+  },
+  data() {
+    return {
+      specificinstances: {},
+      loaded: false,
+      errors: []
+    };
+  },
+  computed: {
+    ...mapGetters({
+      genericmaterials: "genericmaterials/list",
+      gmById: "genericmaterials/byId",
+      specificmaterials: "specificmaterials/list",
+      smById: "specificmaterials/byId",
+      entityById: "entities/byId",
+      authUser: "authUser",
+      isAdmin: "isAdmin",
+      pending_loan: "loans/pending_loan",
+      status: "loans/status"
+    }),
+    emptyLoan() {
+      return (
+        this.pending_loan.generic_materials.length == 0 &&
+        this.pending_loan.specific_materials.length == 0
+      );
+    },
+    canManage() {
+      return (
+        this.isAdmin ||
+        this.authUser.entities.indexOf(this.pending_loan.entity) > -1
+      );
+    },
+    updateMode() {
+      return "id" in this.pending_loan;
+    },
+    readOnly() {
+      return (
+        !this.canManage &&
+        (this.pending_loan.status == 3 || this.pending_loan.status == 4)
+      );
+    },
+    title() {
+      return this.readOnly
+        ? "Consulter prêt"
+        : this.updateMode
+        ? "Modification prêt"
+        : "Nouveau prêt";
+    }
+  },
+  watch: {
+    pending_loan: {
+      handler() {
+        this.$store.commit("loans/savePending");
+      },
+      deep: true
+    }
+  },
+  methods: {
+    ...mapMutations({
+      removeMaterial: "loans/removeMaterial"
+    }),
+    initInstances(item) {
+      return this.$store
+        .dispatch("specificmaterials/instances/fetchList", {
+          prefix: "specificmaterials/" + item + "/"
+        })
+        .then(data => {
+          Vue.set(this.specificinstances, item, data);
+        });
+    },
+    submitLoan(e) {
+      e.preventDefault();
+      if (!this.emptyLoan) {
+        if (this.pending_loan.return_date == "")
+          this.pending_loan.return_date = null;
+        if (this.updateMode) {
+          this.$store
+            .dispatch("loans/update", {
+              data: this.pending_loan,
+              id: this.pending_loan.id
+            })
+            .then(data => {
+              this.$store.commit("loans/setPending", data);
+              this.$bvModal.msgBoxOk("Le prêt a été modifié");
+              this.errors = [];
+            })
+            .catch(e => {
+              if ("non_field_errors" in e.response.data) {
+                this.errors = e.response.data.non_field_errors;
+              }
+              console.log(e.response);
+            });
+        } else {
+          if (this.pending_loan.user == null) {
+            this.pending_loan.user = this.authUser.id;
+          }
+          this.$store
+            .dispatch("loans/create", { data: this.pending_loan })
+            .then(data => {
+              this.$store.commit("loans/setPending", data);
+              this.$bvModal.msgBoxOk("La demande a été envoyée");
+              this.errors = [];
+            })
+            .catch(e => {
+              if ("non_field_errors" in e.response.data) {
+                this.errors = e.response.data.non_field_errors;
+              }
+              console.log(e.response);
+            });
+        }
+      }
+    },
+    cleanMaterials() {
+      this.$store.commit("loans/cleanMaterials");
+    },
+    newLoan() {
+      this.$store.commit("loans/resetPending");
+    },
+    makeUserLabel(item) {
+      return item.username;
+    }
+  },
+  beforeMount() {
+    var pall = [];
+    pall.push(this.$store.dispatch("specificmaterials/fetchList"));
+    pall.push(this.$store.dispatch("genericmaterials/fetchList"));
+    pall.push(this.$store.dispatch("entities/fetchList"));
+    pall.push(this.$store.dispatch("loans/fetchStatus"));
+    this.pending_loan.models.forEach(item => {
+      pall.push(this.initInstances(item));
+    });
+    Promise.all(pall).then(() => {
+      this.loaded = true;
+    });
+  }
+};
+</script>

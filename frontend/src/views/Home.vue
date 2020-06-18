@@ -1,18 +1,12 @@
 <template>
-  <div class="home">
-    <hr />
-    <h4 class="text-center font-weight-bold">Réservation</h4>
-  </div>
+  <div class="home"></div>
 </template>
 
 <script>
+// @ is an alias to /src
 
 export default {
-  name: 'Home',
-
-  components: {
-
-  }
-
-}
+  name: "Home",
+  components: {}
+};
 </script>

@@ -2,8 +2,9 @@ django
 gunicorn
 django-rest-framework
 django-bootstrap3==12.0.3
+drf-nested-routers
 psycopg2-binary
-psycopg2
+#psycopg2
 django-filter==2.2.0
 django-cors-headers
 django-cas-ng

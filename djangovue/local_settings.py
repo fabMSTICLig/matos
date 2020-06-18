@@ -5,14 +5,6 @@ DEBUG=True
 
 # Web acces protections
 ALLOWED_HOSTS = ['localhost']
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:8080',
-    'http://localhost:8081'
-]
-CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://localhost:8080',
-    'http://localhost:8081'
-]
 
 CSRF_COOKIE_DOMAIN="localhost"
 

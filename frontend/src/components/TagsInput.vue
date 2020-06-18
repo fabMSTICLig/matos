@@ -1,0 +1,117 @@
+<template>
+  <ul class="list-group list-group-horizontal d-flew flex-wrap">
+    <li
+      class="list-group-item border rounded"
+      v-for="item in objects_filtered"
+      :key="item.id"
+    >
+      <span> {{ item.name }}</span>
+      <button
+        type="button"
+        class="btn btn-danger btn-sm"
+        v-on:click="removeTag(item)"
+      >
+        X
+      </button>
+    </li>
+    <input
+      type="text"
+      class="list-group-item border rounded"
+      :list="_uid"
+      v-model="input_value"
+      placeholder="Ajouter"
+      @keyup.enter="addTag"
+    />
+    <datalist :id="_uid" v-if="activeDset">
+      <option
+        v-for="item in objects_datalist"
+        :key="item.id"
+        :value="item.name"
+        v-text="item.name"
+      ></option>
+    </datalist>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "TagsInput",
+  props: {
+    ressource: {
+      type: String,
+      required: true
+    },
+    object: {
+      type: Object,
+      required: true
+    },
+    fieldName: {
+      type: String,
+      required: true
+    },
+    forbidAdd: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      input_value: "",
+      activeDset: true
+    };
+  },
+  computed: {
+    objects_list() {
+      return this.$store.getters[this.ressource + "/list"];
+    },
+    objects_filtered() {
+      return this.objects_list.filter(item => {
+        return this.object[this.fieldName].includes(item.id);
+      });
+    },
+    objects_datalist() {
+      return this.objects_list.filter(item => {
+        return !this.object[this.fieldName].includes(item.id);
+      });
+    }
+  },
+  methods: {
+    addTag() {
+      if (this.input_value == "") return;
+      var tag = this.objects_datalist.find(
+        item => item.name == this.input_value
+      );
+      if (tag) {
+        this.object[this.fieldName].push(tag.id);
+        this.input_value = "";
+      } else if (!this.forbidAdd) {
+        tag = this.objects_filtered.find(item => item.name == this.input_value);
+        if (tag) this.input_value = "";
+        else {
+          this.$store
+            .dispatch(this.ressource + "/create", {
+              data: { name: this.input_value }
+            })
+            .then(data => {
+              console.log("Tag created");
+              this.object[this.fieldName].push(data.id);
+              this.input_value = "";
+            })
+            .catch(error => {
+              console.log(JSON.stringify(error));
+            });
+        }
+      }
+    },
+    removeTag(tag) {
+      var index = this.object[this.fieldName].indexOf(tag.id);
+      if (index > -1) {
+        this.object[this.fieldName].splice(index, 1);
+      }
+    }
+  },
+  beforeMount() {
+    this.$store.dispatch(this.ressource + "/fetchList");
+  }
+};
+</script>
