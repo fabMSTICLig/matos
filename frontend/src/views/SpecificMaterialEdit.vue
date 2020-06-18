@@ -107,7 +107,7 @@
                 <ul class="list-group">
                   <li
                     class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                    v-for="item in objects_list"
+                    v-for="item in objects_paginated"
                     :key="item.id"
                     v-on:click="selectObject(item)"
                     :class="{
@@ -126,6 +126,13 @@
                     </button>
                   </li>
                 </ul>
+                <pagination
+                  :total-pages="pages_count"
+                  :total="objects_list.length"
+                  :per-page="10"
+                  :current-page="current_page"
+                  @pagechanged="onPageChange"
+                />
               </fieldset>
             </div>
             <div
@@ -176,12 +183,14 @@
 
 <script>
 import { EditMixin } from "@/common/mixins";
+import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
 export default {
   name: "SpecificMaterialEdit",
   mixins: [EditMixin],
   components: {
-    TagsInput
+    TagsInput,
+    Pagination
   },
   data() {
     return {
@@ -189,6 +198,7 @@ export default {
       new_label: "Nouvel Matériel Spécifique",
       object_name: "Matériel",
       selected_object: null,
+      current_page: 1,
       new_object_name: ""
     };
   },
@@ -207,6 +217,18 @@ export default {
         this.$route.params.matid +
         "/"
       );
+    },
+    objects_paginated() {
+      return this.objects_list.slice(
+        (this.current_page - 1) * process.env.VUE_APP_MAXLIST,
+        this.current_page * process.env.VUE_APP_MAXLIST
+      );
+    },
+    pages_count() {
+      return Math.ceil(this.objects_list.length / process.env.VUE_APP_MAXLIST);
+    },
+    per_page() {
+      return parseInt(process.env.VUE_APP_MAXLIST);
     }
   },
   methods: {
@@ -238,6 +260,9 @@ export default {
             }
           });
       }
+    },
+    onPageChange(page) {
+      this.current_page = page;
     },
     removeObject(item) {
       this.$store

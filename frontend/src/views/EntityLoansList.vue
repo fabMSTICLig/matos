@@ -178,12 +178,14 @@ export default {
           return item.entity == this.$route.params.entityid;
         })
         .filter(item => {
-            var user = this.userById(item.user)
-            if(user)
-              return user
-                .username.toLowerCase()
+          var user = this.userById(item.user);
+          if (user)
+            return (
+              user.username
+                .toLowerCase()
                 .indexOf(this.search_input.toLowerCase()) > -1
-            else return true
+            );
+          else return true;
         });
       return filtered.sort((a, b) => {
         if (a.return_date && !b.return_date) return 1;
@@ -204,8 +206,10 @@ export default {
       this.$router.push({ name: "loan" });
     },
     destroyLoan(item) {
-      this.$bvModal.msgBoxConfirm("Voulez vous vraiment supprimer ce prêt ?").then((value)=>{
-            if(value)this.$store.dispatch("loans/destroy", {'id':item.id});
+      this.$bvModal
+        .msgBoxConfirm("Voulez vous vraiment supprimer ce prêt ?")
+        .then(value => {
+          if (value) this.$store.dispatch("loans/destroy", { id: item.id });
         });
     }
   },
