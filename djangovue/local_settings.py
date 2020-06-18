@@ -20,17 +20,17 @@ CAS_VERSION = '3'
 
 # Email settings
 # https://docs.djangoproject.com/en/2.2/topics/email/
-EMAIL_HOST = 'smtp.mail.fr'
+EMAIL_HOST = 'smtp.webmail.fr'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'USERMAIL'
-EMAIL_HOST_PASSWORD = 'PASSWORD'
+EMAIL_HOST_USER = 'mail@provider.fr'
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT=10
 # FacManager Email settings
 # Email which sends notification mails
-EMAIL_SENDER = 'USERMAIL'
+EMAIL_SENDER = 'mail@provider.fr'
 # Emails which received notification mails
-EMAIL_ADMIN = ['USERMAIL',]
+EMAIL_ADMIN = ['mail@provider.fr',]
 
 if DEBUG == True:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
