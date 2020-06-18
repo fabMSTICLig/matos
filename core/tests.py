@@ -470,13 +470,22 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         self.assertEquals(response.data['status'], 1)
 
+    def test_empty_loan(self):
+        """
+            un prêt doit contenir au moins un matériel
+        """
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan2.pk }), data)
+        response.render()
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         
     def test_indem_adduser_loan(self):
         """
             un utilisateur ne peut modifier un prêt pour un autre utilisateur
         """
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.manager1.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [], 'generic_materials': [] }
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.manager1.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}] }
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan2.pk }), data)
         response.render()
@@ -491,7 +500,6 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
         response.render()
-        print(response.data)
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)     
 
     def test_manager_manage_loan(self):
@@ -553,14 +561,14 @@ class LoanMaterialsTests(APITestCase):
         self.assertIsNone(response.data['parent'])
     
     def test_protected_loan_return_date(self):    
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': []}
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}]}
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
         response.render()
         self.assertEquals(response.data['return_date'], "2020-08-24")
     
     def test_protected_loan_parent(self):    
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [],  'parent': self.loan_manager.pk}
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}],  'parent': self.loan_manager.pk}
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
         response.render()
