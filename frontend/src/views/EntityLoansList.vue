@@ -76,6 +76,13 @@
               >
                 Modifier
               </button>
+              <button
+                class="btn btn-danger"
+                role="button"
+                @click="destroyLoan(selected_object)"
+              >
+                Supprimer
+              </button>
             </div>
           </div>
           <div class="card-body">
@@ -171,11 +178,12 @@ export default {
           return item.entity == this.$route.params.entityid;
         })
         .filter(item => {
-          return (
-            this.userById(item.user)
-              .username.toLowerCase()
-              .indexOf(this.search_input.toLowerCase()) > -1
-          );
+            var user = this.userById(item.user)
+            if(user)
+              return user
+                .username.toLowerCase()
+                .indexOf(this.search_input.toLowerCase()) > -1
+            else return true
         });
       return filtered.sort((a, b) => {
         if (a.return_date && !b.return_date) return 1;
@@ -191,9 +199,14 @@ export default {
     initComponent() {
       return this.$store.dispatch("loans/fetchStatus");
     },
-    editLoan(item) {
-      this.$store.commit("loans/setPending", item);
+    editLoan(loan) {
+      this.$store.commit("loans/setPending", loan);
       this.$router.push({ name: "loan" });
+    },
+    destroyLoan(item) {
+      this.$bvModal.msgBoxConfirm("Voulez vous vraiment supprimer ce prêt ?").then((value)=>{
+            if(value)this.$store.dispatch("loans/destroy", {'id':item.id});
+        });
     }
   },
   beforeMount() {
