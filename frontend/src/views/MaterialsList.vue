@@ -3,7 +3,25 @@
     <div class="col-12 col-md-6">
       <div class="card">
         <div class="card-header">
-          <input v-model="search_input" type="search" placeholder="Search" />
+          <div class="form form-inline float-left">
+            <div class="form-group mr-2">
+              <input
+                class="form-control"
+                v-model="search_input"
+                type="search"
+                placeholder="Search"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="mr-1">Type :</label>
+              <select class="form-control" v-model="type_input">
+                <option value="1">Les deux</option>
+                <option value="2">Generique</option>
+                <option value="3">Specifique</option>
+              </select>
+            </div>
+          </div>
 
           <b-dropdown class="float-right" variant="primary" text="Ajouter">
             <b-dropdown-item
@@ -108,6 +126,7 @@ export default {
   },
   data() {
     return {
+      type_input: 1,
       search_fields: ["name"],
       ressource: "entities/genericMaterials"
     };
@@ -117,13 +136,21 @@ export default {
       return "entities/" + this.$route.params.entityid + "/";
     },
     objects_list() {
-      return this.$store.getters["entities/genericMaterials/list"]
-        .concat(this.$store.getters["entities/specificMaterials/list"])
-        .sort((a, b) => {
-          if (a.name > b.name) return -1;
-          if (a.name < b.name) return 1;
-          return 0;
-        });
+      if (this.type_input == 2)
+        return this.$store.getters["entities/genericMaterials/list"];
+      else if (this.type_input == 3)
+        return this.$store.getters["entities/specificMaterials/list"];
+      else {
+        if (this.$store.getters["entities/specificMaterials/list"])
+          return this.$store.getters["entities/genericMaterials/list"]
+            .concat(this.$store.getters["entities/specificMaterials/list"])
+            .sort((a, b) => {
+              if (a.name > b.name) return -1;
+              if (a.name < b.name) return 1;
+              return 0;
+            });
+        else return [];
+      }
     },
     isGeneric() {
       return "quantity" in this.selected_object;

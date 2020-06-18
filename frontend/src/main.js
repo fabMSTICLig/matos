@@ -13,7 +13,7 @@ Vue.use(IconsPlugin);
 Vue.use(DropdownPlugin);
 
 Vue.filter("field", function(value, field) {
-  if (!value || ! (field in value)) return "";
+  if (!value || !(field in value)) return "";
   return value[field];
 });
 
