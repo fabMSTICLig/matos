@@ -158,6 +158,7 @@ export default {
                 this.goodpassword = false;
                 this.$bvModal.msgBoxOk("Mot de passe incorrect");
               }
+              // eslint-disable-next-line
               console.log(e.response);
             });
         } else {
@@ -169,6 +170,7 @@ export default {
     },
     updateUser() {
       this.$store.dispatch(UPDATE_AUTHUSER, this.authUser).then(() => {
+        // eslint-disable-next-line
         console.log("Profile updated");
         this.$bvModal.msgBoxOk("Profile mis à jour");
       });

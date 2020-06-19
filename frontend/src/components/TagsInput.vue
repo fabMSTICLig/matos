@@ -93,11 +93,13 @@ export default {
               data: { name: this.input_value }
             })
             .then(data => {
+              // eslint-disable-next-line
               console.log("Tag created");
               this.object[this.fieldName].push(data.id);
               this.input_value = "";
             })
             .catch(error => {
+              // eslint-disable-next-line
               console.log(JSON.stringify(error));
             });
         }

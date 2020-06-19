@@ -129,7 +129,7 @@
                 <pagination
                   :total-pages="pages_count"
                   :total="objects_list.length"
-                  :per-page="10"
+                  :per-page="per_page"
                   :current-page="current_page"
                   @pagechanged="onPageChange"
                 />
@@ -195,7 +195,7 @@ export default {
   data() {
     return {
       ressource: "entities/specificMaterials",
-      new_label: "Nouvel Matériel Spécifique",
+      new_label: "Nouveau Matériel Spécifique",
       object_name: "Matériel",
       selected_object: null,
       current_page: 1,

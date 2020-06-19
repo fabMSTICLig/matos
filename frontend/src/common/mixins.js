@@ -128,6 +128,7 @@ export const EditMixin = {
           })
           .then(data => {
             this.object = Object.assign({}, data);
+            // eslint-disable-next-line
             console.log(this.object_name + " updated");
             this.$bvModal.msgBoxOk(this.object_name + " updated");
           });
@@ -143,6 +144,7 @@ export const EditMixin = {
             prefix: this.prefix
           })
           .then(data => {
+            // eslint-disable-next-line
             console.log(this.object_name + " created");
             this.$bvModal.msgBoxOk(this.object_name + " created");
             var params = this.$route.params;
@@ -153,6 +155,7 @@ export const EditMixin = {
             });
           })
           .catch(error => {
+            // eslint-disable-next-line
             console.log(JSON.stringify(error));
           });
       } else {

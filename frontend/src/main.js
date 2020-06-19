@@ -2,14 +2,12 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import { BootstrapVue, IconsPlugin, DropdownPlugin } from "bootstrap-vue";
+import { BootstrapVue, DropdownPlugin } from "bootstrap-vue";
 import { CHECK_AUTH } from "./store/actions.type";
 import ApiService from "./common/api.service";
 
 Vue.config.productionTip = false;
-
 Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
 Vue.use(DropdownPlugin);
 
 Vue.filter("field", function(value, field) {

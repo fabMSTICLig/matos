@@ -289,6 +289,7 @@ export default {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
               }
+              // eslint-disable-next-line
               console.log(e.response);
             });
         } else {
@@ -306,6 +307,7 @@ export default {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
               }
+              // eslint-disable-next-line
               console.log(e.response);
             });
         }
