@@ -522,7 +522,7 @@ class LoanMaterialsTests(APITestCase):
         """
             un prêt ne peut être modifié si il a le status accepté
         """
-        #modifier serializer pour verifier le status du model enregistré
+        #modifier serializer pour sortir l'erreur avant celle des dates
         data = {"status" : 3, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,14), "return_date" : datetime.date(2020,10,14), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
