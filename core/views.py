@@ -342,11 +342,11 @@ class LoanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
-            if serializer.validated_data['status'] != Loan.Status.PENDING and serializer.validated_data['status'] != Loan.Status.REQUESTED:
+            if (serializer.validated_data['status'] != int(Loan.Status.PENDING) and serializer.validated_data['status'] != int(Loan.Status.REQUESTED)) or instance.status == Loan.Status.ACCEPTED :
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})
-            request.data.update({'parent':instance.parent.id if instance.parent else instance.parent})
+            request.data.update({'parent':instance.parent.id if instance.parent else instance.parent})     
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
