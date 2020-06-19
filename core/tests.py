@@ -12,7 +12,7 @@ from rest_framework import status
 from django.core.exceptions import ValidationError
 from django.core import serializers
 import json
-from collections import OrderedDict 
+from collections import OrderedDict
 
 class EntitiesTests(APITestCase):
 
@@ -60,7 +60,7 @@ class EntitiesTests(APITestCase):
         response = view(request, pk=self.lig_entity.pk)
         response.render()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-   
+
     def test_add_entity(self):
         """
         Ensure we can create a new entity object.
@@ -85,26 +85,26 @@ class EntitiesTests(APITestCase):
         response.render()
         data = response.data
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-    
-    
+
+
     def test_add_manager(self):
         """
         Test de l'ajout d'un manager par un admin
         """
         data = { 'managers' : [self.manager2.pk]}
-        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
+        view = EntityViewSet.as_view(actions={'patch': 'partial_update'})
         request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
         force_authenticate(request, user=self.superuser)
         response = view(request, pk=self.lig_entity.pk)
         response.render()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_user_cant_update_entity(self):
         """
         Vérification qu'un utilisateur non manager ne peut modifier une entité
         """
         data = { 'name' : 'nouvelle entité'}
-        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
+        view = EntityViewSet.as_view(actions={'patch': 'partial_update'})
         request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
         force_authenticate(request, user=self.manager2)
         response = view(request, pk=self.lig_entity.pk)
@@ -115,8 +115,8 @@ class EntitiesTests(APITestCase):
         """
         Vérification qu'un utilisateur non manager ne peut modifier une entité
         """
-        data =  { 'name' : 'Ginova', 'description' : ' Une plateforme en libre accès pour expérimenter', 'contact': 'alain-di-donato@grenoble-inp.fr' } 
-        view = EntityViewSet.as_view(actions={'post': 'create'}) 
+        data =  { 'name' : 'Ginova', 'description' : ' Une plateforme en libre accès pour expérimenter', 'contact': 'alain-di-donato@grenoble-inp.fr' }
+        view = EntityViewSet.as_view(actions={'post': 'create'})
         request = self.apiFactory.post(reverse('entity-list'),data)
         force_authenticate(request, user=self.manager1)
         response = view(request)
@@ -127,8 +127,8 @@ class EntitiesTests(APITestCase):
         """
         Vérification qu'un manager d'une entité peut rajouter un manager
         """
-        data =  { 'managers' : [1, 2] } 
-        view = EntityViewSet.as_view(actions={'patch': 'partial_update'}) 
+        data =  { 'managers' : [1, 2] }
+        view = EntityViewSet.as_view(actions={'patch': 'partial_update'})
         request = self.apiFactory.patch(reverse('entity-detail', args=(1, 'pk')),data)
         force_authenticate(request, user=self.manager1)
         response = view(request, pk=self.lig_entity.pk)
@@ -148,13 +148,13 @@ class UsersTests(APITestCase):
         self.apiFactory = self.api_factory()
         self.user = get_user_model().objects.create(username='etudiant1', first_name='etudiant1', email='etudiant@gem-univ-grenoble.fr', password='etudiant1')
         self.user2 = get_user_model().objects.create(username='ensiinfo1', first_name='michel', email='support@ensimag-info.fr', password='matriochka')
-        self.affiliation2 = Affiliation.objects.create(name="Grenoble INP", type="Ecole")       
+        self.affiliation2 = Affiliation.objects.create(name="Grenoble INP", type="Ecole")
         self.user2.affiliations.add(self.affiliation2)
         self.user2.save()
         self.affiliation = Affiliation.objects.create(name='cnrs', type='Recherche' )
-        self.view = UserViewSet.as_view(actions={'patch': 'partial_update'}) 
+        self.view = UserViewSet.as_view(actions={'patch': 'partial_update'})
         self.rgpd_accept_date = datetime.date(2020,6,24)
-        self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr') 
+        self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr')
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
 
     def test_update_self_affiliations(self):
@@ -164,7 +164,7 @@ class UsersTests(APITestCase):
         response = self.view(request, pk=self.user.id)
         response.render()
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-         
+
     def test_not_update_user_affiliation(self):
         """
         Test de la protection de l'affiliation d'un autre utilisateur
@@ -187,8 +187,8 @@ class UsersTests(APITestCase):
         response = self.view(request, pk=self.user.id)
         response.render()
         self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
-      
-   
+
+
 
 class AffiliationsTests(APITestCase):
 
@@ -200,7 +200,7 @@ class AffiliationsTests(APITestCase):
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
         self.affiliation = Affiliation.objects.create(name='Grenoble INP', type='Ecole')
         self.user =  get_user_model().objects.create(username="max", first_name="max", email='max@univ-grenoble.fr', password='1ngF@b')
-   
+
     def test_affiliation_add(self):
         data = { 'name': 'CNRS', 'type': 'Recherche' }
         view = AffiliationViewSet.as_view(actions={'post': 'create'})
@@ -209,7 +209,7 @@ class AffiliationsTests(APITestCase):
         response = view(request)
         response.render()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    
+
     def test_affiliation_update(self):
         data = { 'name' : 'UGA' }
         view = AffiliationViewSet.as_view(actions={'patch': 'partial_update'})
@@ -227,7 +227,7 @@ class AffiliationsTests(APITestCase):
         response = view(request, pk=self.user.pk)
         response.render()
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_user_cant_add_affiliation(self):
         data = { 'name' : 'Inria Grenoble', 'type':'Recherche' }
         view = AffiliationViewSet.as_view(actions={'post': 'create'})
@@ -244,7 +244,7 @@ class GenericMaterialsTests(APITestCase):
         #ajout de managers
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
-        
+
         self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
         self.entity.managers.add(self.manager1)
@@ -259,9 +259,9 @@ class GenericMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(reverse('genericmaterials-list', kwargs={'entity_pk': 1}))
         response.render()
-        # OK 
+        # OK
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
-    
+
     def test_modify_material(self):
         """
         Test de la modification d'un équipement par un manager
@@ -270,7 +270,7 @@ class GenericMaterialsTests(APITestCase):
         data = {'name':'Série SC-1608'}
         response = self.client.patch(reverse('genericmaterials-detail', kwargs={'entity_pk':1, 'pk' : 1}), data)
         response.render()
-        # OK 
+        # OK
         self.assertEquals(response.status_code,status.HTTP_200_OK)
 
     def test_add_material(self):
@@ -301,12 +301,12 @@ class GenericMaterialsTests(APITestCase):
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
 
 class SpecificMaterialsTests(APITestCase):
-    
+
     def setUp(self):
         #ajout de managers
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
-        
+
         self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
         self.entity.managers.add(self.manager1)
@@ -323,8 +323,8 @@ class SpecificMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         data = serializers.serialize('json', [ self.materials_specific, ])
         struct = json.loads(data)
-        material = struct[0]['fields'] 
-        material["instances"] = [self.materials_specific_instance.pk]
+        material = struct[0]['fields']
+        material['instances']=[self.materials_specific_instance.pk]
         response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), material)
         response.render()
         # OK
@@ -358,7 +358,7 @@ class SpecificMaterialsTests(APITestCase):
         response.render()
         # OK
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
-    
+
     def test_not_add_instance_material(self):
         """
         Test de la protection d'ajout d'une instance de matériel spécifique par un utilisateur non manager
@@ -371,7 +371,7 @@ class SpecificMaterialsTests(APITestCase):
         response.render()
         # OK
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
-    
+
     def test_not_update_instance_material(self):
         """
         Test de la protection d'ajout d'une instance de matériel spécifique par un utilisateur non manager
@@ -395,12 +395,15 @@ class LoanMaterialsTests(APITestCase):
         self.materials_specific = SpecificMaterial.objects.create(name="Zybo ARM/FPGA SoC",ref_int="410-279-RET-PHELMA1",ref_man="410-279-RET",localisation="Etagere 2 - box 4",description="Plateforme programmable FPGA",entity=self.entity)
         self.materials_specific_instance = SpecificMaterialInstance.objects.create(model=self.materials_specific, name="carte ARM/FPGA Soc 1", serial_num="002234", description='instance carte FPGA Phelma' )
         self.materials_generic = GenericMaterial.objects.create(name="Module RF433,",ref_int="MHZRF433",ref_man="SparkFunMZ433",localisation="FabMSTIC",description="Module radio 433MHZ",quantity="20",entity=self.entity)
-        self.materials_specific2 = SpecificMaterial.objects.create(name="Epson projector EBS31 RM1250,",ref_int="EBS31-RM1250_ensag",ref_man="EBS31-RM1250",localisation="perForm - salle matériels video - 1er etage",description="Besoin d'un adaptateur screenbeam pour fonctionner",entity=self.entity)        
+        self.materials_specific2 = SpecificMaterial.objects.create(name="Epson projector EBS31 RM1250,",ref_int="EBS31-RM1250_ensag",ref_man="EBS31-RM1250",localisation="perForm - salle matériels video - 1er etage",description="Besoin d'un adaptateur screenbeam pour fonctionner",entity=self.entity)
         self.materials_specific_instance2 = SpecificMaterialInstance.objects.create(model=self.materials_specific2, name="Epson projector EBS31 RM1250", serial_num="002234", description='instance Epson projector EBS31 RM1250 Ensag' )
         self.loan = Loan.objects.create(status=3, checkout_date = datetime.date(2020,6,8), user=self.user,entity=self.entity, due_date=datetime.date(2020,6,24), return_date=datetime.date(2020,6,24), comments='demande de prêt cours arts visuel')
         self.loan.specific_materials.add(self.materials_specific_instance)
         self.loan.save()
-      
+
+        self.loan2 = Loan.objects.create(status=1, checkout_date = datetime.date(2020,6,8), user=self.user,entity=self.entity, due_date=datetime.date(2020,6,24), return_date=datetime.date(2020,6,24), comments='demande de prêt cartes STM32 cours info/iot master ensimag')
+        self.loan2.save()
+
         self.entity2 = Entity.objects.create(name="UGA", description="Univ Grenoble Alpes",contact="contact@univ-grenoble.alpes.fr")
         self.entity2.managers.add(self.user)
         self.entity2.save()
@@ -414,11 +417,11 @@ class LoanMaterialsTests(APITestCase):
         self.loan_user_accepted.specific_materials.add(self.materials_specific_instance)
         self.loan_user_accepted.save()
         self.client = APIClient()
-    
+
     def test_return_date(self):
         """
            date de retour et date de rendu doivent être après la date de sortie
-        """   
+        """
         data = {"status" : 3, "checkout_date" : datetime.date(2020,10,8), "user" : self.user.pk , "entity" : 1, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': 1}), data)
@@ -437,14 +440,14 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.get(reverse('specificmaterials-list', kwargs={'entity_pk': self.entity.pk}), format='json')
         response.render()
-       
+
         try:
             data = serializers.serialize('json', [ self.materials_specific, ])
             struct = json.loads(data)
         except json.decoder.JSONDecodeError:
             logger.exception('Error when parsing JSON, raw data was ' + str(raw_data))
             raise ExternalAPIException('Unable to do my work! Invalid JSON data returned.')
-        
+
         for key, value in enumerate(struct):
             if not 'instances' in value['fields']:
                 self.assertEquals(value['fields']['entity'], self.entity.pk)
@@ -471,18 +474,18 @@ class LoanMaterialsTests(APITestCase):
         print(response.status_code)
         self.assertEquals(response.data['status'], 1)
 
-
-    def test_indem_user_loan(self):
-       
+    def test_empty_loan(self):
         """
-            un utilisateur ne peut créer de prêts pour un autre utilisateur
+            un prêt doit contenir au moins un matériel
         """
-        data = {"status" : 3, "checkout_date" : datetime.date(2020,6,25), "user" : self.manager1.pk , "entity" : 1, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,7,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
-        response = self.client.post(reverse('loan-list'), data, format='json')
+        response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan2.pk }), data)
         response.render()
-        self.assertEquals(response.data['user'], self.user.pk)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
+    def test_indem_adduser_loan(self):
         """
             un utilisateur ne peut modifier un prêt pour un autre utilisateur
         """
@@ -491,11 +494,11 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
         response.render()
         self.assertEquals(response.data['user'], self.user.pk)
-        
+
     def test_update_loan_accepted(self):
         """
             un prêt accepté ne peut être modifié par un utilisateur sans droits
-        """    
+        """
         data = {"status" : 2, "id": self.loan.pk , "checkout_date" : datetime.date(2020,6,9), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,25), "comments" : 'modification prêt accepté', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk }), data)
@@ -511,14 +514,25 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk }), data, format='json')
         response.render()
-        self.assertEquals(response.data['user'], self.user.pk)    
-        self.assertEquals(response.data['status'], 1)   
-  
+        self.assertEquals(response.data['user'], self.user.pk)
+        self.assertEquals(response.data['status'], 1)
+
+
+    def test_indem_update_accepted_loan(self):
+        """
+            un prêt ne peut être modifié si il a le status accepté
+        """
+        #modifier serializer pour verifier le status du model enregistré
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,14), "return_date" : datetime.date(2020,10,14), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
+        response.render()        
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_manager_manage_loan(self):
         """
             le manager d'une entité peut créer un prêt rattaché à cette entité pour une autre personne
-        """  
+        """
         data = {"status" : 2, "id": self.loan.pk ,"checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.manager1)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk }), data, format='json')
@@ -528,31 +542,30 @@ class LoanMaterialsTests(APITestCase):
     def test_own_user_loans(self):
         """
             un utilisateur ne peut voir uniquement les prêts qui lui sont rattachés
-        """  
-       
+        """
+
         self.client.force_authenticate(user=self.user)
         response = self.client.get(reverse('loan-list'), format='json')
         response.render()
-        self.assertEquals(len(response.data), 3)
-        
+        self.assertEquals(len(response.data), 4)
+
     def test_own_manager_loans(self):
         """
             le manager d'une entité peut crée/modifier/supprimer les prêts ratachés à son entité
-        """  
-      
+        """
+
         data = {"status" : 2, "id": self.loan.pk, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk, self.materials_specific_instance2.pk], 'generic_materials': [{"material": 1, "quantity": 10}] }
         self.client.force_authenticate(user=self.manager1)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk }), data, format='json')
         response.render()
         self.assertEquals(response.status_code,status.HTTP_200_OK)
 
-        data = {"status" : 2, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,6,24), "comments" : 'prêt n°2 ', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [{"material": 1, "quantity": 10}] }
+        data = {"status" : 2, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,15), "return_date" : datetime.date(2020,10,16), "comments" : 'prêt n°2 ', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [{"material": 1, "quantity": 10}] }
         self.client.force_authenticate(user=self.manager1)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
-    
+
     def test_child_loan(self):
         """
             Seul un manager peut créer un prêt enfant d'un autre pret
@@ -563,31 +576,31 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.post(reverse('loan-list'), data)
         response.render()
         self.assertTrue(response.data['parent'])
-        self.assertEquals(response.data['parent'], self.loan_manager.pk)  
+        self.assertEquals(response.data['parent'], self.loan_manager.pk)
 
-    def test_child_loan_not_created(self):    
+    def test_child_loan_not_created(self):
         parent = self.loan.pk
         data = {"status" : 1, "checkout_date" : datetime.date(2020,7,30), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,8,24), "return_date" : datetime.date(2020,8,25), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [ self.materials_specific_instance2.pk], 'generic_materials': [], 'parent': self.loan_manager.pk }
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-list'), data)
         response.render()
         self.assertIsNone(response.data['parent'])
-    
-    def test_protected_loan_return_date(self):    
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': []}
+
+    def test_protected_loan_return_date(self):
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}]}
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
         response.render()
         self.assertEquals(response.data['return_date'], "2020-08-24")
-    
-    def test_protected_loan_parent(self):    
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [],  'parent': self.loan_manager.pk}
+
+    def test_protected_loan_parent(self):
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}],  'parent': self.loan_manager.pk}
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
         response.render()
         self.assertEquals(response.data['parent'], self.loan.pk)
 
-    def test_protected_loan_user(self): 
+    def test_protected_loan_user(self):
         """
             un utilisateur ne peut modifier les champs, parent, return_date et
             user (transfert vers un autre utilisateur)
@@ -598,7 +611,7 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.put(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
         response.render()
         self.assertEquals(response.data['user'], 2)
-     
+
     def test_specific_material_instance(self):
         """
         un material spécifique ne peut être emprunté en meme temps
@@ -607,28 +620,27 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        
+
         data = {"status" : 2, "checkout_date" : datetime.date(2020,5,3), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,5,6), "return_date" : None, "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.manager1)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        
+
         data = {"status" : 2, "checkout_date" : datetime.date(2020,5,1), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,5,4), "return_date" : datetime.date(2020,5,5), "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
- 
+
     def test_available_specific_material(self):
         """
             Si un prêt arrive à date échue, le matériel lié peut être dans un nouveau prêt
-        """    
+        """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,4), "return_date" : datetime.date(2020,10,4), "comments" : 'demande de prêt tablettes projet Master 1 Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
         print(response.data)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-    

@@ -23,7 +23,7 @@
                   :key="item.id"
                   v-on:click="selected_object = item"
                 >
-                  <td>{{ entityById(item.entity) | field('name') }} </td>
+                  <td>{{ entityById(item.entity) | field("name") }}</td>
                   <td v-text="loan_status[item.status]"></td>
                   <td v-text="item.checkout_date"></td>
                   <td v-text="item.due_date"></td>
@@ -60,7 +60,7 @@
           <table class="table">
             <tr>
               <th scope="row">Entité</th>
-              <td>{{ entityById(selected_object.entity) | field('name') }}</td>
+              <td>{{ entityById(selected_object.entity) | field("name") }}</td>
             </tr>
 
             <tr>
@@ -93,14 +93,14 @@
               v-for="item in selected_object.models"
               :key="'s' + item"
             >
-              {{ smById(item) | field('name') }}
+              {{ smById(item) | field("name") }}
             </li>
             <li
               class="list-group-item"
               v-for="item in selected_object.generic_materials"
               :key="'g' + item.material"
             >
-              {{ gmById(item.material) | field('name') }}
+              {{ gmById(item.material) | field("name") }}
             </li>
           </ul>
         </div>

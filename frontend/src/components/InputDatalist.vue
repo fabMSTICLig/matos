@@ -52,11 +52,10 @@ export default {
 
     inputValue: {
       get() {
-        if(this.value)
-        {
-            var item = this.objects_list.find(
-                item => item.id.toString() == this.value.toString()
-            );
+        if (this.value) {
+          var item = this.objects_list.find(
+            item => item.id.toString() == this.value.toString()
+          );
         }
         if (item != undefined) {
           return this.makeLabelOrName(item);

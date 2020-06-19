@@ -23,7 +23,6 @@
               }"
               >Prêts</router-link
             >
-
           </div>
         </div>
         <div class="card-body">

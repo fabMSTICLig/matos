@@ -6,18 +6,17 @@
           <div class="card-header">
             <h4 class="float-left">{{ title }}</h4>
             <div class="btn-group float-right" role="group">
-            <router-link
-              class="btn btn-primary"
-              role="button"
-              :to="{
-                name: 'entityloans',
-                params: { entityid: pending_loan.entity }
-              }"
-              v-if="updateMode && canManage"
-              >Retour liste</router-link
-            >
-          </div>
-
+              <router-link
+                class="btn btn-primary"
+                role="button"
+                :to="{
+                  name: 'entityloans',
+                  params: { entityid: pending_loan.entity }
+                }"
+                v-if="updateMode && canManage"
+                >Retour liste</router-link
+              >
+            </div>
           </div>
           <div class="card-body">
             <form class="form" @submit="submitLoan">
@@ -113,7 +112,7 @@
                       :key="'g' + item.material"
                     >
                       <td class="col-7">
-                        {{ gmById(item.material) | field('name') }}
+                        {{ gmById(item.material) | field("name") }}
                       </td>
                       <td class="col-4">
                         <input
@@ -139,7 +138,7 @@
                       v-for="item in pending_loan.models"
                       :key="'s' + item"
                     >
-                      <td class="col-7">{{ smById(item) | field('name') }}</td>
+                      <td class="col-7">{{ smById(item) | field("name") }}</td>
                       <td class="col-4">
                         <DynList
                           :ressource="specificinstances[item]"
@@ -273,7 +272,8 @@ export default {
     submitLoan(e) {
       e.preventDefault();
       if (!this.emptyLoan) {
-        if(this.pending_loan.return_date=="")this.pending_loan.return_date=null
+        if (this.pending_loan.return_date == "")
+          this.pending_loan.return_date = null;
         if (this.updateMode) {
           this.$store
             .dispatch("loans/update", {
@@ -317,8 +317,8 @@ export default {
     newLoan() {
       this.$store.commit("loans/resetPending");
     },
-    makeUserLabel(item){
-        return item.username
+    makeUserLabel(item) {
+      return item.username;
     }
   },
   beforeMount() {

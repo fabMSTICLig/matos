@@ -320,7 +320,7 @@ const routes = [
               import(
                 /* webpackChunkName: "entityloanlist" */ "../views/EntityLoansList.vue"
               )
-          },
+          }
         ]
       }
     ]

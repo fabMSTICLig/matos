@@ -185,6 +185,8 @@ class LoanSerializer(serializers.ModelSerializer):
         #Si la date de retour est défini
         if(data['return_date'] and data['checkout_date'] > data['return_date']):
             raise serializers.ValidationError("La date de retour doit être après la date de sortie")
+        if(len(data['specific_materials']) == 0 and len(data['loangenericitem_set']) == 0):
+            raise serializers.ValidationError("Un prêt doit contenir au moins un matériel.")
         entity = data['entity']
         for mat in data['specific_materials']:
             if mat.model.entity != entity:

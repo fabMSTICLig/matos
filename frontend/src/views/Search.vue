@@ -46,7 +46,7 @@
           <div class="card-header">
             <form class="form form-inline">
               <div class="form-group">
-                <label class="mr-1" >Ordre : </label>
+                <label class="mr-1">Ordre : </label>
                 <select class="form-control" v-model="sort_input">
                   <option
                     v-for="item in sort_choices"
@@ -215,10 +215,10 @@ export default {
     this.$store.dispatch("genericmaterials/fetchList");
     this.$store.dispatch("entities/fetchList");
     //Si le prêt courant est en readonly (ajout de materiel impossible) on le reset
-    if(
-        !this.isAdmin &&
-        this.authUser.entities.indexOf(this.pending_loan.entity) == -1 &&
-        (this.pending_loan.status == 3 || this.pending_loan.status == 4)
+    if (
+      !this.isAdmin &&
+      this.authUser.entities.indexOf(this.pending_loan.entity) == -1 &&
+      (this.pending_loan.status == 3 || this.pending_loan.status == 4)
     ) {
       this.$store.commit("loans/resetPending");
     }
