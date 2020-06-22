@@ -35,6 +35,10 @@ class EntityPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and (request.user.is_staff or (request.user.is_authenticated and request.method != "POST"))
 
+class RGPDAccept(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.rgpd_accept is not None
+
 class IsManagerOf(permissions.BasePermission):
     """
     Permission used for material
