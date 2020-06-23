@@ -21,6 +21,7 @@
       v-model="input_value"
       placeholder="Ajouter"
       @keyup.enter="addTag"
+      @change="addTag"
     />
     <datalist :id="_uid" v-if="activeDset">
       <option
