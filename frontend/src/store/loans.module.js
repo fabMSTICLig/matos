@@ -20,6 +20,14 @@ const loans_extra = {
         commit("setStatus", data);
         return data;
       });
+    },
+    makeChild({ commit }, { id }) {
+      return ApiService.post("loans/" + id + "/make_child").then(({ data }) => {
+        console.log(data);
+        commit("updateSuccess", data.parent);
+        commit("createSuccess", data.child);
+        return data.child;
+      });
     }
   },
   mutations: {
@@ -50,8 +58,13 @@ const loans_extra = {
       }
     },
     setPending(state, data) {
-      state.pending_loan = data;
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+      if (data) {
+        state.pending_loan = data;
+        localStorage.setItem(
+          "pending_loan",
+          JSON.stringify(state.pending_loan)
+        );
+      }
     },
     resetPending(state) {
       state.pending_loan = {

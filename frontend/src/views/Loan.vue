@@ -125,7 +125,7 @@
                       <td class="col-1">
                         <button
                           v-if="!readOnly"
-                          class="btn btn-primary"
+                          class="btn btn-danger"
                           type="button"
                           @click="removeMaterial(gmById(item.material))"
                         >
@@ -149,7 +149,7 @@
                       <td class="col-1">
                         <button
                           v-if="!readOnly"
-                          class="btn btn-primary"
+                          class="btn btn-danger"
                           type="button"
                           @click="removeMaterial(smById(item))"
                         >
@@ -160,26 +160,79 @@
                   </tbody>
                 </table>
               </div>
-              <div role="group" class="btn-group">
-                <button class="btn btn-primary" type="submit" v-if="!readOnly">
-                  {{ updateMode ? "Modifier" : "Envoyer la demande" }}
-                </button>
-                <button
-                  v-if="!updateMode"
-                  class="btn btn-danger"
-                  type="button"
-                  @click="cleanMaterials"
-                >
-                  Vider
-                </button>
-                <button
-                  v-if="updateMode"
-                  class="btn btn-danger"
-                  type="button"
-                  @click="newLoan"
-                >
-                  Nouveau prêt
-                </button>
+              <div
+                class="form-group"
+                v-if="
+                  updateMode &&
+                    (pending_loan.child ||
+                      pending_loan.parent ||
+                      pending_loan.status == 3)
+                "
+              >
+                <label>Historique :</label>
+                <div class="">
+                  <div role="group" class="btn-group">
+                    <button
+                      v-if="updateMode && pending_loan.parent"
+                      class="btn btn-info"
+                      type="button"
+                      @click="goTo(pending_loan.parent)"
+                    >
+                      Précédent
+                    </button>
+                    <button
+                      v-if="
+                        updateMode &&
+                          canManage &&
+                          !pending_loan.child &&
+                          pending_loan.status == 3
+                      "
+                      class="btn btn-info"
+                      type="button"
+                      @click="makeChild"
+                    >
+                      Créer un successeur
+                    </button>
+                    <button
+                      v-if="updateMode && pending_loan.child"
+                      class="btn btn-info"
+                      type="button"
+                      @click="goTo(pending_loan.child)"
+                    >
+                      Suivant
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div role="group" class="btn-group">
+                  <button
+                    class="btn btn-primary float-left"
+                    type="submit"
+                    v-if="!readOnly"
+                  >
+                    {{ updateMode ? "Modifier" : "Envoyer la demande" }}
+                  </button>
+                  <button
+                    v-if="!updateMode"
+                    class="btn btn-danger"
+                    type="button"
+                    @click="cleanMaterials"
+                  >
+                    Vider
+                  </button>
+                </div>
+                <div role="group" class="btn-group float-right">
+                  <button
+                    v-if="updateMode"
+                    class="btn btn-danger"
+                    type="button"
+                    @click="newLoan"
+                  >
+                    Nouveau prêt
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -214,6 +267,7 @@ export default {
       specificmaterials: "specificmaterials/list",
       smById: "specificmaterials/byId",
       entityById: "entities/byId",
+      loanById: "loans/byId",
       authUser: "authUser",
       isAdmin: "isAdmin",
       pending_loan: "loans/pending_loan",
@@ -321,6 +375,18 @@ export default {
     },
     makeUserLabel(item) {
       return item.username;
+    },
+    goTo(id) {
+      this.$store.dispatch("loans/fetchSingle", { id: id }).then(data => {
+        this.$store.commit("loans/setPending", data);
+      });
+    },
+    makeChild() {
+      this.$store
+        .dispatch("loans/makeChild", { id: this.pending_loan.id })
+        .then(data => {
+          this.goTo(data.id);
+        });
     }
   },
   beforeMount() {

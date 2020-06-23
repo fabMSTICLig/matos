@@ -132,8 +132,8 @@ class LoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        #fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'parent', 'specific_materials', 'comments', 'generic_materials')
-        fields = '__all__'
+        fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
+        #fields = '__all__'
     def create(self, validated_data):
         # Create the book instance
         specmats=validated_data.pop('specific_materials')

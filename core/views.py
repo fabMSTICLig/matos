@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 
+import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
@@ -326,7 +327,7 @@ class LoanViewSet(viewsets.ModelViewSet):
     """
     Endpoints for loans
     """
-    queryset = Loan.objects.all()
+    queryset = Loan.objects.select_related("child")
     permission_classes = (RGPDAccept, LoanPermission,)
     serializer_class = LoanSerializer
 
@@ -382,5 +383,33 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         return Response(dict((x, y) for x, y in Loan.Status.choices), status=status.HTTP_200_OK)
 
+    @action(methods=['post'], detail=True)
+    def make_child(self, request,pk=None):
+        """
+        Create a child of the loan
+        Parent/child are used to keep an hisory for loan modification
+        """
+        loan = get_object_or_404(Loan,pk=pk)
+        if(hasattr(loan, "child")):
+            raise serializers.ValidationError("Le prêt a déjà un successeur.")
+        if(loan.status != Loan.Status.ACCEPTED):
+            raise serializers.ValidationError("Vous ne pouvez copier qu'un prêt qui a été accepté.")
+
+        if loan.return_date is None:
+            loan.return_date = timezone.now().date()
+        loan.save()
+
+        child = Loan.objects.create(user=loan.user, entity=loan.entity, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=loan, due_date=loan.due_date, checkout_date=loan.return_date)
+
+        child.specific_materials.set(loan.specific_materials.all())
+
+        mats = []
+        for mat in loan.loangenericitem_set.all():
+            mats.append(LoanGenericItem(loan=child, material=mat.material, quantity=mat.quantity))
+        LoanGenericItem.objects.bulk_create(mats)
+
+        sloan=self.get_serializer(loan)
+        schild=self.get_serializer(child)
 
 
+        return Response({"parent":sloan.data, "child":schild.data})

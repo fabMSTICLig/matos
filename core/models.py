@@ -181,7 +181,7 @@ class Loan(models.Model):
         SpecificMaterialInstance, blank=True, related_name="loans")
     generic_materials = models.ManyToManyField(
         GenericMaterial, blank=True, related_name="loans",through="LoanGenericItem")
-    parent = models.OneToOneField('Loan', null=True, blank=True, on_delete=models.SET_NULL, related_name="child")
+    parent = models.OneToOneField('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="child")
     def __str__(self):
         return self.user.username +"(" + self.checkout_date.isoformat() + ")"
 
