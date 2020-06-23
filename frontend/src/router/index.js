@@ -11,7 +11,8 @@ function requireAuth(to, from, next) {
       to.name == "profile" ||
       (store.getters.authUser.first_name &&
         store.getters.authUser.last_name &&
-        store.getters.authUser.email)
+        store.getters.authUser.email &&
+        store.getters.authUser.rgpd_accept)
     ) {
       next();
     } else {

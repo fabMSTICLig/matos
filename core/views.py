@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import datetime
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.utils import timezone
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
@@ -18,7 +18,7 @@ from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialI
 
 
 from .serializers import *
-from .permissions import EntityPermission, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
+from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
 from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -110,13 +110,30 @@ class SelfView(APIView):
         instance = UserSerializer(request.user, context={'request': request})
         return Response({"user": instance.data})
 
+class RGPDAcceptView(APIView):
+    """
+    Endpoint to accept rgpd conditions
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        if request.user.rgpd_accept is None and 'accept' in request.data:
+            if request.data['accept']:
+                request.user.rgpd_accept = timezone.now().date()
+                request.user.save()
+        return Response({"rgpd_accept": request.user.rgpd_accept})
+
+    def get(self, request, format=None):
+        return Response({"rgpd_accept": request.user.rgpd_accept})
+
+
 class EntityViewSet(viewsets.ModelViewSet):
     """
     Endpoint for the entities
     """
     queryset = Entity.objects.all()
     serializer_class = EntitySerializer
-    permission_classes = (EntityPermission,)
+    permission_classes = (RGPDAccept, EntityPermission,)
 
 class AffiliationViewSet(viewsets.ModelViewSet):
     """
@@ -124,7 +141,7 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     """
     queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (RGPDAccept, IsAdminOrReadOnly,)
 
     @action(methods=['get'], detail=False)
     def types(self, request):
@@ -138,7 +155,7 @@ class TagViewSet(viewsets.ModelViewSet):
     Endpoint for the material tags
     """
     queryset = Tag.objects.all()
-    permission_classes = (IsManagerCreateOrReadOnly,)
+    permission_classes = (RGPDAccept, IsManagerCreateOrReadOnly,)
     serializer_class = TagSerializer
 
     @action(methods=['delete'], detail=False)
@@ -208,7 +225,7 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     Use nested router params
     """
     queryset = GenericMaterial.objects.all()
-    permission_classes = (IsManagerOf,)
+    permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = GenericMaterialSerializer
 
 class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
@@ -216,7 +233,7 @@ class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for generic material
     """
     queryset = GenericMaterial.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (RGPDAccept, IsAuthenticated,)
     serializer_class = GenericMaterialPublicSerializer
 
 class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
@@ -225,7 +242,7 @@ class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     Use nested router params
     """
     queryset = SpecificMaterial.objects.all()
-    permission_classes = (IsManagerOf,)
+    permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = SpecificMaterialSerializer
 
 class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
@@ -233,7 +250,7 @@ class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for specific material
     """
     queryset = SpecificMaterial.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (RGPDAccept, IsAuthenticated,)
     serializer_class = SpecificMaterialPublicSerializer
 
 
@@ -243,7 +260,7 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     Use nested router params
     """
     queryset = SpecificMaterialInstance.objects.all()
-    permission_classes = (IsManagerOf,)
+    permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         """
@@ -298,7 +315,7 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for specific material instance
     """
     queryset = SpecificMaterialInstance.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (RGPDAccept, IsAuthenticated,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
@@ -310,7 +327,7 @@ class LoanViewSet(viewsets.ModelViewSet):
     Endpoints for loans
     """
     queryset = Loan.objects.all()
-    permission_classes = (LoanPermission,)
+    permission_classes = (RGPDAccept, LoanPermission,)
     serializer_class = LoanSerializer
 
     def get_queryset(self):

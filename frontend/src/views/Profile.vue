@@ -4,7 +4,17 @@
       <h3>Votre profile</h3>
     </div>
     <div class="card-body">
-      <form id="editor-form">
+      <form id="editor-form" class="form">
+        <p
+          v-if="
+            !$store.getters.authUser.first_name ||
+              !$store.getters.authUser.last_name ||
+              !$store.getters.authUser.email
+          "
+          class="text-danger"
+        >
+          Pour utiliser ce site vous devez renseigner vos prenom, nom et email.
+        </p>
         <div class="form-group">
           <label>Username</label
           ><input
@@ -96,11 +106,47 @@
         </div>
       </form>
     </div>
+    <b-modal id="modal-rgpd" title="RGPD" hide-footer>
+      <h6>Conditions d'utilisation</h6>
+      <p>
+        Pour permettre le bon fonctionnment du site certaines de vos
+        informations sont stockées.
+      </p>
+      <p>
+        Nom d'utilisateur, Prénom, Nom, Email sont utilisés afin de vous
+        contacter. Seul les managers des entités ont accés à ces informations.
+      </p>
+      <p>
+        Ces informations ainsi que celles liées aux prêts seront stockées 3 ans
+        après que vous ayez quitté l'université ou sur demande à l'adresse
+        CONTACT
+      </p>
+
+      <h6>Accepter vous ces termes ?</h6>
+      <div>
+        <div class="btn-group" role="group" aria-label="RGPD Accept">
+          <button type="button" class="btn btn-primary" @click="accept">
+            Oui
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="$bvModal.hide('modal-rgpd')"
+          >
+            Non
+          </button>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 <script>
 import DynList from "@/components/DynList";
-import { UPDATE_AUTHUSER, UPDATE_PASSWORD } from "@/store/actions.type";
+import {
+  UPDATE_AUTHUSER,
+  UPDATE_PASSWORD,
+  UPDATE_RGPD
+} from "@/store/actions.type";
 import { mapGetters } from "vuex";
 export default {
   name: "Profile",
@@ -174,6 +220,16 @@ export default {
         console.log("Profile updated");
         this.$bvModal.msgBoxOk("Profile mis à jour");
       });
+    },
+    accept() {
+      this.$store.dispatch(UPDATE_RGPD).then(() => {
+        this.$bvModal.hide("modal-rgpd");
+      });
+    }
+  },
+  mounted() {
+    if (!this.authUser.rgpd_accept) {
+      this.$bvModal.show("modal-rgpd");
     }
   }
 };

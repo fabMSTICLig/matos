@@ -1,6 +1,11 @@
 import ApiService from "@/common/api.service";
 
-import { CHECK_AUTH, UPDATE_AUTHUSER, UPDATE_PASSWORD } from "./actions.type";
+import {
+  CHECK_AUTH,
+  UPDATE_AUTHUSER,
+  UPDATE_PASSWORD,
+  UPDATE_RGPD
+} from "./actions.type";
 import { SET_AUTHUSER, PURGE_AUTH } from "./mutations.type";
 
 const state = {
@@ -46,6 +51,12 @@ const actions = {
       passwords
     ).then(() => {
       return "Password changed";
+    });
+  },
+  [UPDATE_RGPD](context) {
+    return ApiService.post(`self/rgpd`, { accept: true }).then(({ data }) => {
+      context.state.authUser.rgpd_accept = data["rgpd_accept"];
+      context.commit(SET_AUTHUSER, context.state.authUser);
     });
   }
 };

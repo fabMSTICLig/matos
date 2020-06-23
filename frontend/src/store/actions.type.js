@@ -1,6 +1,7 @@
 export const CHECK_AUTH = "checkAuth";
 export const UPDATE_AUTHUSER = "updateAuthUser";
 export const UPDATE_PASSWORD = "updatePassword";
+export const UPDATE_RGPD = "updateRGPD";
 export const FETCH_USERS = "fetchUsers";
 export const UPDATE_USER = "updateUser";
 export const GET_USER = "getUser";
