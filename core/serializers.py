@@ -123,7 +123,7 @@ class LoanGenericItemSerializer(serializers.ModelSerializer):
 class LoanSerializer(serializers.ModelSerializer):
     generic_materials = LoanGenericItemSerializer(source="loangenericitem_set",many=True)
     models = serializers.SerializerMethodField()
-    
+
     def get_models(self, obj):
         models=set()
         for item in obj.specific_materials.all():
@@ -134,6 +134,10 @@ class LoanSerializer(serializers.ModelSerializer):
         model = Loan
         fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
         #fields = '__all__'
+        extra_kwargs = {'child': {'required': False}}
+
+    
+
     def create(self, validated_data):
         # Create the book instance
         specmats=validated_data.pop('specific_materials')
