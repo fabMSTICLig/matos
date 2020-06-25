@@ -18,7 +18,7 @@
       type="text"
       class="list-group-item border rounded"
       :list="_uid"
-      v-model="input_value"
+      v-model="inputValue"
       placeholder="Ajouter"
       @keyup.enter="addTag"
       @change="addTag"
@@ -74,7 +74,37 @@ export default {
       return this.objects_list.filter(item => {
         return !this.object[this.fieldName].includes(item.id);
       });
+    },
+
+    inputValue: {
+      get() {
+        if (this.value) {
+          var item = this.objects_list.find(
+            item => item.id.toString() == this.value.toString()
+          );
+        }
+        if (item != undefined) {
+          return this.makeLabelOrName(item);
+        } else {
+          return this.input_value;
+        }
+      },
+      set(val) {
+        var item = undefined;
+        if (Number(val)) {
+          item = this.objects_list.find(item => item.id.toString() == val);
+        }
+        if (item != undefined) {
+          this.input_value = this.makeLabelOrName(item);
+          this.activeDset = false;
+          this.$emit("input", item.id);
+        } else {
+          this.activeDset = true;
+          this.input_value = val;
+        }
+      }
     }
+
   },
   methods: {
     addTag() {

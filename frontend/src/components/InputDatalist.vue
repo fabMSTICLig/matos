@@ -1,7 +1,7 @@
 <template>
   <div class="form-control p-0">
     <input class="h-100 w-100" type="text" :list="_uid" v-model="inputValue" />
-    <datalist :id="_uid" v-if="activeDset">
+     <datalist :id="_uid" v-if="activeDset">
       <option
         v-for="item in objects_list"
         :key="item.id"
@@ -32,7 +32,8 @@ export default {
   data() {
     return {
       input_value: "",
-      activeDset: true
+      activeDset: true,
+      id: ""
     };
   },
   watch: {
@@ -44,6 +45,7 @@ export default {
     }
   },
   computed: {
+  
     objects_list() {
       if (typeof this.ressource == "string")
         return this.$store.getters[this.ressource + "/list"];
@@ -56,6 +58,7 @@ export default {
           var item = this.objects_list.find(
             item => item.id.toString() == this.value.toString()
           );
+          
         }
         if (item != undefined) {
           return this.makeLabelOrName(item);
@@ -67,6 +70,7 @@ export default {
         var item = undefined;
         if (Number(val)) {
           item = this.objects_list.find(item => item.id.toString() == val);
+          
         }
         if (item != undefined) {
           this.input_value = this.makeLabelOrName(item);
@@ -87,6 +91,9 @@ export default {
   beforeMount() {
     if (typeof this.ressource == "string")
       this.$store.dispatch(this.ressource + "/fetchList");
+  },
+  mounted() {
+    this.id = String(this._uid)
   }
 };
 </script>
