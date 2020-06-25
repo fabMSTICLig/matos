@@ -173,8 +173,6 @@ export default {
       );
     },
     isRemoval() {
-      console.log(this.selected_object.status)
-      console.log(this.isManager)
       return (
        this.selected_object.status == 2 && !this.isManager
       );
@@ -192,12 +190,14 @@ export default {
     valid(item) {
        this.$store
             .dispatch("loans/destroy", {
-              data: item,
               id: item.id
             })
             .then(data => {
               this.$store.commit("loans/resetPending", data);
               this.$bvModal.hide("modal-delete");
+              this.isEditable = false;
+              this.isRemoval = false;
+              this.selected_object = null;
               this.errors = [];
             })
             .catch(e => {
