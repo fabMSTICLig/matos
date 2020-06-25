@@ -54,6 +54,14 @@
             >
               {{ isEditable ? "Modifier" : "Consulter" }}
             </button>
+            <button
+              class="btn btn-dark"
+              role="button"
+              @click="deleteLoan()"
+              v-if="isRemoval"
+            >
+              Supprimer
+            </button>
           </div>
         </div>
         <div class="card-body">
@@ -105,6 +113,28 @@
           </ul>
         </div>
       </div>
+      <b-modal id="modal-delete" title="Annuler demande de prêt" hide-footer>
+      <h6>Annuler la demande de prêt</h6>
+      
+      <p>
+        Confirmer l'annulation de la demande de prêt
+      </p>
+      
+      <div>
+        <div class="btn-group" role="group" aria-label="Supprimer la demande">
+          <button type="button" class="btn btn-primary" @click="valid(selected_object)">
+            Oui
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="$bvModal.hide('modal-delete')"
+          >
+            Non
+          </button>
+        </div>
+      </div>
+    </b-modal>
     </div>
   </div>
 </template>
@@ -130,9 +160,23 @@ export default {
       smById: "specificmaterials/byId",
       entityById: "entities/byId"
     }),
+    isManager() {
+      return (
+        (this.selected_object &&
+          this.authUser.entities.indexOf(this.selected_object.entity) > -1) ||
+        this.authUser.is_staff
+      );
+    },
     isEditable() {
       return (
         this.selected_object.status == 1 || this.selected_object.status == 2
+      );
+    },
+    isRemoval() {
+      console.log(this.selected_object.status)
+      console.log(this.isManager)
+      return (
+       this.selected_object.status == 2 && !this.isManager
       );
     }
   },
@@ -145,10 +189,32 @@ export default {
         return item.user == this.authUser.id;
       });
     },
+    valid(item) {
+       this.$store
+            .dispatch("loans/destroy", {
+              data: item,
+              id: item.id
+            })
+            .then(data => {
+              this.$store.commit("loans/resetPending", data);
+              this.$bvModal.hide("modal-delete");
+              this.errors = [];
+            })
+            .catch(e => {
+              if ("non_field_errors" in e.response.data) {
+                this.errors = e.response.data.non_field_errors;
+              }
+              // eslint-disable-next-line
+              console.log(e.response);
+            })
+    },
     editLoan(item) {
       this.$store.commit("loans/setPending", item);
       this.$router.push({ name: "loan" });
-    }
+    },
+    deleteLoan() {
+      this.$bvModal.show("modal-delete");     
+    },
   },
   beforeMount() {
     var pall = [];
