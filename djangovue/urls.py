@@ -18,12 +18,12 @@ from django.urls import path, include
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 import django_cas_ng.views
-
+from core.views import LoginCASView 
 urlpatterns = [
     re_path(r'^$', view=TemplateView.as_view(template_name='index.html')),
     path('admin/', admin.site.urls),
     path('auth/', include('django.contrib.auth.urls')),
-    path('cas/login/',  django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
+    path('cas/login/',  LoginCASView.as_view(), name='cas_ng_login'),
     path('cas/logout/', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     path('api/', include('core.urls')),
 ]

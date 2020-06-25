@@ -5,6 +5,9 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt 
+from django.views import View
+from django.http import HttpResponseRedirect
 
 import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
@@ -14,13 +17,22 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
-
+from django.contrib import messages
+from django_cas_ng import views as baseviews
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 
 
 from .serializers import *
 from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
 from rest_framework.response import Response
+
+from django_cas_ng.utils import (
+    get_cas_client,
+    get_protocol,
+    get_redirect_url,
+    get_service_url,
+    get_user_from_session,
+)
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -100,6 +112,78 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
+
+class LoginCASView(View):
+    """
+        Extended django cas ng baseview to redirect to root url after login in
+    """
+    @csrf_exempt
+    def get(self, request, **kwargs):
+        return self.get_login(request, baseviews.LoginView.as_view()(request, **kwargs))
+
+    def successful_login(self, request, next_page):
+        """
+        This method is called on successful login. Override this method for
+        custom post-auth actions (i.e, to add a cookie with a token).
+
+        :param request:
+        :param next_page:
+        :return:
+        """
+        next_page='/#'
+        return HttpResponseRedirect(next_page)
+
+    def get_login(self,request, response):
+        """
+            return user logged in or response CAS
+        """
+     
+        url = response['Location']
+            
+        next_page = request.GET.get('next')
+        service_url = get_service_url(request, next_page)
+        client = get_cas_client(service_url=service_url, request=request)
+        try:
+            ticket = request.GET.get('ticket')
+            user = authenticate(ticket=ticket,
+                            service=service_url,
+                            request=request)
+            if user is not None:
+                auth_login(request, user)
+            if not request.session.exists(request.session.session_key):
+                request.session.create()
+
+            try:
+                st = SessionTicket.objects.get(session_key=request.session.session_key)
+                st.ticket = ticket
+                st.save()
+            except SessionTicket.DoesNotExist:
+                SessionTicket.objects.create(
+                    session_key=request.session.session_key,
+                    ticket=ticket
+                )
+
+            if settings.CAS_LOGIN_MSG is not None:
+                name = user.get_username()
+                message = settings.CAS_LOGIN_MSG % name
+                messages.success(request, message)
+           
+            return self.successful_login(request=request, next_page=next_page)
+
+            if settings.CAS_RETRY_LOGIN or required:
+                return HttpResponseRedirect(client.get_login_url())
+
+            raise PermissionDenied(_('Login failed.'))
+        except :
+            print('error next url')
+        if request.user.is_authenticated:
+            if settings.CAS_LOGGED_MSG is not None:
+                message = 'authentification réussie' 
+                print(request.user.get_username())
+                messages.success(request, message)
+            return self.successful_login(request=request, next_page=next_page)
+        return response
+
 
 class SelfView(APIView):
     """
