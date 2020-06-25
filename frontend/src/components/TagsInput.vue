@@ -8,7 +8,7 @@
       <span> {{ item.name }}</span>
       <button
         type="button"
-        class="btn btn-danger btn-sm"
+        class="btn btn-danger btn-sm ml-1"
         v-on:click="removeTag(item)"
       >
         X

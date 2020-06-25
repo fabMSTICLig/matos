@@ -32,7 +32,7 @@
             v-slot="{ href, route, navigate }"
           >
             <li class="nav-item" role="presentation">
-              <a class="nav-link" :href="href" @click="navigate">Search</a>
+              <a class="nav-link" :href="href" @click="navigate">Rechercher</a>
             </li>
           </router-link>
 
@@ -75,11 +75,7 @@
             >
           </b-nav-item-dropdown>
           <li class="nav-item" role="presentation">
-            <a
-              class="nav-link"
-              :href="authUser.externe ? '/cas/logout' : '/auth/logout'"
-              >Logout</a
-            >
+            <a class="nav-link" href="/#/" @click="logout">Logout</a>
           </li>
         </ul>
         <ul v-else class="nav navbar-nav">
@@ -118,6 +114,12 @@ export default {
       else return "";
     }
   },
-  methods: {}
+  methods: {
+    logout(e) {
+      e.preventDefault();
+      this.$store.commit("loans/resetPending");
+      window.location = this.authUser.externe ? "/cas/logout" : "/auth/logout";
+    }
+  }
 };
 </script>

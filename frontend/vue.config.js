@@ -1,15 +1,15 @@
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-    .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
 
 module.exports = {
   publicPath: "/static/",
-  configureWebpack:{
+  configureWebpack: {
     plugins: [new BundleAnalyzerPlugin()],
     optimization: {
       splitChunks: {
         minSize: 10000,
         maxSize: 250000,
-        chunks: 'all',
+        chunks: "all"
       }
     }
   }
