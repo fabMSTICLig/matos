@@ -460,6 +460,7 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+
     @action(methods=['get'], detail=False)
     def status(self, request):
         """
@@ -471,7 +472,7 @@ class LoanViewSet(viewsets.ModelViewSet):
     def make_child(self, request,pk=None):
         """
         Create a child of the loan
-        Parent/child are used to keep an hisory for loan modification
+        Parent/child are used to keep an history for loan modification
         """
         loan = get_object_or_404(Loan,pk=pk)
         if(hasattr(loan, "child")):
