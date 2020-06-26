@@ -77,9 +77,10 @@
           <li class="nav-item" role="presentation">
             <a
               class="nav-link"
-              :href="authUser.externe ? '/cas/logout' : '/auth/logout'"
-              >Logout</a
-            >
+              href="#"
+              @click="logout"
+              >Logout
+            </a>
           </li>
         </ul>
         <ul v-else class="nav navbar-nav">
@@ -97,17 +98,19 @@
 
 <script>
 import { mapGetters } from "vuex";
+
 export default {
   name: "Header",
   data() {
     return {
       title: process.env.VUE_APP_TITLE,
-      cas: process.env.VUE_APP_CASNAME
+      cas: process.env.VUE_APP_CASNAME,
+      ressource : "loans"
     };
   },
 
   computed: {
-    ...mapGetters(["authUser", "isAuthenticated", "isAdmin"]),
+    ...mapGetters(["authUser", "isAuthenticated", "isAdmin", "loans"]),
     ...mapGetters({ pending_loan: "loans/pending_loan" }),
     loanQuantity() {
       if (this.pending_loan)
@@ -118,6 +121,13 @@ export default {
       else return "";
     }
   },
-  methods: {}
+  methods: {
+    logout() {
+      if(this.pending_loan) {
+          this.$store.commit(this.ressource + "/resetPending", this.pending_loan)
+          window.location = this.authUser.externe ? '/cas/logout' : '/auth/logout'
+      }
+    }
+  }
 };
 </script>
