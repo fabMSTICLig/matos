@@ -23,12 +23,17 @@ class EntitiesTests(APITestCase):
     def setUp(self):
         self.apiFactory = self.api_factory()
         #ajout de managers
+<<<<<<< HEAD
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1")
         self.manager2 = get_user_model().objects.create(username="manager2", first_name="manager2")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
         self.manager2.rgpd_accept = timezone.now().date()
         self.manager2.save()
+=======
+        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1", email="manager1@grenoble-inp.fr", rgpd_accept="2020-06-25")
+        self.manager2 = get_user_model().objects.create(username="manager2", first_name="manager2", email="manager1@univ-grenoble-alpes.fr", rgpd_accept="2020-06-25")
+>>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
         #ajout des entités
         self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr')
         self.ensimag_entity = Entity.objects.create(name = 'ENSIMAG', description = 'Ecole ENSIMAG - Grenoble INP', contact='contact-ensimag@grenoble-inp.fr')
@@ -36,8 +41,12 @@ class EntitiesTests(APITestCase):
         self.lig_entity.save()
         #ajout d'un admin
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
+<<<<<<< HEAD
         self.superuser.rgpd_accept = timezone.now().date()
         self.superuser.save()
+=======
+        self.superuser.rgpd_accept = True
+>>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
     def test_not_manager_update(self):
         managers_lig_obj = self.lig_entity.managers.all()
@@ -79,6 +88,8 @@ class EntitiesTests(APITestCase):
         response = view(request)
         response.render()
         data = response.data
+        print('ajout')
+        print(response)
         self.assertEqual(response.data['name'], 'Ginova')
 
     def test_delete_entity(self):
@@ -153,8 +164,8 @@ class UsersTests(APITestCase):
 
     def setUp(self):
         self.apiFactory = self.api_factory()
-        self.user = get_user_model().objects.create(username='etudiant1', first_name='etudiant1', email='etudiant@gem-univ-grenoble.fr', password='etudiant1')
-        self.user2 = get_user_model().objects.create(username='ensiinfo1', first_name='michel', email='support@ensimag-info.fr', password='matriochka')
+        self.user = get_user_model().objects.create(username='etudiant1', first_name='etudiant1', email='etudiant@gem-univ-grenoble.fr', password='etudiant1', rgpd_accept="2020-06-25")
+        self.user2 = get_user_model().objects.create(username='ensiinfo1', first_name='michel', email='support@ensimag-info.fr', password='matriochka', rgpd_accept="2020-06-25")
         self.affiliation2 = Affiliation.objects.create(name="Grenoble INP", type="Ecole")
         self.user2.affiliations.add(self.affiliation2)
         self.user2.save()
@@ -163,8 +174,12 @@ class UsersTests(APITestCase):
         self.rgpd_accept_date = datetime.date(2020,6,24)
         self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr')
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
+<<<<<<< HEAD
         self.superuser.rgpd_accept = timezone.now().date()
         self.superuser.save()
+=======
+        self.superuser.rgpd_accept = "2020-06-25"
+>>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
     def test_update_self_affiliations(self):
         data = { 'affiliations' : [self.affiliation.pk] }
@@ -207,10 +222,14 @@ class AffiliationsTests(APITestCase):
     def setUp(self):
         self.apiFactory = self.api_factory()
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
+<<<<<<< HEAD
         self.superuser.rgpd_accept = timezone.now().date()
         self.superuser.save()
+=======
+        self.superuser.rgpd_accept = True
+>>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
         self.affiliation = Affiliation.objects.create(name='Grenoble INP', type='Ecole')
-        self.user =  get_user_model().objects.create(username="max", first_name="max", email='max@univ-grenoble.fr', password='1ngF@b')
+        self.user =  get_user_model().objects.create(username="max", first_name="max", email='max@univ-grenoble.fr', password='1ngF@b', rgpd_accept="2020-06-25")
 
     def test_affiliation_add(self):
         data = { 'name': 'CNRS', 'type': 'Recherche' }
@@ -253,14 +272,19 @@ class GenericMaterialsTests(APITestCase):
 
     def setUp(self):
         #ajout de managers
+<<<<<<< HEAD
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
         self.manager2.rgpd_accept = timezone.now().date()
         self.manager2.save()
+=======
+        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr", rgpd_accept="2020-06-25")
+        self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr", rgpd_accept="2020-06-25")
+>>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
-        self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
+        self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1', rgpd_accept="2020-06-25")
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
         self.entity.managers.add(self.manager1)
         self.entity.save()
@@ -319,14 +343,19 @@ class SpecificMaterialsTests(APITestCase):
 
     def setUp(self):
         #ajout de managers
+<<<<<<< HEAD
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
         self.manager2.rgpd_accept = timezone.now().date()
         self.manager2.save()
+=======
+        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr", rgpd_accept="2020-06-25")
+        self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr", rgpd_accept="2020-06-25")
+>>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
-        self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
+        self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1', rgpd_accept="2020-06-25")
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
         self.entity.managers.add(self.manager1)
         self.entity.save()
@@ -433,6 +462,9 @@ class LoanMaterialsTests(APITestCase):
         self.loan_manager = Loan.objects.create(status=2, checkout_date = datetime.date(2020,10,8), user=self.manager1,entity=self.entity, due_date=datetime.date(2020,10,24), return_date=datetime.date(2020,10,24), comments='demande de prêt tablettes info')
         self.loan_manager.specific_materials.add(self.materials_specific_instance2)
         self.loan_manager.save()
+        self.loan_manager2 = Loan.objects.create(status=2, checkout_date = datetime.date(2020,10,8), user=self.manager2,entity=self.entity, due_date=datetime.date(2020,10,24), return_date=datetime.date(2020,10,24), comments='demande de prêt matériel générique')
+        self.loan_manager2.generic_materials.add(self.materials_generic)
+        self.loan_manager2.save()
         self.loan_user = Loan.objects.create(status=2, checkout_date = datetime.date(2020,6,25), user=self.user,entity=self.entity, due_date=datetime.date(2020,7,24), return_date=datetime.date(2020,8,24), comments='demande de prêt tablettes info', parent=self.loan)
         self.loan_user.specific_materials.add(self.materials_specific_instance)
         self.loan_user.save()
@@ -665,3 +697,24 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    def test_delete_loan_requested(self):
+        """
+            Un utilisateur peut supprimer un prêt demandé
+        """    
+        self.client.force_authenticate(user=self.manager2)
+        response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_manager2.pk}))
+        response.render()
+        print(response.data)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user_accepted.pk}))
+        response.render()
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user.pk}))
+        response.render()
+        print(response.data)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
