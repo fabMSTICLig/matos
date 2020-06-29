@@ -52,9 +52,21 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return UserSerializer
 
+    def get_queryset(self):
+        if self.action == 'list':
+            if self.request.user.is_staff:
+                return self.queryset
+            entities_user = self.request.user.entities.all()
+            entities = [entry['id'] for entry in entities_user.values("id")]
+            queryset = get_user_model().objects.filter(entities__in=entities).distinct()
+            return queryset
+        else:
+            return self.queryset
+
     def get_permissions(self):
         if self.action == 'list':
             permission_classes = [IsAuthenticated]
+            
         elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
             permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
         else:
@@ -179,7 +191,6 @@ class LoginCASView(View):
         if request.user.is_authenticated:
             if settings.CAS_LOGGED_MSG is not None:
                 message = 'authentification réussie' 
-                print(request.user.get_username())
                 messages.success(request, message)
             return self.successful_login(request=request, next_page=next_page)
         return response
