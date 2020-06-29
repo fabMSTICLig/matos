@@ -75,16 +75,7 @@
             >
           </b-nav-item-dropdown>
           <li class="nav-item" role="presentation">
-<<<<<<< HEAD
             <a class="nav-link" href="/#/" @click="logout">Logout</a>
-=======
-            <a
-              class="nav-link"
-              href="#"
-              @click="logout"
-              >Logout
-            </a>
->>>>>>> 75e1654... remise à zero du pret en cours au logout
           </li>
         </ul>
         <ul v-else class="nav navbar-nav">

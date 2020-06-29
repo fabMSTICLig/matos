@@ -39,6 +39,17 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return UserSerializer
 
+    def get_queryset(self):
+        if self.action == 'list':
+            if self.request.user.is_staff:
+                return self.queryset
+            entities_user = self.request.user.entities.all()
+            entities = [entry['id'] for entry in entities_user.values("id")]
+            queryset = get_user_model().objects.filter(entities__in=entities).distinct()
+            return queryset
+        else:
+            return self.queryset
+
     def get_permissions(self):
         if self.action == 'list':
             permission_classes = [IsManager]
@@ -100,6 +111,80 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
+<<<<<<< HEAD
+=======
+class LoginCASView(View):
+    """
+        Extended django cas ng baseview to redirect to root url after login in
+    """
+    @csrf_exempt
+    def get(self, request, **kwargs):
+        return self.get_login(request, baseviews.LoginView.as_view()(request, **kwargs))
+
+    def successful_login(self, request, next_page):
+        """
+        This method is called on successful login. Override this method for
+        custom post-auth actions (i.e, to add a cookie with a token).
+
+        :param request:
+        :param next_page:
+        :return:
+        """
+        next_page='/#'
+        return HttpResponseRedirect(next_page)
+
+    def get_login(self,request, response):
+        """
+            return user logged in or response CAS
+        """
+     
+        url = response['Location']
+            
+        next_page = request.GET.get('next')
+        service_url = get_service_url(request, next_page)
+        client = get_cas_client(service_url=service_url, request=request)
+        try:
+            ticket = request.GET.get('ticket')
+            user = authenticate(ticket=ticket,
+                            service=service_url,
+                            request=request)
+            if user is not None:
+                auth_login(request, user)
+            if not request.session.exists(request.session.session_key):
+                request.session.create()
+
+            try:
+                st = SessionTicket.objects.get(session_key=request.session.session_key)
+                st.ticket = ticket
+                st.save()
+            except SessionTicket.DoesNotExist:
+                SessionTicket.objects.create(
+                    session_key=request.session.session_key,
+                    ticket=ticket
+                )
+
+            if settings.CAS_LOGIN_MSG is not None:
+                name = user.get_username()
+                message = settings.CAS_LOGIN_MSG % name
+                messages.success(request, message)
+           
+            return self.successful_login(request=request, next_page=next_page)
+
+            if settings.CAS_RETRY_LOGIN or required:
+                return HttpResponseRedirect(client.get_login_url())
+
+            raise PermissionDenied(_('Login failed.'))
+        except :
+            print('error next url')
+        if request.user.is_authenticated:
+            if settings.CAS_LOGGED_MSG is not None:
+                message = 'authentification réussie' 
+                messages.success(request, message)
+            return self.successful_login(request=request, next_page=next_page)
+        return response
+
+
+>>>>>>> b02e440... visibilité restreinte des utilisateurs aux managers de l'entité
 class SelfView(APIView):
     """
     Endpoint to see personals informations/profile
