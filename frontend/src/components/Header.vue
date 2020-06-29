@@ -105,7 +105,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["authUser", "isAuthenticated", "isAdmin", "loans"]),
+    ...mapGetters(["authUser", "isAuthenticated", "isAdmin"]),
     ...mapGetters({ pending_loan: "loans/pending_loan" }),
     loanQuantity() {
       if (this.pending_loan)
