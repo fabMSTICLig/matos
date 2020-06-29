@@ -5,34 +5,21 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt 
-from django.views import View
-from django.http import HttpResponseRedirect
 
 import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
+from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
-from django.contrib import messages
-from django_cas_ng import views as baseviews
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
-
 
 from .serializers import *
 from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
-from rest_framework.response import Response
 
-from django_cas_ng.utils import (
-    get_cas_client,
-    get_protocol,
-    get_redirect_url,
-    get_service_url,
-    get_user_from_session,
-)
 
 class UserViewSet(viewsets.ModelViewSet):
     """

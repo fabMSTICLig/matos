@@ -1,45 +1,54 @@
 <template>
   <div>
-    <h1>Recherche</h1>
+    <h1>Rechercher</h1>
     <div class="row">
       <div class="col-xl-3">
-        <div>
-          <h4>Filtres</h4>
+        <div class="card">
+          <div class="card-header">
+            <h4>Filtres</h4>
+          </div>
+          <div class="card-body">
+            <form class="form">
+              <div class="form-group">
+                <label>Chercher</label
+                ><input
+                  type="search"
+                  class="form-control"
+                  placeholder="Arduino"
+                  v-model="search_input"
+                />
+              </div>
+              <div class="form-group">
+                <label>Type</label>
+                <select class="form-control" v-model="type_input">
+                  <option value="1">Les deux</option>
+                  <option value="2">Generique</option>
+                  <option value="3">Specifique</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Entités</label>
+                <TagsInput
+                  fieldName="entities_filter"
+                  :object="this"
+                  ressource="entities"
+                  forbidAdd
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Tags</label>
+                <TagsInput
+                  fieldName="tags"
+                  :object="this"
+                  ressource="tags"
+                  forbidAdd
+                />
+              </div>
+            </form>
+          </div>
         </div>
-        <form class="form">
-          <div class="form-group">
-            <label>Chercher</label
-            ><input type="search" class="form-control" v-model="search_input" />
-          </div>
-          <div class="form-group">
-            <label>Type</label>
-            <select class="form-control" v-model="type_input">
-              <option value="1">Les deux</option>
-              <option value="2">Generique</option>
-              <option value="3">Specifique</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Entités</label>
-            <TagsInput
-              fieldName="entities_filter"
-              :object="this"
-              ressource="entities"
-              forbidAdd
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Tags</label>
-            <TagsInput
-              fieldName="tags"
-              :object="this"
-              ressource="tags"
-              forbidAdd
-            />
-          </div>
-        </form>
       </div>
       <div class="col">
         <div class="card">
@@ -75,9 +84,17 @@
               >
                 <div class="d-flex w-100 justify-content-between">
                   <h4>{{ item.name }}</h4>
-                  <strong>{{ getEntityName(item.entity) }}</strong>
+                  <strong
+                    ><router-link
+                      :to="{
+                        name: 'entitieslist',
+                        query: { select: item.id }
+                      }"
+                      >{{ getEntityName(item.entity) }}</router-link
+                    ></strong
+                  >
                 </div>
-                <p class="text-truncate">{{ item.description }}</p>
+                <p class="">{{ item.description }}</p>
                 <p>
                   <strong>Tags :</strong>
                   <DisplayIdList

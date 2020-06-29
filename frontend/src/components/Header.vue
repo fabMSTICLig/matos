@@ -32,7 +32,7 @@
             v-slot="{ href, route, navigate }"
           >
             <li class="nav-item" role="presentation">
-              <a class="nav-link" :href="href" @click="navigate">Search</a>
+              <a class="nav-link" :href="href" @click="navigate">Rechercher</a>
             </li>
           </router-link>
 
@@ -122,7 +122,8 @@ export default {
     }
   },
   methods: {
-    logout() {
+    logout(e) {
+      e.preventDefault();
       if(this.pending_loan) {
           this.$store.commit(this.ressource + "/resetPending", this.pending_loan)
           window.location = this.authUser.externe ? '/cas/logout' : '/auth/logout'

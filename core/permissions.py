@@ -33,11 +33,11 @@ class EntityPermission(permissions.BasePermission):
         return ismanager and request.method in ['PUT','PATCH'] or request.method in permissions.SAFE_METHODS
 
     def has_permission(self, request, view):
-        return request.user and (request.user.is_staff or (request.user.is_authenticated and request.method != "POST"))
+        return request.user.is_authenticated and (request.user.is_staff or (request.user.is_authenticated and request.method != "POST"))
 
 class RGPDAccept(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.rgpd_accept is not None
+        return request.user.is_authenticated and request.user.rgpd_accept is not None
 
 class IsManagerOf(permissions.BasePermission):
     """
@@ -58,7 +58,7 @@ class IsManagerOf(permissions.BasePermission):
         return ismanager
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
+        return request.user.is_authenticated and request.user.is_authenticated
 
 class IsManagerCreateOrReadOnly(permissions.BasePermission):
     """
@@ -93,4 +93,4 @@ class LoanPermission(permissions.BasePermission):
         return ismanager or safeDestroy or (request.user == obj.user and request.method != 'DELETE') 
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
+        return request.user.is_authenticated and request.user.is_authenticated

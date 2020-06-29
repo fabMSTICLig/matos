@@ -145,6 +145,20 @@ export default {
           if (!owna && ownb) return 1;
           return 0;
         });
+    },
+    initList() {
+      this.$store
+        .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
+        .then(() => {
+          if ("select" in this.$route.query) {
+            var ent = this.$store.getters["entities/byId"](
+              Number(this.$route.query["select"])
+            );
+            if (ent) this.selected_object = ent;
+          } else if (this.objects_filtered.length > 0) {
+            this.selected_object = this.objects_list[0];
+          }
+        });
     }
   }
 };
