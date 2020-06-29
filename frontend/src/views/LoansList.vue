@@ -114,27 +114,31 @@
         </div>
       </div>
       <b-modal id="modal-delete" title="Annuler demande de prêt" hide-footer>
-      <h6>Annuler la demande de prêt</h6>
-      
-      <p>
-        Confirmer l'annulation de la demande de prêt
-      </p>
-      
-      <div>
-        <div class="btn-group" role="group" aria-label="Supprimer la demande">
-          <button type="button" class="btn btn-primary" @click="valid(selected_object)">
-            Oui
-          </button>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="$bvModal.hide('modal-delete')"
-          >
-            Non
-          </button>
+        <h6>Annuler la demande de prêt</h6>
+
+        <p>
+          Confirmer l'annulation de la demande de prêt
+        </p>
+
+        <div>
+          <div class="btn-group" role="group" aria-label="Supprimer la demande">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="validDestroy(selected_object)"
+            >
+              Oui
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="$bvModal.hide('modal-delete')"
+            >
+              Non
+            </button>
+          </div>
         </div>
-      </div>
-    </b-modal>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -173,9 +177,7 @@ export default {
       );
     },
     isRemoval() {
-      return (
-       this.selected_object.status == 2 && !this.isManager
-      );
+      return this.selected_object.status == 2 && !this.isManager;
     }
   },
   methods: {
@@ -187,30 +189,32 @@ export default {
         return item.user == this.authUser.id;
       });
     },
-    valid(item) {
-       this.$store
-            .dispatch("loans/destroy", {
-              id: item.id
-            })
-            .then(data => {
-              this.$store.commit("loans/resetPending", data);
-              this.$bvModal.hide("modal-delete");
-              this.isEditable = false;
-              this.isRemoval = false;
-              this.selected_object = null;
-            })
-            .catch(e => {
-              // eslint-disable-next-line
-              console.log(e.response);
-            })
+    validDestroy(item) {
+      this.$store
+        .dispatch("loans/destroy", {
+          data: item,
+          id: item.id
+        })
+        .then(() => {
+          this.$store.commit("loans/resetPending");
+          this.selected_object = null;
+          this.$bvModal.hide("modal-delete");
+          this.errors = [];
+        })
+        .catch(e => {
+          if ("non_field_errors" in e.response.data) {
+            this.errors = e.response.data.non_field_errors;
+          }
+          console.log(e.response);
+        });
     },
     editLoan(item) {
       this.$store.commit("loans/setPending", item);
       this.$router.push({ name: "loan" });
     },
     deleteLoan() {
-      this.$bvModal.show("modal-delete");     
-    },
+      this.$bvModal.show("modal-delete");
+    }
   },
   beforeMount() {
     var pall = [];
