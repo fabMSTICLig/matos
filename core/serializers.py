@@ -133,10 +133,7 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
-        #fields = '__all__'
-        extra_kwargs = {'child': {'required': False}}
-
-    
+        read_only_fields=('parent', 'child', 'models')
 
     def create(self, validated_data):
         # Create the book instance
