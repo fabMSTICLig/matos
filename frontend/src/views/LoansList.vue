@@ -180,7 +180,7 @@ export default {
   },
   methods: {
     initComponent() {
-      return this.$store.dispatch("loans/fetchStatus");
+      return this.$store.dispatch(this.ressource + "/fetchStatus");
     },
     search_fields(list) {
       return list.filter(item => {
@@ -189,27 +189,23 @@ export default {
     },
     valid(item) {
        this.$store
-            .dispatch("loans/destroy", {
+            .dispatch(this.ressource + "/destroy", {
               id: item.id
             })
             .then(data => {
-              this.$store.commit("loans/resetPending", data);
+              this.$store.commit(this.ressource + "/resetPending", data);
               this.$bvModal.hide("modal-delete");
               this.isEditable = false;
               this.isRemoval = false;
               this.selected_object = null;
-              this.errors = [];
             })
             .catch(e => {
-              if ("non_field_errors" in e.response.data) {
-                this.errors = e.response.data.non_field_errors;
-              }
               // eslint-disable-next-line
               console.log(e.response);
             })
     },
     editLoan(item) {
-      this.$store.commit("loans/setPending", item);
+      this.$store.commit(this.ressource + "/setPending", item);
       this.$router.push({ name: "loan" });
     },
     deleteLoan() {
