@@ -47,15 +47,13 @@
               <a class="nav-link" :href="href" @click="navigate">Entités</a>
             </li>
           </router-link>
-          <b-nav-item-dropdown text="Admin" v-if="isAdmin">
-            <b-dropdown-item :to="{ name: 'users' }"
-              >Utilisateurs</b-dropdown-item
-            >
-            <b-dropdown-item :to="{ name: 'affiliations' }"
-              >Affiliations</b-dropdown-item
-            >
-            <b-dropdown-item :to="{ name: 'tags' }">Tags</b-dropdown-item>
-          </b-nav-item-dropdown>
+          <li v-if="isAdmin" class="nav-item" role="presentation">
+            <Dropdown
+              :items="adminroutes"
+              label="Admin"
+              classtoogle="nav-link"
+            />
+          </li>
         </ul>
         <ul v-if="isAuthenticated" class="nav navbar-nav">
           <li class="nav-item" role="presentation">
@@ -68,12 +66,14 @@
               >Prêt ({{ loanQuantity }})</router-link
             >
           </li>
-          <b-nav-item-dropdown :text="authUser.username">
-            <b-dropdown-item :to="{ name: 'profile' }">Profile</b-dropdown-item>
-            <b-dropdown-item :to="{ name: 'authloans' }"
-              >Mes prêts</b-dropdown-item
-            >
-          </b-nav-item-dropdown>
+          <li class="nav-item" role="presentation">
+            <Dropdown
+              :items="userroutes"
+              :label="authUser.username"
+              classtoogle="nav-link"
+            />
+          </li>
+
           <li class="nav-item" role="presentation">
             <a class="nav-link" href="/#/" @click="logout">Logout</a>
           </li>
@@ -93,14 +93,40 @@
 
 <script>
 import { mapGetters } from "vuex";
-
+import Dropdown from "@/components/Dropdown";
 export default {
   name: "Header",
+  components: {
+    Dropdown
+  },
   data() {
     return {
       title: process.env.VUE_APP_TITLE,
       cas: process.env.VUE_APP_CASNAME,
-      ressource : "loans"
+      adminroutes: [
+        {
+          to: { name: "users" },
+          label: "Utilisateurs"
+        },
+        {
+          to: { name: "tags" },
+          label: "Tags"
+        },
+        {
+          to: { name: "affiliations" },
+          label: "Affiliations"
+        }
+      ],
+      userroutes: [
+        {
+          to: { name: "profile" },
+          label: "Profile"
+        },
+        {
+          to: { name: "authloans" },
+          label: "Mes prêts"
+        }
+      ]
     };
   },
 

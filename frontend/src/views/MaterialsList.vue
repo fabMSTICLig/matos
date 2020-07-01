@@ -22,17 +22,13 @@
               </select>
             </div>
           </div>
-
-          <b-dropdown class="float-right" variant="primary" text="Ajouter">
-            <b-dropdown-item
-              :to="{ name: 'genericmaterial', params: { matid: 'new' } }"
-              >Générique</b-dropdown-item
-            >
-            <b-dropdown-item
-              :to="{ name: 'specificmaterial', params: { matid: 'new' } }"
-              >Spécifique</b-dropdown-item
-            >
-          </b-dropdown>
+          <Dropdown
+            :items="newmaterialroutes"
+            label="Ajouter"
+            class="float-right"
+            classtoogle="btn-primary"
+            :button="true"
+          />
         </div>
         <div class="card-body">
           <div class="table-responsive table-hover">
@@ -118,17 +114,29 @@
 <script>
 import { ListMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
+import Dropdown from "@/components/Dropdown";
 export default {
   name: "MaterialsList",
   mixins: [ListMixin],
   components: {
-    DisplayIdList
+    DisplayIdList,
+    Dropdown
   },
   data() {
     return {
       type_input: 1,
       search_fields: ["name"],
-      ressource: "entities/genericMaterials"
+      ressource: "entities/genericMaterials",
+      newmaterialroutes: [
+        {
+          to: { name: "genericmaterial", params: { matid: "new" } },
+          label: "Générique"
+        },
+        {
+          to: { name: "specificmaterial", params: { matid: "new" } },
+          label: "Spécifique"
+        }
+      ]
     };
   },
   computed: {
