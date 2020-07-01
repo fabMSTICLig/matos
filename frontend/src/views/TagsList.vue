@@ -77,7 +77,7 @@
 
 <script>
 import { ListMixin } from "@/common/mixins";
-import {showMsgConfirm} from "@/components/Modal";
+import { showMsgConfirm } from "@/components/Modal";
 // @ is an alias to /src
 export default {
   name: "TagList",
@@ -90,12 +90,11 @@ export default {
   },
   methods: {
     destroyUnused() {
-        showMsgConfirm(
-          "Voulez vous vraiment supprimer tout les tags non utilisés ?"
-        )
-        .then(val => {
-          if (val) this.$store.dispatch("tags/destroyUnused");
-        });
+      showMsgConfirm(
+        "Voulez vous vraiment supprimer tout les tags non utilisés ?"
+      ).then(val => {
+        if (val) this.$store.dispatch("tags/destroyUnused");
+      });
     }
   }
 };

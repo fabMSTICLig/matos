@@ -183,7 +183,7 @@
 
 <script>
 import { EditMixin } from "@/common/mixins";
-import {showMsgOk} from "@/components/Modal";
+import { showMsgOk } from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
 export default {
