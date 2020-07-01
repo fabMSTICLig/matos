@@ -142,7 +142,7 @@
 
 <script>
 import { ListMixin } from "@/common/mixins";
-import {showMsgConfirm} from "@/components/Modal";
+import { showMsgConfirm } from "@/components/Modal";
 // @ is an alias to /src
 import { mapGetters } from "vuex";
 export default {
@@ -207,10 +207,9 @@ export default {
       this.$router.push({ name: "loan" });
     },
     destroyLoan(item) {
-      showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?")
-        .then(value => {
-          if (value) this.$store.dispatch("loans/destroy", { id: item.id });
-        });
+      showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?").then(value => {
+        if (value) this.$store.dispatch("loans/destroy", { id: item.id });
+      });
     }
   },
   beforeMount() {

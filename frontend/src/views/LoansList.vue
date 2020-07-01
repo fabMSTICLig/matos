@@ -113,7 +113,12 @@
           </ul>
         </div>
       </div>
-      <modal id="modal-delete" title="Annuler demande de prêt" v-model="showDelete" hideFooter>
+      <modal
+        id="modal-delete"
+        title="Annuler demande de prêt"
+        v-model="showDelete"
+        hideFooter
+      >
         <h6>Annuler la demande de prêt</h6>
 
         <p>
@@ -132,7 +137,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              @click="showDelete=false"
+              @click="showDelete = false"
             >
               Non
             </button>
@@ -202,7 +207,7 @@ export default {
         .then(() => {
           this.$store.commit("loans/resetPending");
           this.selected_object = null;
-          this.showDelete=false;
+          this.showDelete = false;
           this.errors = [];
         })
         .catch(e => {
@@ -217,7 +222,7 @@ export default {
       this.$router.push({ name: "loan" });
     },
     deleteLoan() {
-      this.showDelete=true;
+      this.showDelete = true;
     }
   },
   beforeMount() {

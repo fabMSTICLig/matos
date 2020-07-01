@@ -12,5 +12,8 @@ module.exports = {
         chunks: "all"
       }
     }
+  },
+  chainWebpack: config => {
+    config.plugins.delete("prefetch");
   }
 };
