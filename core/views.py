@@ -18,7 +18,7 @@ from rest_framework.decorators import action
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 
 from .serializers import *
-from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
+from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManager, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -52,8 +52,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'list':
-            permission_classes = [IsAuthenticated]
-            
+            permission_classes = [IsManager]
         elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
             permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
         else:

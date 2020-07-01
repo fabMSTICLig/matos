@@ -1,6 +1,12 @@
 from rest_framework import permissions
 from .models import Entity, SpecificMaterial,SpecificMaterialInstance, GenericMaterial, Loan
 
+class IsManager(permissions.BasePermission):
+    """
+    Permission checking if user is a manager or an admin.
+    """
+    def has_permission(self, request, view):
+        return request.user.is_staff or (request.user.is_authenticated and request.user.entities.count()>0)
 
 class IsAdminOrIsSelf(permissions.BasePermission):
     """
@@ -33,7 +39,7 @@ class EntityPermission(permissions.BasePermission):
         return ismanager and request.method in ['PUT','PATCH'] or request.method in permissions.SAFE_METHODS
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (request.user.is_staff or (request.user.is_authenticated and request.method != "POST"))
+        return request.user.is_authenticated and (request.user.is_staff or request.method != "POST")
 
 class RGPDAccept(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -58,7 +64,7 @@ class IsManagerOf(permissions.BasePermission):
         return ismanager
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.is_authenticated
+        return request.user.is_authenticated
 
 class IsManagerCreateOrReadOnly(permissions.BasePermission):
     """
@@ -69,10 +75,10 @@ class IsManagerCreateOrReadOnly(permissions.BasePermission):
     DELETE PUT PATCH Admin
     """
     def has_permission(self, request, view):
-        return (request.user and
+        return (request.user.is_authenticated and
             (request.user.is_staff or
-            request.method in permissions.SAFE_METHODS or
-           request.user.is_authenticated and request.user.entities.all().count()>0 and request.method == "POST"))
+             request.method in permissions.SAFE_METHODS or
+             (request.user.entities.all().count()>0 and request.method == "POST")))
 
 class LoanPermission(permissions.BasePermission):
     """
@@ -88,9 +94,8 @@ class LoanPermission(permissions.BasePermission):
         ismanager = False
         if isinstance(obj, Loan):
             ismanager = request.user in obj.entity.managers.all()
-            if request.user == obj.user:
-                safeDestroy = (request.method == 'DELETE' and not ismanager) and obj.status == int(Loan.Status.REQUESTED) 
-        return ismanager or safeDestroy or (request.user == obj.user and request.method != 'DELETE') 
+            safeDestroy = request.user == obj.user and request.method == 'DELETE' and obj.status == Loan.Status.REQUESTED
+        return ismanager or safeDestroy or (request.user == obj.user and request.method != 'DELETE')
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.is_authenticated
+        return request.user.is_authenticated

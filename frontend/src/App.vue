@@ -2,12 +2,11 @@
   <div id="app" class="container">
     <Header />
     <router-view />
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
   </div>
 </template>
 
 <script>
-import "bootstrap-vue/dist/bootstrap-vue.css";
-import "./assets/bootstrap.min.css";
 import "./assets/style.css";
 import Header from "@/components/Header";
 

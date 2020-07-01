@@ -100,13 +100,13 @@
           ></DynList>
         </div>
         <div class="btn-group" role="group">
-          <button class="btn btn-primary" type="button" v-on:click="update">
+          <button class="btn btn-primary" type="button" @click="update">
             Modifier
           </button>
         </div>
       </form>
     </div>
-    <b-modal id="modal-rgpd" title="RGPD" hide-footer>
+    <modal id="modal-rgpd" title="RGPD" hideFooter v-model="showRGPD">
       <h6>Conditions d'utilisation</h6>
       <p>
         Pour permettre le bon fonctionnment du site certaines de vos
@@ -131,17 +131,18 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="$bvModal.hide('modal-rgpd')"
+            @click="showRGPD=false"
           >
             Non
           </button>
         </div>
       </div>
-    </b-modal>
+    </modal>
   </div>
 </template>
 <script>
 import DynList from "@/components/DynList";
+import {showMsgOk, Modal} from "@/components/Modal";
 import {
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD,
@@ -151,11 +152,13 @@ import { mapGetters } from "vuex";
 export default {
   name: "Profile",
   components: {
-    DynList
+    DynList,
+    Modal
   },
   data() {
     return {
       goodpassword: null,
+      showRGPD:false,
       form: {
         old_password: "",
         new_password: "",
@@ -202,7 +205,7 @@ export default {
             .catch(e => {
               if (e.response.status == 400) {
                 this.goodpassword = false;
-                this.$bvModal.msgBoxOk("Mot de passe incorrect");
+                showMsgOk("Mot de passe incorrect");
               }
               // eslint-disable-next-line
               console.log(e.response);
@@ -218,18 +221,18 @@ export default {
       this.$store.dispatch(UPDATE_AUTHUSER, this.authUser).then(() => {
         // eslint-disable-next-line
         console.log("Profile updated");
-        this.$bvModal.msgBoxOk("Profile mis à jour");
+        showMsgOk("Profile mis à jour")
       });
     },
     accept() {
       this.$store.dispatch(UPDATE_RGPD).then(() => {
-        this.$bvModal.hide("modal-rgpd");
+        this.showRGPD=false
       });
     }
   },
   mounted() {
     if (!this.authUser.rgpd_accept) {
-      this.$bvModal.show("modal-rgpd");
+      this.showRGPD=true
     }
   }
 };
