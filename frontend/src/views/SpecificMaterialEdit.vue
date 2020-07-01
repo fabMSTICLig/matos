@@ -183,6 +183,7 @@
 
 <script>
 import { EditMixin } from "@/common/mixins";
+import {showMsgOk} from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
 export default {
@@ -306,7 +307,7 @@ export default {
         })
         .then(data => {
           this.selectObject(data);
-          this.$bvModal.msgBoxOk("Instance mise à jour");
+          showMsgOk("Instance mise à jour");
         });
     }
   }

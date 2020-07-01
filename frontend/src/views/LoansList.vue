@@ -113,7 +113,7 @@
           </ul>
         </div>
       </div>
-      <b-modal id="modal-delete" title="Annuler demande de prêt" hide-footer>
+      <modal id="modal-delete" title="Annuler demande de prêt" v-model="showDelete" hideFooter>
         <h6>Annuler la demande de prêt</h6>
 
         <p>
@@ -132,24 +132,28 @@
             <button
               type="button"
               class="btn btn-danger"
-              @click="$bvModal.hide('modal-delete')"
+              @click="showDelete=false"
             >
               Non
             </button>
           </div>
         </div>
-      </b-modal>
+      </modal>
     </div>
   </div>
 </template>
 
 <script>
 import { ListMixin } from "@/common/mixins";
+import Modal from "@/components/Modal";
 // @ is an alias to /src
 import { mapGetters } from "vuex";
 export default {
   name: "LoansList",
   mixins: [ListMixin],
+  components: {
+    Modal
+  },
   data() {
     return {
       ressource: "loans",
@@ -198,7 +202,7 @@ export default {
         .then(() => {
           this.$store.commit("loans/resetPending");
           this.selected_object = null;
-          this.$bvModal.hide("modal-delete");
+          this.showDelete=false;
           this.errors = [];
         })
         .catch(e => {
@@ -213,7 +217,7 @@ export default {
       this.$router.push({ name: "loan" });
     },
     deleteLoan() {
-      this.$bvModal.show("modal-delete");
+      this.showDelete=true;
     }
   },
   beforeMount() {
