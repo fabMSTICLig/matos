@@ -77,6 +77,7 @@
 
 <script>
 import { ListMixin } from "@/common/mixins";
+import {showMsgConfirm} from "@/components/Modal";
 // @ is an alias to /src
 export default {
   name: "TagList",
@@ -89,8 +90,7 @@ export default {
   },
   methods: {
     destroyUnused() {
-      this.$bvModal
-        .msgBoxConfirm(
+        showMsgConfirm(
           "Voulez vous vraiment supprimer tout les tags non utilisés ?"
         )
         .then(val => {

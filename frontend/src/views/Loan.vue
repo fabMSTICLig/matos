@@ -258,6 +258,7 @@
 import Vue from "vue";
 import { mapGetters, mapMutations } from "vuex";
 import DynList from "@/components/DynList";
+import {showMsgOk} from "@/components/Modal";
 import InputDatalist from "@/components/InputDatalist";
 export default {
   name: "Loan",
@@ -348,7 +349,7 @@ export default {
             })
             .then(data => {
               this.$store.commit("loans/setPending", data);
-              this.$bvModal.msgBoxOk("Le prêt a été modifié");
+              showMsgOk("Le prêt a été modifié");
               this.errors = [];
             })
             .catch(e => {
@@ -366,7 +367,7 @@ export default {
             .dispatch("loans/create", { data: this.pending_loan })
             .then(data => {
               this.$store.commit("loans/setPending", data);
-              this.$bvModal.msgBoxOk("La demande a été envoyée");
+              showMsgOk("La demande a été envoyée");
               this.errors = [];
             })
             .catch(e => {

@@ -1,4 +1,5 @@
 import Pagination from "@/components/Pagination";
+import {showMsgOk} from "@/components/Modal";
 
 export const ListMixin = {
   components: {
@@ -130,7 +131,7 @@ export const EditMixin = {
             this.object = Object.assign({}, data);
             // eslint-disable-next-line
             console.log(this.object_name + " updated");
-            this.$bvModal.msgBoxOk(this.object_name + " updated");
+            showMsgOk(this.object_name + " updated");
           });
       } else {
         document.querySelector("#editor-form").reportValidity();
@@ -146,7 +147,7 @@ export const EditMixin = {
           .then(data => {
             // eslint-disable-next-line
             console.log(this.object_name + " created");
-            this.$bvModal.msgBoxOk(this.object_name + " created");
+            showMsgOk(this.object_name + " created");
             var params = this.$route.params;
             params[this.$route.meta.routeparam] = data.id;
             this.$router.push({
