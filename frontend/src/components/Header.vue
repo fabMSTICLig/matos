@@ -66,17 +66,7 @@
               >Prêt ({{ loanQuantity }})</router-link
             >
           </li>
-<<<<<<< HEAD
-          <li class="nav-item" role="presentation">
-            <Dropdown
-              :items="userroutes"
-              :label="authUser.username"
-              classtoogle="nav-link"
-            />
-          </li>
 
-=======
->>>>>>> 585b5af2d1e7096c0c4b43a0dc20f44c42161a1d
           <li class="nav-item" role="presentation">
             <Dropdown
               :items="userroutes"

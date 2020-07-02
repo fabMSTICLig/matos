@@ -215,10 +215,6 @@ export default {
           if (value) this.$store.dispatch("loans/destroy", { id: item.id });
         }).then(()=> {
           this.initList();
-<<<<<<< HEAD
-          console.log(this.selected_object);
-=======
->>>>>>> 585b5af2d1e7096c0c4b43a0dc20f44c42161a1d
         })
     }
   },

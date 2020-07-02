@@ -208,10 +208,6 @@ export default {
         .then(() => {
           this.$store.commit("loans/resetPending");
           this.initList();
-<<<<<<< HEAD
-          console.log(this.selected_object)
-=======
->>>>>>> 585b5af2d1e7096c0c4b43a0dc20f44c42161a1d
           this.showDelete=false;
           this.errors = [];
         })
