@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import datetime
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from django.utils import timezone
 
-import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
-from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
+
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 
-from .serializers import *
-from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManager, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
 
+from .serializers import *
+from .permissions import EntityPermission, IsManagerCreateOrReadOnly, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -39,20 +39,9 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return UserSerializer
 
-    def get_queryset(self):
-        if self.action == 'list':
-            if self.request.user.is_staff:
-                return self.queryset
-            entities_user = self.request.user.entities.all()
-            entities = [entry['id'] for entry in entities_user.values("id")]
-            queryset = get_user_model().objects.filter(entities__in=entities).distinct()
-            return queryset
-        else:
-            return self.queryset
-
     def get_permissions(self):
         if self.action == 'list':
-            permission_classes = [IsManager]
+            permission_classes = [IsAuthenticated]
         elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
             permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
         else:
@@ -121,30 +110,13 @@ class SelfView(APIView):
         instance = UserSerializer(request.user, context={'request': request})
         return Response({"user": instance.data})
 
-class RGPDAcceptView(APIView):
-    """
-    Endpoint to accept rgpd conditions
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, format=None):
-        if request.user.rgpd_accept is None and 'accept' in request.data:
-            if request.data['accept']:
-                request.user.rgpd_accept = timezone.now().date()
-                request.user.save()
-        return Response({"rgpd_accept": request.user.rgpd_accept})
-
-    def get(self, request, format=None):
-        return Response({"rgpd_accept": request.user.rgpd_accept})
-
-
 class EntityViewSet(viewsets.ModelViewSet):
     """
     Endpoint for the entities
     """
     queryset = Entity.objects.all()
     serializer_class = EntitySerializer
-    permission_classes = (RGPDAccept, EntityPermission,)
+    permission_classes = (EntityPermission,)
 
 class AffiliationViewSet(viewsets.ModelViewSet):
     """
@@ -152,7 +124,7 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     """
     queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
-    permission_classes = (RGPDAccept, IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
 
     @action(methods=['get'], detail=False)
     def types(self, request):
@@ -166,7 +138,7 @@ class TagViewSet(viewsets.ModelViewSet):
     Endpoint for the material tags
     """
     queryset = Tag.objects.all()
-    permission_classes = (RGPDAccept, IsManagerCreateOrReadOnly,)
+    permission_classes = (IsManagerCreateOrReadOnly,)
     serializer_class = TagSerializer
 
     @action(methods=['delete'], detail=False)
@@ -236,7 +208,7 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     Use nested router params
     """
     queryset = GenericMaterial.objects.all()
-    permission_classes = (RGPDAccept, IsManagerOf,)
+    permission_classes = (IsManagerOf,)
     serializer_class = GenericMaterialSerializer
 
 class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
@@ -244,7 +216,7 @@ class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for generic material
     """
     queryset = GenericMaterial.objects.all()
-    permission_classes = (RGPDAccept, IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = GenericMaterialPublicSerializer
 
 class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
@@ -253,7 +225,7 @@ class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     Use nested router params
     """
     queryset = SpecificMaterial.objects.all()
-    permission_classes = (RGPDAccept, IsManagerOf,)
+    permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialSerializer
 
 class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
@@ -261,7 +233,7 @@ class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for specific material
     """
     queryset = SpecificMaterial.objects.all()
-    permission_classes = (RGPDAccept, IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = SpecificMaterialPublicSerializer
 
 
@@ -271,7 +243,7 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     Use nested router params
     """
     queryset = SpecificMaterialInstance.objects.all()
-    permission_classes = (RGPDAccept, IsManagerOf,)
+    permission_classes = (IsManagerOf,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         """
@@ -326,7 +298,7 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for specific material instance
     """
     queryset = SpecificMaterialInstance.objects.all()
-    permission_classes = (RGPDAccept, IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
@@ -337,8 +309,8 @@ class LoanViewSet(viewsets.ModelViewSet):
     """
     Endpoints for loans
     """
-    queryset = Loan.objects.select_related("child")
-    permission_classes = (RGPDAccept, LoanPermission,)
+    queryset = Loan.objects.all()
+    permission_classes = (LoanPermission,)
     serializer_class = LoanSerializer
 
     def get_queryset(self):
@@ -370,11 +342,11 @@ class LoanViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
-            if (serializer.validated_data['status'] != int(Loan.Status.PENDING) and serializer.validated_data['status'] != int(Loan.Status.REQUESTED)) or instance.status == Loan.Status.ACCEPTED :
+            if serializer.validated_data['status'] != Loan.Status.PENDING and serializer.validated_data['status'] != Loan.Status.REQUESTED:
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})
-            request.data.update({'parent':instance.parent.id if instance.parent else instance.parent})     
+            request.data.update({'parent':instance.parent.id if instance.parent else instance.parent})
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
@@ -386,7 +358,6 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
     @action(methods=['get'], detail=False)
     def status(self, request):
         """
@@ -394,33 +365,5 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         return Response(dict((x, y) for x, y in Loan.Status.choices), status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=True)
-    def make_child(self, request,pk=None):
-        """
-        Create a child of the loan
-        Parent/child are used to keep an history for loan modification
-        """
-        loan = get_object_or_404(Loan,pk=pk)
-        if(hasattr(loan, "child")):
-            raise serializers.ValidationError("Le prêt a déjà un successeur.")
-        if(loan.status != Loan.Status.ACCEPTED):
-            raise serializers.ValidationError("Vous ne pouvez copier qu'un prêt qui a été accepté.")
-
-        if loan.return_date is None:
-            loan.return_date = timezone.now().date()
-        loan.save()
-
-        child = Loan.objects.create(user=loan.user, entity=loan.entity, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=loan, due_date=loan.due_date, checkout_date=loan.return_date)
-
-        child.specific_materials.set(loan.specific_materials.all())
-
-        mats = []
-        for mat in loan.loangenericitem_set.all():
-            mats.append(LoanGenericItem(loan=child, material=mat.material, quantity=mat.quantity))
-        LoanGenericItem.objects.bulk_create(mats)
-
-        sloan=self.get_serializer(loan)
-        schild=self.get_serializer(child)
 
 
-        return Response({"parent":sloan.data, "child":schild.data})
