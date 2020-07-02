@@ -268,7 +268,7 @@
 import Vue from "vue";
 import { mapGetters, mapMutations } from "vuex";
 import DynList from "@/components/DynList";
-import {showMsgOk} from "@/components/Modal";
+import { showMsgOk } from "@/components/Modal";
 import InputDatalist from "@/components/InputDatalist";
 export default {
   name: "Loan",

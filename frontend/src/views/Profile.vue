@@ -131,7 +131,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="showRGPD=false"
+            @click="showRGPD = false"
           >
             Non
           </button>
@@ -142,7 +142,7 @@
 </template>
 <script>
 import DynList from "@/components/DynList";
-import {showMsgOk, Modal} from "@/components/Modal";
+import { showMsgOk, Modal } from "@/components/Modal";
 import {
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD,
@@ -158,7 +158,7 @@ export default {
   data() {
     return {
       goodpassword: null,
-      showRGPD:false,
+      showRGPD: false,
       form: {
         old_password: "",
         new_password: "",
@@ -221,18 +221,18 @@ export default {
       this.$store.dispatch(UPDATE_AUTHUSER, this.authUser).then(() => {
         // eslint-disable-next-line
         console.log("Profile updated");
-        showMsgOk("Profile mis à jour")
+        showMsgOk("Profile mis à jour");
       });
     },
     accept() {
       this.$store.dispatch(UPDATE_RGPD).then(() => {
-        this.showRGPD=false
+        this.showRGPD = false;
       });
     }
   },
   mounted() {
     if (!this.authUser.rgpd_accept) {
-      this.showRGPD=true
+      this.showRGPD = true;
     }
   }
 };

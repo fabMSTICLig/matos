@@ -1,5 +1,5 @@
 import Pagination from "@/components/Pagination";
-import {showMsgOk} from "@/components/Modal";
+import { showMsgOk } from "@/components/Modal";
 
 export const ListMixin = {
   components: {

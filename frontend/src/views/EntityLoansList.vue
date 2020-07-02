@@ -142,7 +142,7 @@
 
 <script>
 import { ListMixin } from "@/common/mixins";
-import {showMsgConfirm} from "@/components/Modal";
+import { showMsgConfirm } from "@/components/Modal";
 // @ is an alias to /src
 import { mapGetters } from "vuex";
 export default {
@@ -215,7 +215,6 @@ export default {
           if (value) this.$store.dispatch("loans/destroy", { id: item.id });
         }).then(()=> {
           this.initList();
-          console.log(this.selected_object);
         })
     }
   },
