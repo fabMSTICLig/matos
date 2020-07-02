@@ -168,6 +168,9 @@ export default {
       userById: "users/byId",
       entityById: "entities/byId"
     }),
+    currentRoute() {
+      return this.$route.path;
+    },
     isEditable() {
       return (
         this.selected_object.status == 1 || this.selected_object.status == 2
@@ -210,7 +213,10 @@ export default {
       showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?")
         .then(value => {
           if (value) this.$store.dispatch("loans/destroy", { id: item.id });
-        });
+        }).then(()=> {
+          this.initList();
+          console.log(this.selected_object);
+        })
     }
   },
   beforeMount() {

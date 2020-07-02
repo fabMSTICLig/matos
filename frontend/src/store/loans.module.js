@@ -85,16 +85,18 @@ const loans_extra = {
       if (state.pending_loan.entity == null) {
         state.pending_loan.entity = mat.entity;
       }
-      if (
-        "quantity" in mat &&
-        state.pending_loan.generic_materials.indexOf(mat.id) == -1
-      ) {
-        state.pending_loan.generic_materials.push({
-          material: mat.id,
-          quantity: 1
-        });
-      } else if (state.pending_loan.models.indexOf(mat.id) == -1) {
-        state.pending_loan.models.push(mat.id);
+      if(state.pending_loan.entity && state.pending_loan.entity == mat.entity){
+        if (
+          "quantity" in mat &&
+          state.pending_loan.generic_materials.indexOf(mat.id) == -1
+        ) {
+          state.pending_loan.generic_materials.push({
+            material: mat.id,
+            quantity: 1
+          });
+        } else if (state.pending_loan.models.indexOf(mat.id) == -1) {
+          state.pending_loan.models.push(mat.id);
+        }
       }
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
