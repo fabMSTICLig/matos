@@ -157,7 +157,8 @@ export default {
   data() {
     return {
       ressource: "loans",
-      loaded: false
+      loaded: false,
+      showDelete: false,
     };
   },
   computed: {
@@ -201,7 +202,8 @@ export default {
         })
         .then(() => {
           this.$store.commit("loans/resetPending");
-          this.selected_object = null;
+          this.initList();
+          console.log(this.selected_object)
           this.showDelete=false;
           this.errors = [];
         })
