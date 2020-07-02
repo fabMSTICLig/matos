@@ -16,10 +16,26 @@
                 v-if="updateMode && canManage"
                 >Retour liste</router-link
               >
-            </div>
+              <router-link
+                class="btn btn-primary"
+                role="button"
+                :to="{
+                  name: 'authloans',
+                }"
+                v-if="updateMode && !canManage"
+                >Retour liste</router-link
+              >
+             </div>
           </div>
           <div class="card-body">
-            <form class="form" @submit="submitLoan">
+            <ul class="text-danger" v-show="errors.length != 0">
+                    <li
+                      v-for="error in errors"
+                      :key="error"
+                      v-text="error"
+                    ></li>
+              </ul>            
+              <form class="form" @submit="submitLoan">
               <div class="row">
                 <div class="col-12 col-md-5">
                   <div class="form-group" v-if="canManage">
@@ -97,13 +113,7 @@
                     Votre prêt doit contenir au moins un matériel. Pour un
                     material spécific veuillez choisir une instance
                   </p>
-                  <ul class="text-danger" v-show="errors.length != 0">
-                    <li
-                      v-for="error in errors"
-                      :key="error"
-                      v-text="error"
-                    ></li>
-                  </ul>
+                  
                   <div class="table-responsive">
                     <table class="table">
                       <thead>
@@ -224,7 +234,7 @@
                     type="submit"
                     v-if="!readOnly"
                   >
-                    {{ updateMode ? "Modifier" : "Envoyer la demande" }}
+                    {{ updateMode ? "Modifier" : labelSubmit }}
                   </button>
                   <button
                     v-if="!updateMode"
@@ -270,7 +280,8 @@ export default {
     return {
       specificinstances: {},
       loaded: false,
-      errors: []
+      errors: [],
+      prevRoute: null
     };
   },
   computed: {
@@ -284,8 +295,16 @@ export default {
       authUser: "authUser",
       isAdmin: "isAdmin",
       pending_loan: "loans/pending_loan",
-      status: "loans/status"
+      status: "loans/status",
     }),
+    labelSubmit(){
+      if(this.canManage) {
+        return "Créer"
+      }
+      else {
+        return "Envoyer la demande"
+      }
+    },
     emptyLoan() {
       return (
         this.pending_loan.generic_materials.length == 0 &&
@@ -327,6 +346,7 @@ export default {
     ...mapMutations({
       removeMaterial: "loans/removeMaterial"
     }),
+    
     initInstances(item) {
       return this.$store
         .dispatch("specificmaterials/instances/fetchList", {
@@ -338,7 +358,8 @@ export default {
     },
     submitLoan(e) {
       e.preventDefault();
-      if (!this.emptyLoan) {
+      this.checkErrors();
+      if (!this.emptyLoan && !this.errors.length) {
         if (this.pending_loan.return_date == "")
           this.pending_loan.return_date = null;
         if (this.updateMode) {
@@ -379,6 +400,18 @@ export default {
             });
         }
       }
+    },
+    checkErrors() {
+        this.errors = []
+        if(!this.pending_loan.user && this.canManage) {
+          this.errors.push("Un utilisateur doit être assigné")
+        }
+        if(this.pending_loan.checkout_date > this.pending_loan.due_date ) {
+          this.errors.push("la date de sortie doit être antérieure à celle du retour prévu")
+        }
+        if(this.pending_loan.return_date && (this.pending_loan.checkout_date > this.pending_loan.return_date)) {
+          this.errors.push("la date de sortie doit être antérieure à celle du retour")
+        }
     },
     cleanMaterials() {
       this.$store.commit("loans/cleanMaterials");

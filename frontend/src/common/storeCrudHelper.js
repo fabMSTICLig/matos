@@ -21,6 +21,22 @@ function mergeDeep(...objects) {
   }, {});
 }
 
+function removeNullFields(data) {
+  
+  let values = data.map( item => {
+    return Object.keys(item).reduce((newObj, key) => {
+      const value = item[key];
+      if (value !== null) {
+        newObj[key] = value;
+      }
+      console.log(newObj)
+      return newObj;
+    }, {});
+  })
+  return values;
+ 
+}
+
 const createCrud = (ressource, source) => {
   const target = {
     namespaced: true,
@@ -41,7 +57,9 @@ const createCrud = (ressource, source) => {
       fetchList({ commit, getters }, { prefix = "" } = {}) {
         return ApiService.query(prefix + ressource, {})
           .then(({ data }) => {
-            commit("fetchListSuccess", data);
+            let datacleaned = removeNullFields(data);
+            console.log(datacleaned);
+            commit("fetchListSuccess", datacleaned);
             return Promise.resolve(getters.list);
           })
           .catch(error => {
