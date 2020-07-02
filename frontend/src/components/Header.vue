@@ -66,6 +66,7 @@
               >Prêt ({{ loanQuantity }})</router-link
             >
           </li>
+
           <li class="nav-item" role="presentation">
             <Dropdown
               :items="userroutes"
@@ -75,7 +76,12 @@
           </li>
 
           <li class="nav-item" role="presentation">
-            <a class="nav-link" href="/#/" @click="logout">Logout</a>
+            <a
+              class="nav-link"
+              href="#"
+              @click="logout"
+              >Logout
+            </a>
           </li>
         </ul>
         <ul v-else class="nav navbar-nav">
@@ -145,8 +151,10 @@ export default {
   methods: {
     logout(e) {
       e.preventDefault();
-      this.$store.commit("loans/resetPending");
-      window.location = this.authUser.externe ? "/cas/logout" : "/auth/logout";
+      if(this.pending_loan) {
+          this.$store.commit("loans/resetPending")
+      }
+      window.location = this.authUser.externe ? '/cas/logout' : '/auth/logout'
     }
   }
 };

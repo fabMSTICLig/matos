@@ -207,8 +207,9 @@ export default {
         })
         .then(() => {
           this.$store.commit("loans/resetPending");
-          this.initList();
-          console.log(this.selected_object)
+          if (this.objects_filtered.length > 0) {
+            this.selected_object = this.objects_filtered[0];
+          }
           this.showDelete=false;
           this.errors = [];
         })

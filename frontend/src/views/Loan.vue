@@ -14,7 +14,7 @@
                   params: { entityid: pending_loan.entity }
                 }"
                 v-if="updateMode && canManage"
-                >Retour liste</router-link
+                >Retour entité</router-link
               >
               <router-link
                 class="btn btn-primary"
@@ -23,7 +23,7 @@
                   name: 'authloans',
                 }"
                 v-if="updateMode && !canManage"
-                >Retour liste</router-link
+                >Mes prêts</router-link
               >
              </div>
           </div>

@@ -60,7 +60,7 @@ export const ListMixin = {
         .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
         .then(() => {
           if (this.objects_filtered.length > 0) {
-            this.selected_object = this.objects_list[0];
+            this.selected_object = this.objects_filtered[0];
           }
         });
     },

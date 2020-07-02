@@ -39,17 +39,6 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return UserSerializer
 
-    def get_queryset(self):
-        if self.action == 'list':
-            if self.request.user.is_staff:
-                return self.queryset
-            entities_user = self.request.user.entities.all()
-            entities = [entry['id'] for entry in entities_user.values("id")]
-            queryset = get_user_model().objects.filter(entities__in=entities).distinct()
-            return queryset
-        else:
-            return self.queryset
-
     def get_permissions(self):
         if self.action == 'list':
             permission_classes = [IsManager]

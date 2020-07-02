@@ -1,0 +1,60 @@
+<template>
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+      <div class="card">
+        <div class="card-header">
+         <h4>Traitement des données</h4>
+        </div>
+        <div class="card-body">
+          <section>
+            <article>
+              <h3>Stockage des informations</h3>
+                <p>
+                  Pour permettre le bon fonctionnment du site certaines, de vos
+                  informations sont stockées au moyen d'un cookie. Votre login <i>Agalan</i> vous permet d'utiliser la plateforme, et le nom d'utilisateur est enregistré pendant la session
+                </p>
+                <h4>Données utilisées</h4>
+                <p>
+                  Nom d'utilisateur, Prénom, Nom, Email sont utilisés afin de vous
+                  contacter. Seul les managers des entités ont accés à ces informations.
+                </p>
+            </article>
+            <article>
+              <h3>Durée de stockage</h3>
+              <p>
+              Ces informations ainsi que celles liées aux prêts seront stockées 3 ans
+              après que vous ayez quitté l'université ou sur demande aux adresses :
+              <ul>
+                <li>relaisdpo@grenoble-inp.fr</li>
+                <li>dpo@grenet.fr</li>
+              </ul>
+              </p>
+            </article>
+            <article>
+              <h3>Accès aux données personnelles</h3>
+              <p>A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec les contacts cités précédemment ou avec le formulaire suivant : </p>
+            </article>
+            <article>
+              <h3>Sécurité des données</h3>
+              Les données enregistrées concernant les entités et les prêts sont accessibles uniquement aux utilisateurs ayant les droits d'accès de celles-ci,
+              et non visible pour les autres utilisateurs sans permissions
+            </article>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+// @ is an alias to /src
+
+export default {
+  name: "DataPolicy",
+  components: {}
+};
+</script>
+<style scoped>
+  .row {
+    margin-top: 60px;
+  }
+</style>
