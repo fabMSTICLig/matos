@@ -5,7 +5,7 @@
         <div class="card-header">
          <h4>Traitement des données</h4>
         </div>
-        <div class="card-body"> 
+        <div class="card-body">
           <section>
             <article>
               <h3>Stockage des informations</h3>
@@ -32,7 +32,7 @@
             </article>
             <article>
               <h3>Accès aux données personnelles</h3>
-              <p>A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec les contacts cités précédemment ou avec le formulaire suivant : </p>     
+              <p>A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec les contacts cités précédemment ou avec le formulaire suivant : </p>
             </article>
             <article>
               <h3>Sécurité des données</h3>
@@ -41,7 +41,7 @@
             </article>
           </section>
         </div>
-      </div> 
+      </div>
     </div>
   </div>
 </template>

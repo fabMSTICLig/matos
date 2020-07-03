@@ -152,9 +152,9 @@ export default {
     logout(e) {
       e.preventDefault();
       if(this.pending_loan) {
-          this.$store.commit(this.ressource + "/resetPending", this.pending_loan)
-          window.location = this.authUser.externe ? '/cas/logout' : '/auth/logout'
+          this.$store.commit("loans/resetPending")
       }
+      window.location = this.authUser.externe ? '/cas/logout' : '/auth/logout'
     }
   }
 };
