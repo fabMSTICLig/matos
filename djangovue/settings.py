@@ -34,6 +34,7 @@ except ImportError:
 # Application definition
 
 INSTALLED_APPS = [
+    'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,9 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'core',
-    'django.contrib.postgres',
     'django_cas_ng',
-    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -111,6 +110,7 @@ CAS_ADMIN_PREFIX = "admin"
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'django_cas_ng.backends.CASBackend',
+    'django_su.backends.SuBackend',
 )
 
 DATABASES = {}
@@ -178,13 +178,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, './static'),
 ]
-
-CORS_ORIGIN_ALLOW_ALL = False
-
-
-CORS_ALLOW_CREDENTIALS = True
-
-
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
