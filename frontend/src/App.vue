@@ -32,6 +32,7 @@ export default {
     this.$store
       .dispatch(CHECK_AUTH)
       .then(() => {
+        /* eslint-disable-next-line no-console */
         console.log("connected");
         var pall = [];
         pall.push(
@@ -64,7 +65,7 @@ export default {
         );
         pall.push(
           import(
-            /* webpackChunkName: "store-loans */ "@/store/loans.module"
+            /* webpackChunkName: "store-loans" */ "@/store/loans.module"
           ).then(module => {
             this.$store.registerModule("loans", module.default);
             this.$store.commit("loans/onLoad");
@@ -85,8 +86,10 @@ export default {
           })
         );
         Promise.all(pall).then(() => {
+          /* eslint-disable-next-line no-console */
           console.log("loaded");
           this.loaded = true;
+          /* eslint-disable-next-line no-console */
           console.log(this.loaded);
         });
       })
