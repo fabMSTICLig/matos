@@ -23,17 +23,12 @@ class EntitiesTests(APITestCase):
     def setUp(self):
         self.apiFactory = self.api_factory()
         #ajout de managers
-<<<<<<< HEAD
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1")
         self.manager2 = get_user_model().objects.create(username="manager2", first_name="manager2")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
         self.manager2.rgpd_accept = timezone.now().date()
         self.manager2.save()
-=======
-        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1", email="manager1@grenoble-inp.fr", rgpd_accept="2020-06-25")
-        self.manager2 = get_user_model().objects.create(username="manager2", first_name="manager2", email="manager1@univ-grenoble-alpes.fr", rgpd_accept="2020-06-25")
->>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
         #ajout des entités
         self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr')
         self.ensimag_entity = Entity.objects.create(name = 'ENSIMAG', description = 'Ecole ENSIMAG - Grenoble INP', contact='contact-ensimag@grenoble-inp.fr')
@@ -41,12 +36,8 @@ class EntitiesTests(APITestCase):
         self.lig_entity.save()
         #ajout d'un admin
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
-<<<<<<< HEAD
         self.superuser.rgpd_accept = timezone.now().date()
         self.superuser.save()
-=======
-        self.superuser.rgpd_accept = True
->>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
     def test_not_manager_update(self):
         managers_lig_obj = self.lig_entity.managers.all()
@@ -174,12 +165,8 @@ class UsersTests(APITestCase):
         self.rgpd_accept_date = datetime.date(2020,6,24)
         self.lig_entity = Entity.objects.create(name = 'LIG', description = 'Laboratoire Informatique de Grenoble', contact='contact-lig@univ-grenoble-alpes.fr')
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
-<<<<<<< HEAD
         self.superuser.rgpd_accept = timezone.now().date()
         self.superuser.save()
-=======
-        self.superuser.rgpd_accept = "2020-06-25"
->>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
     def test_update_self_affiliations(self):
         data = { 'affiliations' : [self.affiliation.pk] }
@@ -222,12 +209,8 @@ class AffiliationsTests(APITestCase):
     def setUp(self):
         self.apiFactory = self.api_factory()
         self.superuser = get_user_model().objects.create_superuser('john', 'john@snow.com', 'johnpassword')
-<<<<<<< HEAD
         self.superuser.rgpd_accept = timezone.now().date()
         self.superuser.save()
-=======
-        self.superuser.rgpd_accept = True
->>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
         self.affiliation = Affiliation.objects.create(name='Grenoble INP', type='Ecole')
         self.user =  get_user_model().objects.create(username="max", first_name="max", email='max@univ-grenoble.fr', password='1ngF@b', rgpd_accept="2020-06-25")
 
@@ -272,17 +255,12 @@ class GenericMaterialsTests(APITestCase):
 
     def setUp(self):
         #ajout de managers
-<<<<<<< HEAD
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
         self.manager2.rgpd_accept = timezone.now().date()
         self.manager2.save()
-=======
-        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr", rgpd_accept="2020-06-25")
-        self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr", rgpd_accept="2020-06-25")
->>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
         self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1', rgpd_accept="2020-06-25")
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
@@ -343,17 +321,12 @@ class SpecificMaterialsTests(APITestCase):
 
     def setUp(self):
         #ajout de managers
-<<<<<<< HEAD
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
         self.manager2.rgpd_accept = timezone.now().date()
         self.manager2.save()
-=======
-        self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr", rgpd_accept="2020-06-25")
-        self.manager2 = get_user_model().objects.create(username="malik", first_name="manager2",email="malik-fabmstic@univ-grenoble-alpes.fr", rgpd_accept="2020-06-25")
->>>>>>> 6431e43... ajout du test suppression pret demandé par l'utilisateur
 
         self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1', rgpd_accept="2020-06-25")
         self.entity = Entity.objects.create(name="ENSAG", description="Ecole Architecture Enseignement Sup",contact="contact@grenoble.archi.fr")
@@ -438,6 +411,9 @@ class LoanMaterialsTests(APITestCase):
         self.manager1 = get_user_model().objects.create(username="manager1", first_name="manager1",email="manager1@grenoble-inp.fr")
         self.manager1.rgpd_accept = timezone.now().date()
         self.manager1.save()
+        self.manager2 = get_user_model().objects.create(username="manager2", first_name="manager2",email="manager2@grenoble-inp.fr")
+        self.manager2.rgpd_accept = timezone.now().date()
+        self.manager2.save()
         self.user =  get_user_model().objects.create(username="ingenieur1", first_name="ingenieur1", email='ingenieur1@univ-grenoble.fr', password='ingénieur1')
         self.user.rgpd_accept = timezone.now().date()
         self.user.save()
@@ -622,21 +598,23 @@ class LoanMaterialsTests(APITestCase):
 
     def test_child_loan(self):
         """
-            Seul un manager peut créer un prêt enfant d'un autre pret
+            Seul un manager peut créer un prêt successeur 
             Vérification de la même entité pour la copie du prêt
         """
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,7,30), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,8,24), "return_date" : datetime.date(2020,8,25), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [ self.materials_specific_instance2.pk], 'generic_materials': [], 'parent': self.loan_manager.pk }
-        self.client.force_authenticate(user=self.manager1)
-        response = self.client.post(reverse('loan-list'), data)
+        data = {"status" : 3, "checkout_date": datetime.date(2020,8,25), "user" : self.user.pk, "entity": self.entity.pk, "due_date": datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt tablettes info'}
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(reverse('loan-make-child', kwargs= {'pk': self.loan_user_accepted.pk}), data)
         response.render()
-        self.assertTrue(response.data['parent'])
-        self.assertEquals(response.data['parent'], self.loan_manager.pk)
+        self.assertEquals(response.data['parent']['id'], self.loan_user_accepted.pk), 
 
     def test_child_loan_not_created(self):
+        """
+            Un manager ne peut créer de pret successeur pour un autre utilisateur
+        """
         parent = self.loan.pk
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,7,30), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,8,24), "return_date" : datetime.date(2020,8,25), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [ self.materials_specific_instance2.pk], 'generic_materials': [], 'parent': self.loan_manager.pk }
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post(reverse('loan-list'), data)
+        data = {"status" : 3, "checkout_date": datetime.date(2020,8,25), "user" : self.manager1.pk, "entity": self.entity.pk, "due_date": datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt tablettes info'}
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.post(reverse('loan-make-child', kwargs= {'pk': self.loan_user_accepted.pk}), data)
         response.render()
         self.assertIsNone(response.data['parent'])
 
@@ -660,11 +638,12 @@ class LoanMaterialsTests(APITestCase):
             user (transfert vers un autre utilisateur)
         """
         # test protection utilisateur
-        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : 1 , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [], 'generic_materials': [{"material": 1, "quantity": 10}] }
+        data = {"status" : 1, "checkout_date" : datetime.date(2020,6,8), "user" : self.manager2.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [], 'generic_materials': [{"material": 1, "quantity": 10}] }
         self.client.force_authenticate(user=self.user)
         response = self.client.put(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        self.assertEquals(response.data['user'], 2)
+        print(response.status_code)
+        self.assertEquals(response.data['user'], self.user.pk)
 
     def test_specific_material_instance(self):
         """
