@@ -1,9 +1,16 @@
 <template>
   <div class="row">
+    <h1 class="col-12">Mes prêts</h1>
     <div class="col-12 col-md-6">
       <div class="card">
         <div class="card-header">
-          <h3>Mes prêts</h3>
+            <form class="form form-inline">
+              <div class="form-group">
+                <label class="mr-1">En cours : </label>
+                <input type="checkbox" aria-label="Checkbox pour prêt en cours" v-model="inprogress"/>
+              </div>
+            </form>
+
         </div>
         <div class="card-body">
           <div class="table-responsive table-hover">
@@ -164,6 +171,7 @@ export default {
       ressource: "loans",
       loaded: false,
       showDelete: false,
+      inprogress:false,
     };
   },
   computed: {
@@ -196,7 +204,9 @@ export default {
     },
     search_fields(list) {
       return list.filter(item => {
-        return item.user == this.authUser.id;
+        return item.user == this.authUser.id && (this.inprogress ? (item.return_date == null) : true);
+      }).sort((a,b)=> {
+        return a.due_date.localeCompare(b.due_date)
       });
     },
     validDestroy(item) {
