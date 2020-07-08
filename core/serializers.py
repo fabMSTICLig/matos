@@ -205,7 +205,7 @@ class LoanSerializer(serializers.ModelSerializer):
             loans = loans.exclude(id=self.initial_data['id'])
         for loan in loans:
             materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
-            raise serializers.ValidationError("Prêt en cours pour le matériel suivant "+str(materialintersec)+" jusqu'au "+str(loan.due_date))
+            raise serializers.ValidationError("Prêt en cours pour le matériel suivant "+str(materialintersec)+" jusqu'au "+str(loan.return_date))
         #conflit prêts dans le future
         loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], status=Loan.Status.ACCEPTED, checkout_date__gte=data['checkout_date'])
         if('id' in self.initial_data):
