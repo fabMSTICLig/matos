@@ -41,7 +41,7 @@ const loans_extra = {
       } else {
         state.pending_loan = {
           entity: null,
-          status: 1,
+          status: 2,
           user: null,
           due_date: null,
           return_date: null,
