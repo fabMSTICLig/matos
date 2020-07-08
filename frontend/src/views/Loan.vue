@@ -38,7 +38,7 @@
               <form class="form" @submit="submitLoan">
               <div class="row">
                 <div class="col-12 col-md-5">
-                  <div class="form-group" v-if="canManage">
+                  <div class="form-group" v-if="canManage && !isBorrowed">
                     <label>Utilisateur :</label>
                     <input-datalist
                       v-model="pending_loan.user"
@@ -311,6 +311,11 @@ export default {
         this.pending_loan.specific_materials.length == 0
       );
     },
+    isBorrowed() {
+      return(
+        this.pending_loan.user == this.authUser.id
+      )
+    },
     canManage() {
       return (
         this.isAdmin ||
@@ -447,6 +452,9 @@ export default {
     Promise.all(pall).then(() => {
       this.loaded = true;
     });
+    if(this.canManage && this.emptyLoan) {
+      this.pending_loan.status = 1 
+    }
   }
 };
 </script>
