@@ -21,6 +21,7 @@ import django_cas_ng.views
 
 urlpatterns = [
     re_path(r'^$', view=TemplateView.as_view(template_name='index.html')),
+    re_path(r'^su/', include('django_su.urls')),
     path('admin/', admin.site.urls),
     path('auth/', include('django.contrib.auth.urls')),
     path('cas/login/', django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),

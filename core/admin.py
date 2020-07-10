@@ -12,6 +12,8 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('PlatPret', {'fields': ('rgpd_accept','affiliations',)}),
     )
+    change_form_template = "admin/auth/user/change_form.html"
+    change_list_template = "admin/auth/user/change_list.html"
 
 admin.site.register(User, CustomUserAdmin)
 
