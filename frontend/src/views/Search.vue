@@ -8,6 +8,7 @@
             <h4>Filtres</h4>
           </div>
           <div class="card-body">
+            {{pending_loan}}
             <form class="form">
               <div class="form-group">
                 <label>Chercher</label
@@ -103,18 +104,20 @@
                     ressource="tags"
                   />
                 </p>
+              
                 <button
                   class="btn btn-primary wt-1"
                   type="button"
-                  @click="addMaterial(item)"
+                  @click="addItem(item)"
                   :class="{
                     disabled:
-                      pending_loan.entity && pending_loan.entity != item.entity
+                      (pending_loan.entity && pending_loan.entity != item.entity) || setDisabled(item)
                   }"
-                  title="Les matériel d'un prêt doivent tous appartenir à la même entité"
+                  title="Les matériels d'un prêt doivent tous appartenir à la même entité"
                 >
                   Ajouter
                 </button>
+                {{item}}
               </li>
             </ul>
           </div>
@@ -159,6 +162,7 @@ export default {
       isAdmin: "isAdmin",
       pending_loan: "loans/pending_loan"
     }),
+   
     objects_list() {
       if (this.type_input == 2) return this.genericmaterials;
       else if (this.type_input == 3) return this.specificmaterials;
@@ -218,6 +222,40 @@ export default {
     ...mapMutations({
       addMaterial: "loans/addMaterial"
     }),
+     setDisabled(material) {
+
+      let genericItemsAdded, specificItemsAdded ;
+
+      if(this.pending_loan) {
+        if(material.quantity){
+            genericItemsAdded = this.pending_loan.generic_materials.filter( item => {
+            return (item.material == material.id) 
+          });
+        }
+        if(material.instances){
+          specificItemsAdded = this.pending_loan.models.filter( spec => {
+          return(spec == material.id) 
+          })
+        }
+      }
+       
+      if(genericItemsAdded) {
+        return genericItemsAdded[0]
+      }
+      if(specificItemsAdded) {
+        return specificItemsAdded[0]
+      }
+      else {
+        return false;
+      }
+    },
+
+    addItem(item) {
+      let self = this
+      if(!self.setDisabled(item)) {
+        self.addMaterial(item)
+      }
+    },
     onPageChange(page) {
       this.current_page = page;
     },
