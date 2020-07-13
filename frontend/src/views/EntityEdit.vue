@@ -1,5 +1,4 @@
 <template>
-  <div class="row">
     <div class="col-12">
       <div class="card" v-if="object">
         <div class="card-header">
@@ -118,7 +117,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>

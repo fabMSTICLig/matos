@@ -213,6 +213,7 @@ const routes = [
           import(/* webpackChunkName: "entity" */ "../views/Entity.vue"),
         meta: {
           routeparam: "entityid",
+          routedelete: "entities",
           breadcumb: {
             label: {
               ressource: "entities",
@@ -224,6 +225,18 @@ const routes = [
         children: [
           {
             path: "",
+            name: "entityinfos",
+            meta: {
+              routeparam: "entityid",
+              routedelete: "entities"
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "entityedit" */ "../views/EntityInfos.vue"
+              )
+          },
+          {
+            path: "/edit",
             name: "entityedit",
             meta: {
               routeparam: "entityid",
