@@ -186,7 +186,8 @@
                       updateMode &&
                         (pending_loan.child ||
                           pending_loan.parent ||
-                          pending_loan.status == 3)
+                          pending_loan.status == 3) &&
+                              makeChild_btn
                     "
                   >
                     <label>Historique :</label>
@@ -205,7 +206,7 @@
                             updateMode &&
                               canManage &&
                               !pending_loan.child &&
-                              pending_loan.status == 3
+                              pending_loan.status == 3 
                           "
                           class="btn btn-info"
                           type="button"
@@ -213,6 +214,7 @@
                         >
                           Créer un successeur
                         </button>
+                        
                         <button
                           v-if="updateMode && pending_loan.child"
                           class="btn btn-info"
@@ -281,7 +283,8 @@ export default {
       specificinstances: {},
       loaded: false,
       errors: [],
-      prevRoute: null
+      prevRoute: null,
+      makeChild_btn: false
     };
   },
   computed: {
@@ -313,7 +316,7 @@ export default {
     },
     isBorrowed() {
       return(
-        this.pending_loan.user == this.authUser.id
+        this.canManage ? false : this.pending_loan.user == this.authUser.id
       )
     },
     canManage() {
@@ -376,6 +379,9 @@ export default {
             .then(data => {
               this.$store.commit("loans/setPending", data);
               showMsgOk("Le prêt a été modifié");
+              if(this.pending_loan.status == 3) {
+                this.makeChild_btn = true
+              }
               this.errors = [];
             })
             .catch(e => {
@@ -433,6 +439,7 @@ export default {
       });
     },
     makeChild() {
+      
       this.$store
         .dispatch("loans/makeChild", { id: this.pending_loan.id })
         .then(data => {
@@ -455,6 +462,15 @@ export default {
     if(this.canManage && this.emptyLoan) {
       this.pending_loan.status = 1 
     }
+    this.$store.dispatch("loans/fetchSingle", { id: this.pending_loan.id }).then(data => {
+          if(data.status !== 3 ) {
+            this.makeChild_btn = false;
+          }
+          else {
+            this.makeChild_btn = true;
+          }
+    });
+
   }
 };
 </script>
