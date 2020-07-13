@@ -8,7 +8,6 @@
             <h4>Filtres</h4>
           </div>
           <div class="card-body">
-            {{pending_loan}}
             <form class="form">
               <div class="form-group">
                 <label>Chercher</label
@@ -89,7 +88,7 @@
                     ><router-link
                       :to="{
                         name: 'entitieslist',
-                        query: { select: item.id }
+                        query: { select: item.entity }
                       }"
                       >{{ getEntityName(item.entity) }}</router-link
                     ></strong
@@ -117,7 +116,6 @@
                 >
                   Ajouter
                 </button>
-                {{item}}
               </li>
             </ul>
           </div>
