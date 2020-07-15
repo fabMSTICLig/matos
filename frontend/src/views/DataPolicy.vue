@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-content-center">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-12">
       <div class="card">
         <div class="card-header">
          <h4>Traitement des données</h4>
@@ -15,43 +15,35 @@
             </article>
             <article>
               <h3>Stockage des informations</h3>
-                <p align="justify">
-                  Pour permettre le bon fonctionnment du site, certaines de vos
-                  informations sont stockées au moyen d'un cookie. Votre login <b><i>Agalan</i></b> vous permet d'utiliser la plateforme, et le nom d'utilisateur est enregistré pendant la session.
+                <p>
+                  Pour permettre le bon fonctionnment du site certaines de vos
+                  informations sont stockées au moyen d'un cookie. Votre login <i>Agalan</i> vous permet d'utiliser la plateforme, et le nom d'utilisateur est enregistré pendant la session.
+                  Un cookie est également utilisé pour enregistrer le prêt en cours d'utilisation (création ou modification)
                 </p>
-                <h4>Objet</h4>
-                <p align="justify">
-                  <b>Nom d'utilisateur</b>, <b>Prénom</b>, <b>Nom</b>, <b>Email</b> sont utilisés afin de vous
-                  contacter. Seul les <b><i>managers</i></b> des entités ont accés à ces informations.
-                </p>
-                <p align="justify">
-                  Un historique des prêts de matériels est mis en place, permettant à chaque entité de disposer des ses informations.
+                <h4>Données utilisées</h4>
+                <p>
+                  Nom d'utilisateur, Prénom, Nom, Email sont utilisés afin de vous
+                  contacter. Les managers des entités et les administrateur du site ont accés à ces informations.
                 </p>
             </article>
             <article>
               <h3>Durée de stockage</h3>
-              <p align="justify">
-              Ces informations ainsi que celles liées aux prêts de matériels, seront stockées autant de temps que
-              vous êtes actif au sein de l'université, écoles ou établissements de recherche. Elles seront également conservées au delà de la durée de votre départ.
+              <p>
+              Ces informations ainsi que celles liées aux prêts seront stockées 1 ans
+              après que vous ayez quitté l'université ou sur demande aux adresses :
+              <ul>
+                <li>relaisdpo@grenoble-inp.fr</li>
+                <li>dpo@grenet.fr</li>
+              </ul>
               </p>
             </article>
             <article>
               <h3>Accès aux données personnelles</h3>
-              <p align="justify">A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec le formulaire suivant : </p>
-              <p align="justify">Ou sur demande avec vos interlocuteurs:</p>
-                <ul>
-                  <li>relaisdpo@grenoble-inp.fr</li>
-                  <li>dpo@grenet.fr</li>
-                </ul>
+              <p>A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec les contacts cités précédemment</p>
             </article>
             <article>
               <h3>Sécurité des données</h3>
-              <ol>
-                <li>Les données enregistrées concernant les entités et les prêts sont accessibles uniquement aux utilisateurs ayant les droits d'accès de celles-ci,
-                et non visible pour les autres utilisateurs sans permissions.</li>
-                 <li align="justify">Les données sont archivées régulièrement et permettent de retrouver l'historique des informations et des prêts de matériels pour toute entité.
-                </li>
-              </ol>
+              Les données enregistrées concernant les entités et les prêts sont accessibles aux managers des entités concernées et aux administrateurs du site.
             </article>
           </section>
         </div>

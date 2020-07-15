@@ -163,7 +163,6 @@ class SpecificMaterialInstance(models.Model):
 
 class Loan(models.Model):
     class Status(models.IntegerChoices):
-        PENDING = 1, 'En Attente'
         REQUESTED = 2, 'Demandé'
         ACCEPTED = 3, 'Accepté'
         DENIED = 4, 'Refusé'
