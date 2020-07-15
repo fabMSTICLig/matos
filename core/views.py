@@ -354,16 +354,15 @@ class LoanViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
-            if (serializer.validated_data['status'] != int(Loan.Status.PENDING) and serializer.validated_data['status'] != int(Loan.Status.REQUESTED)) or instance.status == Loan.Status.ACCEPTED :
+        if(not request.user.is_staff and request.user not in instance.entity.managers.all()):
+            if instance.status == Loan.Status.DENIED or instance.status == Loan.Status.ACCEPTED :
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
+            request.data.update({'status':int(Loan.Status.REQUESTED)})
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})
-            request.data.update({'parent':instance.parent.id if instance.parent else instance.parent})     
+            request.data.update({'parent':instance.parent.id if instance.parent else None})
+        partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
