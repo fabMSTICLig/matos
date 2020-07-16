@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-content-center">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-12">
       <div class="card">
         <div class="card-header">
          <h4>Traitement des données</h4>
@@ -10,19 +10,20 @@
             <article>
               <h3>Stockage des informations</h3>
                 <p>
-                  Pour permettre le bon fonctionnment du site certaines, de vos
-                  informations sont stockées au moyen d'un cookie. Votre login <i>Agalan</i> vous permet d'utiliser la plateforme, et le nom d'utilisateur est enregistré pendant la session
+                  Pour permettre le bon fonctionnment du site certaines de vos
+                  informations sont stockées au moyen d'un cookie. Votre login <i>Agalan</i> vous permet d'utiliser la plateforme, et le nom d'utilisateur est enregistré pendant la session.
+                  Un cookie est également utilisé pour enregistrer le prêt en cours d'utilisation (création ou modification)
                 </p>
                 <h4>Données utilisées</h4>
                 <p>
                   Nom d'utilisateur, Prénom, Nom, Email sont utilisés afin de vous
-                  contacter. Seul les managers des entités ont accés à ces informations.
+                  contacter. Les managers des entités et les administrateur du site ont accés à ces informations.
                 </p>
             </article>
             <article>
               <h3>Durée de stockage</h3>
               <p>
-              Ces informations ainsi que celles liées aux prêts seront stockées 3 ans
+              Ces informations ainsi que celles liées aux prêts seront stockées 1 ans
               après que vous ayez quitté l'université ou sur demande aux adresses :
               <ul>
                 <li>relaisdpo@grenoble-inp.fr</li>
@@ -32,12 +33,11 @@
             </article>
             <article>
               <h3>Accès aux données personnelles</h3>
-              <p>A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec les contacts cités précédemment ou avec le formulaire suivant : </p>
+              <p>A tout moment, vous pouvez demander un accès aux données vous concernant, rectifier ou supprimer vos données avec les contacts cités précédemment</p>
             </article>
             <article>
               <h3>Sécurité des données</h3>
-              Les données enregistrées concernant les entités et les prêts sont accessibles uniquement aux utilisateurs ayant les droits d'accès de celles-ci,
-              et non visible pour les autres utilisateurs sans permissions
+              Les données enregistrées concernant les entités et les prêts sont accessibles aux managers des entités concernées et aux administrateurs du site.
             </article>
           </section>
         </div>
