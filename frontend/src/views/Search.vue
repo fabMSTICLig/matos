@@ -278,3 +278,8 @@ export default {
   }
 };
 </script>
+<style>
+  input {
+    overflow: hidden !important;
+  }
+</style>
