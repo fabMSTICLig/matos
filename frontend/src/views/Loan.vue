@@ -300,6 +300,12 @@ export default {
       pending_loan: "loans/pending_loan",
       status: "loans/status",
     }),
+    loanMessageSent() {
+      if (this.pending_loan.status ==  2) return "La demande a été envoyée";
+      if (this.pending_loan.status ==  3) return "La demande a été acceptée";
+      if (this.pending_loan.status ==  4) return "La demande a été refusée";
+      return "La demande a été envoyée";
+    },
     labelSubmit(){
       if(this.canManage) {
         return "Créer"
@@ -317,7 +323,7 @@ export default {
     isBorrowed() {
       return(
         this.canManage ? false : this.pending_loan.user == this.authUser.id
-      )
+      );
     },
     canManage() {
       return (
@@ -403,7 +409,7 @@ export default {
             .dispatch("loans/create", { data: this.pending_loan })
             .then(data => {
               this.$store.commit("loans/setPending", data);
-              showMsgOk("La demande a été envoyée");
+              showMsgOk(this.loanMessageSent);
               this.errors = [];
             })
             .catch(e => {
@@ -466,15 +472,17 @@ export default {
     if(this.canManage && this.emptyLoan) {
       this.pending_loan.status = 1 
     }
-    this.$store.dispatch("loans/fetchSingle", { id: this.pending_loan.id }).then(data => {
+    if(this.pending_loan.id && this.pending_loan.status == 3) {
+      this.$store.dispatch("loans/fetchSingle", { id: this.pending_loan.id }).then(data => {
           if(data.status !== 3 ) {
             this.makeChild_btn = false;
           }
           else {
             this.makeChild_btn = true;
           }
-    });
-
+      });
+    }
+    
   }
 };
 </script>
