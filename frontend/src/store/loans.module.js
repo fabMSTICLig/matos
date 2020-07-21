@@ -41,7 +41,7 @@ const loans_extra = {
       } else {
         state.pending_loan = {
           entity: null,
-          status: 2,
+          status: null,
           user: null,
           due_date: null,
           return_date: null,
@@ -69,7 +69,7 @@ const loans_extra = {
     resetPending(state) {
       state.pending_loan = {
         entity: null,
-        status: 1,
+        status: null,
         user: null,
         due_date: null,
         return_date: null,
@@ -115,7 +115,7 @@ const loans_extra = {
         );
       }
       if (
-        state.pending_loan.status == 1 &&
+        state.pending_loan.status == null &&
         state.pending_loan.specific_materials.length == 0 &&
         state.pending_loan.generic_materials.length == 0
       ) {
@@ -127,7 +127,7 @@ const loans_extra = {
       state.pending_loan.generic_materials = [];
       state.pending_loan.specific_materials = [];
       state.pending_loan.models = [];
-      if (state.pending_loan.status == 1) {
+      if (state.pending_loan.status == null) {
         state.pending_loan.entity = null;
       }
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));

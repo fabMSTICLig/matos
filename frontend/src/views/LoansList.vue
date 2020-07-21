@@ -126,8 +126,6 @@
         v-model="showDelete"
         hideFooter
       >
-        <h6>Annuler la demande de prêt</h6>
-
         <p>
           Confirmer l'annulation de la demande de prêt
         </p>

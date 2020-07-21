@@ -389,6 +389,10 @@ export default {
           if (this.pending_loan.user == null) {
             this.pending_loan.user = this.authUser.id;
           }
+          if(this.pending_loan.status == null)
+          {
+            this.pending_loan.status=2
+          }
           this.$store
             .dispatch("loans/create", { data: this.pending_loan })
             .then(data => {
