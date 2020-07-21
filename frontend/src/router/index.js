@@ -333,7 +333,8 @@ const routes = [
             component: () =>
               import(
                 /* webpackChunkName: "entityloanlist" */ "../views/EntityLoansList.vue"
-              )
+              ),
+            props: true
           }
         ]
       }
