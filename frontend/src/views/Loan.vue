@@ -14,8 +14,7 @@
                   params: { entityid: pending_loan.entity }
                 }"
                 v-if="updateMode && canManage"
-                >Retour entité</router-link
-              >
+              >Retour entité</router-link>
               <router-link
                 class="btn btn-primary"
                 role="button"
@@ -23,19 +22,14 @@
                   name: 'authloans',
                 }"
                 v-if="updateMode && !canManage"
-                >Mes prêts</router-link
-              >
-             </div>
+              >Mes prêts</router-link>
+            </div>
           </div>
           <div class="card-body">
             <ul class="text-danger" v-show="errors.length != 0">
-                    <li
-                      v-for="error in errors"
-                      :key="error"
-                      v-text="error"
-                    ></li>
-              </ul>            
-              <form class="form" @submit="submitLoan">
+              <li v-for="error in errors" :key="error" v-text="error"></li>
+            </ul>
+            <form class="form" @submit="submitLoan">
               <div class="row">
                 <div class="col-12 col-md-5">
                   <div class="form-group" v-if="canManage && !isBorrowed">
@@ -47,8 +41,8 @@
                     ></input-datalist>
                   </div>
                   <div class="form-group">
-                    <label>Entité :</label
-                    ><input
+                    <label>Entité :</label>
+                    <input
                       type="text"
                       class="form-control"
                       :value="entityById(pending_loan.entity) | field('name')"
@@ -62,17 +56,12 @@
                       v-model="pending_loan.status"
                       :disabled="!canManage"
                     >
-                      <option
-                        v-for="(val, key) in status"
-                        v-text="val"
-                        :key="key"
-                        :value="key"
-                      ></option>
+                      <option v-for="(val, key) in status" v-text="val" :key="key" :value="key"></option>
                     </select>
                   </div>
                   <div class="form-group">
-                    <label>Date sortie :</label
-                    ><input
+                    <label>Date sortie :</label>
+                    <input
                       class="form-control"
                       type="date"
                       v-model="pending_loan.checkout_date"
@@ -81,8 +70,8 @@
                     />
                   </div>
                   <div class="form-group">
-                    <label>Date retour prévue:</label
-                    ><input
+                    <label>Date retour prévue:</label>
+                    <input
                       class="form-control"
                       type="date"
                       v-model="pending_loan.due_date"
@@ -91,17 +80,13 @@
                     />
                   </div>
                   <div class="form-group" v-if="canManage">
-                    <label>Date retour:</label
-                    ><input
-                      class="form-control"
-                      type="date"
-                      v-model="pending_loan.return_date"
-                    />
+                    <label>Date retour:</label>
+                    <input class="form-control" type="date" v-model="pending_loan.return_date" />
                   </div>
 
                   <div class="form-group">
-                    <label>Commentaire :</label
-                    ><textarea
+                    <label>Commentaire :</label>
+                    <textarea
                       class="form-control"
                       v-model="pending_loan.comments"
                       :disabled="readOnly"
@@ -113,7 +98,7 @@
                     Votre prêt doit contenir au moins un matériel. Pour un
                     material spécific veuillez choisir une instance
                   </p>
-                  
+
                   <div class="table-responsive">
                     <table class="table">
                       <thead>
@@ -129,9 +114,7 @@
                           v-for="item in pending_loan.generic_materials"
                           :key="'g' + item.material"
                         >
-                          <td class="col-4">
-                            {{ gmById(item.material) | field("name") }}
-                          </td>
+                          <td class="col-4">{{ gmById(item.material) | field("name") }}</td>
                           <td class="col-7">
                             <input
                               type="number"
@@ -146,19 +129,11 @@
                               class="btn btn-danger"
                               type="button"
                               @click="removeMaterial(gmById(item.material))"
-                            >
-                              X
-                            </button>
+                            >X</button>
                           </td>
                         </tr>
-                        <tr
-                          class="d-flex"
-                          v-for="item in pending_loan.models"
-                          :key="'s' + item"
-                        >
-                          <td class="col-4">
-                            {{ smById(item) | field("name") }}
-                          </td>
+                        <tr class="d-flex" v-for="item in pending_loan.models" :key="'s' + item">
+                          <td class="col-4">{{ smById(item) | field("name") }}</td>
                           <td class="col-7">
                             <DynList
                               :ressource="specificinstances[item]"
@@ -172,9 +147,7 @@
                               class="btn btn-danger"
                               type="button"
                               @click="removeMaterial(smById(item))"
-                            >
-                              X
-                            </button>
+                            >X</button>
                           </td>
                         </tr>
                       </tbody>
@@ -191,16 +164,14 @@
                     "
                   >
                     <label>Historique :</label>
-                    <div class="">
+                    <div class>
                       <div role="group" class="btn-group">
                         <button
                           v-if="updateMode && pending_loan.parent"
                           class="btn btn-info"
                           type="button"
                           @click="goTo(pending_loan.parent)"
-                        >
-                          Précédent
-                        </button>
+                        >Précédent</button>
                         <button
                           v-if="
                             updateMode &&
@@ -211,18 +182,14 @@
                           class="btn btn-info"
                           type="button"
                           @click="makeChild"
-                        >
-                          Créer un successeur
-                        </button>
-                        
+                        >Créer un successeur</button>
+
                         <button
                           v-if="updateMode && pending_loan.child"
                           class="btn btn-info"
                           type="button"
                           @click="goTo(pending_loan.child)"
-                        >
-                          Suivant
-                        </button>
+                        >Suivant</button>
                       </div>
                     </div>
                   </div>
@@ -235,17 +202,13 @@
                     class="btn btn-primary float-left"
                     type="submit"
                     v-if="!readOnly"
-                  >
-                    {{ updateMode ? "Modifier" : labelSubmit }}
-                  </button>
+                  >{{ updateMode && isEditable ? "Modifier" : labelSubmit }}</button>
                   <button
                     v-if="!updateMode"
                     class="btn btn-danger"
                     type="button"
                     @click="cleanMaterials"
-                  >
-                    Vider
-                  </button>
+                  >Vider</button>
                 </div>
                 <div role="group" class="btn-group float-right">
                   <button
@@ -253,9 +216,7 @@
                     class="btn btn-danger"
                     type="button"
                     @click="newLoan"
-                  >
-                    Nouveau prêt
-                  </button>
+                  >Nouveau prêt</button>
                 </div>
               </div>
             </form>
@@ -298,21 +259,23 @@ export default {
       authUser: "authUser",
       isAdmin: "isAdmin",
       pending_loan: "loans/pending_loan",
-      status: "loans/status",
+      status: "loans/status"
     }),
     loanMessageSent() {
-      if (this.pending_loan.status ==  2) return "La demande a été envoyée";
-      if (this.pending_loan.status ==  3) return "La demande a été acceptée";
-      if (this.pending_loan.status ==  4) return "La demande a été refusée";
+      if (this.pending_loan.status == 2) return "La demande a été envoyée";
+      if (this.pending_loan.status == 3) return "La demande a été acceptée";
+      if (this.pending_loan.status == 4) return "La demande a été refusée";
       return "La demande a été envoyée";
     },
-    labelSubmit(){
-      if(this.canManage) {
-        return "Créer"
+    labelSubmit() {
+      if (this.canManage) {
+        return "Créer";
+      } else {
+        return "Envoyer la demande";
       }
-      else {
-        return "Envoyer la demande"
-      }
+    },
+    isEditable() {
+      return this.pending_loan.status == 1 || this.pending_loan.status == 2;
     },
     emptyLoan() {
       return (
@@ -321,9 +284,9 @@ export default {
       );
     },
     isBorrowed() {
-      return(
-        this.canManage ? false : this.pending_loan.user == this.authUser.id
-      );
+      return this.canManage
+        ? false
+        : this.pending_loan.user == this.authUser.id;
     },
     canManage() {
       return (
@@ -360,7 +323,7 @@ export default {
     ...mapMutations({
       removeMaterial: "loans/removeMaterial"
     }),
-    
+
     initInstances(item) {
       return this.$store
         .dispatch("specificmaterials/instances/fetchList", {
@@ -385,8 +348,8 @@ export default {
             .then(data => {
               this.$store.commit("loans/setPending", data);
               showMsgOk("Le prêt a été modifié");
-              if(this.pending_loan.status == 3) {
-                this.makeChild_btn = true
+              if (this.pending_loan.status == 3) {
+                this.makeChild_btn = true;
               }
               this.errors = [];
             })
@@ -401,9 +364,8 @@ export default {
           if (this.pending_loan.user == null) {
             this.pending_loan.user = this.authUser.id;
           }
-          if(this.pending_loan.status == null)
-          {
-            this.pending_loan.status=2
+          if (this.pending_loan.status == null) {
+            this.pending_loan.status = 2;
           }
           this.$store
             .dispatch("loans/create", { data: this.pending_loan })
@@ -423,16 +385,23 @@ export default {
       }
     },
     checkErrors() {
-        this.errors = []
-        if(!this.pending_loan.user && this.canManage) {
-          this.errors.push("Un utilisateur doit être assigné")
-        }
-        if(this.pending_loan.checkout_date > this.pending_loan.due_date ) {
-          this.errors.push("la date de sortie doit être antérieure à celle du retour prévu")
-        }
-        if(this.pending_loan.return_date && (this.pending_loan.checkout_date > this.pending_loan.return_date)) {
-          this.errors.push("la date de sortie doit être antérieure à celle du retour")
-        }
+      this.errors = [];
+      if (!this.pending_loan.user && this.canManage) {
+        this.errors.push("Un utilisateur doit être assigné");
+      }
+      if (this.pending_loan.checkout_date > this.pending_loan.due_date) {
+        this.errors.push(
+          "la date de sortie doit être antérieure à celle du retour prévu"
+        );
+      }
+      if (
+        this.pending_loan.return_date &&
+        this.pending_loan.checkout_date > this.pending_loan.return_date
+      ) {
+        this.errors.push(
+          "la date de sortie doit être antérieure à celle du retour"
+        );
+      }
     },
     cleanMaterials() {
       this.$store.commit("loans/cleanMaterials");
@@ -449,7 +418,6 @@ export default {
       });
     },
     makeChild() {
-      
       this.$store
         .dispatch("loans/makeChild", { id: this.pending_loan.id })
         .then(data => {
@@ -469,20 +437,20 @@ export default {
     Promise.all(pall).then(() => {
       this.loaded = true;
     });
-    if(this.canManage && this.emptyLoan) {
-      this.pending_loan.status = 1 
+    if (this.canManage && this.emptyLoan) {
+      this.pending_loan.status = 1;
     }
-    if(this.pending_loan.id && this.pending_loan.status == 3) {
-      this.$store.dispatch("loans/fetchSingle", { id: this.pending_loan.id }).then(data => {
-          if(data.status !== 3 ) {
+    if (this.pending_loan.id && this.pending_loan.status == 3) {
+      this.$store
+        .dispatch("loans/fetchSingle", { id: this.pending_loan.id })
+        .then(data => {
+          if (data.status !== 3) {
             this.makeChild_btn = false;
-          }
-          else {
+          } else {
             this.makeChild_btn = true;
           }
-      });
+        });
     }
-    
   }
 };
 </script>
