@@ -5,8 +5,14 @@
         <div class="card-header">
          <h4>Traitement des données</h4>
         </div>
-        <div class="card-body">
+        <div class="card-body scroll">
           <section>
+            <article>
+              <h3>Destinataires</h3>
+                <p align="justify"> Chaque entité, composante universitaire, école, laboratoire ou plateforme pédagogique representée par un ayant droit,
+                  dispose de ses données sur la plateforme.
+              </p>
+            </article>
             <article>
               <h3>Stockage des informations</h3>
                 <p>
@@ -56,5 +62,25 @@ export default {
 <style scoped>
   .row {
     margin-top: 60px;
+  }
+  ol {
+  list-style-type: none;
+  /*use padding to move list item from left to right*/
+  padding-left: 1em;
+  }
+
+  ol li {
+    text-align: justify;
+  }
+
+  ol li:before {
+  content: "-";
+  position: absolute;
+  /*change margin to move dash around*/
+  margin-left: -1em;
+  }
+  .scroll {
+    max-height: 450px;
+    overflow-y: scroll;
   }
 </style>

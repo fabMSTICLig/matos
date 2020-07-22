@@ -8,9 +8,9 @@
         </div>
         <div class="card-body">
           <p>La plateforme MATOS a pour but d'aider les différentes entitées de l'université à se prêter du matériel. Par exemple le fablab FabMSTIC prête des cartes arduino dans le cadre de projet pédagogique aux étudiants ENSIMAG et PolyTech Grenoble</p>
-          <h4>Quelques définitions utile pour l'utilisation du site </h4>
+          <h4>Quelques définitions utiles pour l'utilisation du site </h4>
           <ul>
-            <li>Une <strong>Entité</strong> peut être un laboratoire, une composante universitaire, un service d'un laboratoire, une plateforme technique, ... Chaque entité peut avoir une granularité différente et un fonctionnement différent. Il est donc conseillé de lire la description de l'entité chez qui on souhaite emprunter du matériel. Si vous souhaitez prêter du matériel et créer un entité veuillez contacter les administrateurs du site.</li>
+            <li>Une <strong>Entité</strong> peut être un laboratoire, une composante universitaire, un service d'un laboratoire, une plateforme technique, ... Chaque entité peut avoir une granularité différente et un fonctionnement différent. Il est donc conseillé de lire la description de l'entité chez qui l'on souhaite emprunter du matériel. Si vous souhaitez prêter du matériel et créer une entité, veuillez contacter les administrateurs du site.</li>
             <li> Il existe deux types de matériel. <strong>Spécifique</strong> et <strong>Générique</strong>
               <ul>
                 <li>Le matériel <strong>Spécifique</strong> correspond au matériel dont on ne peut pas intervertir les instances. Par exemple le fablab possède 10 tablettes MarqueX (10 instances), chaque tablette a un numéro de série, s'il prête la tablette 1 (l'instance 1), il est important que ce soit la tablette 1 qui revienne.</li>
@@ -29,7 +29,7 @@
 
 <script>
 // @ is an alias to /src
-import DataPolicy from "./DataPolicy"
+import DataPolicy from "@/views/DataPolicy.vue"
 
 export default {
   name: "Home",
