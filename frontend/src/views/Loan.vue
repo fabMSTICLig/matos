@@ -202,7 +202,7 @@
                     class="btn btn-primary float-left"
                     type="submit"
                     v-if="!readOnly"
-                  >{{ updateMode && isEditable ? "Modifier" : labelSubmit }}</button>
+                  >{{ updateMode ? "Modifier" : labelSubmit }}</button>
                   <button
                     v-if="!updateMode"
                     class="btn btn-danger"
@@ -268,15 +268,13 @@ export default {
       return "La demande a été envoyée";
     },
     labelSubmit() {
-      if (this.canManage) {
+      if (this.canManage && !this.updateMode) {
         return "Créer";
       } else {
         return "Envoyer la demande";
       }
     },
-    isEditable() {
-      return this.pending_loan.status == 1 || this.pending_loan.status == 2;
-    },
+  
     emptyLoan() {
       return (
         this.pending_loan.generic_materials.length == 0 &&
