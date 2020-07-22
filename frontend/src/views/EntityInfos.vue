@@ -34,7 +34,7 @@
 import { mapGetters } from "vuex";
 import { EditMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
-import EntityEdit from "./EntityEdit";
+import EntityEdit from "@/views/EntityEdit";
 
 export default {
   name: "Entity",

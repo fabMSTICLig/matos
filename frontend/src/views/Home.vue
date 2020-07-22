@@ -29,7 +29,7 @@
 
 <script>
 // @ is an alias to /src
-import DataPolicy from "./DataPolicy"
+import DataPolicy from "@/views/DataPolicy.vue"
 
 export default {
   name: "Home",
