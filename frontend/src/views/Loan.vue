@@ -14,15 +14,17 @@
                   params: { entityid: pending_loan.entity }
                 }"
                 v-if="updateMode && canManage"
-              >Retour entité</router-link>
+                >Retour entité</router-link
+              >
               <router-link
                 class="btn btn-primary"
                 role="button"
                 :to="{
-                  name: 'authloans',
+                  name: 'authloans'
                 }"
                 v-if="updateMode && !canManage"
-              >Mes prêts</router-link>
+                >Mes prêts</router-link
+              >
             </div>
           </div>
           <div class="card-body">
@@ -56,7 +58,12 @@
                       v-model="pending_loan.status"
                       :disabled="!canManage"
                     >
-                      <option v-for="(val, key) in status" v-text="val" :key="key" :value="key"></option>
+                      <option
+                        v-for="(val, key) in status"
+                        v-text="val"
+                        :key="key"
+                        :value="key"
+                      ></option>
                     </select>
                   </div>
                   <div class="form-group">
@@ -81,7 +88,11 @@
                   </div>
                   <div class="form-group" v-if="canManage">
                     <label>Date retour:</label>
-                    <input class="form-control" type="date" v-model="pending_loan.return_date" />
+                    <input
+                      class="form-control"
+                      type="date"
+                      v-model="pending_loan.return_date"
+                    />
                   </div>
 
                   <div class="form-group">
@@ -114,7 +125,9 @@
                           v-for="item in pending_loan.generic_materials"
                           :key="'g' + item.material"
                         >
-                          <td class="col-4">{{ gmById(item.material) | field("name") }}</td>
+                          <td class="col-4">
+                            {{ gmById(item.material) | field("name") }}
+                          </td>
                           <td class="col-7">
                             <input
                               type="number"
@@ -129,11 +142,19 @@
                               class="btn btn-danger"
                               type="button"
                               @click="removeMaterial(gmById(item.material))"
-                            >X</button>
+                            >
+                              X
+                            </button>
                           </td>
                         </tr>
-                        <tr class="d-flex" v-for="item in pending_loan.models" :key="'s' + item">
-                          <td class="col-4">{{ smById(item) | field("name") }}</td>
+                        <tr
+                          class="d-flex"
+                          v-for="item in pending_loan.models"
+                          :key="'s' + item"
+                        >
+                          <td class="col-4">
+                            {{ smById(item) | field("name") }}
+                          </td>
                           <td class="col-7">
                             <DynList
                               :ressource="specificinstances[item]"
@@ -147,7 +168,9 @@
                               class="btn btn-danger"
                               type="button"
                               @click="removeMaterial(smById(item))"
-                            >X</button>
+                            >
+                              X
+                            </button>
                           </td>
                         </tr>
                       </tbody>
@@ -160,7 +183,7 @@
                         (pending_loan.child ||
                           pending_loan.parent ||
                           pending_loan.status == 3) &&
-                              makeChild_btn
+                        makeChild_btn
                     "
                   >
                     <label>Historique :</label>
@@ -171,25 +194,31 @@
                           class="btn btn-info"
                           type="button"
                           @click="goTo(pending_loan.parent)"
-                        >Précédent</button>
+                        >
+                          Précédent
+                        </button>
                         <button
                           v-if="
                             updateMode &&
                               canManage &&
                               !pending_loan.child &&
-                              pending_loan.status == 3 
+                              pending_loan.status == 3
                           "
                           class="btn btn-info"
                           type="button"
                           @click="makeChild"
-                        >Créer un successeur</button>
+                        >
+                          Créer un successeur
+                        </button>
 
                         <button
                           v-if="updateMode && pending_loan.child"
                           class="btn btn-info"
                           type="button"
                           @click="goTo(pending_loan.child)"
-                        >Suivant</button>
+                        >
+                          Suivant
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -202,13 +231,17 @@
                     class="btn btn-primary float-left"
                     type="submit"
                     v-if="!readOnly"
-                  >{{ updateMode ? "Modifier" : labelSubmit }}</button>
+                  >
+                    {{ updateMode ? "Modifier" : labelSubmit }}
+                  </button>
                   <button
                     v-if="!updateMode"
                     class="btn btn-danger"
                     type="button"
                     @click="cleanMaterials"
-                  >Vider</button>
+                  >
+                    Vider
+                  </button>
                 </div>
                 <div role="group" class="btn-group float-right">
                   <button
@@ -216,7 +249,9 @@
                     class="btn btn-danger"
                     type="button"
                     @click="newLoan"
-                  >Nouveau prêt</button>
+                  >
+                    Nouveau prêt
+                  </button>
                 </div>
               </div>
             </form>
@@ -274,7 +309,7 @@ export default {
         return "Envoyer la demande";
       }
     },
-  
+
     emptyLoan() {
       return (
         this.pending_loan.generic_materials.length == 0 &&

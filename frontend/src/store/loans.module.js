@@ -85,7 +85,10 @@ const loans_extra = {
       if (state.pending_loan.entity == null) {
         state.pending_loan.entity = mat.entity;
       }
-      if(state.pending_loan.entity && (state.pending_loan.entity == mat.entity)){
+      if (
+        state.pending_loan.entity &&
+        state.pending_loan.entity == mat.entity
+      ) {
         if (
           "quantity" in mat &&
           state.pending_loan.generic_materials.indexOf(mat.id) == -1

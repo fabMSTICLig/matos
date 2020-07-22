@@ -1,12 +1,10 @@
 import createCrud from "@/common/storeCrudHelper";
 
 const users_extra = {
-  
   getters: {
     users(state) {
       return state.users;
     }
-  
   },
   mutations: {}
 };

@@ -4,13 +4,16 @@
     <div class="col-12 col-md-6">
       <div class="card">
         <div class="card-header">
-            <form class="form form-inline">
-              <div class="form-group">
-                <label class="mr-1">En cours : </label>
-                <input type="checkbox" aria-label="Checkbox pour prêt en cours" v-model="inprogress"/>
-              </div>
-            </form>
-
+          <form class="form form-inline">
+            <div class="form-group">
+              <label class="mr-1">En cours : </label>
+              <input
+                type="checkbox"
+                aria-label="Checkbox pour prêt en cours"
+                v-model="inprogress"
+              />
+            </div>
+          </form>
         </div>
         <div class="card-body">
           <div class="table-responsive table-hover">
@@ -169,7 +172,7 @@ export default {
       ressource: "loans",
       loaded: false,
       showDelete: false,
-      inprogress:false,
+      inprogress: false
     };
   },
   computed: {
@@ -201,11 +204,16 @@ export default {
       return this.$store.dispatch("loans/fetchStatus");
     },
     search_fields(list) {
-      return list.filter(item => {
-        return item.user == this.authUser.id && (this.inprogress ? (item.return_date == null) : true);
-      }).sort((a,b)=> {
-        return a.due_date.localeCompare(b.due_date)
-      });
+      return list
+        .filter(item => {
+          return (
+            item.user == this.authUser.id &&
+            (this.inprogress ? item.return_date == null : true)
+          );
+        })
+        .sort((a, b) => {
+          return a.due_date.localeCompare(b.due_date);
+        });
     },
     validDestroy(item) {
       this.$store
@@ -218,7 +226,7 @@ export default {
           if (this.objects_filtered.length > 0) {
             this.selected_object = this.objects_filtered[0];
           }
-          this.showDelete=false;
+          this.showDelete = false;
           this.errors = [];
         })
         .catch(e => {

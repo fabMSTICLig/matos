@@ -45,7 +45,9 @@
                     :key="item.id"
                     v-on:click="selected_object = item"
                   >
-                    <td v-if="users.length">{{ userById(item.user) | field("username") }}</td>
+                    <td v-if="users.length">
+                      {{ userById(item.user) | field("username") }}
+                    </td>
                     <td v-text="loan_status[item.status]"></td>
                     <td v-text="item.checkout_date"></td>
                     <td v-text="item.due_date"></td>
@@ -159,7 +161,7 @@ export default {
       }
     };
   },
-  props: ['entityid'],
+  props: ["entityid"],
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
     ...mapGetters(["authUser"]),
@@ -171,7 +173,7 @@ export default {
       entityById: "entities/byId",
       users: "users/list"
     }),
-  
+
     isEditable() {
       return (
         this.selected_object.status == 1 || this.selected_object.status == 2
@@ -206,7 +208,7 @@ export default {
     entityid: function() {
       this.selected_object = this.objects_filtered[0];
     }
-  }, 
+  },
   methods: {
     initComponent() {
       return this.$store.dispatch("loans/fetchStatus");
@@ -216,14 +218,14 @@ export default {
       this.$router.push({ name: "loan" });
     },
     destroyLoan(item) {
-      showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?")
-        .then(value => {
-          if (value) this.$store.dispatch("loans/destroy", { id: item.id }).then(()=>{
-              if (this.objects_filtered.length > 0) {
-                this.selected_object = this.objects_filtered[0];
-              }
-            })
-        })
+      showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?").then(value => {
+        if (value)
+          this.$store.dispatch("loans/destroy", { id: item.id }).then(() => {
+            if (this.objects_filtered.length > 0) {
+              this.selected_object = this.objects_filtered[0];
+            }
+          });
+      });
     }
   },
   beforeMount() {

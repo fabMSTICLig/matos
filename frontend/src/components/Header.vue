@@ -76,12 +76,7 @@
           </li>
 
           <li class="nav-item" role="presentation">
-            <a
-              class="nav-link"
-              href="#"
-              @click="logout"
-              >Logout
-            </a>
+            <a class="nav-link" href="#" @click="logout">Logout </a>
           </li>
         </ul>
         <ul v-else class="nav navbar-nav">
@@ -151,10 +146,10 @@ export default {
   methods: {
     logout(e) {
       e.preventDefault();
-      if(this.pending_loan) {
-          this.$store.commit("loans/resetPending")
+      if (this.pending_loan) {
+        this.$store.commit("loans/resetPending");
       }
-      window.location = this.authUser.externe ? '/cas/logout' : '/auth/logout'
+      window.location = this.authUser.externe ? "/cas/logout" : "/auth/logout";
     }
   }
 };

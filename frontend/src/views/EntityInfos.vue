@@ -1,28 +1,39 @@
 <template>
-  <div class="row" v-if="!isManager">
-    <entity-edit v-if="isManager"></entity-edit>
+  <div class="row">
     <div class="col-12">
       <div class="card" v-if="object">
         <div class="card-header">
-          <h3 class="float-left">{{ entityById($route.params.entityid) | field("name") }}</h3>
+          <h3 class="float-left">
+            {{ object | field("name") }}
+          </h3>
+          <router-link
+            class="btn btn-primary float-right"
+            role="button"
+            :to="{
+              name: 'entityedit',
+              params: { entityid: object.id }
+            }"
+            v-if="isManager"
+            >Modifier</router-link
+          >
         </div>
         <div class="card-body">
           <fieldset>
             <legend>Informations</legend>
             <p class="card-text">
-              <span><strong>{{object.description}}</strong></span>
+              <span
+                ><strong>{{ object.description }}</strong></span
+              >
             </p>
             <p class="card-text">
               <span><strong>Contact :&nbsp;</strong></span
-              ><a :href="'mailto:' + object.contact">{{
-                object.contact
-              }}</a>
+              ><a :href="'mailto:' + object.contact">{{ object.contact }}</a>
             </p>
             <h4>Affiliations :&nbsp;</h4>
             <DisplayIdList
-            fieldName="affiliations"
-            :object="object"
-            ressource="affiliations"
+              fieldName="affiliations"
+              :object="object"
+              ressource="affiliations"
             />
           </fieldset>
         </div>
@@ -32,39 +43,42 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import { EditMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
-import EntityEdit from "@/views/EntityEdit";
 
 export default {
   name: "Entity",
-  mixins: [EditMixin],
   data() {
     return {
-      ressource: "entities",
-      object_name: "Entité"
-    }
+      object: null,
+      ressource: "entities"
+    };
   },
-  components:{
-    DisplayIdList,
-    EntityEdit
-
+  components: {
+    DisplayIdList
   },
   computed: {
-     ...mapGetters(["authUser"]),
-   
-    ...mapGetters({
-      entityById: "entities/byId",
-    }),
+    ...mapGetters(["authUser"]),
     isManager() {
       return (
-        (this.selected_object &&
-          this.authUser.entities.indexOf(this.selected_object.id) > -1) ||
+        (this.object && this.authUser.entities.indexOf(this.object.id) > -1) ||
         this.authUser.is_staff
       );
     }
-
   },
-  methods: {}
+  methods: {},
+  beforeMount() {
+    if (
+      this.$route.params[this.$route.meta.routeparam] != "new" &&
+      parseInt(this.$route.params[this.$route.meta.routeparam], -1) != -1
+    ) {
+      this.$store
+        .dispatch(this.ressource + "/fetchSingle", {
+          id: this.$route.params[this.$route.meta.routeparam]
+        })
+        .then(data => {
+          this.object = Object.assign({}, data);
+        });
+    }
+  }
 };
 </script>

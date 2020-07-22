@@ -24,7 +24,19 @@ function requireAuth(to, from, next) {
     next("/");
   }
 }
-
+function requireManager(to, from, next) {
+  if (store.getters.isAuthenticated) {
+    var user = store.getters.authUser;
+    if (
+      user.entities.indexOf(to.params["entityid"]) > -1 ||
+      store.getters.isAdmin
+    ) {
+      next();
+    } else {
+      next("/");
+    }
+  }
+}
 function requireAdmin(to, from, next) {
   if (store.getters.isAuthenticated && store.getters.isAdmin) {
     next();
@@ -219,7 +231,7 @@ const routes = [
               ressource: "entities",
               labelprop: "name"
             },
-            name: "entityedit"
+            name: "entityinfos"
           }
         },
         children: [
@@ -232,15 +244,20 @@ const routes = [
             },
             component: () =>
               import(
-                /* webpackChunkName: "entityedit" */ "../views/EntityInfos.vue"
+                /* webpackChunkName: "entityinfos" */ "../views/EntityInfos.vue"
               )
           },
           {
-            path: "/edit",
+            path: "edit",
             name: "entityedit",
+            beforeEnter: requireManager,
             meta: {
               routeparam: "entityid",
-              routedelete: "entities"
+              routedelete: "entities",
+              breadcumb: {
+                label: "Edit",
+                name: "entityedit"
+              }
             },
             component: () =>
               import(
@@ -249,6 +266,7 @@ const routes = [
           },
           {
             path: "materials",
+            beforeEnter: requireManager,
             meta: {
               breadcumb: {
                 label: "Materiels",
@@ -323,6 +341,7 @@ const routes = [
           {
             path: "loans",
             name: "entityloans",
+            beforeEnter: requireManager,
             meta: {
               routeparam: "entityid",
               breadcumb: {
