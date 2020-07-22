@@ -198,14 +198,14 @@ class LoanSerializer(serializers.ModelSerializer):
             loans = loans.exclude(id=self.initial_data['id'])
         for loan in loans:
             materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
-            raise serializers.ValidationError("Prêt en cours pour le matériel suivant "+str(materialintersec)+" jusqu'au "+str(loan.due_date))
+            raise serializers.ValidationError("Prêt en cours pour le matériel suivant : "+str(materialintersec[0])+" - jusqu'au "+str(loan.due_date))
         #conflit prêts en fini
         loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], status=Loan.Status.ACCEPTED, checkout_date__lte=data['checkout_date'], return_date__gt=data['checkout_date'])
         if('id' in self.initial_data):
             loans = loans.exclude(id=self.initial_data['id'])
         for loan in loans:
             materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
-            raise serializers.ValidationError("Prêt en cours pour le matériel suivant "+str(materialintersec)+" jusqu'au "+str(loan.return_date))
+            raise serializers.ValidationError("Prêt en cours pour le matériel suivant : "+str(materialintersec[0])+" - jusqu'au "+str(loan.return_date))
         #conflit prêts dans le future
         loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], status=Loan.Status.ACCEPTED, checkout_date__gte=data['checkout_date'])
         if('id' in self.initial_data):
@@ -213,9 +213,9 @@ class LoanSerializer(serializers.ModelSerializer):
         for loan in loans:
             if data['due_date']> loan.checkout_date:
                 materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
-                raise serializers.ValidationError("Le matériel "+str(materialintersec)+" doit être rendu avant le "+str(loan.checkout_date))
+                raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être rendu avant le "+str(loan.checkout_date))
                 
         for item in data['loangenericitem_set']:
             if item['material'].entity != entity:
-                raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité preteuse.")
+                raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité prêteuse.")
         return data
