@@ -109,72 +109,73 @@
                     Votre prêt doit contenir au moins un matériel. Pour un
                     material spécific veuillez choisir une instance
                   </p>
-
-                  <div class="table-responsive">
-                    <table class="table">
-                      <thead>
-                        <tr class="d-flex">
-                          <th class="col-7">Matériels</th>
-                          <th class="col-4">Quantité</th>
-                          <th class="col-1"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          class="d-flex"
-                          v-for="item in pending_loan.generic_materials"
-                          :key="'g' + item.material"
-                        >
-                          <td class="col-4">
-                            {{ gmById(item.material) | field("name") }}
-                          </td>
-                          <td class="col-7">
-                            <input
-                              type="number"
-                              class="form-control form-control"
-                              v-model="item.quantity"
-                              :disabled="readOnly"
-                            />
-                          </td>
-                          <td class="col-1">
-                            <button
-                              v-if="!readOnly"
-                              class="btn btn-danger"
-                              type="button"
-                              @click="removeMaterial(gmById(item.material))"
-                            >
-                              X
-                            </button>
-                          </td>
-                        </tr>
-                        <tr
-                          class="d-flex"
-                          v-for="item in pending_loan.models"
-                          :key="'s' + item"
-                        >
-                          <td class="col-4">
-                            {{ smById(item) | field("name") }}
-                          </td>
-                          <td class="col-7">
-                            <DynList
-                              :ressource="specificinstances[item]"
-                              v-model="pending_loan.specific_materials"
-                              :readonly="readOnly"
-                            ></DynList>
-                          </td>
-                          <td class="col-1">
-                            <button
-                              v-if="!readOnly"
-                              class="btn btn-danger"
-                              type="button"
-                              @click="removeMaterial(smById(item))"
-                            >
-                              X
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="row">
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead>
+                          <tr class="d-flex">
+                            <th class="col-4">Matériels</th>
+                            <th class="col-7">Quantité</th>
+                            <th class="col-1"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            class="d-flex"
+                            v-for="item in pending_loan.generic_materials"
+                            :key="'g' + item.material"
+                          >
+                            <td class="col-4">
+                              {{ gmById(item.material) | field("name") }}
+                            </td>
+                            <td class="col-7">
+                              <input
+                                type="number"
+                                class="form-control form-control"
+                                v-model="item.quantity"
+                                :disabled="readOnly"
+                              />
+                            </td>
+                            <td class="col-1">
+                              <button
+                                v-if="!readOnly"
+                                class="btn btn-danger"
+                                type="button"
+                                @click="removeMaterial(gmById(item.material))"
+                              >
+                                X
+                              </button>
+                            </td>
+                          </tr>
+                          <tr
+                            class="d-flex"
+                            v-for="item in pending_loan.models"
+                            :key="'s' + item"
+                          >
+                            <td class="col-4">
+                              {{ smById(item) | field("name") }}
+                            </td>
+                            <td class="col-7">
+                              <DynList
+                                :ressource="specificinstances[item]"
+                                v-model="pending_loan.specific_materials"
+                                :readonly="readOnly"
+                              ></DynList>
+                            </td>
+                            <td class="col-1">
+                              <button
+                                v-if="!readOnly"
+                                class="btn btn-danger"
+                                type="button"
+                                @click="removeMaterial(smById(item))"
+                              >
+                                X
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                   <div
                     class="form-group"

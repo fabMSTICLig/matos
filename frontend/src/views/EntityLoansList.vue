@@ -32,7 +32,7 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th v-if="users.length">Utilisateur</th>
+                    <th>Utilisateur</th>
                     <th>Status</th>
                     <th>Date sortie</th>
                     <th>Date retour prévue</th>
@@ -45,7 +45,7 @@
                     :key="item.id"
                     v-on:click="selected_object = item"
                   >
-                    <td v-if="users.length">
+                    <td>
                       {{ userById(item.user) | field("username") }}
                     </td>
                     <td v-text="loan_status[item.status]"></td>
@@ -143,12 +143,12 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
-// @ is an alias to /src
-import { mapGetters } from "vuex";
+
 export default {
-  name: "LoansList",
+  name: "EntityLoansList",
   mixins: [ListMixin],
   data() {
     return {
@@ -165,7 +165,6 @@ export default {
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
     ...mapGetters(["authUser"]),
-    ...mapGetters(["users"]),
     ...mapGetters({
       gmById: "genericmaterials/byId",
       smById: "specificmaterials/byId",
@@ -173,12 +172,6 @@ export default {
       entityById: "entities/byId",
       users: "users/list"
     }),
-
-    isEditable() {
-      return (
-        this.selected_object.status == 1 || this.selected_object.status == 2
-      );
-    },
     objects_filtered() {
       var filtered = this.objects_list
         .filter(item => {

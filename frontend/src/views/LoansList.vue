@@ -159,7 +159,6 @@
 <script>
 import { ListMixin } from "@/common/mixins";
 import Modal from "@/components/Modal";
-// @ is an alias to /src
 import { mapGetters } from "vuex";
 export default {
   name: "LoansList",
@@ -191,9 +190,7 @@ export default {
       );
     },
     isEditable() {
-      return (
-        this.selected_object.status == 1 || this.selected_object.status == 2
-      );
+      return this.selected_object.status == 2;
     },
     isRemoval() {
       return this.selected_object.status == 2 && !this.isManager;
