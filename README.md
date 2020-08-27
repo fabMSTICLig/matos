@@ -57,6 +57,10 @@ lancer les migrations
 
 > sudo python3 manage.py migrate
 
+démarrer le serveur
+
+> sudo python3 manage.py runserver
+
 ### authentification
 
 ### création d’un superutilisateur
