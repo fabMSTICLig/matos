@@ -92,6 +92,7 @@ ol li:before {
   /*change margin to move dash around*/
   margin-left: -1em;
 }
+
 .scroll {
   max-height: 450px;
   overflow-y: scroll;
