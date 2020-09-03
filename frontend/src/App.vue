@@ -4,28 +4,60 @@
     <div v-if="loaded">
       <Header />
       <router-view />
+      <Footer />
     </div>
+    <modal
+      id="modal-cookie"
+      title="Utilisation de cookie"
+      v-model="showCookie"
+      hideFooter
+    >
+      <p>
+        Ce site utilise des cookies afin de fonctionner. Ils sont uniquement
+        utilisés pour gerer la session de l'utilisateur. Il n'y a pas de cookie
+        de tierces parties ou d'utilisation à des fins statistiques.
+      </p>
+
+      <div>
+        <div class="btn-group" role="group" aria-label="Accepter">
+          <button type="button" class="btn btn-primary" @click="validCookie">
+            J'ai compris
+          </button>
+        </div>
+      </div>
+    </modal>
   </div>
 </template>
 
 <script>
 import "./assets/style.css";
+import Modal from "@/components/Modal";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { mapGetters } from "vuex";
 import { CHECK_AUTH } from "./store/actions.type";
 
 export default {
   name: "App",
   components: {
-    Header
+    Header,
+    Footer,
+    Modal
   },
   data() {
     return {
-      loaded: false
+      loaded: false,
+      showCookie: false
     };
   },
   computed: {
     ...mapGetters(["authUser"])
+  },
+  methods: {
+    validCookie() {
+      localStorage.setItem("cookiepopup", "true");
+      this.showCookie = false;
+    }
   },
   mounted() {
     document.title = process.env.VUE_APP_TITLE;
@@ -96,14 +128,9 @@ export default {
       .catch(() => {
         this.loaded = true;
       });
+    if (localStorage.getItem("cookiepopup") == null) {
+      this.showCookie = true;
+    }
   }
 };
 </script>
-
-<style>
-@media only screen and (min-width: 1200px) {
-  .container {
-    max-width: 1500px;
-  }
-}
-</style>

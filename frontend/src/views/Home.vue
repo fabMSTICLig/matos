@@ -10,8 +10,8 @@
             <p>
               La plateforme MATOS a pour but d'aider les différentes entitées de
               l'université à se prêter du matériel. Par exemple le fablab
-              FabMSTIC prête des cartes arduino dans le cadre de projet
-              pédagogique aux étudiants ENSIMAG et PolyTech Grenoble
+              FabMSTIC prête des cartes arduino dans le cadre de projets
+              pédagogiques aux étudiants de l'ENSIMAG et de PolyTech Grenoble
             </p>
             <h4>Quelques définitions utiles pour l'utilisation du site</h4>
             <ul>
