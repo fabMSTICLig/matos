@@ -16,20 +16,17 @@
             v-if="isManager"
             >Retour</router-link
             >
-            <button @click="markedInfos"
-                        v-if="isManager && !edited"
-                        class="btn btn-primary float-right"
-
-            >Modifier</button>
+           
           </div>
          
         </div>
-        <div class="card-body" v-show="loaded_infos">
-          <fieldset v-if="!edited && !object.infos">
+        <div class="card-body">
+          <fieldset>
             <legend>Informations</legend>
+            <markdown :description="object.description" :displayed="displayed"></markdown>
             <p class="card-text">
               <span
-                ><strong>{{ object.description }}</strong></span
+                ></span
               >
             </p>
             <p class="card-text">
@@ -41,10 +38,8 @@
               fieldName="affiliations"
               :object="object"
               ressource="affiliations"
-              @setIdList="setIdList($event)"
             />
           </fieldset>
-          <markdown :object="object" :edited="edited" v-if="loaded_infos" @edited="stateInfos($event)" :infos="input"></markdown>
         </div>
       </div>
     </div>
@@ -61,10 +56,7 @@ export default {
     return {
       object: null,
       ressource: "entities",
-      input: "### Informations",
-      affiliations: "",
-      edited: false,
-      loaded_infos : false
+      displayed : true
     };
   },
   components: {
@@ -81,32 +73,7 @@ export default {
     },
   },
   methods: {
-  
-    setIdList(evt) {      
-      for(let i=0; i<=evt.length -1; i++) {
-            this.affiliations += evt[i].name + " "
-      }
-      
-      if (localStorage.getItem("marked_entityInfos") == null) {
-        this.input = this.input + " \n" + this.object.description + "\n" + "##### Contact : "+  this.object.contact + "\n" + "##### Affiliations" + "\n" + "\n "+ this.affiliations;
-      }
 
-      if (localStorage.getItem("marked_entityInfos") != null) {
-            let md = localStorage.getItem("marked_entityInfos");
-            this.object.infos = md;
-            this.input = md;
-      } 
-      
-      this.loaded_infos = true;
-    },
-
-    markedInfos(){
-      this.edited = !this.edited;
-    },
-
-    stateInfos(evt) {
-      this.edited=evt;
-    }
        
   },
  

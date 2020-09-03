@@ -37,15 +37,8 @@ export default {
       });
     }
   },
-  watch: {
-    objects_filtered(data) {
-      this.$emit('setIdList', data);
-    }
-  },
   methods: {
-    emitList(data) {
-      console.log(data)
-    }
+   
   },
   beforeMount() {
     this.$store.dispatch(this.ressource + "/fetchList");

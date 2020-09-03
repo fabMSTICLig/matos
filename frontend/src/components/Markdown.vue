@@ -1,12 +1,12 @@
 <template>
-  <div v-if="object">
-    <fieldset v-if="!edited && object.infos" v-html="compiledMarkdown"></fieldset>
-    <div id="editor" v-if="edited">
-      <textarea :value="input" @input="update"></textarea>
-        <div v-html="compiledMarkdown"></div>
-        <button @click="markedInfos"
-                class="btn btn-primary"
-        >Valider</button>
+  <div>
+    <div id="editor">
+        <div class="card" v-if="!displayed">
+          <div class="card-body">
+            <div v-html="compiledMarkdown" :value="input" id="markdown"></div>
+          </div>
+        </div>
+        <div v-html="compiledMarkdown" :value="input" v-if="displayed" id="markdown"></div>
     </div>
   </div>
 </template>
@@ -18,62 +18,34 @@ import { debounce } from "vue-debounce";
 export default {
   name: "Markdown",
   props: {
-    object: {
-      type: Object,
+    description: {
+      type: String,
       required: true
     },
-    edited: {
-      type: Boolean,
-      required: true
-    },
-    infos: {
-      type: String
+    displayed: {
+      type: Boolean
     }
   },
   data() {
     return {
-      input: "### Informations",
       loaded_infos : false,
-      syntax: ""
+      syntax: "",
+      input:""
     };
   },
   computed: {
 
     compiledMarkdown() {      
-      let md="";
-
-      if(!this.edited) {
-        if (localStorage.getItem("marked_entityInfos") != null) {
-          md = localStorage.getItem("marked_entityInfos");
-        }
-      }
-      else {
-        md = this.input;
-      }
-     
-      return marked(md, { sanitize: true }) ;
+      return marked(this.description, { sanitize: true }) ;
     },
   },
   watch: {
-    
+    description(text){
+      
+      debounce(this.input = text , 400)
+
+    }
   },
-  methods: {
-    update(e) {
-      debounce(this.input = e.target.value , 400)
-
-      let entityInfos = this.input.split("### Informations")
-      entityInfos = "### Informations " + entityInfos[1]
-      localStorage.setItem(
-        "marked_entityInfos",
-        entityInfos
-      );
-    },
-
-    markedInfos(){
-      this.$emit('edited', !this.edited)
-    },
-  },
-
   beforeMount() {
 
     this.syntax = "# Titre niveau 1 à 6 ######"+"\n"+
@@ -92,39 +64,27 @@ export default {
 
 "liste : "+" \n " + " \n" + " \n" + "* élément" + " \n " + " \n" + " \n" ;
 
-    if (localStorage.getItem("marked_entityInfos") != null) {
-      console.log("chargement")
-      this.input = this.syntax
-      this.input += localStorage.getItem("marked_entityInfos");
-    }
-    else {
-      this.input = "";
-      this.input += this.syntax
-      this.input += this.infos;
-    }
-
-   
+       
   }
 
 };
 </script>
-<style scoped>
+<style>
 
-#editor {
+#markdown {
   margin: 0;
   height: 100%;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  color: #333;
+  color: #333
 }
 
 textarea,
-#editor div {
+#markdown div {
   display: inline-block;
-  width: 49%;
-  height: 100vh;
+  width: 100%;
+  height: 50vh;
   vertical-align: top;
   box-sizing: border-box;
-  padding: 0 20px;
 }
 
 textarea {
@@ -142,4 +102,23 @@ code {
   color: #f66;
 }
 
+#markdown h6 {
+    color: #777 !important;
+    margin-bottom: 0.5rem !important;
+    margin-top: -0.375rem;
+}
+
+#markdown h4 {
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    font-family: "News Cycle", "Arial Narrow Bold", sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+#markdown p {
+    margin-top: 25px;
+    margin-bottom: 1rem;
+
+}
 </style>
