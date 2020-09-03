@@ -82,9 +82,7 @@
           </div>
         </div>
         <div class="card-body">
-          <p class="card-text">
-            {{ selected_object.description }}
-          </p>
+          <markdown :description="selected_object.description" :displayed="displayed"></markdown>
           <p class="card-text">
             <span><strong>Contact :&nbsp;</strong></span
             ><a :href="'mailto:' + selected_object.contact">{{
@@ -107,15 +105,19 @@
 import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
+import Markdown from "@/components/Markdown";
+
 export default {
   name: "EntitiesList",
   mixins: [ListMixin],
   components: {
-    DisplayIdList
+    DisplayIdList,
+    Markdown
   },
   data() {
     return {
-      ressource: "entities"
+      ressource: "entities",
+      displayed: true
     };
   },
   computed: {
