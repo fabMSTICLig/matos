@@ -30,9 +30,15 @@ class TagAdmin(admin.ModelAdmin):
     pass
 
 
+class SpecificMaterialInstance(admin.TabularInline):
+    model = SpecificMaterialInstance
+
 @admin.register(SpecificMaterial)
 class SpecificMaterialAdmin(admin.ModelAdmin):
     model = SpecificMaterial
+    inlines = [SpecificMaterialInstance]
+
+
 
 @admin.register(GenericMaterial)
 class GenericMaterialAdmin(admin.ModelAdmin):
