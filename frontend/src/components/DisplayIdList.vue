@@ -37,9 +37,7 @@ export default {
       });
     }
   },
-  methods: {
-   
-  },
+  methods: {},
   beforeMount() {
     this.$store.dispatch(this.ressource + "/fetchList");
   }

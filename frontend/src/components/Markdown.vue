@@ -1,18 +1,24 @@
 <template>
   <div>
     <div id="editor">
-        <div class="card" v-if="!displayed">
-          <div class="card-body">
-            <div v-html="compiledMarkdown" :value="input" id="markdown"></div>
-          </div>
+      <div class="card" v-if="!displayed">
+        <div class="card-body">
+          <div v-html="compiledMarkdown" :value="input" id="markdown"></div>
         </div>
-        <div v-html="compiledMarkdown" :value="input" v-if="displayed" id="markdown"></div>
+      </div>
+      <div
+        v-html="compiledMarkdown"
+        :value="input"
+        v-if="displayed"
+        id="markdown"
+      ></div>
     </div>
   </div>
 </template>
 
 <script>
-import marked  from "marked";
+import marked from "marked";
+import DOMPurify from "dompurify";
 import { debounce } from "vue-debounce";
 
 export default {
@@ -28,54 +34,28 @@ export default {
   },
   data() {
     return {
-      loaded_infos : false,
-      syntax: "",
-      input:""
+      loaded_infos: false,
+      input: ""
     };
   },
   computed: {
-
-    compiledMarkdown() {      
-      return marked(this.description, { sanitize: true }) ;
-    },
-  },
-  watch: {
-    description(text){
-      
-      debounce(this.input = text , 400)
-
+    compiledMarkdown() {
+      return DOMPurify.sanitize(marked(this.description));
     }
   },
-  beforeMount() {
-
-    this.syntax = "# Titre niveau 1 à 6 ######"+"\n"+
-
-"pour créer des paragraphes, revenir à la ligne"+" \n "+ "\n"+
-
-"**texte en gras** *italique*"+" \n "+ 
-  
-  "`code`"+ " \n " + " \n" + " \n" +
-
-"Mon site web [UFR](https://ufr-imag.univ-grenoble-alpes.fr)."+ " \n " + " \n" + " \n" +
-
-"liste numerotée :"+ " \n " + " \n" + " \n" +
-"1. élément" +  " \n " + " \n" + " \n" +
-"2. élément" +" \n " + " \n" + " \n" +
-
-"liste : "+" \n " + " \n" + " \n" + "* élément" + " \n " + " \n" + " \n" ;
-
-       
+  watch: {
+    description(text) {
+      debounce((this.input = text), 400);
+    }
   }
-
 };
 </script>
 <style>
-
 #markdown {
   margin: 0;
   height: 100%;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  color: #333
+  color: #333;
 }
 
 textarea,
@@ -103,22 +83,21 @@ code {
 }
 
 #markdown h6 {
-    color: #777 !important;
-    margin-bottom: 0.5rem !important;
-    margin-top: -0.375rem;
+  color: #777 !important;
+  margin-bottom: 0.5rem !important;
+  margin-top: -0.375rem;
 }
 
 #markdown h4 {
-    margin-bottom: 0.75rem;
-    font-size: 1.5rem;
-    font-family: "News Cycle", "Arial Narrow Bold", sans-serif;
-    font-weight: 700;
-    line-height: 1.1;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  font-family: "News Cycle", "Arial Narrow Bold", sans-serif;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 #markdown p {
-    margin-top: 25px;
-    margin-bottom: 1rem;
-
+  margin-top: 25px;
+  margin-bottom: 1rem;
 }
 </style>

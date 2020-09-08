@@ -82,7 +82,10 @@
           </div>
         </div>
         <div class="card-body">
-          <markdown :description="selected_object.description" :displayed="displayed"></markdown>
+          <markdown
+            :description="selected_object.description"
+            :displayed="displayed"
+          ></markdown>
           <p class="card-text">
             <span><strong>Contact :&nbsp;</strong></span
             ><a :href="'mailto:' + selected_object.contact">{{

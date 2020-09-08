@@ -6,29 +6,39 @@
           <h3 class="float-left">
             {{ object | field("name") }}
           </h3>
-          <div class="btn-group float-right" role="group" aria-label="Basic example">
+          <div
+            class="btn-group float-right"
+            role="group"
+            aria-label="Basic example"
+          >
             <router-link
-            class="btn btn-primary float-right"
-            role="button"
-            :to="{
-              name: 'entitieslist'
-            }"
-            v-if="isManager"
-            >Retour</router-link
+              class="btn btn-primary"
+              role="button"
+              :to="{
+                name: 'entityedit',
+                params: { entityid: object.id }
+              }"
+              v-show="isManager"
+              >Modifier</router-link
             >
-           
+            <router-link
+              class="btn btn-primary float-right"
+              role="button"
+              :to="{
+                name: 'entitieslist'
+              }"
+              v-if="isManager"
+              >Retour</router-link
+            >
           </div>
-         
         </div>
         <div class="card-body">
           <fieldset>
             <legend>Informations</legend>
-            <markdown :description="object.description" :displayed="displayed"></markdown>
-            <p class="card-text">
-              <span
-                ></span
-              >
-            </p>
+            <markdown
+              :description="object.description"
+              :displayed="displayed"
+            ></markdown>
             <p class="card-text">
               <span><strong>Contact :&nbsp;</strong></span
               ><a :href="'mailto:' + object.contact">{{ object.contact }}</a>
@@ -56,7 +66,7 @@ export default {
     return {
       object: null,
       ressource: "entities",
-      displayed : true
+      displayed: true
     };
   },
   components: {
@@ -70,13 +80,8 @@ export default {
         (this.object && this.authUser.entities.indexOf(this.object.id) > -1) ||
         this.authUser.is_staff
       );
-    },
+    }
   },
-  methods: {
-
-       
-  },
- 
   beforeMount() {
     if (
       this.$route.params[this.$route.meta.routeparam] != "new" &&
@@ -88,8 +93,7 @@ export default {
         })
         .then(data => {
           this.object = Object.assign({}, data);
-
-        })    
+        });
     }
   }
 };

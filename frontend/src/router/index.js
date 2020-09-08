@@ -26,7 +26,7 @@ function requireAuth(to, from, next) {
 }
 function requireManager(to, from, next) {
   if (store.getters.isAuthenticated) {
-     var user = store.getters.authUser;
+    var user = store.getters.authUser;
     if (
       user.entities.indexOf(parseInt(to.params["entityid"])) > -1 ||
       store.getters.isAdmin
@@ -34,7 +34,7 @@ function requireManager(to, from, next) {
       console.log(user.entities);
       next();
     } else {
-      console.log('redirection')
+      console.log("redirection");
       console.log(parseInt(to.params["entityid"]));
       console.log(user.entities);
 

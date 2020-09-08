@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="container">
-    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap.min.css" />
     <div v-if="loaded">
       <Header />
       <router-view />
