@@ -91,6 +91,47 @@ const routes = [
       import(/* webpackChunkName: "loans" */ "../views/LoansList.vue")
   },
   {
+    path: "/materials",
+    component: () =>
+    import(/* webpackChunkName: "affiliation" */ "../views/Materials.vue"),
+    meta: {
+      breadcumb: {
+        label: "Materiels",
+        name: "materials"
+      }
+    },
+    children: [
+      {
+        path: "g/:matid",
+        component:() =>  import(/* webpackChunkName: "materialgeneric" */ "../views/GenericMaterial.vue"),
+        meta: {
+          routeparam: "matid",
+          breadcumb: {
+            label: {
+              ressource: "genericmaterials",
+              labelprop: "name"
+            },
+            name: "genericmaterial-item"
+          }
+        }
+      },
+      {
+        path: "s/:matid",
+        component:() =>  import(/* webpackChunkName: "materialgeneric" */ "../views/SpecificMaterial.vue"),
+        meta: {
+          routeparam: "matid",
+          breadcumb: {
+            label: {
+              ressource: "specificmaterials",
+              labelprop: "name"
+            },
+            name: "specificmaterial-item"
+          }
+        }
+      }
+    ]
+  },
+  {
     path: "/affiliations",
     component: () =>
       import(/* webpackChunkName: "affiliation" */ "../views/Affiliations.vue"),

@@ -27,7 +27,7 @@
       <div class="card-body">
         <form id="editor-form">
           <div class="form-row">
-            <div class="col col-12 col-md-8">
+            <div class="col col-md-4 col-lg-4 col-xs-10 col-sm-12">
               <fieldset>
                 <legend>Informations</legend>
                 <div class="form-group">
@@ -48,35 +48,9 @@
                     required
                   />
                 </div>
-
-                <div class="form-group">
-                  <label
-                    >Description
-                    <button
-                      class="btn btn-info"
-                      type="button"
-                      @click="showMD = true"
-                    >
-                      Aide
-                    </button></label
-                  ><textarea
-                    class="form-control"
-                    v-model="object.description"
-                  ></textarea>
-                  <markdown :description="object.description"></markdown>
-                </div>
               </fieldset>
             </div>
             <div class="col col-12 col-md-4">
-              <fieldset>
-                <legend>Affiliations</legend>
-                <div class="form-group">
-                  <DynList
-                    ressource="affiliations"
-                    v-model="object.affiliations"
-                  ></DynList>
-                </div>
-              </fieldset>
               <fieldset>
                 <legend>Managers</legend>
                 <div class="form-group">
@@ -93,6 +67,35 @@
                   </DynList>
                 </div>
               </fieldset>
+
+            </div>
+            <div class="col col-12 col-md-4">
+              <fieldset>
+                <legend>Affiliations</legend>
+                <div class="form-group">
+                  <DynList
+                    ressource="affiliations"
+                    v-model="object.affiliations"
+                  ></DynList>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col col-12 col-md-4">
+              <fieldset>
+                <div class="form-group">
+                  <label>Description</label>
+
+                  <textarea
+                    class="form-control"
+                    v-model="object.description"
+                  ></textarea>
+                  <a href="#" class="logo-font" @click="showMD = true"> Aide  </a>
+                </div>
+              </fieldset>            
+            </div>
+                        
+            <div class="md col col-12 col-md-6">
+                <markdown :description="object.description"></markdown>
             </div>
           </div>
           <div class="btn-group" role="group">
@@ -123,8 +126,8 @@
           </div>
         </form>
       </div>
-    </div>
-    <modal
+      </div>
+      <modal
       id="modal-syntaxe"
       title="Markdown Syntaxe"
       hideFooter
@@ -166,7 +169,7 @@
       <span>---</span>
       <h6>Citations</h6>
       <span> > Citations </span>
-      <div>
+      <div class="center-btn">
         <button type="button" class="btn btn-info" @click="showMD = false">
           Ok
         </button>
@@ -213,7 +216,7 @@ export default {
     },
     makeManagerLabel(item) {
       return item.first_name + " " + item.last_name;
-    }
+    },
   }
 };
 </script>
@@ -232,5 +235,16 @@ export default {
 #modal-syntaxe .modal-body {
   height: 500px;
   overflow-y: auto;
+}
+
+.form-row .md.col.col-12.col-md-6 {
+  margin: 32px 0 0 0;
+}
+
+#modal-syntaxe .center-btn {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 15px;
+  text-align: center;
 }
 </style>
