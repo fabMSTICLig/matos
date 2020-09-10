@@ -27,7 +27,7 @@
       <div class="card-body">
         <form id="editor-form">
           <div class="form-row">
-            <div class="col col-md-4 col-lg-4 col-xs-10 col-sm-12">
+            <div class="col col-md-6 col-lg-6 col-xs-10 col-sm-12">
               <fieldset>
                 <legend>Informations</legend>
                 <div class="form-group">
@@ -48,9 +48,22 @@
                     required
                   />
                 </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea
+                    class="form-control"
+                    v-model="object.description"
+                  ></textarea>
+                  <a href="#" class="logo-font" @click="showMD = true"> Aide  </a>
+                </div>
               </fieldset>
             </div>
-            <div class="col col-12 col-md-4">
+                          
+            <div class="md col-12 col-md-6 col-lg-6">
+                <markdown :description="object.description"></markdown>
+            </div>
+
+            <div class="col col-12 col-md-6">
               <fieldset>
                 <legend>Managers</legend>
                 <div class="form-group">
@@ -69,7 +82,7 @@
               </fieldset>
 
             </div>
-            <div class="col col-12 col-md-4">
+            <div class="col col-12 col-md-6">
               <fieldset>
                 <legend>Affiliations</legend>
                 <div class="form-group">
@@ -80,23 +93,8 @@
                 </div>
               </fieldset>
             </div>
-            <div class="col col-12 col-md-4">
-              <fieldset>
-                <div class="form-group">
-                  <label>Description</label>
-
-                  <textarea
-                    class="form-control"
-                    v-model="object.description"
-                  ></textarea>
-                  <a href="#" class="logo-font" @click="showMD = true"> Aide  </a>
-                </div>
-              </fieldset>            
-            </div>
-                        
-            <div class="md col col-12 col-md-6">
-                <markdown :description="object.description"></markdown>
-            </div>
+         
+          
           </div>
           <div class="btn-group" role="group">
             <button
@@ -237,8 +235,8 @@ export default {
   overflow-y: auto;
 }
 
-.form-row .md.col.col-12.col-md-6 {
-  margin: 32px 0 0 0;
+.md.col-12.col-md-6.col-lg-6 {
+  margin: 76px 0 0 0;
 }
 
 #modal-syntaxe .center-btn {
