@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12">
+  <div>
     <div class="card" v-if="object">
       <div class="card-header">
         <h3 class="float-left" v-text="cardName"></h3>
