@@ -89,15 +89,22 @@ const loans_extra = {
         state.pending_loan.entity &&
         state.pending_loan.entity == mat.entity
       ) {
+        let gen_mat = state.pending_loan.generic_materials;
+        let gen_mat_included = gen_mat.filter(item => {
+          return item.material == mat.id
+        });
+
+        console.log(mat)
+        console.log(gen_mat_included)
         if (
           "quantity" in mat &&
-          state.pending_loan.generic_materials.indexOf(mat.id) == -1
+          !gen_mat_included.length
         ) {
-          state.pending_loan.generic_materials.push({
+            state.pending_loan.generic_materials.push({
             material: mat.id,
             quantity: 1
           });
-        } else if (state.pending_loan.models.indexOf(mat.id) == -1) {
+        } else if (state.pending_loan.models.indexOf(mat.id) == -1 && !mat.quantity) {
           state.pending_loan.models.push(mat.id);
         }
       }
