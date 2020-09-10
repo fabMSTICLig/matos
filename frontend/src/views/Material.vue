@@ -12,13 +12,9 @@
                 <div class="d-flex justify-content-between">
                     <div><span class="badge badge-info text-capitalize" style="font-size: 14px;">Détails</span>
                 </div>
-                <div role="group" class="btn-group"><button class="btn btn-primary" type="button" style="height: 37px;">Ajouter</button></div>
+                <div role="group" class="btn-group"><button class="btn btn-primary" type="button" style="height: 37px;" @click="toLoan">Ajouter</button></div>
                 </div>
-                <div>
-                    <span class="icon-link">&#10138;</span>
-                </div>
-                <div v-show="bookmark">
-                  <sup style="font-size: 19px;">{{linkMaterial}}</sup></div>
+   
                 <div class="col col-12 col-md-6">
                    <markdown :description="object.description" :displayed="displayed"></markdown>
                 </div>               
@@ -48,7 +44,7 @@
 import { EditMixin } from "@/common/mixins";
 import Markdown from "@/components/Markdown";
 
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 export default {
   name: "GenericMaterial",
   mixins: [EditMixin],
@@ -58,28 +54,28 @@ export default {
 
   data() {
     return {
-      ressource: "genericmaterials",
       object_name: "Matériel",
       activeDset: true,
       displayed: true,
-      bookmark: false
-
     };
   },
   computed: {
     ...mapGetters({
-      tags: "tags/list"
+      tags: "tags/list",
+      pending_loan: "loans/pending_loan"
+
      }),
     materialTags(){
       return this.tags.filter(item => {
         return this.object["tags"].includes(item.id);
       });
-    },
-    linkMaterial(){
-      return process.env.VUE_APP_SERVER + " /" + this.$route.fullpath
     }
+   
   },
   methods: {
+    ...mapMutations({
+      addMaterial: "loans/addMaterial"
+    }),
     get_empty() {
       return {
         name: "",
@@ -94,12 +90,25 @@ export default {
     make_label() {
       return this.object.name;
     },
-    getLink() {
-      this.bookmark = true
+  
+    toLoan() {
+      if(this.pending_loan.generic_materials.length){
+        this.addMaterial(this.object);      
+      }
+      else {
+        console.log(this.pending_loan)
+        this.addMaterial(this.object);
+      }     
     }
   },
   beforeMount() {
     this.$store.dispatch("tags/fetchList");
+     if (this.$route.name == "specificmaterial-item") {
+      this.ressource = "specificmaterials";
+    }
+    if (this.$route.name == "genericmaterial-item") {
+      this.ressource = "genericmaterials";
+    }
   }
 };
 </script>
@@ -108,11 +117,4 @@ export default {
     margin-bottom: 25px;
     margin-top: 15px;
   }
-
-  .icon-link {
-    color: #EB6864;
-    border: 1px solid #EB6864;
-    border-radius: 5px;
-  }
-
 </style>
