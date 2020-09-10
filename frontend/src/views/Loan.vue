@@ -32,8 +32,8 @@
               <li v-for="error in errors" :key="error" v-text="error"></li>
             </ul>
             <form class="form" @submit="submitLoan">
-              <div class="row">
-                <div class="col-12 col-md-5">
+              <div class="form-row">
+                <div class="col-12 col-md-5 col-lg-5">
                   <div class="form-group" v-if="canManage && !isBorrowed">
                     <label>Utilisateur :</label>
                     <input-datalist
@@ -109,34 +109,34 @@
                     Votre prêt doit contenir au moins un matériel. Pour un
                     material spécific veuillez choisir une instance
                   </p>
-                  <div class="row">
                     <div class="table-responsive">
                       <table class="table">
                         <thead>
-                          <tr class="d-flex">
-                            <th class="col-4">Matériels</th>
-                            <th class="col-7">Quantité</th>
-                            <th class="col-1"></th>
+                          <tr>
+                            <th style="width: auto;">Matériels</th>
+                            <th style="width: auto;">Quantité</th>
+                            <th></th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr
-                            class="d-flex"
-                            v-for="item in pending_loan.generic_materials"
+                             v-for="item in pending_loan.generic_materials"
                             :key="'g' + item.material"
                           >
-                            <td class="col-4">
+                            <td style="border-bottom: 1px solid #dee2e6;">
                               {{ gmById(item.material) | field("name") }}
+                                                          
                             </td>
-                            <td class="col-7">
+                            <td style="border-bottom: 1px solid #dee2e6;">
                               <input
                                 type="number"
-                                class="form-control form-control"
+                                class="number-input form-control form-control"
                                 v-model="item.quantity"
                                 :disabled="readOnly"
                               />
                             </td>
-                            <td class="col-1">
+
+                            <td>
                               <button
                                 v-if="!readOnly"
                                 class="btn btn-danger"
@@ -145,38 +145,39 @@
                               >
                                 X
                               </button>
-                            </td>
+                            </td>                            
                           </tr>
                           <tr
-                            class="d-flex"
-                            v-for="item in pending_loan.models"
-                            :key="'s' + item"
+                             v-for="item in pending_loan.models"
+                            :key="'s' + item.material"
                           >
-                            <td class="col-4">
+                            <td colspan="2">
                               {{ smById(item) | field("name") }}
-                            </td>
-                            <td class="col-7">
-                              <DynList
-                                :ressource="specificinstances[item]"
-                                v-model="pending_loan.specific_materials"
-                                :readonly="readOnly"
-                              ></DynList>
-                            </td>
-                            <td class="col-1">
+                              <tr>
+                                <td style="font-size: 16px;border-style: none;" class="subitem" ><strong>Instances</strong>
+                                  <DynList
+                                  :ressource="specificinstances[item]"
+                                  v-model="pending_loan.specific_materials"
+                                  :readonly="readOnly"
+                                  ></DynList>
+                                </td>
+                              </tr>                              
+                            </td>                        
+
+                            <td>
                               <button
                                 v-if="!readOnly"
                                 class="btn btn-danger"
                                 type="button"
-                                @click="removeMaterial(smById(item))"
+                                @click="removeMaterial(gmById(item.material))"
                               >
                                 X
                               </button>
-                            </td>
-                          </tr>
+                            </td>   
+                          </tr>                       
                         </tbody>
                       </table>
                     </div>
-                  </div>
                   <div
                     class="form-group"
                     v-if="
@@ -488,3 +489,17 @@ export default {
   }
 };
 </script>
+<style>
+  td .number-input {
+    width: 110px;
+  }
+
+  td .subitem {
+    padding: 10px 0 0 0 !important;
+  }
+
+  td .subitem > div {
+    min-width: 300px;
+  }
+
+</style>
