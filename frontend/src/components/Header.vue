@@ -8,11 +8,12 @@
         data-toggle="collapse"
         class="navbar-toggler"
         data-target="#navcol-1"
+        @click="collapse"
       >
         <span class="sr-only">Toggle navigation</span
         ><span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navcol-1">
+      <div :class="collapsed" id="navcol-1">
         <ul class="nav navbar-nav mr-auto">
           <router-link
             active-class="active"
@@ -104,6 +105,7 @@ export default {
     return {
       title: process.env.VUE_APP_TITLE,
       cas: process.env.VUE_APP_CASNAME,
+      collapsed: "collapse navbar-collapse",
       adminroutes: [
         {
           to: { name: "users" },
@@ -150,6 +152,14 @@ export default {
         this.$store.commit("loans/resetPending");
       }
       window.location = this.authUser.externe ? "/cas/logout" : "/auth/logout";
+    },
+    collapse(item) {
+      if(this.collapsed == "collapse navbar-collapse" ){
+          this.collapsed = "navbar-collapse"
+      }
+      else {
+          this.collapsed = "collapse navbar-collapse"
+      }
     }
   }
 };
