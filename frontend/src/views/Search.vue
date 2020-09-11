@@ -83,7 +83,7 @@
                 class="list-group-item list-group-item-action flex-column align-items-start"
               >
                 <div class="d-flex w-100 justify-content-between">
-                  <h4>{{ item.name }}</h4>
+                  <div class="head-link" @click="goToMaterial(item)"><h4>{{ item.name }}</h4></div>
                   <strong
                     ><router-link
                       :to="{
@@ -94,7 +94,7 @@
                     ></strong
                   >
                 </div>
-                <p class="">{{ item.description }}</p>
+                <markdown :description="item.description" :displayed="displayed"></markdown>
                 <p>
                   <strong>Tags :</strong>
                   <DisplayIdList
@@ -131,12 +131,15 @@ import { mapGetters, mapMutations } from "vuex";
 import TagsInput from "@/components/TagsInput";
 import Pagination from "@/components/Pagination";
 import DisplayIdList from "@/components/DisplayIdList";
+import Markdown from "@/components/Markdown";
+
 export default {
   name: "Search",
   components: {
     TagsInput,
     Pagination,
-    DisplayIdList
+    DisplayIdList,
+    Markdown
   },
   data() {
     return {
@@ -149,7 +152,8 @@ export default {
       sort_choices: {
         name: { value: 1, label: "Nom" },
         entity: { value: 2, label: "Entité" }
-      }
+      },
+      displayed: true
     };
   },
   computed: {
@@ -222,6 +226,14 @@ export default {
     ...mapMutations({
       addMaterial: "loans/addMaterial"
     }),
+    goToMaterial(item) {
+      if(item.instances) {
+        this.$router.push({ name: 'specificmaterial-item', params: {matid: item.id} })
+      }
+      else {
+        this.$router.push({ name: 'genericmaterial-item', params: {matid: item.id} })
+      }
+    },
     setDisabled(material) {
       let genericItemsAdded, specificItemsAdded;
 
@@ -283,5 +295,18 @@ export default {
 <style>
 input {
   overflow: hidden !important;
+}
+.stretched-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.head-link {
+  color: #EB6864;
+  cursor: pointer;
+}
+
+.head-link:hover {
+    text-decoration: underline;
 }
 </style>

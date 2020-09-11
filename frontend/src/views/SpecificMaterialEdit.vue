@@ -20,6 +20,15 @@
                       required
                     />
                   </div>
+                   <div class="form-group">
+                    <label>Description</label
+                    ><textarea
+                      class="form-control"
+                      v-model="object.description"
+                    />
+                    <a href="#" class="logo-font" @click="showHelp = true"> Aide  </a>
+
+                  </div>
                   <div class="form-group">
                     <label>Référence interne</label
                     ><input
@@ -36,13 +45,7 @@
                       v-model="object.ref_man"
                     />
                   </div>
-                  <div class="form-group">
-                    <label>Description</label
-                    ><textarea
-                      class="form-control"
-                      v-model="object.description"
-                    />
-                  </div>
+                 
                   <div class="form-group">
                     <label>Localisation</label
                     ><input
@@ -60,7 +63,103 @@
                     />
                   </div>
                 </fieldset>
-                <div class="btn-group" role="group">
+              
+              </form>
+            </div>
+            <div class="col-8">
+              <div class="row">
+                <div v-if="!is_new" class="col-xl-6 col-md-6"> 
+                  <fieldset>
+                    <legend>Instances</legend>
+                    <form @submit="addObject">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Ajouter</span>
+                        </div>
+                        <input v-model="new_object_name" class="form-control" />
+                        <div class="input-group-append">
+                          <button class="btn btn-primary" type="submit">
+                            Valider
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                    <ul class="list-group">
+                      <li
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                        v-for="item in objects_paginated"
+                        :key="item.id"
+                        v-on:click="selectObject(item)"
+                        :class="{
+                          active: selected_object && item.id == selected_object.id
+                        }"
+                      >
+                        <span>
+                          {{ item.name }}
+                        </span>
+                        <button
+                          class="btn btn-danger"
+                          type="button"
+                          @click="removeObject(item)"
+                        >
+                          X
+                        </button>
+                      </li>
+                    </ul>
+                    <pagination
+                      :total-pages="pages_count"
+                      :total="objects_list.length"
+                      :per-page="per_page"
+                      :current-page="current_page"
+                      @pagechanged="onPageChange"
+                    />
+                  </fieldset>
+                </div>
+                <div
+              v-if="!is_new && selected_object"
+              class="col-xl-6 col-md-6"
+                >
+                <form @submit="updateInstance">
+                  <fieldset>
+                    <legend>Instance</legend>
+                    <div class="form-group">
+                      <label>Nom</label
+                      ><input
+                        class="form-control"
+                        type="text"
+                        v-model="selected_object.name"
+                        required
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Numéro série</label
+                      ><input
+                        class="form-control"
+                        type="text"
+                        v-model="selected_object.serial_num"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Description</label
+                      ><textarea
+                        class="form-control"
+                        v-model="selected_object.description"
+                      />
+                    </div>
+                  </fieldset>
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-primary" type="submit">
+                      Modifier
+                    </button>
+                  </div>
+                </form>
+              </div>
+          </div>
+          <div class="md col-md-8">
+            <markdown :description="object.description" :showhelp="showHelp"></markdown>
+          </div>
+            <div class="col col-4">
+              <div class="btn-group" role="group">
                   <button
                     v-if="is_new"
                     class="btn btn-primary"
@@ -86,94 +185,10 @@
                     Supprimer
                   </button>
                 </div>
-              </form>
             </div>
-            <div v-if="!is_new" class="col col-12 col-md-6 col-xl-4">
-              <fieldset>
-                <legend>Instances</legend>
-                <form @submit="addObject">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">Ajouter</span>
-                    </div>
-                    <input v-model="new_object_name" class="form-control" />
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" type="submit">
-                        Valider
-                      </button>
-                    </div>
-                  </div>
-                </form>
-                <ul class="list-group">
-                  <li
-                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                    v-for="item in objects_paginated"
-                    :key="item.id"
-                    v-on:click="selectObject(item)"
-                    :class="{
-                      active: selected_object && item.id == selected_object.id
-                    }"
-                  >
-                    <span>
-                      {{ item.name }}
-                    </span>
-                    <button
-                      class="btn btn-danger"
-                      type="button"
-                      @click="removeObject(item)"
-                    >
-                      X
-                    </button>
-                  </li>
-                </ul>
-                <pagination
-                  :total-pages="pages_count"
-                  :total="objects_list.length"
-                  :per-page="per_page"
-                  :current-page="current_page"
-                  @pagechanged="onPageChange"
-                />
-              </fieldset>
-            </div>
-            <div
-              v-if="!is_new && selected_object"
-              class="col col-12 col-md-6 col-xl-4"
-            >
-              <form @submit="updateInstance">
-                <fieldset>
-                  <legend>Instance</legend>
-                  <div class="form-group">
-                    <label>Nom</label
-                    ><input
-                      class="form-control"
-                      type="text"
-                      v-model="selected_object.name"
-                      required
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>Numéro série</label
-                    ><input
-                      class="form-control"
-                      type="text"
-                      v-model="selected_object.serial_num"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label>Description</label
-                    ><textarea
-                      class="form-control"
-                      v-model="selected_object.description"
-                    />
-                  </div>
-                </fieldset>
-                <div class="btn-group" role="group">
-                  <button class="btn btn-primary" type="submit">
-                    Modifier
-                  </button>
-                </div>
-              </form>
-            </div>
+        </div>
+         
+            
           </div>
         </div>
       </div>
@@ -186,12 +201,14 @@ import { EditMixin } from "@/common/mixins";
 import { showMsgOk } from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
+import Markdown from "@/components/Markdown";
 export default {
   name: "SpecificMaterialEdit",
   mixins: [EditMixin],
   components: {
     TagsInput,
-    Pagination
+    Pagination,
+    Markdown
   },
   data() {
     return {
@@ -200,7 +217,8 @@ export default {
       object_name: "Matériel",
       selected_object: null,
       current_page: 1,
-      new_object_name: ""
+      new_object_name: "",
+      showHelp: false
     };
   },
   computed: {
@@ -313,3 +331,12 @@ export default {
   }
 };
 </script>
+<style>
+textarea {
+  min-height: 200px;
+}
+.md {
+  margin-top: 40px;
+  margin-bottom: 35px;
+}
+</style>

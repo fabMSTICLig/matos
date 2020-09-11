@@ -8,7 +8,7 @@
         <div class="card-body">
           <form id="editor-form">
             <div class="form-row">
-              <div class="col col-12">
+              <div class="col col-6 col-md-6 col-xs-12">
                 <fieldset>
                   <legend>Informations</legend>
                   <div class="form-group">
@@ -42,6 +42,7 @@
                       class="form-control"
                       v-model="object.description"
                     />
+                    <a href="#" class="logo-font" @click="showHelp = true"> Aide  </a>
                   </div>
                   <div class="form-group">
                     <label>Localisation</label
@@ -68,6 +69,9 @@
                     />
                   </div>
                 </fieldset>
+              </div>
+              <div class="md col-12 col-md-6 col-lg-6">
+                <markdown :description="object.description" :showhelp="showHelp"></markdown>
               </div>
             </div>
             <div class="btn-group" role="group">
@@ -106,19 +110,26 @@
 <script>
 import { EditMixin } from "@/common/mixins";
 import TagsInput from "@/components/TagsInput";
+import Markdown from "@/components/Markdown";
+
 export default {
   name: "GenericMaterialEdit",
   mixins: [EditMixin],
   components: {
-    TagsInput
+    TagsInput,
+    Markdown
+
   },
   data() {
     return {
       ressource: "entities/genericMaterials",
       new_label: "Nouvel Matériel Générique",
-      object_name: "Matériel"
+      object_name: "Matériel",
+      showHelp: false
+
     };
   },
+
   computed: {
     prefix() {
       return "entities/" + this.$route.params.entityid + "/";
@@ -143,3 +154,13 @@ export default {
   }
 };
 </script>
+<style>
+.form-group textarea {
+  min-height: 250px;
+}
+
+.md.col-12.col-md-6.col-lg-6 {
+  margin: 76px 0 0 0;
+}
+
+</style>
