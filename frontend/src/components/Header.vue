@@ -153,7 +153,7 @@ export default {
       }
       window.location = this.authUser.externe ? "/cas/logout" : "/auth/logout";
     },
-    collapse(item) {
+    collapse() {
       if(this.collapsed == "collapse navbar-collapse" ){
           this.collapsed = "navbar-collapse"
       }
