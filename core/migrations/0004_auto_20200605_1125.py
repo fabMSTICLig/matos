@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Loan',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.PositiveSmallIntegerField(choices=[(1, 'En Attente'), (2, 'Demandé'), (3, 'Accecpté'), (4, 'Refusé')])),
+                ('status', models.PositiveSmallIntegerField(choices=[(1, 'En Attente'), (2, 'Demandé'), (3, 'Accepté'), (4, 'Refusé')])),
                 ('checkout_date', models.DateField()),
                 ('due_date', models.DateField()),
                 ('return_date', models.DateField(blank=True, null=True)),
