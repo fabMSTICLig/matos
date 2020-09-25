@@ -5,6 +5,8 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
+from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework_files.viewsets import ImportExportModelViewSet
 
 import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
@@ -125,6 +127,16 @@ class RGPDAcceptView(APIView):
 
     def get(self, request, format=None):
         return Response({"rgpd_accept": request.user.rgpd_accept})
+
+
+class PersonalDataView(APIView):
+    #queryset = ABC.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        instance = UserDataSerializer(request.user, context={'request': request})
+        return Response({"user": instance.data})
+
 
 
 class EntityViewSet(viewsets.ModelViewSet):

@@ -6,6 +6,7 @@ export const FETCH_USERS = "fetchUsers";
 export const UPDATE_USER = "updateUser";
 export const GET_USER = "getUser";
 export const CREATE_USER = "setUser";
+export const USER_DATA = "setUserData";
 
 export const FETCH_AFFILIATION_TYPES = "fetchAffiliationTypes";
 export const FETCH_AFFILIATIONS = "fetchAffiliations";

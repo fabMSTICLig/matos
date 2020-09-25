@@ -153,13 +153,17 @@
         </div>
       </modal>
     </div>
+    <div class="bottom btn btn-primary" @click="personalData">Consulter mes données</div>
   </div>
 </template>
 
 <script>
+import { USER_DATA } from "@/store/actions.type";
 import { ListMixin } from "@/common/mixins";
 import Modal from "@/components/Modal";
 import { mapGetters } from "vuex";
+import { JSONRenderer } from "@/common/helpers";
+
 export default {
   name: "LoansList",
   mixins: [ListMixin],
@@ -176,7 +180,7 @@ export default {
   },
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
-    ...mapGetters(["authUser"]),
+    ...mapGetters(["authUser","userData"]),
     ...mapGetters({
       gmById: "genericmaterials/byId",
       smById: "specificmaterials/byId",
@@ -239,6 +243,19 @@ export default {
     },
     deleteLoan() {
       this.showDelete = true;
+    },
+
+    personalData() {
+      return this.$store.dispatch(USER_DATA)
+              .then(() => {
+                let dateObj = new Date();
+                let month = dateObj.getMonth() + 1; //months from 1-12
+                let day = dateObj.getUTCDate();
+                let year = dateObj.getUTCFullYear();
+                let labelData = this.authUser.username + "_" + day + month  + year + ".json";
+                JSONRenderer.download(this.userData,labelData,"text/plain")
+                console.log(this.userData)
+      })
     }
   },
   beforeMount() {
@@ -253,3 +270,8 @@ export default {
   }
 };
 </script>
+<style>
+.bottom.btn {
+  margin-left: 18px;
+}
+</style>
