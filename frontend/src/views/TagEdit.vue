@@ -33,7 +33,7 @@
                 v-if="!is_new"
                 class="btn btn-primary"
                 type="button"
-                v-on:click="update"
+                v-on:click="update(msg)"
               >
                 Modifier
               </button>
@@ -63,7 +63,8 @@ export default {
     return {
       ressource: "tags",
       new_label: "Nouveau Tag",
-      object_name: "Tag"
+      object_name: "Tag",
+      msg: "mis à jour"
     };
   },
   computed: {},
