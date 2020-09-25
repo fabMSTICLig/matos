@@ -4,12 +4,14 @@ import {
   CHECK_AUTH,
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD,
-  UPDATE_RGPD
+  UPDATE_RGPD,
+  USER_DATA
 } from "./actions.type";
-import { SET_AUTHUSER, PURGE_AUTH } from "./mutations.type";
+import { SET_AUTHUSER, PURGE_AUTH, SET_USERDATA } from "./mutations.type";
 
 const state = {
-  authUser: {}
+  authUser: {},
+  userData: {}
 };
 
 const getters = {
@@ -21,6 +23,9 @@ const getters = {
   },
   isAdmin(state) {
     return state.authUser.is_staff;
+  },
+  userData(state) {
+    return state.userData
   }
 };
 
@@ -58,7 +63,19 @@ const actions = {
       context.state.authUser.rgpd_accept = data["rgpd_accept"];
       context.commit(SET_AUTHUSER, context.state.authUser);
     });
-  }
+  },
+  [USER_DATA](context) {
+    return new Promise((resolve) => {
+      ApiService.query("self/data", {})
+        .then(({ data }) => {
+          context.commit(SET_USERDATA, data.user);
+          resolve();
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    });
+  },
 };
 
 const mutations = {
@@ -67,6 +84,9 @@ const mutations = {
   },
   [PURGE_AUTH](state) {
     state.authUser = {};
+  },
+  [SET_USERDATA](state, userData) {
+    state.userData = userData;
   }
 };
 

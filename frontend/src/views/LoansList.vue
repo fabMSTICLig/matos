@@ -180,7 +180,7 @@ export default {
   },
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
-    ...mapGetters(["authUser","userData"]),
+    ...mapGetters(["authUser", "userData"]),
     ...mapGetters({
       gmById: "genericmaterials/byId",
       smById: "specificmaterials/byId",

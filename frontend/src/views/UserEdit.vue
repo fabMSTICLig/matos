@@ -94,7 +94,7 @@
                 v-if="!is_new"
                 class="btn btn-primary"
                 type="button"
-                v-on:click="update"
+                v-on:click="update(msg)"
               >
                 Modifier
               </button>
@@ -127,7 +127,8 @@ export default {
     return {
       ressource: "users",
       new_label: "Nouvel Utilisateur",
-      object_name: "User"
+      object_name: "User",
+      msg: "mis à jour"
     };
   },
   computed: {},

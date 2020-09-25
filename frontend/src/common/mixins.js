@@ -119,7 +119,7 @@ export const EditMixin = {
           });
       }
     },
-    update() {
+    update(msg) {
       if (document.querySelector("#editor-form").checkValidity()) {
         this.$store
           .dispatch(this.ressource + "/update", {
@@ -131,7 +131,7 @@ export const EditMixin = {
             this.object = Object.assign({}, data);
             // eslint-disable-next-line
             console.log(this.object_name + " updated");
-            showMsgOk(this.object_name + " updated");
+            showMsgOk(this.object_name + " " + msg);
           });
       } else {
         document.querySelector("#editor-form").reportValidity();

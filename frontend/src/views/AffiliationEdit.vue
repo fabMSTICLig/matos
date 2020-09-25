@@ -45,7 +45,7 @@
                 v-if="!is_new"
                 class="btn btn-primary"
                 type="button"
-                v-on:click="update"
+                v-on:click="update(msg)"
               >
                 Modifier
               </button>
@@ -76,7 +76,8 @@ export default {
     return {
       ressource: "affiliations",
       new_label: "Nouvelle Affiliation",
-      object_name: "Affiliation"
+      object_name: "Affiliation",
+      msg: "mise à jour"
     };
   },
   computed: {
