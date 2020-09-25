@@ -26,7 +26,7 @@
                       class="form-control"
                       v-model="object.description"
                     />
-                    <a href="#" class="logo-font" @click="showHelp = true"> Aide  </a>
+                    <div class="sub-link" @click="showMessage">Aide</div>
 
                   </div>
                   <div class="form-group">
@@ -45,7 +45,7 @@
                       v-model="object.ref_man"
                     />
                   </div>
-                 
+
                   <div class="form-group">
                     <label>Localisation</label
                     ><input
@@ -63,12 +63,12 @@
                     />
                   </div>
                 </fieldset>
-              
+
               </form>
             </div>
             <div class="col-8">
               <div class="row">
-                <div v-if="!is_new" class="col-xl-6 col-md-6"> 
+                <div v-if="!is_new" class="col-xl-6 col-md-6">
                   <fieldset>
                     <legend>Instances</legend>
                     <form @submit="addObject">
@@ -140,11 +140,8 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label>Description</label
-                      ><textarea
-                        class="form-control"
-                        v-model="selected_object.description"
-                      />
+                      <label>Description</label>
+                      <markdown :description="selected_object.description" :showhelp="showHelp"></markdown>
                     </div>
                   </fieldset>
                   <div class="btn-group" role="group">
@@ -172,7 +169,7 @@
                     v-if="!is_new"
                     class="btn btn-primary"
                     type="button"
-                    v-on:click="update"
+                    v-on:click="update(msg)"
                   >
                     Modifier
                   </button>
@@ -187,8 +184,8 @@
                 </div>
             </div>
         </div>
-         
-            
+
+
           </div>
         </div>
       </div>
@@ -218,7 +215,9 @@ export default {
       selected_object: null,
       current_page: 1,
       new_object_name: "",
-      showHelp: false
+      showHelp: false,
+      msg: 'mis à jour'
+
     };
   },
   computed: {
@@ -327,7 +326,15 @@ export default {
           this.selectObject(data);
           showMsgOk("Instance mise à jour");
         });
+    },
+    showMessage(){
+      this.showHelp = true;
     }
+  },
+  created() {
+   this.$on('hideHelp', hide => {
+      this.showHelp = hide;
+    });
   }
 };
 </script>
@@ -338,5 +345,12 @@ textarea {
 .md {
   margin-top: 40px;
   margin-bottom: 35px;
+}
+.sub-link {
+  color: #EB6864;
+  cursor: pointer;
+}
+.sub-link:hover {
+    text-decoration: underline;
 }
 </style>

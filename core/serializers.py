@@ -44,6 +44,9 @@ class UserSerializer(serializers.ModelSerializer):
     def get_externe(self, obj):
         return len(obj.password)==0
 
+
+
+
 class UserPublicSerializer(serializers.ModelSerializer):
     """
     Public Serializer class for User objects
@@ -64,6 +67,8 @@ class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
         fields = '__all__'
+
+
 
 class TagSerializer(serializers.ModelSerializer):
     """
@@ -97,6 +102,8 @@ class SpecificMaterialSerializer(serializers.ModelSerializer):
         model = SpecificMaterial
         fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation']
 
+
+
 class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
     """
     Serializer for specific material objects.
@@ -113,6 +120,22 @@ class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
         model = SpecificMaterialInstance
         fields = '__all__'
 
+class SpecificInstancesNestedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for specific material objects.
+    """
+    instances = SpecificMaterialInstanceSerializer(many=True,read_only=True)
+    class Meta:
+        model = SpecificMaterial
+        fields = ['id','name','description','instances']
+
+class SpecificMaterialUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for specific material objects.
+    """
+    class Meta:
+        model = SpecificMaterial
+        fields = ['id','name','description']
 
 class LoanGenericItemSerializer(serializers.ModelSerializer):
 
@@ -214,8 +237,45 @@ class LoanSerializer(serializers.ModelSerializer):
             if data['due_date']> loan.checkout_date:
                 materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
                 raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être rendu avant le "+str(loan.checkout_date))
-                
+
         for item in data['loangenericitem_set']:
             if item['material'].entity != entity:
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité prêteuse.")
         return data
+
+class LoanNestedSerializer(serializers.ModelSerializer):
+    specific_materials = SpecificMaterialUserSerializer(many=True, read_only=True)
+    class Meta:
+        model = Loan
+        fields = ('id','status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'generic_materials', 'parent', 'child')
+
+
+class EntityNestedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Nested Entity objects.
+    """
+    affiliations = AffiliationSerializer(many=True, read_only=True)
+    genericmaterials = GenericMaterialSerializer(many=True, read_only=True)
+    specificmaterials = SpecificInstancesNestedSerializer(many=True, read_only=True)
+    loans = LoanSerializer(many=True, read_only=True)
+    class Meta:
+        model = Entity
+        fields = ('name','managers','description','affiliations','genericmaterials', 'specificmaterials', 'loans')
+
+class UserDataSerializer(serializers.ModelSerializer):
+    """
+    Serializer class of the User Model
+    The class member person is a nested representation
+    """
+    externe = serializers.SerializerMethodField()
+    entities = EntityNestedSerializer(many=True, read_only=True)
+    loans = LoanNestedSerializer(many=True, read_only=True)
+    affiliations = AffiliationSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('rgpd_accept', 'affiliations', 'entities', 'externe','loans')
+        read_only_fields = ('rgpd_accept','affiliations','entities','externe')
+
+    def get_externe(self, obj):
+        return len(obj.password)==0

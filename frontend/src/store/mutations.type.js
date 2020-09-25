@@ -4,6 +4,7 @@ export const SET_PASSWORD = "setPassword";
 export const SET_USERS = "setUsers";
 export const SET_USER = "setUser";
 export const ADD_USER = "addUser";
+export const SET_USERDATA = "setUserData";
 
 export const SET_AFFILIATION_TYPES = "setAffiliationType";
 export const SET_AFFILIATIONS = "setAffiliations";
