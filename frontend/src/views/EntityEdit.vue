@@ -54,11 +54,11 @@
                     class="form-control"
                     v-model="object.description"
                   ></textarea>
-                  <a href="#" class="logo-font" @click="showHelp = true"> Aide  </a>
+                  <div class="sub-link" @click="showMessage"> Aide</div>
                 </div>
               </fieldset>
             </div>
-                          
+
             <div class="md col-12 col-md-6 col-lg-6">
                 <markdown :description="object.description" :showhelp="showHelp"></markdown>
             </div>
@@ -107,7 +107,7 @@
               v-if="!is_new"
               class="btn btn-primary"
               type="button"
-              v-on:click="update"
+              v-on:click="update(msg)"
             >
               Modifier
             </button>
@@ -122,7 +122,7 @@
           </div>
         </form>
       </div>
-    </div>  
+    </div>
   </div>
 </template>
 
@@ -143,7 +143,8 @@ export default {
       ressource: "entities",
       new_label: "Nouvelle Entité",
       object_name: "Entité",
-      showHelp: false
+      showHelp: false,
+      msg: "mise à jour"
     };
   },
   computed: {},
@@ -163,6 +164,15 @@ export default {
     makeManagerLabel(item) {
       return item.first_name + " " + item.last_name;
     },
+    showMessage(){
+      this.showHelp = true;
+    }
+
+  },
+  created() {
+   this.$on('hideHelp', hide => {
+      this.showHelp = hide;
+    });
   }
 };
 </script>
@@ -175,5 +185,11 @@ export default {
   margin: 76px 0 0 0;
 }
 
-
+.sub-link {
+  color: #EB6864;
+  cursor: pointer;
+}
+.sub-link:hover {
+    text-decoration: underline;
+}
 </style>

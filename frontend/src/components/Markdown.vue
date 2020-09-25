@@ -56,7 +56,7 @@
       <h6>Citations</h6>
       <span> > Citations </span>
       <div class="center-btn">
-        <button type="button" class="btn btn-info" @click="showhelp = false">
+        <button type="button" class="btn btn-info" @click="hideHelp">
           Ok
         </button>
       </div>
@@ -91,7 +91,7 @@ export default {
   data() {
     return {
       loaded_infos: false,
-      input: "",
+      input: ""
     };
   },
   computed: {
@@ -102,6 +102,11 @@ export default {
   watch: {
     description(text) {
       debounce((this.input = text), 400);
+    }
+  },
+  methods: {
+    hideHelp(){
+      this.$parent.$emit('hideHelp', false);
     }
   }
 };

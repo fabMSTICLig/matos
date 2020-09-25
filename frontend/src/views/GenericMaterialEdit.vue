@@ -42,7 +42,7 @@
                       class="form-control"
                       v-model="object.description"
                     />
-                    <a href="#" class="logo-font" @click="showHelp = true"> Aide  </a>
+                    <div class="sub-link" @click="showMessage">Aide</div>
                   </div>
                   <div class="form-group">
                     <label>Localisation</label
@@ -87,7 +87,7 @@
                 v-if="!is_new"
                 class="btn btn-primary"
                 type="button"
-                v-on:click="update"
+                v-on:click="update(msg)"
               >
                 Modifier
               </button>
@@ -125,7 +125,8 @@ export default {
       ressource: "entities/genericMaterials",
       new_label: "Nouvel Matériel Générique",
       object_name: "Matériel",
-      showHelp: false
+      showHelp: false,
+      msg: 'mis à jour'
 
     };
   },
@@ -150,7 +151,15 @@ export default {
     },
     make_label() {
       return this.object.name;
+    },
+    showMessage(){
+      this.showHelp = true;
     }
+  },
+  created() {
+   this.$on('hideHelp', hide => {
+      this.showHelp = hide;
+    });
   }
 };
 </script>
@@ -162,5 +171,11 @@ export default {
 .md.col-12.col-md-6.col-lg-6 {
   margin: 76px 0 0 0;
 }
-
+.sub-link {
+  color: #EB6864;
+  cursor: pointer;
+}
+.sub-link:hover {
+    text-decoration: underline;
+}
 </style>
