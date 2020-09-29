@@ -105,6 +105,7 @@
           </button>
         </div>
       </form>
+      <div class="bottom btn btn-primary" @click="personalData">Consulter mes données</div>
     </div>
     <modal id="modal-rgpd" title="RGPD" hideFooter v-model="showRGPD">
       <h6>Conditions d'utilisation</h6>
@@ -146,9 +147,11 @@ import { showMsgOk, Modal } from "@/components/Modal";
 import {
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD,
-  UPDATE_RGPD
+  UPDATE_RGPD,
+  USER_DATA
 } from "@/store/actions.type";
 import { mapGetters } from "vuex";
+import { JSONRenderer } from "@/common/helpers";
 export default {
   name: "Profile",
   components: {
@@ -167,7 +170,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["authUser"]),
+    ...mapGetters(["authUser","userData"]),
     passvalid() {
       if (
         this.form.old_password == "" &&
@@ -228,6 +231,18 @@ export default {
       this.$store.dispatch(UPDATE_RGPD).then(() => {
         this.showRGPD = false;
       });
+    },
+    personalData() {
+      return this.$store.dispatch(USER_DATA)
+              .then(() => {
+                let dateObj = new Date();
+                let month = dateObj.getMonth() + 1; //months from 1-12
+                let day = dateObj.getUTCDate();
+                let year = dateObj.getUTCFullYear();
+                let labelData = this.authUser.username + "_" + day + month  + year + ".json";
+                JSONRenderer.download(this.userData,labelData,"text/plain")
+                console.log(this.userData)
+      })
     }
   },
   mounted() {
@@ -237,3 +252,9 @@ export default {
   }
 };
 </script>
+<style>
+.bottom.btn {
+  float: right;
+  margin-top: -38px;
+}
+</style>

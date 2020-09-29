@@ -5,8 +5,6 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
-from rest_framework.parsers import JSONParser, MultiPartParser
-from rest_framework_files.viewsets import ImportExportModelViewSet
 
 import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser

@@ -75,9 +75,10 @@
           <h3>
             {{ selected_object.name }}
           </h3>
-          <p class="card-text">
-            {{ selected_object.description }}
-          </p>
+          <markdown
+            :description="selected_object.description"
+            :displayed="displayed"
+          ></markdown>
           <table class="table">
             <tr>
               <th scope="row">Ref interne</th>
@@ -115,12 +116,15 @@
 import { ListMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
 import Dropdown from "@/components/Dropdown";
+import Markdown from "@/components/Markdown";
+
 export default {
   name: "MaterialsList",
   mixins: [ListMixin],
   components: {
     DisplayIdList,
-    Dropdown
+    Dropdown,
+    Markdown
   },
   data() {
     return {
@@ -136,7 +140,8 @@ export default {
           to: { name: "specificmaterial", params: { matid: "new" } },
           label: "Spécifique"
         }
-      ]
+      ],
+      displayed: true
     };
   },
   computed: {

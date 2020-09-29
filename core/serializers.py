@@ -245,22 +245,19 @@ class LoanSerializer(serializers.ModelSerializer):
 
 class LoanNestedSerializer(serializers.ModelSerializer):
     specific_materials = SpecificMaterialUserSerializer(many=True, read_only=True)
+    generic_materials = GenericMaterialSerializer(many=True, read_only=True)
     class Meta:
         model = Loan
-        fields = ('id','status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'generic_materials', 'parent', 'child')
+        fields = ('id','status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments','specific_materials', 'generic_materials', 'parent', 'child')
 
 
 class EntityNestedSerializer(serializers.ModelSerializer):
     """
     Serializer for Nested Entity objects.
     """
-    affiliations = AffiliationSerializer(many=True, read_only=True)
-    genericmaterials = GenericMaterialSerializer(many=True, read_only=True)
-    specificmaterials = SpecificInstancesNestedSerializer(many=True, read_only=True)
-    loans = LoanSerializer(many=True, read_only=True)
     class Meta:
         model = Entity
-        fields = ('name','managers','description','affiliations','genericmaterials', 'specificmaterials', 'loans')
+        fields = ('name','description','contact')
 
 class UserDataSerializer(serializers.ModelSerializer):
     """
