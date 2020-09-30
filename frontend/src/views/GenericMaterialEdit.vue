@@ -71,7 +71,7 @@
                 </fieldset>
               </div>
               <div class="md col-12 col-md-6 col-lg-6">
-                <markdown :description="object.description" :showhelp="showHelp"></markdown>
+                <markdown :description="object.description" :showhelp="showHelp" v-if="object.description"></markdown>
               </div>
             </div>
             <div class="btn-group" role="group">

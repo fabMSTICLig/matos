@@ -7,7 +7,7 @@
         </div>
         <div class="card-body">
           <div class="form-row">
-            <div class="col col-12 col-md-6 col-xl-4">
+            <div class="col col-1g-6 col-md-4 col-xl-4">
               <form id="editor-form">
                 <fieldset>
                   <legend>Informations</legend>
@@ -66,7 +66,7 @@
 
               </form>
             </div>
-            <div class="col-8">
+            <div class="col-xl-8 col-md-8">
               <div class="row">
                 <div v-if="!is_new" class="col-xl-6 col-md-6">
                   <fieldset>

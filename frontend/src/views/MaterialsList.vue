@@ -212,6 +212,8 @@ export default {
     background: #EB6864;
     color: #FFF;
   }
-
+  #editor {
+    margin: 30px 0px 30px 0px;
+  }
 
 </style>

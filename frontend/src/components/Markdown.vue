@@ -188,7 +188,5 @@ blockquote {
   text-align: center;
 }
 
-#editor {
-  margin: 30px 0px 30px 0px;
-}
+
 </style>

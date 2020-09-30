@@ -44,6 +44,9 @@
                     v-for="item in objects_paginated"
                     :key="item.id"
                     v-on:click="selected_object = item"
+                    :class="{
+                      active: selected_object && item.id == selected_object.id
+                    }"
                   >
                     <td>
                       {{ userById(item.user) | field("username") }}
@@ -233,3 +236,10 @@ export default {
   }
 };
 </script>
+<style>
+
+tbody tr.active {
+  background: #EB6864;
+  color: #FFF;
+}
+</style>
