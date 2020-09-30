@@ -162,6 +162,14 @@ code {
   margin-bottom: 1rem;
 }
 
+blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 1em 10px .1em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+
 #modal-syntaxe .modal {
   display: block !important;
 }
@@ -178,5 +186,9 @@ code {
   margin-right: auto;
   margin-bottom: 15px;
   text-align: center;
+}
+
+#editor {
+  margin: 30px 0px 30px 0px;
 }
 </style>

@@ -141,7 +141,9 @@
                     </div>
                     <div class="form-group">
                       <label>Description</label>
-                      <markdown :description="selected_object.description" :showhelp="showHelp"></markdown>
+                      <textarea
+                      class="form-control"
+                      v-model="selected_object.description"></textarea>
                     </div>
                   </fieldset>
                   <div class="btn-group" role="group">
@@ -153,7 +155,7 @@
               </div>
           </div>
           <div class="md col-md-8">
-            <markdown :description="object.description" :showhelp="showHelp"></markdown>
+            <markdown :description="object.description" :showhelp="showHelp" v-if="object.description"></markdown>
           </div>
             <div class="col col-4">
               <div class="btn-group" role="group">

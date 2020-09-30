@@ -81,7 +81,7 @@
             >
           </div>
         </div>
-        <div class="card-body">
+        <div class="card-body scroll">
           <markdown
             :description="selected_object.description"
             :displayed="displayed"
@@ -168,3 +168,9 @@ export default {
   }
 };
 </script>
+<style>
+.scroll {
+  max-height: 450px;
+  overflow-y: scroll;
+}
+</style>
