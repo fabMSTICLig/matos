@@ -149,7 +149,8 @@ class LoanSerializer(serializers.ModelSerializer):
     def get_models(self, obj):
         models=set()
         for item in obj.specific_materials.all():
-            models.add(item.model.id)
+            if(item.model.entity_id == obj.entity.id):
+                models.add(item.model.id)
         return list(models)
 
     class Meta:
