@@ -94,16 +94,6 @@ class GenericMaterialPublicSerializer(serializers.ModelSerializer):
         model = GenericMaterial
         exclude = ['localisation']
 
-class SpecificMaterialSerializer(serializers.ModelSerializer):
-    """
-    Serializer for specific material objects.
-    """
-    class Meta:
-        model = SpecificMaterial
-        fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation']
-
-
-
 class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
     """
     Serializer for specific material objects.
@@ -119,6 +109,15 @@ class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecificMaterialInstance
         fields = '__all__'
+
+class SpecificMaterialSerializer(serializers.ModelSerializer):
+    """
+    Serializer for specific material objects.
+    """
+    instances = SpecificMaterialInstanceSerializer(many=True, read_only=True)
+    class Meta:
+        model = SpecificMaterial
+        fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation']
 
 class SpecificInstancesNestedSerializer(serializers.ModelSerializer):
     """

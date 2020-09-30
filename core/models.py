@@ -112,7 +112,7 @@ class Material(models.Model):
     tags : Tag[]
         list of tag of the material (Ex, electronic, linux, arduino)
     """
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
     ref_int = models.CharField(max_length=50, null=True, blank=True)
     ref_man = models.CharField(max_length=50, null=True, blank=True)
     localisation = models.CharField(max_length=50, null=True, blank=True)
@@ -192,5 +192,3 @@ class LoanGenericItem(models.Model):
 
     class Meta:
         unique_together = ['loan', 'material']
-
-
