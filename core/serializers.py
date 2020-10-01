@@ -214,6 +214,8 @@ class LoanSerializer(serializers.ModelSerializer):
         entity = data['entity']
         for mat in data['specific_materials']:
             if mat.model.entity != entity:
+                print(mat.model)
+                print(entity)
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité preteuse.")
         #conflit prêts en cours
         loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], status=Loan.Status.ACCEPTED, checkout_date__lte=data['checkout_date'], return_date=None, due_date__gt=data['checkout_date']).distinct()
@@ -240,6 +242,8 @@ class LoanSerializer(serializers.ModelSerializer):
 
         for item in data['loangenericitem_set']:
             if item['material'].entity != entity:
+                print(item['material'])
+                print(entity)
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité prêteuse.")
         return data
 

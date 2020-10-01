@@ -325,12 +325,41 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     Public endpoints for specific material instance
     """
     queryset = SpecificMaterialInstance.objects.all()
-    permission_classes = (RGPDAccept, IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
 
 
+class SpecificMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    endpoints for loan related specific material
+    """
+    queryset = Loan.objects.all()
+    permission_classes = (RGPDAccept, IsAuthenticated,)
+    serializer_class = LoanSerializer
+    def get_queryset(self, **kwargs):
+        print(self.kwargs)
+        specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['specificmaterial_pk'])
+        print(specific_material)
+        #return self.queryset.filter(pk=self.kwargs['specificmaterial_pk'])
+        loan = Loan.objects.filter(specific_materials__in=specific_material)
+        return loan
+
+class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    endpoints for loan related specific material
+    """
+    queryset = Loan.objects.all()
+    permission_classes = (RGPDAccept, IsAuthenticated,)
+    serializer_class = LoanSerializer
+    def get_queryset(self, **kwargs):
+        print(self.kwargs)
+        generic_material = GenericMaterial.objects.filter(pk=self.kwargs['genericmaterial_pk'])
+        print(generic_material)
+        #return self.queryset.filter(pk=self.kwargs['specificmaterial_pk'])
+        loan = Loan.objects.filter(generic_materials__in=generic_material)
+        return loan
 
 class LoanViewSet(viewsets.ModelViewSet):
     """

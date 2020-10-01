@@ -10,7 +10,7 @@ entities/(entity_pk)/specificmaterials/
 entities/(entity_pk)/specificmaterials/(specificmaterial_pk)/instances
 """
 from django.urls import path, include
-from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView, TagViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialViewSet, EntitySpecificMaterialInstanceViewSet, GenericMaterialViewSet, SpecificMaterialViewSet, SpecificMaterialInstanceViewSet, LoanViewSet, RGPDAcceptView, PersonalDataView
+from .views import AffiliationViewSet, EntityViewSet, UserViewSet, SelfView, TagViewSet, EntityGenericMaterialViewSet, EntitySpecificMaterialViewSet, EntitySpecificMaterialInstanceViewSet, GenericMaterialViewSet, SpecificMaterialViewSet, SpecificMaterialInstanceViewSet, LoanViewSet, RGPDAcceptView, PersonalDataView, SpecificMaterialLoanViewSet, GenericMaterialLoanViewSet
 
 from rest_framework_nested import routers
 
@@ -25,6 +25,12 @@ router.register(r'loans', LoanViewSet)
 
 router_publicspecificmaterials = routers.NestedSimpleRouter(router, r'specificmaterials', lookup='specificmaterial')
 router_publicspecificmaterials.register(r'instances', SpecificMaterialInstanceViewSet, basename='public-instances')
+
+router_loans_specific = routers.NestedSimpleRouter(router, r'specificmaterials', lookup='specificmaterial')
+router_loans_specific.register(r'loans',SpecificMaterialLoanViewSet,basename='loans')
+
+router_loans_generic = routers.NestedSimpleRouter(router, r'genericmaterials', lookup='genericmaterial')
+router_loans_generic.register(r'loans',GenericMaterialLoanViewSet,basename='loans')
 
 router_entities = routers.NestedSimpleRouter(router, r'entities', lookup='entity')
 router_entities.register(r'genericmaterials',EntityGenericMaterialViewSet,basename='genericmaterials')
@@ -41,5 +47,7 @@ urlpatterns = [
     path('', include(router_entities.urls)),
     path('', include(router_specific_materials.urls)),
     path('', include(router_publicspecificmaterials.urls)),
+    path('', include(router_loans_specific.urls)),
+    path('', include(router_loans_generic.urls))
 
 ]
