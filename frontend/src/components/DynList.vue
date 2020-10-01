@@ -1,19 +1,20 @@
 <template>
   <div>
     <form v-if="!readonly" :id="_uid" @submit="addObject">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">Ajouter</span>
-        </div>
-        <input-datalist
-          v-model="new_object_id"
-          :ressource="ressource"
-          :makeLabel="makeLabel"
-        ></input-datalist>
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="submit">
-            Valider
-          </button>
+      <div :class="show ? 'dropdown show' : 'dropdown'" @focusout="hide">
+        <a
+        :class="classtoogle + ' btn dropdown-toggle'"
+        :id="'button' + _uid"
+        @click="toogle">
+          Ajouter
+        </a>
+      <div
+          :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
+          :id="'tooltip' + _uid"
+        >
+          <div v-for="item in objects_list"
+           :key="item.id"
+           @click="addObject(item)">{{item.name}}</div>
         </div>
       </div>
     </form>
@@ -42,7 +43,6 @@
 </template>
 
 <script>
-import InputDatalist from "@/components/InputDatalist";
 export default {
   name: "DynList",
   props: {
@@ -65,11 +65,13 @@ export default {
     }
   },
   components: {
-    InputDatalist
   },
   data() {
     return {
-      new_object_id: 0
+      new_object_id: 0,
+      items: [],
+      show: false,
+      classtoogle: 'btn-primary'
     };
   },
   computed: {
@@ -82,20 +84,31 @@ export default {
       return this.objects_list.filter(item => {
         return this.value.indexOf(item.id) > -1;
       });
-    }
+    },
+
   },
   methods: {
-    addObject(e) {
+    toogle(e) {
       e.preventDefault();
-      if (this.value.indexOf(this.new_object_id) > -1) {
-        this.new_object_id = 0;
+      this.show = !this.show;
+    },
+    hide(e) {
+      if (!this.$el.contains(e.relatedTarget)) {
+        this.show = false;
+      }
+    },
+    addObject(item) {
+      alert('add object')
+      //e.preventDefault();
+      if (this.value.indexOf(item.id) > -1) {
+        //this.new_object_id = 0;
       } else if (
-        this.value.indexOf(this.new_object_id) == -1 &&
-        this.objects_list.some(item => item.id == this.new_object_id)
+        this.value.indexOf(item.id) == -1 &&
+        this.objects_list.some(object => object.id == item.id)
       ) {
-        this.value.push(this.new_object_id);
+        this.value.push(item.id);
         this.$emit("input", this.value);
-        this.new_object_id = 0;
+        //this.new_object_id = 0;
       }
     },
     removeObject(id) {
@@ -104,7 +117,25 @@ export default {
         this.value.splice(index, 1);
         this.$emit("input", this.value);
       }
+    },
+    itemSelected(item) {
+      let selected;
+      let object_selected = this.value.filter(object => {
+        console.log(object)
+        if(item.id == object) {
+          return true;
+        }
+      });
+
+      if(object_selected.length) {
+        selected = true
+      }
+      return selected;
     }
+  },
+  beforeMount() {
+    //do something before mounting vue instance
+    this.items = this.value
   }
 };
 </script>

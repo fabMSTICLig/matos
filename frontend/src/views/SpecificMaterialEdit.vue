@@ -355,4 +355,9 @@ textarea {
 .sub-link:hover {
     text-decoration: underline;
 }
+
+#editor {
+  margin: 80px 0px 0px 0px;
+}
+
 </style>

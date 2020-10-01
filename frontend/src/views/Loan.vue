@@ -125,7 +125,7 @@
                           >
                             <td style="border-bottom: 1px solid #dee2e6;">
                               {{ gmById(item.material) | field("name") }}
-                                                          
+
                             </td>
                             <td style="border-bottom: 1px solid #dee2e6;">
                               <input
@@ -145,7 +145,7 @@
                               >
                                 X
                               </button>
-                            </td>                            
+                            </td>
                           </tr>
                           <tr
                              v-for="item in pending_loan.models"
@@ -161,8 +161,8 @@
                                   :readonly="readOnly"
                                   ></DynList>
                                 </td>
-                              </tr>                              
-                            </td>                        
+                              </tr>
+                            </td>
 
                             <td>
                               <button
@@ -173,8 +173,8 @@
                               >
                                 X
                               </button>
-                            </td>   
-                          </tr>                       
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
