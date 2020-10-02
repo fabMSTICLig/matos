@@ -8,13 +8,23 @@
         @click="toogle">
           Ajouter
         </a>
-      <div
-          :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
-          :id="'tooltip' + _uid"
-        >
-          <div v-for="item in objects_list"
-           :key="item.id"
-           @click="addObject(item)">{{item.name}}</div>
+        <div
+            :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
+            :id="'tooltip' + _uid"
+            v-if="objects_list"
+          >
+          <ul>
+            <li v-for="item in objects_list" 
+            :key="item.id"
+            @click="addObject(item)"
+            class="dropdown-item">
+              <span>
+                <slot v-bind:item="item">
+                  {{ item.name }}
+                </slot>
+              </span>           
+            </li>
+          </ul>
         </div>
       </div>
     </form>
@@ -98,7 +108,6 @@ export default {
       }
     },
     addObject(item) {
-      alert('add object')
       //e.preventDefault();
       if (this.value.indexOf(item.id) > -1) {
         //this.new_object_id = 0;
@@ -110,6 +119,7 @@ export default {
         this.$emit("input", this.value);
         //this.new_object_id = 0;
       }
+      this.show = !this.show;
     },
     removeObject(id) {
       const index = this.value.indexOf(id);
@@ -131,11 +141,30 @@ export default {
         selected = true
       }
       return selected;
+    },
+    makeLabelOrName(item) {
+      return this.makeLabel ? this.makeLabel(item) : item.name;
     }
   },
   beforeMount() {
     //do something before mounting vue instance
     this.items = this.value
+    if (typeof this.ressource == "string")
+      this.$store.dispatch(this.ressource + "/fetchList");
+      console.log(this.ressource)
   }
 };
 </script>
+<style scoped>
+.dropdown-menu.show > ul {
+  margin-left: -40px;
+}
+
+.dropdown-menu.show  > ul > li:hover {
+  cursor:pointer
+}
+
+.dropdown-toggle {
+  color: #FFF;
+}
+</style>

@@ -107,7 +107,10 @@
                 <div class="col-12 col-md-7">
                   <p class="text-danger" v-show="emptyLoan">
                     Votre prêt doit contenir au moins un matériel. Pour un
-                    material spécific veuillez choisir une instance
+                    materiel spécific veuillez choisir une instance
+                  </p>
+                  <p class="text-danger" v-show="emptyInstances">
+                    Pour valider votre demande, veuillez choisir une instance de material spécific 
                   </p>
                     <div class="table-responsive">
                       <table class="table">
@@ -318,6 +321,14 @@ export default {
         this.pending_loan.specific_materials.length == 0
       );
     },
+
+    emptyInstances() {
+      return(
+        this.pending_loan.models.length ?
+        this.pending_loan.specific_materials.length == 0 : false
+        );
+    },
+
     isBorrowed() {
       return this.canManage
         ? false
@@ -371,7 +382,7 @@ export default {
     submitLoan(e) {
       e.preventDefault();
       this.checkErrors();
-      if (!this.emptyLoan && !this.errors.length) {
+      if (!this.emptyLoan && !this.errors.length && !this.emptyInstances) {
         if (this.pending_loan.return_date == "")
           this.pending_loan.return_date = null;
         if (this.updateMode) {
@@ -437,6 +448,7 @@ export default {
           "la date de sortie doit être antérieure à celle du retour"
         );
       }
+    
     },
     cleanMaterials() {
       this.$store.commit("loans/cleanMaterials");
@@ -501,5 +513,7 @@ export default {
   td .subitem > div {
     min-width: 300px;
   }
-
+  .table-responsive {
+    min-height: 500px;
+  }
 </style>
