@@ -104,8 +104,10 @@
             Modifier
           </button>
         </div>
+        <div class="btn btn-primary float-right" @click="personalData">
+          Consulter mes données
+        </div>
       </form>
-      <div class="bottom btn btn-primary" @click="personalData">Consulter mes données</div>
     </div>
     <modal id="modal-rgpd" title="RGPD" hideFooter v-model="showRGPD">
       <h6>Conditions d'utilisation</h6>
@@ -170,7 +172,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["authUser","userData"]),
+    ...mapGetters(["authUser", "userData"]),
     passvalid() {
       if (
         this.form.old_password == "" &&
@@ -233,16 +235,16 @@ export default {
       });
     },
     personalData() {
-      return this.$store.dispatch(USER_DATA)
-              .then(() => {
-                let dateObj = new Date();
-                let month = dateObj.getMonth() + 1; //months from 1-12
-                let day = dateObj.getUTCDate();
-                let year = dateObj.getUTCFullYear();
-                let labelData = this.authUser.username + "_" + day + month  + year + ".json";
-                JSONRenderer.download(this.userData,labelData,"text/plain")
-                console.log(this.userData)
-      })
+      return this.$store.dispatch(USER_DATA).then(() => {
+        let dateObj = new Date();
+        let month = dateObj.getMonth() + 1; //months from 1-12
+        let day = dateObj.getUTCDate();
+        let year = dateObj.getUTCFullYear();
+        let labelData =
+          this.authUser.username + "_" + day + month + year + ".json";
+        JSONRenderer.download(this.userData, labelData, "text/plain");
+        console.log(this.userData);
+      });
     }
   },
   mounted() {
@@ -252,9 +254,3 @@ export default {
   }
 };
 </script>
-<style>
-.bottom.btn {
-  float: right;
-  margin-top: -38px;
-}
-</style>

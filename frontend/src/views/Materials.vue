@@ -9,9 +9,8 @@
 <script>
 export default {
   name: "Materials",
-  components: {
-  },
-   computed: {
+  components: {},
+  computed: {
     name() {
       var entity = this.$store.getters["entities/byId"](
         this.$route.params.entityid
@@ -19,8 +18,7 @@ export default {
       if (entity) {
         return entity.name;
       } else return "";
-    },
-   
+    }
   }
 };
 </script>

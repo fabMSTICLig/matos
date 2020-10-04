@@ -83,7 +83,9 @@
                 class="list-group-item list-group-item-action flex-column align-items-start"
               >
                 <div class="d-flex w-100 justify-content-between">
-                  <div class="head-link" @click="goToMaterial(item)"><h4>{{ item.name }}</h4></div>
+                  <a href="#" @click.prevent="goToMaterial(item)"
+                    ><h4>{{ item.name }}</h4></a
+                  >
                   <strong
                     ><router-link
                       :to="{
@@ -94,7 +96,10 @@
                     ></strong
                   >
                 </div>
-                <markdown :description="item.description" :displayed="displayed"></markdown>
+                <markdown
+                  :description="item.description"
+                  :displayed="displayed"
+                ></markdown>
                 <p>
                   <strong>Tags :</strong>
                   <DisplayIdList
@@ -227,11 +232,16 @@ export default {
       addMaterial: "loans/addMaterial"
     }),
     goToMaterial(item) {
-      if(item.instances) {
-        this.$router.push({ name: 'specificmaterial-item', params: {matid: item.id} })
-      }
-      else {
-        this.$router.push({ name: 'genericmaterial-item', params: {matid: item.id} })
+      if (item.instances) {
+        this.$router.push({
+          name: "specificmaterial-item",
+          params: { matid: item.id }
+        });
+      } else {
+        this.$router.push({
+          name: "genericmaterial-item",
+          params: { matid: item.id }
+        });
       }
     },
     setDisabled(material) {
@@ -292,21 +302,3 @@ export default {
   }
 };
 </script>
-<style>
-input {
-  overflow: hidden !important;
-}
-.stretched-link:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.head-link {
-  color: #EB6864;
-  cursor: pointer;
-}
-
-.head-link:hover {
-    text-decoration: underline;
-}
-</style>

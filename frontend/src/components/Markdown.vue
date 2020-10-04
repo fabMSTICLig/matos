@@ -13,12 +13,13 @@
         id="markdown"
       ></div>
     </div>
-     <modal
+    <modal
       id="modal-syntaxe"
       title="Markdown Syntaxe"
       hideFooter
-      v-model="showhelp"
-      >
+      v-bind:show="showhelp"
+      @change="hideHelp()"
+    >
       <h6>
         Utilisation de la syntaxe markdown pour modifier la description de
         l'entité :
@@ -55,7 +56,7 @@
       <span>---</span>
       <h6>Citations</h6>
       <span> > Citations </span>
-      <div class="center-btn">
+      <div class="row justify-content-md-center">
         <button type="button" class="btn btn-info" @click="hideHelp">
           Ok
         </button>
@@ -83,7 +84,6 @@ export default {
     showhelp: {
       type: Boolean
     }
-
   },
   components: {
     Modal
@@ -105,88 +105,9 @@ export default {
     }
   },
   methods: {
-    hideHelp(){
-      this.$parent.$emit('hideHelp', false);
+    hideHelp() {
+      this.$emit("hideHelp");
     }
   }
 };
 </script>
-<style>
-#markdown {
-  margin: 0;
-  height: 100%;
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  color: #333;
-}
-
-textarea,
-#markdown div {
-  display: inline-block;
-  width: 100%;
-  height: 50vh;
-  vertical-align: top;
-  box-sizing: border-box;
-}
-
-textarea {
-  border: none;
-  border-right: 1px solid #ccc;
-  resize: none;
-  outline: none;
-  background-color: #f6f6f6;
-  font-size: 14px;
-  font-family: "Monaco", courier, monospace;
-  padding: 20px;
-}
-
-code {
-  color: #f66;
-}
-
-#markdown h6 {
-  color: #777 !important;
-  margin-bottom: 0.5rem !important;
-  margin-top: -0.375rem;
-}
-
-#markdown h4 {
-  margin-bottom: 0.75rem;
-  font-size: 1.5rem;
-  font-family: "News Cycle", "Arial Narrow Bold", sans-serif;
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-#markdown p {
-  margin-top: 25px;
-  margin-bottom: 1rem;
-}
-
-blockquote {
-  background: #f9f9f9;
-  border-left: 10px solid #ccc;
-  margin: 1.5em 10px;
-  padding: 1em 10px .1em 10px;
-  quotes: "\201C""\201D""\2018""\2019";
-}
-
-#modal-syntaxe .modal {
-  display: block !important;
-}
-
-#modal-syntaxe .modal-dialog {
-  overflow-y: initial !important;
-}
-#modal-syntaxe .modal-body {
-  height: 500px;
-  overflow-y: auto;
-}
-#modal-syntaxe .center-btn {
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-
-</style>

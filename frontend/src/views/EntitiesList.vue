@@ -28,6 +28,10 @@
                   v-for="item in objects_paginated"
                   :key="item.id"
                   v-on:click="selected_object = item"
+                  :class="{
+                    'table-active':
+                      selected_object && item.id == selected_object.id
+                  }"
                 >
                   <td v-text="item.name"></td>
                 </tr>
@@ -81,7 +85,7 @@
             >
           </div>
         </div>
-        <div class="card-body scroll">
+        <div class="card-body">
           <markdown
             :description="selected_object.description"
             :displayed="displayed"
@@ -168,9 +172,3 @@ export default {
   }
 };
 </script>
-<style>
-.scroll {
-  max-height: 450px;
-  overflow-y: scroll;
-}
-</style>

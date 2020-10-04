@@ -54,13 +54,17 @@
                     class="form-control"
                     v-model="object.description"
                   ></textarea>
-                  <div class="sub-link" @click="showMessage"> Aide</div>
+                  <a href="#" @click.prevent="showMessage">Aide</a>
                 </div>
               </fieldset>
             </div>
 
             <div class="md col-12 col-md-6 col-lg-6">
-                <markdown :description="object.description" :showhelp="showHelp"></markdown>
+              <markdown
+                :description="object.description"
+                :showhelp="showHelp"
+                @hideHelp="showHelp = false"
+              ></markdown>
             </div>
 
             <div class="col col-12 col-md-6">
@@ -80,7 +84,6 @@
                   </DynList>
                 </div>
               </fieldset>
-
             </div>
             <div class="col col-12 col-md-6">
               <fieldset>
@@ -136,7 +139,7 @@ export default {
   mixins: [EditMixin],
   components: {
     DynList,
-    Markdown,
+    Markdown
   },
   data() {
     return {
@@ -164,32 +167,9 @@ export default {
     makeManagerLabel(item) {
       return item.first_name + " " + item.last_name;
     },
-    showMessage(){
+    showMessage() {
       this.showHelp = true;
     }
-
-  },
-  created() {
-   this.$on('hideHelp', hide => {
-      this.showHelp = hide;
-    });
   }
 };
 </script>
-<style>
-.form-group textarea {
-  min-height: 250px;
-}
-
-.md.col-12.col-md-6.col-lg-6 {
-  margin: 76px 0 0 0;
-}
-
-.sub-link {
-  color: #EB6864;
-  cursor: pointer;
-}
-.sub-link:hover {
-    text-decoration: underline;
-}
-</style>

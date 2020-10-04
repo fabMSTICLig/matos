@@ -7,7 +7,7 @@
         </div>
         <div class="card-body">
           <div class="form-row">
-            <div class="col col-1g-6 col-md-4 col-xl-4">
+            <div class="col col-6 col-lg-4">
               <form id="editor-form">
                 <fieldset>
                   <legend>Informations</legend>
@@ -20,14 +20,13 @@
                       required
                     />
                   </div>
-                   <div class="form-group">
+                  <div class="form-group">
                     <label>Description</label
                     ><textarea
                       class="form-control"
                       v-model="object.description"
                     />
-                    <div class="sub-link" @click="showMessage">Aide</div>
-
+                    <a href="#" @click.prevent="showMessage">Aide</a>
                   </div>
                   <div class="form-group">
                     <label>Référence interne</label
@@ -63,12 +62,46 @@
                     />
                   </div>
                 </fieldset>
-
               </form>
+              <div class="btn-group" role="group">
+                <button
+                  v-if="is_new"
+                  class="btn btn-primary"
+                  type="button"
+                  v-on:click="create"
+                >
+                  Ajouter
+                </button>
+                <button
+                  v-if="!is_new"
+                  class="btn btn-primary"
+                  type="button"
+                  v-on:click="update(msg)"
+                >
+                  Modifier
+                </button>
+                <button
+                  v-if="!is_new"
+                  class="btn btn-danger"
+                  type="button"
+                  v-on:click="destroy"
+                >
+                  Supprimer
+                </button>
+              </div>
             </div>
-            <div class="col-xl-8 col-md-8">
+            <div class="col col-6 col-lg-4">
+              <markdown
+                :description="object.description"
+                :showhelp="showHelp"
+                @hideHelp="showHelp = false"
+                v-if="object.description"
+              ></markdown>
+            </div>
+
+            <div class="col col-12 col-lg-4">
               <div class="row">
-                <div v-if="!is_new" class="col-xl-6 col-md-6">
+                <div v-if="!is_new" class="col col-12">
                   <fieldset>
                     <legend>Instances</legend>
                     <form @submit="addObject">
@@ -91,7 +124,8 @@
                         :key="item.id"
                         v-on:click="selectObject(item)"
                         :class="{
-                          active: selected_object && item.id == selected_object.id
+                          active:
+                            selected_object && item.id == selected_object.id
                         }"
                       >
                         <span>
@@ -115,79 +149,44 @@
                     />
                   </fieldset>
                 </div>
-                <div
-              v-if="!is_new && selected_object"
-              class="col-xl-6 col-md-6"
-                >
-                <form @submit="updateInstance">
-                  <fieldset>
-                    <legend>Instance</legend>
-                    <div class="form-group">
-                      <label>Nom</label
-                      ><input
-                        class="form-control"
-                        type="text"
-                        v-model="selected_object.name"
-                        required
-                      />
+                <div v-if="!is_new && selected_object" class="col col-12">
+                  <form @submit="updateInstance">
+                    <fieldset>
+                      <legend>Instance</legend>
+                      <div class="form-group">
+                        <label>Nom</label
+                        ><input
+                          class="form-control"
+                          type="text"
+                          v-model="selected_object.name"
+                          required
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label>Numéro série</label
+                        ><input
+                          class="form-control"
+                          type="text"
+                          v-model="selected_object.serial_num"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label>Description</label>
+                        <textarea
+                          class="form-control"
+                          v-model="selected_object.description"
+                        ></textarea>
+                      </div>
+                    </fieldset>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-primary" type="submit">
+                        Modifier
+                      </button>
                     </div>
-                    <div class="form-group">
-                      <label>Numéro série</label
-                      ><input
-                        class="form-control"
-                        type="text"
-                        v-model="selected_object.serial_num"
-                      />
-                    </div>
-                    <div class="form-group">
-                      <label>Description</label>
-                      <textarea
-                      class="form-control"
-                      v-model="selected_object.description"></textarea>
-                    </div>
-                  </fieldset>
-                  <div class="btn-group" role="group">
-                    <button class="btn btn-primary" type="submit">
-                      Modifier
-                    </button>
-                  </div>
-                </form>
-              </div>
-          </div>
-          <div class="md col-md-8">
-            <markdown :description="object.description" :showhelp="showHelp" v-if="object.description"></markdown>
-          </div>
-            <div class="col col-4">
-              <div class="btn-group" role="group">
-                  <button
-                    v-if="is_new"
-                    class="btn btn-primary"
-                    type="button"
-                    v-on:click="create"
-                  >
-                    Ajouter
-                  </button>
-                  <button
-                    v-if="!is_new"
-                    class="btn btn-primary"
-                    type="button"
-                    v-on:click="update(msg)"
-                  >
-                    Modifier
-                  </button>
-                  <button
-                    v-if="!is_new"
-                    class="btn btn-danger"
-                    type="button"
-                    v-on:click="destroy"
-                  >
-                    Supprimer
-                  </button>
+                  </form>
                 </div>
+              </div>
             </div>
-        </div>
-
-
           </div>
         </div>
       </div>
@@ -218,8 +217,7 @@ export default {
       current_page: 1,
       new_object_name: "",
       showHelp: false,
-      msg: 'mis à jour'
-
+      msg: "mis à jour"
     };
   },
   computed: {
@@ -329,35 +327,9 @@ export default {
           showMsgOk("Instance mise à jour");
         });
     },
-    showMessage(){
+    showMessage() {
       this.showHelp = true;
     }
-  },
-  created() {
-   this.$on('hideHelp', hide => {
-      this.showHelp = hide;
-    });
   }
 };
 </script>
-<style>
-textarea {
-  min-height: 200px;
-}
-.md {
-  margin-top: 40px;
-  margin-bottom: 35px;
-}
-.sub-link {
-  color: #EB6864;
-  cursor: pointer;
-}
-.sub-link:hover {
-    text-decoration: underline;
-}
-
-#editor {
-  margin: 80px 0px 0px 0px;
-}
-
-</style>

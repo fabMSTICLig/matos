@@ -33,7 +33,8 @@
                   :key="item.id"
                   v-on:click="selected_object = item"
                   :class="{
-                    active: selected_object && item.id == selected_object.id
+                    'table-active':
+                      selected_object && item.id == selected_object.id
                   }"
                 >
                   <td>{{ entityById(item.entity) | field("name") }}</td>
@@ -257,12 +258,3 @@ export default {
   }
 };
 </script>
-<style>
-.bottom.btn {
-  margin-left: 18px;
-}
-tbody tr.active {
-  background: #EB6864;
-  color: #FFF;
-}
-</style>

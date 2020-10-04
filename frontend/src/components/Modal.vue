@@ -8,7 +8,7 @@
       tabindex="-1"
       role="dialog"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
           <div v-if="!hideHeader" class="modal-header">
             <h5 class="modal-title">{{ title }}</h5>

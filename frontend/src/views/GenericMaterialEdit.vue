@@ -42,7 +42,7 @@
                       class="form-control"
                       v-model="object.description"
                     />
-                    <div class="sub-link" @click="showMessage">Aide</div>
+                    <a href="#" @click.prevent="showMessage">Aide</a>
                   </div>
                   <div class="form-group">
                     <label>Localisation</label
@@ -71,7 +71,12 @@
                 </fieldset>
               </div>
               <div class="md col-12 col-md-6 col-lg-6">
-                <markdown :description="object.description" :showhelp="showHelp" v-if="object.description"></markdown>
+                <markdown
+                  :description="object.description"
+                  :showhelp="showHelp"
+                  @hideHelp="showHelp = false"
+                  v-if="object.description"
+                ></markdown>
               </div>
             </div>
             <div class="btn-group" role="group">
@@ -118,7 +123,6 @@ export default {
   components: {
     TagsInput,
     Markdown
-
   },
   data() {
     return {
@@ -126,8 +130,7 @@ export default {
       new_label: "Nouvel Matériel Générique",
       object_name: "Matériel",
       showHelp: false,
-      msg: 'mis à jour'
-
+      msg: "mis à jour"
     };
   },
 
@@ -152,35 +155,9 @@ export default {
     make_label() {
       return this.object.name;
     },
-    showMessage(){
+    showMessage() {
       this.showHelp = true;
     }
-  },
-  created() {
-   this.$on('hideHelp', hide => {
-      this.showHelp = hide;
-    });
   }
 };
 </script>
-<style>
-.form-group textarea {
-  min-height: 250px;
-}
-
-.md.col-12.col-md-6.col-lg-6 {
-  margin: 76px 0 0 0;
-}
-.sub-link {
-  color: #EB6864;
-  cursor: pointer;
-}
-.sub-link:hover {
-    text-decoration: underline;
-}
-
-#editor {
-  margin: 80px 0px 0px 0px;
-}
-
-</style>

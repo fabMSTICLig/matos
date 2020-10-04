@@ -25,7 +25,7 @@ const getters = {
     return state.authUser.is_staff;
   },
   userData(state) {
-    return state.userData
+    return state.userData;
   }
 };
 
@@ -65,7 +65,7 @@ const actions = {
     });
   },
   [USER_DATA](context) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       ApiService.query("self/data", {})
         .then(({ data }) => {
           context.commit(SET_USERDATA, data.user);
@@ -75,7 +75,7 @@ const actions = {
           console.log(e);
         });
     });
-  },
+  }
 };
 
 const mutations = {

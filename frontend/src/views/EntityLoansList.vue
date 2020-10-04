@@ -45,7 +45,8 @@
                     :key="item.id"
                     v-on:click="selected_object = item"
                     :class="{
-                      active: selected_object && item.id == selected_object.id
+                      'table-active':
+                        selected_object && item.id == selected_object.id
                     }"
                   >
                     <td>
@@ -236,10 +237,3 @@ export default {
   }
 };
 </script>
-<style>
-
-tbody tr.active {
-  background: #EB6864;
-  color: #FFF;
-}
-</style>

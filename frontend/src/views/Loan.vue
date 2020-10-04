@@ -110,77 +110,78 @@
                     materiel spécific veuillez choisir une instance
                   </p>
                   <p class="text-danger" v-show="emptyInstances">
-                    Pour valider votre demande, veuillez choisir une instance de material spécific 
+                    Pour valider votre demande, veuillez choisir une instance de
+                    material spécific
                   </p>
-                    <div class="table-responsive">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th style="width: auto;">Matériels</th>
-                            <th style="width: auto;">Quantité</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr
-                             v-for="item in pending_loan.generic_materials"
-                            :key="'g' + item.material"
-                          >
-                            <td style="border-bottom: 1px solid #dee2e6;">
-                              {{ gmById(item.material) | field("name") }}
+                  <div class="table-responsive-md">
+                    <table class="table">
+                      <thead>
+                        <tr class="d-flex">
+                          <th class="col-8">Matériels</th>
+                          <th class="col-3">Quantité</th>
+                          <th class="col-1"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="d-flex"
+                          v-for="item in pending_loan.generic_materials"
+                          :key="'g' + item.material"
+                        >
+                          <td class="col-8">
+                            {{ gmById(item.material) | field("name") }}
+                          </td>
+                          <td class="col-3">
+                            <input
+                              type="number"
+                              class="number-input form-control form-control"
+                              v-model="item.quantity"
+                              :disabled="readOnly"
+                            />
+                          </td>
 
-                            </td>
-                            <td style="border-bottom: 1px solid #dee2e6;">
-                              <input
-                                type="number"
-                                class="number-input form-control form-control"
-                                v-model="item.quantity"
-                                :disabled="readOnly"
-                              />
-                            </td>
+                          <td class="col-1">
+                            <button
+                              v-if="!readOnly"
+                              class="btn btn-danger"
+                              type="button"
+                              @click="removeMaterial(gmById(item.material))"
+                            >
+                              X
+                            </button>
+                          </td>
+                        </tr>
+                        <tr
+                          class="d-flex"
+                          v-for="item in pending_loan.models"
+                          :key="'s' + item.material"
+                        >
+                          <td class="col-11" colspan="2">
+                            {{ smById(item) | field("name") }}
+                            <div>
+                              <h6>Instances</h6>
+                              <DynList
+                                :ressource="specificinstances[item]"
+                                v-model="pending_loan.specific_materials"
+                                :readonly="readOnly"
+                              ></DynList>
+                            </div>
+                          </td>
 
-                            <td>
-                              <button
-                                v-if="!readOnly"
-                                class="btn btn-danger"
-                                type="button"
-                                @click="removeMaterial(gmById(item.material))"
-                              >
-                                X
-                              </button>
-                            </td>
-                          </tr>
-                          <tr
-                             v-for="item in pending_loan.models"
-                            :key="'s' + item.material"
-                          >
-                            <td colspan="2">
-                              {{ smById(item) | field("name") }}
-                              <tr>
-                                <td style="font-size: 16px;border-style: none;" class="subitem" ><strong>Instances</strong>
-                                  <DynList
-                                  :ressource="specificinstances[item]"
-                                  v-model="pending_loan.specific_materials"
-                                  :readonly="readOnly"
-                                  ></DynList>
-                                </td>
-                              </tr>
-                            </td>
-
-                            <td>
-                              <button
-                                v-if="!readOnly"
-                                class="btn btn-danger"
-                                type="button"
-                                @click="removeMaterial(gmById(item.material))"
-                              >
-                                X
-                              </button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                          <td>
+                            <button
+                              v-if="!readOnly"
+                              class="btn btn-danger"
+                              type="button"
+                              @click="removeMaterial(gmById(item.material))"
+                            >
+                              X
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                   <div
                     class="form-group"
                     v-if="
@@ -323,10 +324,9 @@ export default {
     },
 
     emptyInstances() {
-      return(
-        this.pending_loan.models.length ?
-        this.pending_loan.specific_materials.length == 0 : false
-        );
+      return this.pending_loan.models.length
+        ? this.pending_loan.specific_materials.length == 0
+        : false;
     },
 
     isBorrowed() {
@@ -448,7 +448,6 @@ export default {
           "la date de sortie doit être antérieure à celle du retour"
         );
       }
-    
     },
     cleanMaterials() {
       this.$store.commit("loans/cleanMaterials");
@@ -501,19 +500,3 @@ export default {
   }
 };
 </script>
-<style>
-  td .number-input {
-    width: 110px;
-  }
-
-  td .subitem {
-    padding: 10px 0 0 0 !important;
-  }
-
-  td .subitem > div {
-    min-width: 300px;
-  }
-  .table-responsive {
-    min-height: 500px;
-  }
-</style>

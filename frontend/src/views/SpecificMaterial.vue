@@ -104,7 +104,6 @@
 </template>
 
 <script>
-
 import { EditMixin } from "@/common/mixins";
 import TagsInput from "@/components/TagsInput";
 export default {
@@ -120,9 +119,7 @@ export default {
       object_name: "Matériel"
     };
   },
-  computed: {
-   
-  },
+  computed: {},
   methods: {
     get_empty() {
       return {

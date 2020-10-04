@@ -16,7 +16,7 @@
     </li>
     <input
       type="text"
-      class="list-group-item border rounded"
+      class="form-control"
       :list="_uid"
       v-model="inputValue"
       placeholder="Ajouter"

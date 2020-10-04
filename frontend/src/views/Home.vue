@@ -51,8 +51,8 @@
           </div>
         </div>
       </div>
+      <data-policy class="mt-5"></data-policy>
     </div>
-    <data-policy></data-policy>
   </div>
 </template>
 
