@@ -280,7 +280,7 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
         """
         entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
-            raise PermissionDenied("Your are not a manager of this entity")
+            raise PermissionDenied("You are not a manager of this entity")
         if not entity.specificmaterials.filter(id=self.kwargs['specificmaterial_pk']).exists():
             raise PermissionDenied("This material does not belong to your entity")
         return self.queryset.filter(model__entity=entity, model=self.kwargs['specificmaterial_pk'])
@@ -336,15 +336,17 @@ class SpecificMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
     endpoints for loan related specific material
     """
     queryset = Loan.objects.all()
-    permission_classes = (RGPDAccept, IsAuthenticated,)
+    permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = LoanSerializer
+
     def get_queryset(self, **kwargs):
-        print(self.kwargs)
-        specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['specificmaterial_pk'])
-        print(specific_material)
-        #return self.queryset.filter(pk=self.kwargs['specificmaterial_pk'])
+        specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['instance_pk'])
+        entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
+        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
+            raise PermissionDenied("You are not a manager of this entity")
         loan = Loan.objects.filter(specific_materials__in=specific_material)
         return loan
+
 
 class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
     """

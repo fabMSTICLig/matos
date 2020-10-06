@@ -26,18 +26,18 @@ router.register(r'loans', LoanViewSet)
 router_publicspecificmaterials = routers.NestedSimpleRouter(router, r'specificmaterials', lookup='specificmaterial')
 router_publicspecificmaterials.register(r'instances', SpecificMaterialInstanceViewSet, basename='public-instances')
 
-router_loans_specific = routers.NestedSimpleRouter(router, r'specificmaterials', lookup='specificmaterial')
-router_loans_specific.register(r'loans',SpecificMaterialLoanViewSet,basename='loans')
-
-router_loans_generic = routers.NestedSimpleRouter(router, r'genericmaterials', lookup='genericmaterial')
-router_loans_generic.register(r'loans',GenericMaterialLoanViewSet,basename='loans')
-
 router_entities = routers.NestedSimpleRouter(router, r'entities', lookup='entity')
 router_entities.register(r'genericmaterials',EntityGenericMaterialViewSet,basename='genericmaterials')
 router_entities.register(r'specificmaterials',EntitySpecificMaterialViewSet,basename='specificmaterials')
 
 router_specific_materials = routers.NestedSimpleRouter(router_entities, r'specificmaterials', lookup='specificmaterial')
 router_specific_materials.register(r'instances', EntitySpecificMaterialInstanceViewSet, basename='instances')
+
+router_loans_specific = routers.NestedSimpleRouter(router_specific_materials, r'instances', lookup='instance')
+router_loans_specific.register(r'loans',SpecificMaterialLoanViewSet,basename='loans')
+
+router_loans_generic = routers.NestedSimpleRouter(router_entities, r'genericmaterials', lookup='genericmaterial')
+router_loans_generic.register(r'loans',GenericMaterialLoanViewSet,basename='loans')
 
 urlpatterns = [
     path('self/', SelfView.as_view()),
