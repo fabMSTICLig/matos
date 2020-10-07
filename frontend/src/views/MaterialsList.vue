@@ -67,11 +67,13 @@
           <h3 class="float-left">
             Matériel {{ isGeneric ? "Générique" : "Spécifique" }}
           </h3>
-            <div class="btn-group float-right" role="group">
+          <div class="btn-group float-right" role="group">
             <router-link class="btn btn-primary" role="button" :to="loansRoute"
-              >Prêts</router-link>
+              >Prêts</router-link
+            >
             <router-link class="btn btn-primary" role="button" :to="editRoute"
-              >Modifier</router-link>
+              >Modifier</router-link
+            >
           </div>
         </div>
         <div class="card-body">
@@ -183,7 +185,13 @@ export default {
       if ("quantity" in this.selected_object) {
         name = "loansmaterialgeneric";
       }
-      return { name: name, params: { matid: this.selected_object.id, entityid: this.$route.params.entityid } };
+      return {
+        name: name,
+        params: {
+          matid: this.selected_object.id,
+          entityid: this.$route.params.entityid
+        }
+      };
     }
   },
   methods: {

@@ -192,23 +192,23 @@ export default {
             );
           else return true;
         });
-        return filtered.sort((a, b) => {
-          if (this.sort_input == this.sort_choices.due_date.value)
-            return a.due_date.localeCompare(b.due_date);
-          if (this.sort_input == this.sort_choices.checkout_date.value)
-            return a.checkout_date.localeCompare(b.checkout_date);
-          if (this.sort_input == this.sort_choices.return_date.value){
-            if (a.return_date && b.return_date) {
-              return a.return_date.localeCompare(b.return_date);
-            }
-            if (a.return_date && !b.return_date) {
-              return -1
-            }
-            if (b.return_date && !a.return_date) {
-              return 1
-            }
+      return filtered.sort((a, b) => {
+        if (this.sort_input == this.sort_choices.due_date.value)
+          return a.due_date.localeCompare(b.due_date);
+        if (this.sort_input == this.sort_choices.checkout_date.value)
+          return a.checkout_date.localeCompare(b.checkout_date);
+        if (this.sort_input == this.sort_choices.return_date.value) {
+          if (a.return_date && b.return_date) {
+            return a.return_date.localeCompare(b.return_date);
           }
-          });
+          if (a.return_date && !b.return_date) {
+            return -1;
+          }
+          if (b.return_date && !a.return_date) {
+            return 1;
+          }
+        }
+      });
     }
   },
   watch: {

@@ -200,6 +200,7 @@ import { showMsgOk } from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
 import Markdown from "@/components/Markdown";
+
 export default {
   name: "SpecificMaterialEdit",
   mixins: [EditMixin],

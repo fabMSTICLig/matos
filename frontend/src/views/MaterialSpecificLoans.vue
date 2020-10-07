@@ -8,8 +8,12 @@
               <h5 style="margin-top: 7px; margin-right: 15px;">Instances</h5>
               <input type="text" class="form-control" value="Search" />
               <div class="">
-                <router-link class="btn btn-primary float-left" role="button" :to="materialsRoute"
-                  >Retour</router-link>
+                <router-link
+                  class="btn btn-primary float-left"
+                  role="button"
+                  :to="materialsRoute"
+                  >Retour</router-link
+                >
               </div>
             </div>
             <div class="card-body">
@@ -21,19 +25,20 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="item in objects_list"
-                        :key="item.id"
-                        v-on:click="setInstance(item)"
-                        :class="{
+                    <tr
+                      v-for="item in objects_list"
+                      :key="item.id"
+                      v-on:click="setInstance(item)"
+                      :class="{
                         'table-active':
                           selected_instance && item.id == selected_instance.id
-                        }">
+                      }"
+                    >
                       <td>{{ item.name }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <!-- pagination -->
             </div>
           </div>
         </div>
@@ -48,15 +53,16 @@
                 placeholder="Search"
               />
               <div class="input-group-prepend">
-                  <label class="input-group-text" for="typeselect">Ordre</label>
+                <label class="input-group-text" for="typeselect">Ordre</label>
               </div>
-                <select v-model="sort_input">
-                  <option
-                    v-for="item in sort_choices"
-                    :value="item.value"
-                    :key="item.value"
-                    >{{ item.label }}</option>
-                </select>
+              <select v-model="sort_input">
+                <option
+                  v-for="item in sort_choices"
+                  :value="item.value"
+                  :key="item.value"
+                  >{{ item.label }}</option
+                >
+              </select>
             </div>
             <div class="card-body">
               <form>
@@ -74,13 +80,15 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="loan in objects_paginated"
+                          <tr
+                            v-for="loan in objects_paginated"
                             :key="loan.id"
                             v-on:click="selected_object = loan"
                             :class="{
                               'table-active':
                                 selected_object && loan.id == selected_object.id
-                            }">
+                            }"
+                          >
                             <td>
                               {{ userById(loan.user) | field("username") }}
                             </td>
@@ -114,7 +122,6 @@
 <script>
 import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
-import Vue from "vue";
 
 export default {
   name: "MaterialSpecificLoans",
@@ -131,7 +138,7 @@ export default {
         due_date: { value: 1, label: "Date retour prévue" },
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
-      },
+      }
     };
   },
 
@@ -143,37 +150,37 @@ export default {
       users: "users/list"
     }),
     objects_filtered() {
-        if(this.loans.length){
-          var filtered = this.loans.filter(item => {
-            var user = this.userById(item.user);
-            if (user)
-              return (
-                user.username
-                  .toLowerCase()
-                  .indexOf(this.search_input.toLowerCase()) > -1
-              );
-            else return true;
-          });
-          return filtered.sort((a, b) => {
-            if (this.sort_input == this.sort_choices.due_date.value)
-              return a.due_date.localeCompare(b.due_date);
-            if (this.sort_input == this.sort_choices.checkout_date.value)
-              return a.checkout_date.localeCompare(b.checkout_date);
-            if (this.sort_input == this.sort_choices.return_date.value){
-              if (a.return_date && b.return_date) {
-                return a.return_date.localeCompare(b.return_date);
-              }
-              if (a.return_date && !b.return_date) {
-                return -1
-              }
-              if (b.return_date && !a.return_date) {
-                return 1
-              }
+      if (this.loans.length) {
+        var filtered = this.loans.filter(item => {
+          var user = this.userById(item.user);
+          if (user)
+            return (
+              user.username
+                .toLowerCase()
+                .indexOf(this.search_input.toLowerCase()) > -1
+            );
+          else return true;
+        });
+        return filtered.sort((a, b) => {
+          if (this.sort_input == this.sort_choices.due_date.value)
+            return a.due_date.localeCompare(b.due_date);
+          if (this.sort_input == this.sort_choices.checkout_date.value)
+            return a.checkout_date.localeCompare(b.checkout_date);
+          if (this.sort_input == this.sort_choices.return_date.value) {
+            if (a.return_date && b.return_date) {
+              return a.return_date.localeCompare(b.return_date);
             }
-            });
-        }
-        return this.loans;
-      },
+            if (a.return_date && !b.return_date) {
+              return -1;
+            }
+            if (b.return_date && !a.return_date) {
+              return 1;
+            }
+          }
+        });
+      }
+      return this.loans;
+    },
     objects_list() {
       return this.$store.getters["entities/specificMaterials/instances/list"];
     },
@@ -206,34 +213,38 @@ export default {
           id_specificmaterial: this.$route.params.matid,
           id_instance: this.selected_instance.id
         })
-        .then((data) => {
+        .then(() => {
           this.selected_object = this.objects_filtered[0];
-          console.log(this.loans)
-        })
+          console.log(this.loans);
+        });
     }
   },
 
   beforeMount() {
-    var pall=[]
+    var pall = [];
     pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
-    pall.push(this.$store
-      .dispatch(this.ressource + "/fetchSingle", {
-        id: this.$route.params.matid,
-        prefix: this.prefix
-      })
-      .then(data => {
-        this.material = data;
-      }));
-    pall.push( this.$store
-      .dispatch("entities/specificMaterials/instances/fetchList", {
-        prefix: this.instancePrefix
-      })
-      .then(() => {
-        if (this.objects_list.length > 0) {
-          this.selectObject(this.objects_list[0]);
-        }
-      }));
+    pall.push(
+      this.$store
+        .dispatch(this.ressource + "/fetchSingle", {
+          id: this.$route.params.matid,
+          prefix: this.prefix
+        })
+        .then(data => {
+          this.material = data;
+        })
+    );
+    pall.push(
+      this.$store
+        .dispatch("entities/specificMaterials/instances/fetchList", {
+          prefix: this.instancePrefix
+        })
+        .then(() => {
+          if (this.objects_list.length > 0) {
+            this.selectObject(this.objects_list[0]);
+          }
+        })
+    );
     Promise.all(pall).then(() => {
       this.$store
         .dispatch("entities/specificMaterials/instances/materialLoans", {
@@ -244,9 +255,8 @@ export default {
         .then(() => {
           this.selected_object = this.objects_filtered[0];
           this.loaded = true;
-        })
+        });
     });
-
   }
 };
 </script>

@@ -366,6 +366,30 @@ const routes = [
                 }
               },
               {
+                path: "g/:matid/loans",
+                name: "loansmaterialgeneric",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "loansmaterialgeneric" */ "../views/MaterialGenericLoans.vue"
+                  ),
+                meta: {
+                  routeparam: "matid",
+                  breadcumb: {
+                    label: {
+                      ressource: "entities/genericMaterials",
+                      prefix: [
+                        {
+                          ressource: "entities",
+                          param: "entityid"
+                        }
+                      ],
+                      labelprop: "name"
+                    },
+                    name: "genericmaterialloans"
+                  }
+                }
+              },
+              {
                 path: "s/:matid",
                 name: "specificmaterial",
                 component: () =>
@@ -387,6 +411,30 @@ const routes = [
                       labelprop: "name"
                     },
                     name: "specificmaterial"
+                  }
+                }
+              },
+              {
+                path: "s/:matid/loans",
+                name: "loansmaterialspecific",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "loansmaterialspecific" */ "../views/MaterialSpecificLoans.vue"
+                  ),
+                meta: {
+                  routeparam: "matid",
+                  breadcumb: {
+                    label: {
+                      ressource: "entities/specificMaterials",
+                      prefix: [
+                        {
+                          ressource: "entities",
+                          param: "entityid"
+                        }
+                      ],
+                      labelprop: "name"
+                    },
+                    name: "specificmaterialloans"
                   }
                 }
               }
