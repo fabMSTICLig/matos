@@ -274,6 +274,10 @@ export default {
     },
     deleteLoan() {
       this.showDelete = true;
+    },
+    editLoan(loan) {
+      this.$store.commit("loans/setPending", loan);
+      this.$router.push({ name: "loan" });
     }
   },
   beforeMount() {
