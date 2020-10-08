@@ -381,11 +381,13 @@ const routes = [
                         {
                           ressource: "entities",
                           param: "entityid"
-                        }
+                        },
+
                       ],
-                      labelprop: "name"
+                      labelprop: "name",
+                      labelchild: "Prêts"
                     },
-                    name: "genericmaterialloans"
+                    name: "genericmaterial"
                   }
                 }
               },
@@ -432,9 +434,11 @@ const routes = [
                           param: "entityid"
                         }
                       ],
-                      labelprop: "name"
+                      labelprop: "name",
+                      labelchild: "Prêts"
+
                     },
-                    name: "specificmaterialloans"
+                    name: "specificmaterial"
                   }
                 }
               }

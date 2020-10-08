@@ -22,7 +22,8 @@ export default {
 
   data() {
     return {
-      breaditems: []
+      breaditems: [],
+      labelchild:""
     };
   },
   computed: {},
@@ -60,6 +61,7 @@ export default {
                       item.ressource + "/" + route.params[item.param] + "/";
                   });
                 }
+
                 this.$store
                   .dispatch(
                     item.meta.breadcumb.label.ressource + "/fetchSingle",
@@ -72,11 +74,22 @@ export default {
                       params: route.params
                     });
                   });
-              }
             }
-          })
-        );
+          }
+        })
+      );
       }
+      if(item.meta.breadcumb) {
+        if(item.meta.breadcumb.label.labelchild)
+          promises.push(
+            new Promise(resolve => {
+              resolve({
+                label: item.meta.breadcumb.label.labelchild,
+                name: ""
+                });
+              })
+            );
+        }
     }
   },
   watch: {
