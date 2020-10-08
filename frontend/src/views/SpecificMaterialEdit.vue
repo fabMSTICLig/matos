@@ -6,8 +6,11 @@
           <h3 v-text="cardName"></h3>
         </div>
         <div class="card-body">
+          <ul class="text-danger" v-show="emptyInstances">
+            <li> Pour valider la création d'un matériel spécifique, veuillez ajouter des instances</li>
+          </ul>
           <div class="form-row">
-            <div class="col col-6 col-lg-4">
+            <div class="col col-6 col-md-12 col-sm-12 col-lg-4">
               <form id="editor-form">
                 <fieldset>
                   <legend>Informations</legend>
@@ -44,7 +47,6 @@
                       v-model="object.ref_man"
                     />
                   </div>
-
                   <div class="form-group">
                     <label>Localisation</label
                     ><input
@@ -68,7 +70,7 @@
                   v-if="is_new"
                   class="btn btn-primary"
                   type="button"
-                  v-on:click="create"
+                  v-on:click="validateForm"
                 >
                   Ajouter
                 </button>
@@ -90,100 +92,103 @@
                 </button>
               </div>
             </div>
-            <div class="col col-6 col-lg-4">
-              <markdown
-                :description="object.description"
-                :showhelp="showHelp"
-                @hideHelp="showHelp = false"
-                v-if="object.description"
-              ></markdown>
-            </div>
-
-            <div class="col col-12 col-lg-4">
+            <div class="col-lg-8 col-md-12">
               <div class="row">
-                <div v-if="!is_new" class="col col-12">
-                  <fieldset>
-                    <legend>Instances</legend>
-                    <form @submit="addObject">
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Ajouter</span>
+                <div class="col col-md-12 col-sm-12 col-lg-5">
+                    <fieldset>
+                      <legend>Instances</legend>
+                      <form @submit="addObject" id="editor-instances">
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Ajouter</span>
+                          </div>
+                          <input v-model="new_object_name" class="form-control" required />
+                          <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                              Valider
+                            </button>
+                          </div>
                         </div>
-                        <input v-model="new_object_name" class="form-control" />
-                        <div class="input-group-append">
+                      </form>
+                      <ul class="list-group">
+                        <li
+                          class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                          v-for="item in objects_paginated"
+                          :key="item.id"
+                          v-on:click="selectObject(item)"
+                          :class="{
+                            active:
+                              selected_object && item.id == selected_object.id
+                          }"
+                        >
+                          <span>
+                            {{ item.name }}
+                          </span>
+                          <button
+                            class="btn btn-danger"
+                            type="button"
+                            @click="removeObject(item)"
+                          >
+                            X
+                          </button>
+                        </li>
+                      </ul>
+                      <pagination
+                        :total-pages="pages_count"
+                        :total="objects_list.length"
+                        :per-page="per_page"
+                        :current-page="current_page"
+                        @pagechanged="onPageChange"
+                      />
+                    </fieldset>
+                </div>
+                <div class="col col-md-12 col-lg-5">
+                    <div v-if="!is_new && selected_object">
+                      <form @submit="updateInstance">
+                        <fieldset>
+                          <legend>Instance</legend>
+                          <div class="form-group">
+                            <label>Nom</label
+                            ><input
+                              class="form-control"
+                              type="text"
+                              v-model="selected_object.name"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label>Numéro série</label
+                            ><input
+                              class="form-control"
+                              type="text"
+                              v-model="selected_object.serial_num"
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label>Description</label>
+                            <textarea
+                              class="form-control"
+                              v-model="selected_object.description"
+                            ></textarea>
+                          </div>
+                        </fieldset>
+                        <div class="btn-group" role="group">
                           <button class="btn btn-primary" type="submit">
-                            Valider
+                            Modifier
                           </button>
                         </div>
-                      </div>
-                    </form>
-                    <ul class="list-group">
-                      <li
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                        v-for="item in objects_paginated"
-                        :key="item.id"
-                        v-on:click="selectObject(item)"
-                        :class="{
-                          active:
-                            selected_object && item.id == selected_object.id
-                        }"
-                      >
-                        <span>
-                          {{ item.name }}
-                        </span>
-                        <button
-                          class="btn btn-danger"
-                          type="button"
-                          @click="removeObject(item)"
-                        >
-                          X
-                        </button>
-                      </li>
-                    </ul>
-                    <pagination
-                      :total-pages="pages_count"
-                      :total="objects_list.length"
-                      :per-page="per_page"
-                      :current-page="current_page"
-                      @pagechanged="onPageChange"
-                    />
-                  </fieldset>
-                </div>
-                <div v-if="!is_new && selected_object" class="col col-12">
-                  <form @submit="updateInstance">
-                    <fieldset>
-                      <legend>Instance</legend>
-                      <div class="form-group">
-                        <label>Nom</label
-                        ><input
-                          class="form-control"
-                          type="text"
-                          v-model="selected_object.name"
-                          required
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label>Numéro série</label
-                        ><input
-                          class="form-control"
-                          type="text"
-                          v-model="selected_object.serial_num"
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label>Description</label>
-                        <textarea
-                          class="form-control"
-                          v-model="selected_object.description"
-                        ></textarea>
-                      </div>
-                    </fieldset>
-                    <div class="btn-group" role="group">
-                      <button class="btn btn-primary" type="submit">
-                        Modifier
-                      </button>
+                      </form>
                     </div>
-                  </form>
+                </div>
+              </div>
+              <div class="row mt-4">
+                <div class="col col-lg-12 col-md-12">
+                  <markdown
+                    :description="object.description"
+                    :showhelp="showHelp"
+                    @hideHelp="showHelp = false"
+                    v-if="object.description"
+                  ></markdown>
                 </div>
               </div>
             </div>
@@ -218,7 +223,9 @@ export default {
       current_page: 1,
       new_object_name: "",
       showHelp: false,
-      msg: "mis à jour"
+      msg: "mis à jour",
+      errors: [],
+      emptyInstances: null
     };
   },
   computed: {
@@ -262,6 +269,11 @@ export default {
         tags: []
       };
     },
+    validateForm() {
+      this.create();
+      this.emptyInstances = true;
+      console.log(this.emptyInstances);
+    },
     make_label() {
       return this.object.name;
     },
@@ -296,6 +308,7 @@ export default {
     },
     addObject(e) {
       e.preventDefault();
+      //if (document.querySelector("#editor-instances").checkValidity())
       if (this.new_object_name != "") {
         this.$store
           .dispatch("entities/specificMaterials/instances/create", {
