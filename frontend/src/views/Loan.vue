@@ -154,7 +154,7 @@
                         <tr
                           class="d-flex"
                           v-for="item in pending_loan.models"
-                          :key="'s' + item.material"
+                          :key="'s' + item"
                         >
                           <td class="col-11" colspan="2">
                             {{ smById(item) | field("name") }}

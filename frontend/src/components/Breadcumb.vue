@@ -23,7 +23,7 @@ export default {
   data() {
     return {
       breaditems: [],
-      labelchild:""
+      labelchild: ""
     };
   },
   computed: {},
@@ -74,22 +74,22 @@ export default {
                       params: route.params
                     });
                   });
+              }
             }
-          }
-        })
-      );
+          })
+        );
       }
-      if(item.meta.breadcumb) {
-        if(item.meta.breadcumb.label.labelchild)
+      if (item.meta.breadcumb) {
+        if (item.meta.breadcumb.label.labelchild)
           promises.push(
             new Promise(resolve => {
               resolve({
                 label: item.meta.breadcumb.label.labelchild,
                 name: ""
-                });
-              })
-            );
-        }
+              });
+            })
+          );
+      }
     }
   },
   watch: {

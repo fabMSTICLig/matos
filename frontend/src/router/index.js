@@ -381,8 +381,7 @@ const routes = [
                         {
                           ressource: "entities",
                           param: "entityid"
-                        },
-
+                        }
                       ],
                       labelprop: "name",
                       labelchild: "Prêts"
@@ -436,7 +435,6 @@ const routes = [
                       ],
                       labelprop: "name",
                       labelchild: "Prêts"
-
                     },
                     name: "specificmaterial"
                   }

@@ -2,11 +2,15 @@
   <div>
     <div v-if="selected_object">
       <div class="row">
-        <div class="col-12 col-md-12 col-lg-6 col-sm-12">
+        <div class="col-12 col-md-12 col-lg-7 col-sm-12">
           <div class="card">
             <div class="card-header input-group">
               <div class="input-group-append">
-                <div :class="show ? 'dropdown show' : 'dropdown'" @focusout="hide" style="margin-right: 10px;">
+                <div
+                  :class="show ? 'dropdown show' : 'dropdown'"
+                  @focusout="hide"
+                  style="margin-right: 10px;"
+                >
                   <div
                     class="btn btn-primary dropdown-toggle"
                     id="dropdownMenuButton"
@@ -14,17 +18,29 @@
                   >
                     Instances
                   </div>
-                  <div :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
-                  :id="'tooltip' + _uid" aria-labelledby="dropdownMenuButton">
-                    <button class="dropdown-item"
-                            v-for="item in objects_list"
-                            :key="item.id"
-                            @click="selectInstance(item)"
-                            type="button">{{item.name}}</button>
+                  <div
+                    :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
+                    :id="'tooltip' + _uid"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    <button
+                      class="dropdown-item"
+                      v-for="item in objects_list"
+                      :key="item.id"
+                      @click="selectInstance(item)"
+                      type="button"
+                    >
+                      {{ item.name }}
+                    </button>
                   </div>
                 </div>
               </div>
-              <input type="search" class="form-control" v-model="search_input" placeholder="Search" />
+              <input
+                type="search"
+                class="form-control"
+                v-model="search_input"
+                placeholder="Search"
+              />
 
               <div class="input-group-prepend">
                 <label class="input-group-text" for="typeselect">Ordre</label>
@@ -82,7 +98,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-12 col-lg-6 col-sm-12">
+        <div class="col-12 col-md-12 col-lg-5 col-sm-12">
           <div class="card" v-if="selected_object">
             <div class="card-header">
               <h3 class="float-left" v-text="selected_object.name"></h3>
@@ -299,7 +315,7 @@ export default {
   methods: {
     selectInstance(item) {
       this.selected_instance = Object.assign({}, item);
-      this.show=false;
+      this.show = false;
       this.$store
         .dispatch("entities/specificMaterials/instances/materialLoans", {
           id_entity: this.$route.params.entityid,
@@ -325,9 +341,7 @@ export default {
       }
     },
     pages_total() {
-      return Math.ceil(
-        this.loans.length / process.env.VUE_APP_MAXLIST
-      );
+      return Math.ceil(this.loans.length / process.env.VUE_APP_MAXLIST);
     },
     onPageChange(page) {
       this.current_page = page;
