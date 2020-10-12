@@ -145,6 +145,34 @@ class EntitiesTests(APITestCase):
         list_result = [entry for entry in managers_lig_obj]
         self.assertEqual(list_result,[self.manager1, self.manager2])
 
+    def test_loans_specificmaterial(self):
+        """
+        Vérification d'accès aux prêts d'un materiel spécifique
+        """
+        data={"name": "camera viso", "ref_int":"visio-angle-large"}
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':self.lig_entity.pk}),data)
+        response.render()
+        specificmaterial_pk = response.data['id']
+
+        data={"serial_num": "cam1", "name":"instance1"}
+        response = self.client.post(reverse('instances-list', kwargs={'entity_pk':self.lig_entity.pk,'specificmaterial_pk':specificmaterial_pk}),data)
+        response.render()
+        instance_pk =  response.data['id']
+
+        data = {"status" : 2, "checkout_date" : datetime.date(2020,6,25), "user" : self.manager1.pk , "entity" : self.lig_entity.pk, "due_date" : datetime.date(2020,7,25), "return_date" : datetime.date(2020,7,25), "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [instance_pk], 'generic_materials': []}
+        response = self.client.post(reverse('loan-list'),data)
+        response.render()
+
+        response = self.client.get(reverse('loans-list', kwargs={'entity_pk':self.lig_entity.pk,'specificmaterial_pk':specificmaterial_pk,'instance_pk':instance_pk}))
+        response.render()
+        print(response.data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 1)
+
+
+
+
 
 class UsersTests(APITestCase):
 
@@ -595,14 +623,14 @@ class LoanMaterialsTests(APITestCase):
 
     def test_child_loan(self):
         """
-            Seul un manager peut créer un prêt successeur 
+            Seul un manager peut créer un prêt successeur
             Vérification de la même entité pour la copie du prêt
         """
         data = {"status" : 3, "checkout_date": datetime.date(2020,8,25), "user" : self.user.pk, "entity": self.entity.pk, "due_date": datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt tablettes info'}
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-make-child', kwargs= {'pk': self.loan_user_accepted.pk}), data)
         response.render()
-        self.assertEquals(response.data['parent']['id'], self.loan_user_accepted.pk), 
+        self.assertEquals(response.data['parent']['id'], self.loan_user_accepted.pk),
 
     def test_protected_loan_return_date(self):
         data = {"status" : 2, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}]}
@@ -665,7 +693,7 @@ class LoanMaterialsTests(APITestCase):
     def test_delete_loan_requested(self):
         """
             Un utilisateur peut supprimer un prêt demandé
-        """    
+        """
         self.client.force_authenticate(user=self.manager2)
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_manager2.pk}))
         response.render()
