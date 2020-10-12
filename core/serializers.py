@@ -156,7 +156,7 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
-        read_only_fields=('parent', 'child', 'models')
+        read_only_fields=('child', 'models')
 
     def create(self, validated_data):
         # Create the book instance
@@ -204,6 +204,10 @@ class LoanSerializer(serializers.ModelSerializer):
         return instance
 
     def validate(self, data):
+        if('parent' in data and data['parent'] is not None):
+            loan_parent = Loan.objects.get(id=data['parent'].id)
+            if(data['checkout_date'] < loan_parent.checkout_date):
+                raise serializers.ValidationError("La date de sortie doit être postérieure à celle du prêt parent" + str(loan_parent.checkout_date))
         if(data['checkout_date'] > data['due_date']):
             raise serializers.ValidationError("La date de rendu doit être après la date de sortie")
         #Si la date de retour est défini
