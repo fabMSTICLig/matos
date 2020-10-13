@@ -39,7 +39,6 @@ class SpecificMaterialAdmin(admin.ModelAdmin):
     inlines = [SpecificMaterialInstanceAdmin]
 
 
-
 @admin.register(GenericMaterial)
 class GenericMaterialAdmin(admin.ModelAdmin):
     pass
@@ -47,26 +46,9 @@ class GenericMaterialAdmin(admin.ModelAdmin):
 class LoanGenericItemAdmin(admin.TabularInline):
     model = LoanGenericItem
 
-class LoanAdminForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(LoanAdminForm, self).__init__(*args, **kwargs)
-        print(self.fields['specific_materials'])
-        wsm = SpecificMaterial.objects.filter(entity=self.instance.entity_id)
-        spec_instances = []
-
-        for mat in wsm:
-            instances = SpecificMaterialInstance.objects.filter(model=mat.id)
-            print(instances)
-            for instance in instances:
-                spec_instances.append((instance.id, mat.name + " ("+ instance.name +") " ))
-       
-        w=self.fields['specific_materials'].widget
-       
-        w.choices = spec_instances
 
 @admin.register(Loan)
 class LoanAdmin(admin.ModelAdmin):
     model = Loan
     inlines = [LoanGenericItemAdmin]
-    form = LoanAdminForm
     filter_horizontal  = ('specific_materials',)
