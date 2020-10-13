@@ -50,8 +50,18 @@ export default {
       }
     },
     item(){
-      this.$emit("input", this.item.value.id);
-    }
+      if(this.item.value)
+        this.$emit("input", this.item.value.id);
+    },
+    options(opts){
+      if(this.value && typeof this.value == "number")
+        console.log(this.value);
+        let self = this;
+        this.item = opts.find(
+          item => item.value.id.toString() == self.value
+        );
+        console.log(this.item);
+      }
   },
   computed: {
     objects_list() {
@@ -62,15 +72,15 @@ export default {
     options(){
       let options = [];
       for(let i=0; i<=this.objects_list.length-1; i++){
-        let option = { 
-          value: this.objects_list[i], 
-          text: this.makeLabelOrName(this.objects_list[i]) 
+        let option = {
+          value: this.objects_list[i],
+          text: this.makeLabelOrName(this.objects_list[i])
         };
         options.push(option)
       }
       return options;
     },
-        
+
     inputValue: {
       get() {
         if (this.value) {
@@ -111,7 +121,7 @@ export default {
   },
   mounted() {
     this.id = String(this._uid);
+
   }
 };
 </script>
-
