@@ -29,7 +29,7 @@
           </div>
           <div class="card-body">
             <ul class="text-danger" v-show="errors.length != 0">
-              <li v-for="error in errors" :key="error" v-text="error"></li>
+              <li v-for="error in errors" :key="error" v-text="error" tabIndex="-1" ></li>
             </ul>
             <form class="form" @submit="submitLoan">
               <div class="form-row">
@@ -382,6 +382,9 @@ export default {
     submitLoan(e) {
       e.preventDefault();
       this.checkErrors();
+      if(this.errors.length) {
+        window.scrollTo(0,0);
+      }
       if (!this.emptyLoan && !this.errors.length && !this.emptyInstances) {
         if (this.pending_loan.return_date == "")
           this.pending_loan.return_date = null;
