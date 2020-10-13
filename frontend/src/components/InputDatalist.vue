@@ -50,7 +50,7 @@ export default {
       }
     },
     item(){
-      if(this.item.value)
+      if(this.item && this.item.value)
         this.$emit("input", this.item.value.id);
     },
     options(opts){
