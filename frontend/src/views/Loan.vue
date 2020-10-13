@@ -109,10 +109,6 @@
                     Votre prêt doit contenir au moins un matériel. Pour un
                     materiel spécific veuillez choisir une instance
                   </p>
-                  <p class="text-danger" v-show="emptyInstances">
-                    Pour valider votre demande, veuillez choisir une instance de
-                    material spécific
-                  </p>
                   <div class="table-responsive-md">
                     <table class="table">
                       <thead>
@@ -427,6 +423,9 @@ export default {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
               }
+              this.errors = [];
+              this.errors.push(e.response.data);
+              window.scrollTo(0,0);
               // eslint-disable-next-line
               console.log(e.response);
             });
