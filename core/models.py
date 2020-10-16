@@ -124,6 +124,7 @@ class Material(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ['name', 'entity']
 
 class GenericMaterial(Material):
     """
@@ -160,6 +161,9 @@ class SpecificMaterialInstance(models.Model):
     model = models.ForeignKey(SpecificMaterial, on_delete=models.CASCADE, related_name="instances")
     def __str__(self):
         return self.model.name +"(" + self.name + ")"
+        
+    class Meta:
+        unique_together = ['name', 'model']
 
 class Loan(models.Model):
     class Status(models.IntegerChoices):
