@@ -111,6 +111,7 @@ export default {
   },
   mounted() {
     this.id = String(this._uid);
+
   }
 };
 </script>

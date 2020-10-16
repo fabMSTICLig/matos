@@ -29,7 +29,7 @@
           </div>
           <div class="card-body">
             <ul class="text-danger" v-show="errors.length != 0">
-              <li v-for="error in errors" :key="error" v-text="error"></li>
+              <li v-for="error in errors" :key="error" v-text="error" tabIndex="-1" ></li>
             </ul>
             <form class="form" @submit="submitLoan">
               <div class="form-row">
@@ -462,6 +462,9 @@ export default {
                 this.errors = e.response.data.non_field_errors;
                 window.scrollTo(0,0);
               }
+              this.errors = [];
+              this.errors.push(e.response.data);
+              window.scrollTo(0,0);
               // eslint-disable-next-line
               console.log(e.response);
             });

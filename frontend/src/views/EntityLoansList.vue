@@ -190,9 +190,14 @@ export default {
         });
       return filtered.sort((a, b) => {
         if (this.sort_input == this.sort_choices.due_date.value)
-          return a.due_date.localeCompare(b.due_date);
+            return a.due_date.localeCompare(b.due_date);
         if (this.sort_input == this.sort_choices.checkout_date.value)
-          return a.checkout_date.localeCompare(b.checkout_date);
+          if (a.checkout_date.localeCompare(b.checkout_date) > 0) {
+            return a.checkout_date.localeCompare(b.checkout_date)
+          };
+          if (a.checkout_date.localeCompare(b.checkout_date) == 0) {
+            return a.due_date.localeCompare(b.due_date)
+          };
         if (this.sort_input == this.sort_choices.return_date.value) {
           if (a.return_date && b.return_date) {
             return a.return_date.localeCompare(b.return_date);
