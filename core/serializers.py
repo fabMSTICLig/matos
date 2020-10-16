@@ -157,7 +157,9 @@ class LoanSerializer(serializers.ModelSerializer):
         model = Loan
         fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
         read_only_fields=('child', 'models')
-
+        extra_kwargs = {
+            'status': {'error_messages': {'invalid_choice': "Veuillez sélectionner un status pour le prêt en cours"}},
+        }
     def create(self, validated_data):
         # Create the book instance
         specmats=validated_data.pop('specific_materials')
