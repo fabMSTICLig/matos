@@ -166,7 +166,6 @@ class EntitiesTests(APITestCase):
 
         response = self.client.get(reverse('loans-list', kwargs={'entity_pk':self.lig_entity.pk,'specificmaterial_pk':specificmaterial_pk,'instance_pk':instance_pk}))
         response.render()
-        print(response.data)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), 1)
 
@@ -343,6 +342,9 @@ class GenericMaterialsTests(APITestCase):
         # OK
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
 
+        # def test_available_generic_material
+        # test pour retourner la disponibilité d'un matériel sur des dates données
+        
 class SpecificMaterialsTests(APITestCase):
 
     def setUp(self):
@@ -368,11 +370,8 @@ class SpecificMaterialsTests(APITestCase):
         Test de l'ajout d'un équipement spécifique par un manager
         """
         self.client.force_authenticate(user=self.manager1)
-        data = serializers.serialize('json', [ self.materials_specific, ])
-        struct = json.loads(data)
-        material = struct[0]['fields']
-        material['instances']=[self.materials_specific_instance.pk]
-        response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), material)
+        material_specific = {"name": "filmeuse plastique A4","ref_int":"A4-Fellowes","ref_man":"410-A4RET","localisation":"Etagere 2 - box 4","description":"Filmeuse format A4/A5 ","entity":self.entity.id}
+        response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), material_specific)
         response.render()
         # OK
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
@@ -384,6 +383,15 @@ class SpecificMaterialsTests(APITestCase):
         response.render()
         # OK
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        # test champs unique nom matériel et entité
+        self.client.force_authenticate(user=self.manager1)
+        data = serializers.serialize('json', [ self.materials_specific, ])
+        struct = json.loads(data)
+        material = struct[0]['fields']
+        response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1 }), material)
+        response.render()
+        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(len(response.data['non_field_errors']),1)
 
     def test_not_update_material(self):
         self.client.force_authenticate(user=self.manager2)
@@ -398,11 +406,10 @@ class SpecificMaterialsTests(APITestCase):
         Test de l'ajout d'une instance équipement spécifique par un manager
         """
         self.client.force_authenticate(user=self.manager1)
-        data = serializers.serialize('json', [ self.materials_specific_instance, ])
-        struct = json.loads(data)
-        material = struct[0]['fields']
-        response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), material)
+        materials_specific_instance = {"model":self.materials_specific.pk, "name":"carte ARM/FPGA Soc 2", "serial_num":"002234", "description":'instance2 carte FPGA Phelma'}
+        response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), materials_specific_instance)
         response.render()
+        print(response.data)
         # OK
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
 
@@ -418,6 +425,15 @@ class SpecificMaterialsTests(APITestCase):
         response.render()
         # OK
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        # test champs unique nom instance et materiel spécifique
+        self.client.force_authenticate(user=self.manager1)
+        data = serializers.serialize('json', [ self.materials_specific_instance, ])
+        struct = json.loads(data)
+        material = struct[0]['fields']
+        response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), material)
+        response.render()
+        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(len(response.data['non_field_errors']),1)
 
     def test_not_update_instance_material(self):
         """
