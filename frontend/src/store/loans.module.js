@@ -28,6 +28,16 @@ const loans_extra = {
         commit("createSuccess", data.child);
         return data.child;
       });
+    },
+    copy({ commit }, { id, data }) {
+      return ApiService.post("loans/" + id + "/copy", data).then(({ data }) => {
+        console.log(data);
+        commit("createSuccess", data);
+        return data;
+      }).catch(error => {
+        console.log(error)
+          return Promise.reject(error);
+      });;
     }
   },
   mutations: {

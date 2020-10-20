@@ -8,6 +8,14 @@ export const DataHelper = {
     } else {
       items.push(item);
     }
+  },
+  copy: function(object) {
+    let objectCopy = {}; // objectCopy will store a copy of the mainObject
+    let key;
+    for (key in object) {
+      objectCopy[key] = object[key]; // copies each property to the objectCopy object
+    }
+    return objectCopy;
   }
 };
 

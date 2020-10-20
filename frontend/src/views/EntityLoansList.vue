@@ -74,11 +74,16 @@
         <div class="card" v-if="selected_object">
           <div class="card-header">
             <h3 class="float-left" v-text="selected_object.name"></h3>
+            <button class="btn btn-primary"
+              role="button"
+              @click="copy=true"
+            >Copier</button>
             <div class="btn-group float-right" role="group">
               <button
                 class="btn btn-primary"
                 role="button"
                 @click="editLoan(selected_object)"
+                :disabled="copy"
               >
                 Modifier
               </button>
@@ -86,13 +91,88 @@
                 class="btn btn-danger"
                 role="button"
                 @click="destroyLoan(selected_object)"
+                :disabled="copy"
               >
                 Supprimer
               </button>
             </div>
           </div>
           <div class="card-body">
-            <table class="table">
+            <form class="form" v-if="copy && copyObj" @submit="copyLoan">
+              <div class="form-row">
+                <div class="col-md-6 form-group">
+                  <label>Date sortie :</label>
+                  <input
+                    class="form-control"
+                    type="date"
+                    v-model="copyObj.checkout_date"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-md-6 form-group">
+                  <label>Utilisateur :</label>
+                  <input-datalist
+                    v-model="copyObj.user"
+                    ressource="users"
+                    :makeLabel="makeUserLabel"
+                  ></input-datalist>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-md-12 form-group">
+                  <div class="table-responsive-md">
+                    <table class="table">
+                      <thead>
+                        <tr class="d-flex">
+                          <th class="col-8">Matériels</th>
+                          <th class="col-3">Quantité</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="d-flex"
+                          v-for="item in copyObj.generic_materials"
+                          :key="'g' + item.material"
+                        >
+                          <td class="col-8">
+                            {{ gmById(item.material) | field("name") }}
+                          </td>
+                          <td class="col-3">
+                            <input
+                              type="number"
+                              class="number-input form-control form-control"
+                              v-model="item.quantity"
+                            />
+                          </td>
+                        </tr>
+                        <tr
+                          class="d-flex"
+                          v-for="item in copyObj.models"
+                          :key="'s' + item"
+                        >
+                          <td class="col-11" colspan="2">
+                            {{ smById(item) | field("name") }}
+                            <div>
+                              <h6>Instances</h6>
+                              <DynList
+                                :ressource="specificinstances[item]"
+                                v-model="copyObj.specific_materials"
+                                v-if="specificinstances[item]"
+                              ></DynList>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary float-left">Valider</button>
+              <button @click="copy=false" class="btn btn-primary float-left">Annuler</button>
+            </form>
+            <table class="table" v-if="!copy">
               <tr>
                 <th scope="row">Utilisateur</th>
                 <td>
@@ -117,13 +197,13 @@
               </tr>
             </table>
 
-            <h5>Commentaires</h5>
+            <h5 v-if="!copy">Commentaires</h5>
             <p class="card-text">
               {{ selected_object.comments }}
             </p>
 
-            <h5>Matériels</h5>
-            <ul class="list-group">
+            <h5 v-if="!copy">Matériels</h5>
+            <ul class="list-group" v-if="!copy">
               <li
                 class="list-group-item"
                 v-for="item in selected_object.models"
@@ -147,9 +227,13 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
+import InputDatalist from "@/components/InputDatalist";
+import DynList from "@/components/DynList";
+import { DataHelper } from "@/common/helpers";
 
 export default {
   name: "EntityLoansList",
@@ -163,8 +247,15 @@ export default {
         due_date: { value: 1, label: "Date retour prévue" },
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
-      }
+      },
+      copy: false,
+      specificinstances: {},
+      copyObj: {}
     };
+  },
+  components: {
+    InputDatalist,
+    DynList
   },
   props: ["entityid"],
   computed: {
@@ -219,11 +310,27 @@ export default {
   watch: {
     entityid: function() {
       this.selected_object = this.objects_filtered[0];
+    },
+    selected_object: function(){
+      console.log(DataHelper)
+      this.copyObj = DataHelper.copy(this.selected_object);
+      this.selected_object.models.forEach(item => {
+        this.initInstances(item);
+      })
     }
   },
   methods: {
     initComponent() {
       return this.$store.dispatch("loans/fetchStatus");
+    },
+    initInstances(item) {
+      return this.$store
+        .dispatch("specificmaterials/instances/fetchList", {
+          prefix: "specificmaterials/" + item + "/"
+        })
+        .then(data => {
+          Vue.set(this.specificinstances, item, data);
+        });
     },
     editLoan(loan) {
       this.$store.commit("loans/setPending", loan);
@@ -238,14 +345,26 @@ export default {
             }
           });
       });
+    },
+    makeUserLabel(item) {
+      return item.username;
+    },
+    copyLoan(){
+      this.$store
+        .dispatch("loans/copy", { id: this.copyObj.id, data: this.copyObj })
+        .then(() => {
+          this.copy = !this.copy;
+        });
     }
   },
+
   beforeMount() {
     var pall = [];
     pall.push(this.$store.dispatch("specificmaterials/fetchList"));
     pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
+
     Promise.all(pall).then(() => {
       this.loaded = true;
     });

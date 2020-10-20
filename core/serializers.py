@@ -154,6 +154,7 @@ class LoanSerializer(serializers.ModelSerializer):
         model = Loan
         fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
         read_only_fields=('child', 'models')
+        extra_kwargs={'status':{'error_messages':{'invalid_choice':'Veuillez séléctionner un status pour le prêt'}}}
 
     def create(self, validated_data):
         # Create the book instance
@@ -215,8 +216,6 @@ class LoanSerializer(serializers.ModelSerializer):
         entity = data['entity']
         for mat in data['specific_materials']:
             if mat.model.entity != entity:
-                print(mat.model)
-                print(entity)
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité preteuse.")
         #conflit prêts en cours
         loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], status=Loan.Status.ACCEPTED, checkout_date__lte=data['checkout_date'], return_date=None, due_date__gt=data['checkout_date']).distinct()

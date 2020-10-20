@@ -4,7 +4,7 @@
                   v-model="item"
                   placeholder="Select"
                   v-if="objects_list.length"
-                  :id=id>
+                  :id="id">
     </model-select>
   </div>
 </template>
@@ -47,6 +47,11 @@ export default {
       if (newval == 0) {
         this.activeDset = true;
         this.input_value = "";
+      } else {
+        let self = this;
+        this.item = this.options.find(
+          item => item.value.id.toString() == self.value
+        );
       }
     },
     item(){

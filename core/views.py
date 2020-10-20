@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-
+import datetime
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 
 from .serializers import *
@@ -136,7 +136,6 @@ class PersonalDataView(APIView):
         return Response({"user": instance.data})
 
 
-
 class EntityViewSet(viewsets.ModelViewSet):
     """
     Endpoint for the entities
@@ -181,7 +180,6 @@ class TagViewSet(viewsets.ModelViewSet):
             return Response(ids, status=status.HTTP_200_OK)
         else:
             raise PermissionDenied()
-
 
 
 class EntityMaterialMixin:
@@ -422,6 +420,58 @@ class LoanViewSet(viewsets.ModelViewSet):
         Return the affiliation types
         """
         return Response(dict((x, y) for x, y in Loan.Status.choices), status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True)
+    def copy(self, request,pk=None):
+        """
+        Create a copy of the loan
+        """
+        loan = get_object_or_404(Loan,pk=pk)
+
+        user=loan.user
+        checkout_date = loan.checkout_date
+        due_date = loan.due_date
+
+        if(request.data['user']):
+            user = get_user_model().objects.get(id=request.data['user'])
+        if(request.data['checkout_date']):
+            checkout_date = request.data['checkout_date'].split('-')
+            checkout_date = datetime.datetime(int(checkout_date[0]),int(checkout_date[1]),int(checkout_date[2]))
+            loan_checkout_date = loan.checkout_date
+            loan_checkout_date = datetime.datetime(loan_checkout_date.year,loan_checkout_date.month,loan_checkout_date.day)
+            diff = checkout_date - loan_checkout_date
+            checkout_date = request.data['checkout_date']
+            checkout_date = datetime.datetime.strptime(checkout_date, '%Y-%m-%d')
+            checkout_date = checkout_date.date()
+            print(diff)
+            due_date = datetime.datetime(loan.due_date.year, loan.due_date.month, loan.due_date.day) + diff
+            print(datetime.datetime(loan.due_date.year, loan.due_date.month, loan.due_date.day))
+            due_date = due_date.date()
+            print(due_date)
+
+        copy = Loan.objects.create(user=user, entity=loan.entity, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=None, due_date=due_date, checkout_date=checkout_date)
+
+        mats = []
+        if(request.data['specific_materials']):
+            for mat in request.data['specific_materials']:
+                mats.append(SpecificMaterialInstance.objects.get(id=mat))
+
+        if(len(mats) > 0):
+            copy.specific_materials.set(mats)
+        else:
+            copy.specific_materials.set(loan.specific_materials.all())
+
+        gen_mats = []
+        if(request.data['generic_materials']):
+            for mat in request.data['generic_materials']:
+                material = GenericMaterial.objects.get(id=mat['material'])
+                gen_mats.append(LoanGenericItem(loan=copy, material=material, quantity=mat['quantity']))
+            LoanGenericItem.objects.bulk_create(gen_mats)
+        print(LoanGenericItem)
+        scopy=self.get_serializer(copy)
+
+        return Response(scopy.data)
+
 
     @action(methods=['post'], detail=True)
     def make_child(self, request,pk=None):

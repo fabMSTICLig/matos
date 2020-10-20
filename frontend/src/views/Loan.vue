@@ -109,6 +109,7 @@
                     Votre prêt doit contenir au moins un matériel. Pour un
                     materiel spécific veuillez choisir une instance
                   </p>
+
                   <div class="table-responsive-md">
                     <table class="table">
                       <thead>
@@ -282,7 +283,8 @@ export default {
       loaded: false,
       errors: [],
       prevRoute: null,
-      makeChild_btn: false
+      makeChild_btn: false,
+      selected: []
     };
   },
   computed: {
@@ -365,7 +367,40 @@ export default {
     ...mapMutations({
       removeMaterial: "loans/removeMaterial"
     }),
-
+    setMaterialItems() {
+      let self = this;
+      Object.keys(this.specificinstances).map(function(objectKey) {
+        var instances = self.specificinstances[objectKey];
+        var instances_notin = instances.filter(item => {
+          return self.pending_loan.specific_materials.find(s => s != item.id);
+        });
+        instances_notin.forEach(item => {
+          self.$store
+            .dispatch("entities/specificMaterials/instances/materialLoans", {
+              id_entity: self.pending_loan.entity,
+              id_specificmaterial: item.model,
+              id_instance: item.id
+            })
+            .then(data => {
+              //this.selected_object = this.objects_filtered[0];
+              var borrowed = data.filter(loan => {
+                    return (loan.status == 3) ? (loan.due_date > self.pending_loan.checkout_date &&
+                       loan.checkout_date <= self.pending_loan.checkout_date) ||
+                    (loan.return_date > self.pending_loan.checkout_date && self.pending_loan.checkout_date <= loan.checkout_date)||
+                    (loan.checkout_date >= self.pending_loan.checkout_date && self.pending_loan.due_date > loan.checkout_date )
+                    : false;
+              });
+              if (borrowed.length) {
+                let instance_borrowed = instances.find(i => i.id == item.id);
+                var spec_instances = self.specificinstances[item.model].find(
+                  i => i.id == instance_borrowed.id
+                );
+                self.$set(spec_instances, "borrowed", true);
+              }
+            });
+        });
+      });
+    },
     initInstances(item) {
       return this.$store
         .dispatch("specificmaterials/instances/fetchList", {
@@ -373,6 +408,7 @@ export default {
         })
         .then(data => {
           Vue.set(this.specificinstances, item, data);
+          this.setMaterialItems();
         });
     },
     submitLoan(e) {
@@ -401,6 +437,8 @@ export default {
             .catch(e => {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
+                window.scrollTo(0,0);
+
               }
               // eslint-disable-next-line
               console.log(e.response);
@@ -422,6 +460,7 @@ export default {
             .catch(e => {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
+                window.scrollTo(0,0);
               }
               this.errors = [];
               this.errors.push(e.response.data);
