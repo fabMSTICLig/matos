@@ -15,7 +15,7 @@
               <label class="input-group-text" for="typeselect">Ordre</label>
             </div>
             <div class="input-group-append">
-              <select v-model="sort_input">
+              <select v-model="sort_input" class="form-control">
                 <option
                   v-for="item in sort_choices"
                   :value="item.value"

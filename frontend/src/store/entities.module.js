@@ -70,7 +70,6 @@ const generic_extra = {
         .then(({ data }) => {
           commit(SET_MATERIAL_LOANS, data);
           return data;
-
         })
         .catch(e => {
           console.log(e);

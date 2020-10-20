@@ -288,23 +288,20 @@ export default {
       this.emptyInstances = true;
     },
     checkErrors() {
-      var instancesName="";
+      var instancesName = "";
       this.errors = [];
 
-      if(this.selected_object)
+      if (this.selected_object)
         instancesName = this.objects_paginated.filter(object => {
           return this.selected_object.name == object.name;
         });
-      
-      if(this.new_object_name.length)
+
+      if (this.new_object_name.length)
         instancesName = this.objects_paginated.filter(object => {
           return this.new_object_name == object.name;
-        }); 
-      
-        
-      if (instancesName.length > 0) 
-          this.errors.push("Nom d'Instance existant");
-      
+        });
+
+      if (instancesName.length > 0) this.errors.push("Nom d'Instance existant");
     },
     make_label() {
       return this.object.name;
@@ -364,17 +361,17 @@ export default {
     updateInstance(e) {
       e.preventDefault();
       this.checkErrors();
-      if(!this.errors.length){
+      if (!this.errors.length) {
         this.$store
-        .dispatch("entities/specificMaterials/instances/update", {
-          data: this.selected_object,
-          id: this.selected_object.id,
-          prefix: this.instancePrefix
-        })
-        .then(data => {
-          this.selectObject(data);
-          showMsgOk("Instance mise à jour");
-        });
+          .dispatch("entities/specificMaterials/instances/update", {
+            data: this.selected_object,
+            id: this.selected_object.id,
+            prefix: this.instancePrefix
+          })
+          .then(data => {
+            this.selectObject(data);
+            showMsgOk("Instance mise à jour");
+          });
       }
     },
     showMessage() {
@@ -383,7 +380,7 @@ export default {
   },
 
   watch: {
-    new_object_name(){
+    new_object_name() {
       this.errors = [];
     }
   }

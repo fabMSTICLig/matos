@@ -5,8 +5,6 @@ import store from "./store";
 import { CHECK_AUTH } from "./store/actions.type";
 import ApiService from "./common/api.service";
 
-import 'vue-search-select/dist/VueSearchSelect.css';
-
 Vue.config.productionTip = false;
 
 Vue.filter("field", function(value, field) {
