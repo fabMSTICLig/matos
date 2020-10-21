@@ -344,7 +344,7 @@ class GenericMaterialsTests(APITestCase):
 
         # def test_available_generic_material
         # test pour retourner la disponibilité d'un matériel sur des dates données
-        
+
 class SpecificMaterialsTests(APITestCase):
 
     def setUp(self):
@@ -483,6 +483,9 @@ class LoanMaterialsTests(APITestCase):
         self.loan_manager2 = Loan.objects.create(status=2, checkout_date = datetime.date(2020,10,8), user=self.manager2,entity=self.entity, due_date=datetime.date(2020,10,24), return_date=datetime.date(2020,10,24), comments='demande de prêt matériel générique')
         self.loan_manager2.generic_materials.add(self.materials_generic)
         self.loan_manager2.save()
+        self.loan_manager_2 = Loan.objects.create(status=3, checkout_date=datetime.date(2020,10,11), user=self.manager1, entity=self.entity, due_date=datetime.date(2021,2,1), return_date=datetime.date(2020,12,10), comments='changement de projecteur')
+        self.loan_manager_2.specific_materials.add(self.materials_specific_instance2)
+        self.loan_manager_2.save()
         self.loan_user = Loan.objects.create(status=2, checkout_date = datetime.date(2020,6,25), user=self.user,entity=self.entity, due_date=datetime.date(2020,7,24), return_date=datetime.date(2020,8,24), comments='demande de prêt tablettes info', parent=self.loan)
         self.loan_user.specific_materials.add(self.materials_specific_instance)
         self.loan_user.save()
@@ -698,7 +701,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_available_specific_material(self):
         """
-            Si un prêt arrive à date échue, le matériel lié peut être dans un nouveau prêt
+            Si un prêt arrive à date échue, le matériel lié est de nouveau disponible
         """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,4), "return_date" : datetime.date(2020,10,4), "comments" : 'demande de prêt tablettes projet Master 1 Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -724,3 +727,16 @@ class LoanMaterialsTests(APITestCase):
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user.pk}))
         response.render()
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_material_availability(self):
+        """
+           Test la disponibilité d'un matériel avec une date de retour
+        """
+        self.client.force_authenticate(user=self.manager1)
+        data = {"status" : 3, "checkout_date" : datetime.date(2020,10,8), "user" : self.manager1.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,9), "return_date" : datetime.date(2020,12,20), "comments" : 'demande de prêt projecteur cours Polytech', 'specific_materials': [self.materials_specific_instance2.pk], 'generic_materials': [] }
+        response = self.client.post(reverse('loan-list'), data, format='json')
+        response.render()
+        print(response.data)
+        self.assertGreater(datetime.date(2020,12,10), datetime.date(2020,11,11))
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)

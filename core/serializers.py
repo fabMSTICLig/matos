@@ -239,6 +239,10 @@ class LoanSerializer(serializers.ModelSerializer):
             if data['due_date']> loan.checkout_date:
                 materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
                 raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être rendu avant le "+str(loan.checkout_date))
+            if data['return_date']:
+                if data['return_date'] > loan.checkout_date:
+                    materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
+                    raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être retourné avant le "+str(loan.checkout_date))
 
         for item in data['loangenericitem_set']:
             if item['material'].entity != entity:
