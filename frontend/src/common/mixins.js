@@ -188,3 +188,71 @@ export const EditMixin = {
     });
   }
 };
+
+export const MaterialAvailability = {
+  methods: {
+    getMaterialAvailability(pending_loan) {
+      let self = this;
+
+      Object.keys(this.specificinstances).map(function(objectKey) {
+        var instances = self.specificinstances[objectKey];
+        var instances_notin = [];
+        pending_loan.specific_materials.some(function(a) {
+          if (!instances.indexOf(a.id)) {
+            instances_notin.push(a);
+            return true;
+          }
+        });
+
+        instances.forEach(item => {
+          self.$store
+            .dispatch("entities/specificMaterials/instances/materialLoans", {
+              id_entity: pending_loan.entity,
+              id_specificmaterial: item.model,
+              id_instance: item.id
+            })
+            .then(data => {
+              var borrowed = data.filter(loan => {
+                if (pending_loan.id) {
+                  if (loan.id !== pending_loan.id) {
+                    return self.filterBorrowed(loan,pending_loan);
+                  }
+                } else {
+                  return self.filterBorrowed(loan, pending_loan);
+                }
+              });
+              if (borrowed.length) {
+                console.log("borrowed");
+                let instance_borrowed = instances.find(i => i.id == item.id);
+                var spec_instances = self.specificinstances[item.model].find(
+                  i => i.id == instance_borrowed.id
+                );
+                self.$set(spec_instances, "borrowed", true);
+                console.log(self.specificinstances);
+              }
+              if (!borrowed.length) {
+                self.specificinstances[item.model].forEach(item => {
+                  self.$set(item, "borrowed", "");
+                });
+              }
+          });
+        });
+      });
+    },
+    filterBorrowed(loan, pending_loan) {
+      return loan.status == 3
+        ? (loan.due_date > pending_loan.checkout_date &&
+            loan.checkout_date <= pending_loan.checkout_date) ||
+            (loan.return_date > pending_loan.checkout_date &&
+              loan.checkout_date <= pending_loan.checkout_date) ||
+            (loan.checkout_date >= pending_loan.checkout_date &&
+              pending_loan.due_date > loan.checkout_date &&
+              (pending_loan.return_date ? pending_loan.return_date.length==0 : false || !pending_loan.return_date)
+            ) ||
+            (pending_loan.return_date ? loan.checkout_date >= pending_loan.checkout_date &&
+                loan.due_date > pending_loan.checkout_date &&
+                pending_loan.return_date > loan.checkout_date : false)
+        : false;
+    }
+  }
+};

@@ -1,7 +1,7 @@
 <template>
   <div>
     <form v-if="!readonly" :id="_uid" @submit="addObject">
-      <div class="input-group">
+      <div class="input-group" style="height:43px;">
         <div class="input-group-prepend">
           <span class="input-group-text">Ajouter</span>
         </div>
@@ -69,7 +69,8 @@ export default {
   },
   data() {
     return {
-      new_object_id: 0
+      new_object_id: 0,
+      id_mat: ""
     };
   },
   computed: {

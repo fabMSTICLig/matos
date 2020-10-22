@@ -5,23 +5,23 @@
       <div class="col-12 col-md-6">
         <div class="card">
           <div class="card-header input-group">
-                <input
-                  class="form-control"
-                  v-model="search_input"
-                  type="search"
-                  placeholder="Search"
-                />
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="typeselect">Ordre : </label>
-                </div>
-                <select class="form-control" v-model="sort_input">
-                  <option
-                    v-for="item in sort_choices"
-                    :value="item.value"
-                    :key="item.value"
-                    >{{ item.label }}</option
-                  >
-                </select>
+            <input
+              class="form-control"
+              v-model="search_input"
+              type="search"
+              placeholder="Search"
+            />
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="typeselect">Ordre : </label>
+            </div>
+            <select class="form-control" v-model="sort_input">
+              <option
+                v-for="item in sort_choices"
+                :value="item.value"
+                :key="item.value"
+                >{{ item.label }}</option
+              >
+            </select>
           </div>
           <div class="card-body">
             <div class="table-responsive table-hover">
@@ -42,7 +42,8 @@
                     v-on:click="selected_object = item"
                     :class="{
                       'table-active':
-                        selected_object && item.id == selected_object.id
+                        selected_object &&
+                        item.id == selected_object.id
                     }"
                   >
                     <td>
@@ -70,16 +71,14 @@
         <div class="card" v-if="selected_object">
           <div class="card-header">
             <h3 class="float-left" v-text="selected_object.name"></h3>
-            <button class="btn btn-primary"
-              role="button"
-              @click="copy=true"
-            >Copier</button>
+            <button class="btn btn-primary" role="button" @click="setCopy()">
+              Copier
+            </button>
             <div class="btn-group float-right" role="group">
               <button
                 class="btn btn-primary"
                 role="button"
                 @click="editLoan(selected_object)"
-                :disabled="copy"
               >
                 Modifier
               </button>
@@ -87,88 +86,13 @@
                 class="btn btn-danger"
                 role="button"
                 @click="destroyLoan(selected_object)"
-                :disabled="copy"
               >
                 Supprimer
               </button>
             </div>
           </div>
           <div class="card-body">
-            <form class="form" v-if="copy && copyObj" @submit="copyLoan">
-              <div class="form-row">
-                <div class="col-md-6 form-group">
-                  <label>Date sortie :</label>
-                  <input
-                    class="form-control"
-                    type="date"
-                    v-model="copyObj.checkout_date"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col-md-6 form-group">
-                  <label>Utilisateur :</label>
-                  <input-datalist
-                    v-model="copyObj.user"
-                    ressource="users"
-                    :makeLabel="makeUserLabel"
-                  ></input-datalist>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col-md-12 form-group">
-                  <div class="table-responsive-md">
-                    <table class="table">
-                      <thead>
-                        <tr class="d-flex">
-                          <th class="col-8">Matériels</th>
-                          <th class="col-3">Quantité</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          class="d-flex"
-                          v-for="item in copyObj.generic_materials"
-                          :key="'g' + item.material"
-                        >
-                          <td class="col-8">
-                            {{ gmById(item.material) | field("name") }}
-                          </td>
-                          <td class="col-3">
-                            <input
-                              type="number"
-                              class="number-input form-control form-control"
-                              v-model="item.quantity"
-                            />
-                          </td>
-                        </tr>
-                        <tr
-                          class="d-flex"
-                          v-for="item in copyObj.models"
-                          :key="'s' + item"
-                        >
-                          <td class="col-11" colspan="2">
-                            {{ smById(item) | field("name") }}
-                            <div>
-                              <h6>Instances</h6>
-                              <DynList
-                                :ressource="specificinstances[item]"
-                                v-model="copyObj.specific_materials"
-                                v-if="specificinstances[item]"
-                              ></DynList>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary float-left">Valider</button>
-              <button @click="copy=false" class="btn btn-primary float-left">Annuler</button>
-            </form>
-            <table class="table" v-if="!copy">
+            <table class="table">
               <tr>
                 <th scope="row">Utilisateur</th>
                 <td>
@@ -193,13 +117,13 @@
               </tr>
             </table>
 
-            <h5 v-if="!copy">Commentaires</h5>
+            <h5>Commentaires</h5>
             <p class="card-text">
               {{ selected_object.comments }}
             </p>
 
-            <h5 v-if="!copy">Matériels</h5>
-            <ul class="list-group" v-if="!copy">
+            <h5>Matériels</h5>
+            <ul class="list-group">
               <li
                 class="list-group-item"
                 v-for="item in selected_object.models"
@@ -225,15 +149,13 @@
 <script>
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import { ListMixin } from "@/common/mixins";
+import { ListMixin, MaterialAvailability } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
-import InputDatalist from "@/components/InputDatalist";
-import DynList from "@/components/DynList";
 import { DataHelper } from "@/common/helpers";
 
 export default {
   name: "EntityLoansList",
-  mixins: [ListMixin],
+  mixins: [ListMixin, MaterialAvailability],
   data() {
     return {
       ressource: "loans",
@@ -244,14 +166,9 @@ export default {
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
       },
-      copy: false,
       specificinstances: {},
-      copyObj: {}
+      copyObj: {},
     };
-  },
-  components: {
-    InputDatalist,
-    DynList
   },
   props: ["entityid"],
   computed: {
@@ -281,14 +198,14 @@ export default {
         });
       return filtered.sort((a, b) => {
         if (this.sort_input == this.sort_choices.due_date.value)
-            return a.due_date.localeCompare(b.due_date);
+          return a.due_date.localeCompare(b.due_date);
         if (this.sort_input == this.sort_choices.checkout_date.value)
           if (a.checkout_date.localeCompare(b.checkout_date) > 0) {
-            return a.checkout_date.localeCompare(b.checkout_date)
-          };
-          if (a.checkout_date.localeCompare(b.checkout_date) == 0) {
-            return a.due_date.localeCompare(b.due_date)
-          };
+            return a.checkout_date.localeCompare(b.checkout_date);
+          }
+        if (a.checkout_date.localeCompare(b.checkout_date) == 0) {
+          return a.due_date.localeCompare(b.due_date);
+        }
         if (this.sort_input == this.sort_choices.return_date.value) {
           if (a.return_date && b.return_date) {
             return a.return_date.localeCompare(b.return_date);
@@ -307,12 +224,10 @@ export default {
     entityid: function() {
       this.selected_object = this.objects_filtered[0];
     },
-    selected_object: function(){
-      console.log(DataHelper)
-      this.copyObj = DataHelper.copy(this.selected_object);
+    selected_object: function() {
       this.selected_object.models.forEach(item => {
         this.initInstances(item);
-      })
+      });
     }
   },
   methods: {
@@ -327,6 +242,11 @@ export default {
         .then(data => {
           Vue.set(this.specificinstances, item, data);
         });
+    },
+    setCopy() {
+      this.copyObj = DataHelper.copy(this.selected_object);
+      this.$store
+        .dispatch("loans/copy", { id: this.copyObj.id, data: this.copyObj })
     },
     editLoan(loan) {
       this.$store.commit("loans/setPending", loan);
@@ -344,13 +264,6 @@ export default {
     },
     makeUserLabel(item) {
       return item.username;
-    },
-    copyLoan(){
-      this.$store
-        .dispatch("loans/copy", { id: this.copyObj.id, data: this.copyObj })
-        .then(() => {
-          this.copy = !this.copy;
-        });
     }
   },
 

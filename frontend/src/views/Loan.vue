@@ -29,7 +29,12 @@
           </div>
           <div class="card-body">
             <ul class="text-danger" v-show="errors.length != 0">
-              <li v-for="error in errors" :key="error" v-text="error" tabIndex="-1" ></li>
+              <li
+                v-for="error in errors"
+                :key="error"
+                v-text="error"
+                tabIndex="-1"
+              ></li>
             </ul>
             <form class="form" @submit="submitLoan">
               <div class="form-row">
@@ -74,6 +79,7 @@
                       v-model="pending_loan.checkout_date"
                       required
                       :disabled="readOnly"
+                      @change="getMaterialAvailability(pending_loan)"
                     />
                   </div>
                   <div class="form-group">
@@ -84,6 +90,7 @@
                       v-model="pending_loan.due_date"
                       required
                       :disabled="readOnly"
+                      @change="getMaterialAvailability(pending_loan)"
                     />
                   </div>
                   <div class="form-group" v-if="canManage">
@@ -92,6 +99,7 @@
                       class="form-control"
                       type="date"
                       v-model="pending_loan.return_date"
+                      @change="getMaterialAvailability(pending_loan)"
                     />
                   </div>
 
@@ -271,8 +279,10 @@ import { mapGetters, mapMutations } from "vuex";
 import DynList from "@/components/DynList";
 import { showMsgOk } from "@/components/Modal";
 import InputDatalist from "@/components/InputDatalist";
+import { MaterialAvailability } from "@/common/mixins";
 export default {
   name: "Loan",
+  mixins: [MaterialAvailability],
   components: {
     DynList,
     InputDatalist
@@ -367,40 +377,7 @@ export default {
     ...mapMutations({
       removeMaterial: "loans/removeMaterial"
     }),
-    setMaterialItems() {
-      let self = this;
-      Object.keys(this.specificinstances).map(function(objectKey) {
-        var instances = self.specificinstances[objectKey];
-        var instances_notin = instances.filter(item => {
-          return self.pending_loan.specific_materials.find(s => s != item.id);
-        });
-        instances_notin.forEach(item => {
-          self.$store
-            .dispatch("entities/specificMaterials/instances/materialLoans", {
-              id_entity: self.pending_loan.entity,
-              id_specificmaterial: item.model,
-              id_instance: item.id
-            })
-            .then(data => {
-              //this.selected_object = this.objects_filtered[0];
-              var borrowed = data.filter(loan => {
-                    return (loan.status == 3) ? (loan.due_date > self.pending_loan.checkout_date &&
-                       loan.checkout_date <= self.pending_loan.checkout_date) ||
-                    (loan.return_date > self.pending_loan.checkout_date && self.pending_loan.checkout_date <= loan.checkout_date)||
-                    (loan.checkout_date >= self.pending_loan.checkout_date && self.pending_loan.due_date > loan.checkout_date )
-                    : false;
-              });
-              if (borrowed.length) {
-                let instance_borrowed = instances.find(i => i.id == item.id);
-                var spec_instances = self.specificinstances[item.model].find(
-                  i => i.id == instance_borrowed.id
-                );
-                self.$set(spec_instances, "borrowed", true);
-              }
-            });
-        });
-      });
-    },
+
     initInstances(item) {
       return this.$store
         .dispatch("specificmaterials/instances/fetchList", {
@@ -408,14 +385,14 @@ export default {
         })
         .then(data => {
           Vue.set(this.specificinstances, item, data);
-          this.setMaterialItems();
+          this.getMaterialAvailability(this.pending_loan);
         });
     },
     submitLoan(e) {
       e.preventDefault();
       this.checkErrors();
-      if(this.errors.length) {
-        window.scrollTo(0,0);
+      if (this.errors.length) {
+        window.scrollTo(0, 0);
       }
       if (!this.emptyLoan && !this.errors.length && !this.emptyInstances) {
         if (this.pending_loan.return_date == "")
@@ -437,8 +414,7 @@ export default {
             .catch(e => {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
-                window.scrollTo(0,0);
-
+                window.scrollTo(0, 0);
               }
               // eslint-disable-next-line
               console.log(e.response);
@@ -460,11 +436,11 @@ export default {
             .catch(e => {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
-                window.scrollTo(0,0);
+                window.scrollTo(0, 0);
               }
               this.errors = [];
               this.errors.push(e.response.data);
-              window.scrollTo(0,0);
+              window.scrollTo(0, 0);
               // eslint-disable-next-line
               console.log(e.response);
             });
@@ -491,6 +467,7 @@ export default {
       }
     },
     cleanMaterials() {
+      this.$store.commit("loans/resetPending");
       this.$store.commit("loans/cleanMaterials");
     },
     newLoan() {

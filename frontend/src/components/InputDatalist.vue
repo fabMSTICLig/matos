@@ -7,6 +7,7 @@
       label="name"
       :searchable="true"
       :allow-empty="true"
+      select-label=""
     ></multiselect>
   </div>
 </template>
@@ -46,11 +47,6 @@ export default {
       if (newval == 0) {
         this.activeDset = true;
         this.input_value = "";
-      } else {
-        let self = this;
-        this.item = this.options.find(
-          item => item.value.id.toString() == self.value
-        );
       }
     },
     item() {
@@ -112,12 +108,20 @@ export default {
   },
   beforeMount() {
     if (typeof this.ressource == "string")
-      this.$store.dispatch(this.ressource + "/fetchList");
+      this.$store.dispatch(this.ressource + "/fetchList").then(() => {
+        if (this.value && this.options) {
+          let selected_item = this.options.filter(item => {
+            return item.value.id == this.value;
+          });
+          this.item = selected_item[0];
+        }
+        console.log(this.item);
+      });
   },
   mounted() {
     this.id = String(this._uid);
-
-  }
+  },
+  created() {}
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
