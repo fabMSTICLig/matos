@@ -205,7 +205,6 @@ export default {
     if (this.$route.name == "genericmaterialitem") {
       this.ressource = "genericmaterials";
     }
-    console.log(this.ressource);
     if (parseInt(this.$route.params[this.$route.meta.routeparam], -1) != -1) {
       this.$store
         .dispatch(this.ressource + "/fetchSingle", {
@@ -216,7 +215,6 @@ export default {
         });
     }
     this.$store.dispatch("entities/fetchList").then(data => {
-      console.log("entités");
       this.entities = data;
     });
   }
