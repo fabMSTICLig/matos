@@ -234,12 +234,12 @@ export default {
     goToMaterial(item) {
       if (item.instances) {
         this.$router.push({
-          name: "specificmaterial-item",
+          name: "specificmaterialitem",
           params: { matid: item.id }
         });
       } else {
         this.$router.push({
-          name: "genericmaterial-item",
+          name: "genericmaterialitem",
           params: { matid: item.id }
         });
       }

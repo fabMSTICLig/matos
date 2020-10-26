@@ -1,14 +1,18 @@
 import createCrud from "@/common/storeCrudHelper";
 import ApiService from "@/common/api.service";
-import { SET_MATERIAL_LOANS } from "./mutations.type";
+import { SET_MATERIAL_LOANS, SET_MATERIALS } from "./mutations.type";
 
 const instances_extra = {
   state: {
-    loans: {}
+    loans: {},
+    materials: {}
   },
   getters: {
     loans(state) {
       return state.loans;
+    },
+    materials(state) {
+      return state.materials;
     }
   },
   actions: {
@@ -30,11 +34,24 @@ const instances_extra = {
         .catch(e => {
           console.log(e);
         });
+    },
+    getMaterials({ commit }, { id }) {
+      return ApiService.query("entities/" + id + "/specificmaterials")
+        .then(({ data }) => {
+          commit(SET_MATERIALS, data);
+          return data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
     }
   },
   mutations: {
     setMaterialLoans(state, loans) {
       state.loans = loans;
+    },
+    setMaterials(state, materials) {
+      state.materials = materials;
     }
   }
 };
@@ -55,6 +72,9 @@ const generic_extra = {
   getters: {
     loans(state) {
       return state.loans;
+    },
+    materials(state) {
+      return state.materials;
     }
   },
   actions: {
@@ -74,11 +94,25 @@ const generic_extra = {
         .catch(e => {
           console.log(e);
         });
+    },
+
+    getMaterials({ commit }, { id }) {
+      return ApiService.query("entities/" + id + "/genericmaterials")
+        .then(({ data }) => {
+          commit(SET_MATERIALS, data);
+          return data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
     }
   },
   mutations: {
     setMaterialLoans(state, loans) {
       state.loans = loans;
+    },
+    setMaterials(state, materials) {
+      state.materials = materials;
     }
   }
 };

@@ -12,12 +12,12 @@
           <div class="input-group-prepend">
             <label class="input-group-text" for="typeselect">Type</label>
           </div>
-          <select v-model="type_input">
+          <select v-model="type_input" class="form-control col-3">
             <option value="1">Les deux</option>
             <option value="2">Generique</option>
             <option value="3">Specifique</option>
           </select>
-          <div class="input-group-append">
+          <div class="input-group-append ml-3">
             <Dropdown
               :items="newmaterialroutes"
               label="Ajouter"
