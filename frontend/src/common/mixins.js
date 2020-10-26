@@ -215,7 +215,7 @@ export const MaterialAvailability = {
               var borrowed = data.filter(loan => {
                 if (pending_loan.id) {
                   if (loan.id !== pending_loan.id) {
-                    return self.filterBorrowed(loan,pending_loan);
+                    return self.filterBorrowed(loan, pending_loan);
                   }
                 } else {
                   return self.filterBorrowed(loan, pending_loan);
@@ -235,7 +235,7 @@ export const MaterialAvailability = {
                   self.$set(item, "borrowed", "");
                 });
               }
-          });
+            });
         });
       });
     },
@@ -247,11 +247,14 @@ export const MaterialAvailability = {
               loan.checkout_date <= pending_loan.checkout_date) ||
             (loan.checkout_date >= pending_loan.checkout_date &&
               pending_loan.due_date > loan.checkout_date &&
-              (pending_loan.return_date ? pending_loan.return_date.length==0 : false || !pending_loan.return_date)
-            ) ||
-            (pending_loan.return_date ? loan.checkout_date >= pending_loan.checkout_date &&
+              (pending_loan.return_date
+                ? pending_loan.return_date.length == 0
+                : false || !pending_loan.return_date)) ||
+            (pending_loan.return_date
+              ? loan.checkout_date >= pending_loan.checkout_date &&
                 loan.due_date > pending_loan.checkout_date &&
-                pending_loan.return_date > loan.checkout_date : false)
+                pending_loan.return_date > loan.checkout_date
+              : false)
         : false;
     }
   }

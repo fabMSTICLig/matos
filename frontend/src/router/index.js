@@ -94,6 +94,7 @@ const routes = [
     path: "/materials",
     component: () =>
       import(/* webpackChunkName: "affiliation" */ "../views/Materials.vue"),
+    name: "materials",
     meta: {
       breadcumb: {
         label: "Materiels",
@@ -107,15 +108,12 @@ const routes = [
           import(
             /* webpackChunkName: "materialgeneric" */ "../views/Material.vue"
           ),
-        name: "genericmaterial-item",
+        name: "genericmaterialitem",
         meta: {
           routeparam: "matid",
           breadcumb: {
-            label: {
-              ressource: "genericmaterials",
-              labelprop: "name"
-            },
-            name: "genericmaterial-item"
+            label: "materiel générique",
+            name: "genericmaterialitem"
           }
         }
       },
@@ -125,15 +123,12 @@ const routes = [
           import(
             /* webpackChunkName: "materialgeneric" */ "../views/Material.vue"
           ),
-        name: "specificmaterial-item",
+        name: "specificmaterialitem",
         meta: {
           routeparam: "matid",
           breadcumb: {
-            label: {
-              ressource: "specificmaterials",
-              labelprop: "name"
-            },
-            name: "specificmaterial-item"
+            label: "materiel spécifique",
+            name: "specificmaterialitem"
           }
         }
       }

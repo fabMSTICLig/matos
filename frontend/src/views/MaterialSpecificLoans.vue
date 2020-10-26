@@ -18,21 +18,25 @@
                   >
                     Instances
                   </div>
-                  <div
+                  <ul
                     :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
                     :id="'tooltip' + _uid"
                     aria-labelledby="dropdownMenuButton"
                   >
-                    <button
+                    <li
                       class="dropdown-item"
                       v-for="item in objects_list"
                       :key="item.id"
                       @click="selectInstance(item)"
                       type="button"
+                      :class="{
+                        active:
+                          selected_instance && item.id == selected_instance.id
+                      }"
                     >
                       {{ item.name }}
-                    </button>
-                  </div>
+                    </li>
+                  </ul>
                 </div>
               </div>
               <input

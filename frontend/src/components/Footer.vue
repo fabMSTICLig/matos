@@ -16,8 +16,16 @@
           </div>
         </div>
         <div class="col col-lg-6 media">
-          <img :src="`${publicPath}logos-inp-uga.jpg`" width="50%" class="mr-4" />
-          <img :src="`${publicPath}nanoelec-logo.jpg`" width="40%" class="mr-3" />
+          <img
+            :src="`${publicPath}logos-inp-uga.jpg`"
+            width="50%"
+            class="mr-4"
+          />
+          <img
+            :src="`${publicPath}nanoelec-logo.jpg`"
+            width="40%"
+            class="mr-3"
+          />
         </div>
       </div>
       <div class="row">
@@ -36,11 +44,10 @@
 <script>
 export default {
   name: "Footer",
-  data () {
-  return {
-    publicPath: process.env.BASE_URL
+  data() {
+    return {
+      publicPath: process.env.BASE_URL
+    };
   }
-}
-
 };
 </script>

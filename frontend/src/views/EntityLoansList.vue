@@ -42,8 +42,7 @@
                     v-on:click="selected_object = item"
                     :class="{
                       'table-active':
-                        selected_object &&
-                        item.id == selected_object.id
+                        selected_object && item.id == selected_object.id
                     }"
                   >
                     <td>
@@ -167,7 +166,7 @@ export default {
         return_date: { value: 3, label: "Date de retour" }
       },
       specificinstances: {},
-      copyObj: {},
+      copyObj: {}
     };
   },
   props: ["entityid"],
@@ -245,8 +244,10 @@ export default {
     },
     setCopy() {
       this.copyObj = DataHelper.copy(this.selected_object);
-      this.$store
-        .dispatch("loans/copy", { id: this.copyObj.id, data: this.copyObj })
+      this.$store.dispatch("loans/copy", {
+        id: this.copyObj.id,
+        data: this.copyObj
+      });
     },
     editLoan(loan) {
       this.$store.commit("loans/setPending", loan);
