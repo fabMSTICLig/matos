@@ -196,13 +196,6 @@ export const MaterialAvailability = {
 
       Object.keys(this.specificinstances).map(function(objectKey) {
         var instances = self.specificinstances[objectKey];
-        var instances_notin = [];
-        pending_loan.specific_materials.some(function(a) {
-          if (!instances.indexOf(a.id)) {
-            instances_notin.push(a);
-            return true;
-          }
-        });
 
         instances.forEach(item => {
           self.$store
@@ -222,7 +215,6 @@ export const MaterialAvailability = {
                 }
               });
               if (borrowed.length) {
-                console.log("borrowed");
                 let instance_borrowed = instances.find(i => i.id == item.id);
                 var spec_instances = self.specificinstances[item.model].find(
                   i => i.id == instance_borrowed.id
@@ -238,6 +230,73 @@ export const MaterialAvailability = {
             });
         });
       });
+    },
+    getTotalGenericMaterial(pending_loan) {
+      let self = this;
+      let totalGenericMaterials = [];
+      this.genericMaterialsLoan = this.genericmaterials.filter(material => {
+        return pending_loan.generic_materials.find(
+          generic_material => generic_material.material == material.id
+        );
+      });
+
+      this.genericMaterialsLoan.forEach(material => {
+        totalGenericMaterials.push({ id: material.id, quantity: 0 });
+        self.$store
+          .dispatch("entities/genericMaterials/getLoans", {
+            id_entity: this.pending_loan.entity,
+            id_genericmaterial: material.id
+          })
+          .then(loans => {
+            if (loans.length) {
+              loans.forEach(loan => {
+                let genmats = loan.generic_materials.find(
+                  generic_material => generic_material.material == material.id
+                );
+                if (material.id && genmats.quantity) {
+                  let totalMat = totalGenericMaterials.find(
+                    total => total.id == material.id
+                  );
+                  switch (loan.id) {
+                    case this.pending_loan.id:
+                      break;
+                    default:
+                      totalMat.quantity += genmats.quantity;
+                  }
+                }
+              });
+            }
+          });
+      });
+      return totalGenericMaterials;
+    },
+    getGenericMaterialAvailability(pending_loan) {
+      let self = this;
+      let disabled = [];
+      this.genericMaterialsLoan = this.genericmaterials.filter(material => {
+        return self.pending_loan.generic_materials.find(
+          generic_material => generic_material.material == material.id
+        );
+      });
+
+      this.genericMaterialsLoan.forEach(material => {
+        self.$store
+          .dispatch("entities/genericMaterials/getLoans", {
+            id_entity: pending_loan.entity,
+            id_genericmaterial: material.id
+          })
+          .then(loans => {
+            if (loans.length) {
+              loans.forEach(loan => {
+                var borrowed = self.filterBorrowed(loan, self.pending_loan);
+                if (borrowed) {
+                  disabled.push(material.id);
+                }
+              });
+            }
+          });
+      });
+      return disabled;
     },
     filterBorrowed(loan, pending_loan) {
       return loan.status == 3

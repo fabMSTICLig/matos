@@ -132,26 +132,29 @@ export default {
           });
         }
         filtered.forEach(entity => {
-            if(this.ressource == "specificmaterials"){
-              prefix  =  "entities/specificMaterials/instances";
-            }
-            if(this.ressource == "genericmaterials"){
-              prefix  =  "entities/genericMaterials";
-            }
-            this.$store.dispatch(prefix+"/getMaterials", {
+          if (this.ressource == "specificmaterials") {
+            prefix = "entities/specificMaterials/instances";
+          }
+          if (this.ressource == "genericmaterials") {
+            prefix = "entities/genericMaterials";
+          }
+          this.$store
+            .dispatch(prefix + "/getMaterials", {
               id: entity.id
             })
-            .then((materials) => {
-              let presentMaterial = materials.filter( material => {
-                return material.name == this.object.name
-              })
-              if(presentMaterial.length) {
-                let entityMaterial = filtered.find( entity=> entity.id == presentMaterial[0].entity);
+            .then(materials => {
+              let presentMaterial = materials.filter(material => {
+                return material.name == this.object.name;
+              });
+              if (presentMaterial.length) {
+                let entityMaterial = filtered.find(
+                  entity => entity.id == presentMaterial[0].entity
+                );
                 var index = filtered.indexOf(entityMaterial);
-                filtered=filtered.splice(index,1);
+                filtered = filtered.splice(index, 1);
               }
-            })
-          });
+            });
+        });
       }
       return filtered;
     }

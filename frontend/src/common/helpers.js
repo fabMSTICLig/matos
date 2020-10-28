@@ -16,6 +16,9 @@ export const DataHelper = {
       objectCopy[key] = object[key]; // copies each property to the objectCopy object
     }
     return objectCopy;
+  },
+  hasObject: function(object, key, array) {
+    return array.length ? array.find(item => item == object[key]) : null;
   }
 };
 
