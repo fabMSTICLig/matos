@@ -168,7 +168,7 @@
                         >
                           <td class="col-6">
                             <span class="text-danger"
-                              >Quantité maximum atteinte :
+                              >Quantité maximum dépassée :
                               {{ gmById(material) | field("quantity") }}</span
                             >
                           </td>
@@ -187,10 +187,7 @@
                           <td class="col-6">
                             <span class="text-danger"
                               >Quantité disponible dépassée :
-                              {{
-                                loansMaterialQuantity(material_loan)
-                                  | field("quantity")
-                              }}</span
+                              {{ loansMaterialQuantity(material_loan) }}</span
                             >
                           </td>
                           <td class="col-6">
@@ -454,6 +451,10 @@ export default {
         this.borrowedMaterials = this.getGenericMaterialAvailability(
           this.pending_loan
         );
+
+        this.totalGenericMaterials = this.getTotalGenericMaterial(
+          this.pending_loan
+        );
         this.$store.commit("loans/savePending");
       },
       deep: true
@@ -603,20 +604,37 @@ export default {
         "material",
         this.maxQuantities
       );
+      let materialMaxLoanQuantity = DataHelper.hasObject(
+        genericitem,
+        "material",
+        this.maxQuantitiesLoan
+      );
       let indexMax = this.maxQuantities.indexOf(materialMaxQuantity);
 
-      if (genericitem.quantity > materialLoan.quantity) {
-        if (!materialMaxQuantity || !this.maxQuantities.length) {
+      // quantité maximale dépassée
+
+      if (
+        genericitem.quantity > materialLoan.quantity &&
+        materialLoan.quantity !== 0
+      ) {
+        if (
+          (!materialMaxQuantity || !this.maxQuantities.length) &&
+          !materialMaxLoanQuantity
+        ) {
           this.maxQuantities.push(genericitem.material);
         }
       }
 
-      if (this.totalGenericMaterials && this.loadedLoans) {
+      if (
+        this.totalGenericMaterials &&
+        this.loadedLoans &&
+        materialLoan.quantity !== 0
+      ) {
         let materialBorrowed = this.totalGenericMaterials.find(
           material => material.id == genericitem.material
         );
 
-        //quantité empruntée supérieure ou égale au stock total
+        // quantité empruntée supérieure ou égale au stock total
 
         if (materialBorrowed.quantity >= materialLoan.quantity) {
           let itemDisabled = DataHelper.hasObject(
@@ -636,6 +654,7 @@ export default {
             this.disabled.push(genericitem.material);
             this.maxQuantities.splice(indexMax, 1);
           }
+          return true;
         }
 
         let quantityDelta =
@@ -645,11 +664,7 @@ export default {
           "material",
           this.maxQuantities
         );
-        let materialMaxLoanQuantity = DataHelper.hasObject(
-          genericitem,
-          "material",
-          this.maxQuantitiesLoan
-        );
+
         if (!materialBorrowed.quantity) {
           quantityDelta = 0;
         }
@@ -667,13 +682,14 @@ export default {
 
         // quantité supérieure ou égale au stock total
 
-        if (sumQuantity >= materialLoan.quantity) {
+        if (sumQuantity > materialLoan.quantity) {
           if (!materialMaxQuantity && quantityDelta == 0) {
             this.maxQuantities.push(genericitem.material);
           }
         }
       }
-      return genericitem.quantity > materialLoan.quantity ? true : false;
+
+      return false;
     },
     disabledItem(item) {
       let materialDisabled = this.disabled.find(
@@ -682,7 +698,13 @@ export default {
       return materialDisabled ? true : false;
     },
     loansMaterialQuantity(item) {
-      return this.totalGenericMaterials.find(material => material.id == item);
+      let matgen = this.totalGenericMaterials.find(
+        material => material.id == item
+      );
+      let materialLoan = this.genericMaterialsLoan.find(
+        generic_material => generic_material.id == item
+      );
+      return materialLoan.quantity - matgen.quantity;
     }
   },
   beforeMount() {
@@ -704,9 +726,11 @@ export default {
       this.borrowedMaterials = this.getGenericMaterialAvailability(
         this.pending_loan
       );
+
       this.totalGenericMaterials = this.getTotalGenericMaterial(
         this.pending_loan
       );
+
       this.loadedLoans = true;
     });
     if (this.canManage && this.emptyLoan) {

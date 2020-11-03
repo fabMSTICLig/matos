@@ -257,11 +257,10 @@ export const MaterialAvailability = {
                   let totalMat = totalGenericMaterials.find(
                     total => total.id == material.id
                   );
-                  switch (loan.id) {
-                    case this.pending_loan.id:
-                      break;
-                    default:
+                  if (loan.id !== pending_loan.id) {
+                    if (self.filterBorrowed(loan, pending_loan)) {
                       totalMat.quantity += genmats.quantity;
+                    }
                   }
                 }
               });
@@ -288,9 +287,11 @@ export const MaterialAvailability = {
           .then(loans => {
             if (loans.length) {
               loans.forEach(loan => {
-                var borrowed = self.filterBorrowed(loan, self.pending_loan);
-                if (borrowed) {
-                  disabled.push(material.id);
+                if (loan.id !== pending_loan.id) {
+                  var borrowed = self.filterBorrowed(loan, self.pending_loan);
+                  if (borrowed) {
+                    disabled.push(material.id);
+                  }
                 }
               });
             }
