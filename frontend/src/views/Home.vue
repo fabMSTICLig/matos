@@ -7,7 +7,7 @@
             <h4>La plateforme MATOS</h4>
           </div>
           <div class="card-body">
-            <p>
+            <p class="text-justify">
               La plateforme MATOS a pour but d'aider les différentes entitées de
               l'université à se prêter du matériel. Par exemple le fablab
               FabMSTIC prête des cartes arduino dans le cadre de projets
@@ -16,34 +16,40 @@
             <h4>Quelques définitions utiles pour l'utilisation du site</h4>
             <ul>
               <li>
+                <p class="text-justify">
                 Une <strong>Entité</strong> peut être un laboratoire, une
                 composante universitaire, un service d'un laboratoire, une
-                plateforme technique, ... Chaque entité peut avoir une
-                granularité différente et un fonctionnement différent. Il est
+                plateforme technique, ...
+                Chaque entité peut avoir une granularité différente et un fonctionnement différent. Il est
                 donc conseillé de lire la description de l'entité chez qui l'on
                 souhaite emprunter du matériel. Si vous souhaitez prêter du
                 matériel et créer une entité, veuillez contacter les
                 administrateurs du site.
+                </p>
               </li>
               <li>
                 Il existe deux types de matériel. <strong>Spécifique</strong> et
                 <strong>Générique</strong>
                 <ul>
                   <li>
+                    <p class="text-justify">
                     Le matériel <strong>Spécifique</strong> correspond au
                     matériel dont on ne peut pas intervertir les instances. Par
                     exemple le fablab possède 10 tablettes MarqueX (10
                     instances), chaque tablette a un numéro de série, s'il prête
                     la tablette 1 (l'instance 1), il est important que ce soit
                     la tablette 1 qui revienne.
+                    </p>
                   </li>
                   <li>
-                    Le matériel <strong>Générique</strong> correpond au matériel
+                    <p class="text-justify">
+                    Le matériel <strong>Générique</strong> correspond au matériel
                     dont on peut intervertir les instances. Par exemple le
                     fablab possède des cartes Arduino Uno, quand il prête une
-                    carte Arduino Uno, il souhaite qu'une carte Ardduino Uno
+                    carte Arduino Uno, il souhaite qu'une carte Arduino Uno
                     soit retournée, mais ce n'est pas très grave si ce n'est pas
                     la même que celle prêtée.
+                    </p>
                   </li>
                 </ul>
               </li>
