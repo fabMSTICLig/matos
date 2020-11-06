@@ -235,7 +235,7 @@
                               v-if="!readOnly"
                               class="btn btn-danger"
                               type="button"
-                              @click="removeMaterial(gmById(item.material))"
+                              @click="removeMaterial(smById(item))"
                               style="margin-left: -10px;"
                             >
                               X
