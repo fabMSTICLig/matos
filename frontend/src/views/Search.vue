@@ -116,8 +116,7 @@
                   :class="{
                     disabled:
                       (pending_loan.entity &&
-                        pending_loan.entity != item.entity) ||
-                      setDisabled(item)
+                        pending_loan.entity != item.entity)
                   }"
                   title="Les matériels d'un prêt doivent tous appartenir à la même entité"
                 >
@@ -244,39 +243,8 @@ export default {
         });
       }
     },
-    setDisabled(material) {
-      let genericItemsAdded, specificItemsAdded;
-
-      if (this.pending_loan) {
-        if (material.quantity) {
-          genericItemsAdded = this.pending_loan.generic_materials.filter(
-            item => {
-              return item.material == material.id;
-            }
-          );
-        }
-        if (material.instances) {
-          specificItemsAdded = this.pending_loan.models.filter(spec => {
-            return spec == material.id;
-          });
-        }
-      }
-
-      if (genericItemsAdded) {
-        return genericItemsAdded[0];
-      }
-      if (specificItemsAdded) {
-        return specificItemsAdded[0];
-      } else {
-        return false;
-      }
-    },
-
     addItem(item) {
-      let self = this;
-      if (!self.setDisabled(item)) {
-        self.addMaterial(item);
-      }
+      this.addMaterial(item);
     },
     onPageChange(page) {
       this.current_page = page;
