@@ -115,7 +115,7 @@
                 <div class="col-12 col-md-7">
                   <p class="text-danger" v-show="emptyLoan">
                     Votre prêt doit contenir au moins un matériel. Pour un
-                    materiel spécific veuillez choisir une instance
+                    materiel spécifique veuillez choisir une instance
                   </p>
 
                   <div class="table-responsive-md">
@@ -235,7 +235,7 @@
                               v-if="!readOnly"
                               class="btn btn-danger"
                               type="button"
-                              @click="removeMaterial(gmById(item.material))"
+                              @click="removeMaterial(smById(item))"
                               style="margin-left: -10px;"
                             >
                               X
@@ -360,7 +360,8 @@ export default {
       genericMaterialsLoan: [],
       disabled: [],
       loadedLoans: false,
-      borrowedMaterials: []
+      borrowedMaterials: [],
+      idRoute:""
     };
   },
   computed: {
@@ -458,7 +459,25 @@ export default {
         this.$store.commit("loans/savePending");
       },
       deep: true
-    }
+    },
+    '$route.params.loanid': {
+        handler: function(loanid) {
+           console.log(loanid);
+           this.idRoute = loanid;
+           if(loanid) {
+             this.$store.dispatch("loans/list")
+             .then(loans => {
+               let pending_loan = loans.find( loan => loan.id == loanid);
+               if(pending_loan) {
+                 this.goTo(pending_loan.id);
+               }
+             });
+           }
+
+        },
+        deep: true,
+        immediate: true
+      }
   },
   methods: {
     ...mapMutations({
@@ -586,6 +605,9 @@ export default {
     goTo(id) {
       this.$store.dispatch("loans/fetchSingle", { id: id }).then(data => {
         this.$store.commit("loans/setPending", data);
+        this.pending_loan.models.forEach(item => {
+          this.initInstances(item);
+        });
       });
     },
     makeChild() {
