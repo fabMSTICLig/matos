@@ -12,6 +12,9 @@ const loans_extra = {
     },
     status(state) {
       return state.status;
+    },
+    loans(state) {
+      return state.loans;
     }
   },
   actions: {
@@ -27,6 +30,13 @@ const loans_extra = {
         commit("updateSuccess", data.parent);
         commit("createSuccess", data.child);
         return data.child;
+      });
+    },
+    list({ commit }) {
+      return ApiService.get("loans").then(({ data }) => {
+        console.log(data);
+        commit("setList", data);
+        return data;
       });
     },
     copy({ commit }, { id, data }) {
@@ -123,6 +133,7 @@ const loans_extra = {
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
     removeMaterial(state, mat) {
+      console.log(mat);
       if ("quantity" in mat) {
         state.pending_loan.generic_materials = state.pending_loan.generic_materials.filter(
           item => item.material != mat.id
@@ -156,6 +167,9 @@ const loans_extra = {
     },
     savePending(state) {
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+    },
+    setList(state, loans) {
+      state.loans = loans;
     }
   }
 };
