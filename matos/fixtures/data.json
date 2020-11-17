@@ -1,0 +1,16 @@
+[
+ {"model": "api.location", "fields": {"reference":"universite grenoble fablab",
+     "title": "fabMSTIC", "description": "fablab univ"
+      }},
+  {"model": "api.family", "fields":{"reference":"cartes electronique", "title": "modelisation signal", "description": "traitement du signal", "unit": "db",
+    "minQuantity": 1 }},
+    {"model": "api.product", "fields": {"sku": "5", 
+        "barcode": "445fdfd778",
+        "unitCost": 0.00,
+        "quantity": 5.0,
+        "minQuantity": 1.0,
+        "title": "coaxial signal card", 
+        "description": "modelisation signal coaxial serie",
+        "location":1,
+        "family": 1 }}
+     ]
