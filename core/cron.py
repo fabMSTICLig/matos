@@ -17,7 +17,12 @@ class AlertLoansEnded(CronJobBase):
     schedule = Schedule(run_every_mins=0)
     code = 'core.cron.alert_loans_ended'    # a unique code
 
+    def get_rendered_template(self, tpl, context):
+        return self.get_template(tpl).render(context)
 
+
+    def get_template(self, tpl):
+        return template.loader.get_template(tpl)
 
     ## récuperation des reservations
     def do(self):
@@ -27,21 +32,39 @@ class AlertLoansEnded(CronJobBase):
         day = datetime.date.today().day
         date_format = "%Y-%m-%d"
         now = datetime.datetime.strptime(str(year)+"-"+str(month)+"-"+str(day), date_format)
-        loansEnded = []
-
+        loansEnded = {}
         for loan in loans:
             due_date = datetime.datetime(loan.due_date.year,loan.due_date.month,loan.due_date.day)
             if((now >= due_date) and loan.status == 3 and loan.return_date is None):
-                loansEnded.append(loan)
+                item = {}
+                item["id"] = loan.pk
+                item["genericmaterials"] = []
+                item["specificinstances"] = []
+                item["entity"] = loan.entity
+                item["checkout_date"] = loan.checkout_date
+                item["due_date"] =  loan.due_date
+                for mat in loan.generic_materials.all():
+                    item["genericmaterials"].append({"name": mat.name,"quantity":mat.quantity})
+                for mat in loan.specific_materials.all():
+                    item["specificinstances"].append({"name": mat.name,"serial_num":mat.serial_num})
+                if not loan.user.email in loansEnded:
+                    loansEnded[loan.user.email]=[item]
 
-        for loan in loansEnded:
-            print(loan.id)
-            print(loan.user)
-            print(loan.user.email)
-            print(loan.entity)
-            html_tpl  = get_template('email/loans.html')
-            d = Context({ 'loan': loan })
-            html_content = html_tpl.render(d)
+                else:
+                    loansEnded[loan.user.email].append(item)
+
+        for i,x in enumerate(loansEnded):
+            for loans in loansEnded[x]:
+                html_tpl  = get_template('email/loans.html')
+                context = { 'loans': loans }
+                html_content = self.get_rendered_template('email/loans.html', context)
+                from_email = 'mail'
+                to = [x,] # put your real email here
+                subject = 'Plateforme MATOS : prêts en retard'
+                text_content = 'liste des prêts à retourner'
+                msg=EmailMultiAlternatives(subject, text_content, from_email, to)
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
 
 class AlertLoansDueDate(CronJobBase):
     """
@@ -70,7 +93,6 @@ class AlertLoansDueDate(CronJobBase):
 
         loans_to_end = []
         loans = Loan.objects.all()
-
         return_loans = {}
 
         for loan in loans:
@@ -82,16 +104,15 @@ class AlertLoansDueDate(CronJobBase):
                         due_time["day"]=[loan.id]
                         return_loans[loan.user.email]=due_time
                     else:
-                            if "day" in return_loans[loan.user.email]:
-                                #return_loans[loan.user.email][x].append(loan.id)
-                                print("append")
-                            else:
-                                due_time={}
-                                due_time["day"] = [loan.id]
-                                return_loans[loan.user.email]["day"]=[loan.id]
+                        if "day" in return_loans[loan.user.email]:
+                            #return_loans[loan.user.email][x].append(loan.id)
+                            print("append")
+                        else:
+                            due_time={}
+                            due_time["day"] = [loan.id]
+                            return_loans[loan.user.email]["day"]=[loan.id]
 
                 elif((due_date - now).days > 1 and (due_date - now).days <= 4):
-
                     if not loan.user.email in return_loans:
                         due_time={}
                         due_time["midweek"]=[loan.id]
@@ -137,13 +158,11 @@ class AlertLoansDueDate(CronJobBase):
 
                     context = { 'loans': return_loans[borrower][next_return], 'delta':next_return }
                     html_content = self.get_rendered_template('email/loans.html', context)
-                    from_email = 'lesaulnc@nomagic.fr'
-                    to = ['clement.lesaulnier@orange.fr',] # put your real email here
+                    from_email = 'email'
+                    to = [borrower,] # put your real email here
                     subject = 'Plateforme MATOS : prêts arrivant à échéance'
-                    text_content = 'liste des prêts retournés'
+                    text_content = 'liste des emprunts à retourner'
                     msg=EmailMultiAlternatives(subject, text_content, from_email, to)
                     msg.attach_alternative(html_content, "text/html")
                     print(msg)
                     msg.send()
-                    #delta = return_loans[id][0]
-                    #loan.delta = delta

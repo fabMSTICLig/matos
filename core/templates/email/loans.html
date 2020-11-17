@@ -30,11 +30,16 @@
     <table cellpadding="15" style="display: block;  width: 100%;  margin: 1em 0;">
       <thead style="width: auto; position: relative; overflow-x: auto;">
       <tr >
-        <td><h3>Date d'emprunt</h3></td>
+        <td width="200"><h3>Date d'emprunt</h3></td>
 
-        <td><h3>{{loan.checkout_date}}</h3></td>
+        <td width="200"><h3>{{loan.checkout_date}}</h3></td>
 
-        <td><h3>Entité </h3></td>
+        {% if loan.due_date %}
+        <td width="100"><h3>Date de retour prévu</h3></td>
+        <td width="200"><h3>{{loan.due_date}}</h3></td>
+        {% endif %}
+
+        <td width="100"><h3>Entité </h3></td>
 
         <td><h3>{{loan.entity}}</h3></td>
       </tr>
@@ -63,7 +68,7 @@
       </tr>
       {% endfor %}
  </table>
- <p style="margin-top:15px;"><a style="font-size:15px; color:#143b79; text-decoration:underline; margin-top:25px;margin-bottom:15px;" href="http://localhost:8000/#/loan/{{loan.id}}" />Accès au prêt</a></p>
+ <p style="margin-top:15px; margin-bottom:30px;"><a style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;" href="http://localhost:8000/#/loan/{{loan.id}}" />Accès au prêt</a></p>
 
 {% endfor %}
 <table>
