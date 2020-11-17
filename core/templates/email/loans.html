@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+</head>
+{% block content %}
+<h3 style="text-decoration: underline;">plateforme MATOS</h3>
+{% if delta == "day" %}
+<h3>Les matériels suivant sont à rendre demain: </h3>
+{% endif %}
+
+{% if delta == "midweek" %}
+<h3>Les équipements suivant sont à rendre dans 4 jours  </h3>
+{% endif %}
+
+{% if delta == "week" %}
+<h3>Les matériels suivant sont à rendre dans une semaine : </h3>
+{% endif %}
+
+{% for loan in loans %}
+<div style="padding: 0.75rem 1.75rem 2rem 0.55rem;
+              margin-bottom: 0;
+              background-color: rgba(0,0,0,0.03);
+              border-bottom: 1px solid rgba(0,0,0,0.125);
+              min-height: 40px;
+              margin-bottom: 15px;"
+              class="heading">
+    <table cellpadding="15" style="display: block;  width: 100%;  margin: 1em 0;">
+      <thead style="width: auto; position: relative; overflow-x: auto;">
+      <tr >
+        <td><h3>Date d'emprunt</h3></td>
+
+        <td><h3>{{loan.checkout_date}}</h3></td>
+
+        <td><h3>Entité </h3></td>
+
+        <td><h3>{{loan.entity}}</h3></td>
+      </tr>
+    </thead>
+
+    </table>
+
+</div>
+<table cellspacing="0" cellpadding="10" border="0" width="100%">
+    <thead>
+      <tr>
+        <td><b>Matériel</b></td><td><b>Quantité</b></td><td><b>Numéro de série</b>
+      </tr>
+    </thead>
+      {% for material in loan.genericmaterials %}
+      <tr>
+        <td><b>{{material.name}}</b></td>
+        <td><b>{{material.quantity}}</b></td>
+      </tr>
+      {% endfor %}
+      {% for material in loan.specificinstances %}
+      <tr>
+        <td><b>{{material.name}}</b></td>
+        <td>1</td>
+        <td><b>{{material.serial_num}}</b></td>
+      </tr>
+      {% endfor %}
+ </table>
+ <p style="margin-top:15px;"><a style="font-size:15px; color:#143b79; text-decoration:underline; margin-top:25px;margin-bottom:15px;" href="http://localhost:8000/#/loan/{{loan.id}}" />Accès au prêt</a></p>
+
+{% endfor %}
+<table>
+  <tr>
+    <td><img src="https://matos.univ-grenoble-alpes.fr/static/logos-inp-uga.jpg" width="60%"></td>
+    <td><img src="https://matos.univ-grenoble-alpes.fr/static/nanoelec-logo.jpg" width="30%"></td>
+  </tr>
+</table>
+{% endblock %}
+</html>
