@@ -126,7 +126,7 @@ const loans_extra = {
               quantity: 1
             });
           }
-          
+
         }else if (
           state.pending_loan.models.indexOf(mat.id) == -1
         ) {
@@ -136,7 +136,6 @@ const loans_extra = {
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
     removeMaterial(state, mat) {
-      console.log(mat);
       if ("quantity" in mat) {
         state.pending_loan.generic_materials = state.pending_loan.generic_materials.filter(
           item => item.material != mat.id
