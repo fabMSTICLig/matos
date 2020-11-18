@@ -560,7 +560,8 @@ export default {
                 window.scrollTo(0, 0);
               }
               this.errors = [];
-              this.errors.push(e.response.data);
+              this.errors.push(e.response.data.non_field_errors ? e.response.data.non_field_errors[0] : e.response.data);
+              console.log(this.errors);
               window.scrollTo(0, 0);
               // eslint-disable-next-line
               console.log(e.response);
