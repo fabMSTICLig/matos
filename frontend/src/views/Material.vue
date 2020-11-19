@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div class="card" v-if="object">
+      <div class="card" v-if="object && filter_entities && loaded">
         <div class="card-header">
           <h3 class="float-left" v-text="object.name"></h3>
           <div role="group" class="float-right">
@@ -13,6 +13,7 @@
               >
                 Ajouter
               </button>
+              {{objects_filtered}}
               <div
                 :class="
                   show
@@ -21,8 +22,10 @@
                 "
                 @focusout="hide"
                 style="margin-right: 10px;"
-                v-if="isManager"
+                v-if="isManager && filter_entities.length"
+
               >
+
                 <div
                   class="btn btn-primary dropdown-toggle"
                   id="dropdownMenuButton"
@@ -37,7 +40,7 @@
                 >
                   <button
                     class="dropdown-item"
-                    v-for="item in objects_filtered"
+                    v-for="item in filter_entities"
                     :key="item.id"
                     @click="copyMaterial(item)"
                     type="button"
@@ -100,7 +103,9 @@ export default {
       displayed: true,
       entities: [],
       show: false,
-      prefix: ""
+      prefix: "",
+      loaded: false,
+      filter_entities:[]
     };
   },
   computed: {
@@ -116,47 +121,6 @@ export default {
     },
     isManager() {
       return this.authUser.entities.length || this.authUser.is_staff;
-    },
-    objects_filtered() {
-      var prefix = "";
-      var filtered = "";
-      if (this.entities.length) {
-        filtered = this.entities.filter(entity => {
-          return this.authUser.entities.find(
-            managed => managed == entity.id && managed != this.object.entity
-          );
-        });
-        if (this.authUser.is_staff) {
-          filtered = this.entities.filter(entity => {
-            return entity.id != this.object.entity;
-          });
-        }
-        filtered.forEach(entity => {
-          if (this.ressource == "specificmaterials") {
-            prefix = "entities/specificMaterials/instances";
-          }
-          if (this.ressource == "genericmaterials") {
-            prefix = "entities/genericMaterials";
-          }
-          this.$store
-            .dispatch(prefix + "/getMaterials", {
-              id: entity.id
-            })
-            .then(materials => {
-              let presentMaterial = materials.filter(material => {
-                return material.name == this.object.name;
-              });
-              if (presentMaterial.length) {
-                let entityMaterial = filtered.find(
-                  entity => entity.id == presentMaterial[0].entity
-                );
-                var index = filtered.indexOf(entityMaterial);
-                filtered = filtered.splice(index, 1);
-              }
-            });
-        });
-      }
-      return filtered;
     }
   },
   methods: {
@@ -174,6 +138,54 @@ export default {
       if (!this.$el.contains(e.relatedTarget)) {
         this.show = false;
       }
+    },
+    get_entities() {
+      var prefix = "";
+      var filtered = "";
+      let self = this;
+      if (this.entities.length) {
+          filtered = this.entities.filter(entity => {
+          return this.authUser.entities.find(
+            managed => managed == entity.id && managed != this.object.entity
+          );
+
+        });
+        if (this.authUser.is_staff) {
+          filtered = this.entities.filter(entity => {
+            return entity.id != this.object.entity;
+          });
+        }
+
+        if(filtered.length){
+
+          filtered.forEach(entity => {
+            if (this.ressource == "specificmaterials") {
+              prefix = "entities/specificMaterials/instances";
+            }
+            if (this.ressource == "genericmaterials") {
+              prefix = "entities/genericMaterials";
+            }
+
+            this.$store
+              .dispatch(prefix + "/getMaterials", {
+                id: entity.id
+              })
+              .then(materials => {
+                let presentMaterial = materials.filter(material => {
+                  return material.name == this.object.name;
+                });
+
+                if (!presentMaterial.length) {
+                  self.filter_entities.push(entity);
+                }
+              });
+          });
+          self.loaded = true;
+        }
+
+      }
+      self.loaded = true;
+
     },
     copyMaterial(entity) {
       var ressource = "";
@@ -200,7 +212,11 @@ export default {
     }
   },
   beforeMount() {
-    this.$store.dispatch("tags/fetchList");
+
+    var pall = [];
+    pall.push(this.$store.dispatch("specificmaterials/fetchList"));
+    pall.push(this.$store.dispatch("tags/fetchList"));
+
 
     if (this.$route.name == "specificmaterialitem") {
       this.ressource = "specificmaterials";
@@ -209,17 +225,21 @@ export default {
       this.ressource = "genericmaterials";
     }
     if (parseInt(this.$route.params[this.$route.meta.routeparam], -1) != -1) {
-      this.$store
+      pall.push(this.$store
         .dispatch(this.ressource + "/fetchSingle", {
           id: this.$route.params[this.$route.meta.routeparam]
         })
         .then(data => {
           this.object = Object.assign({}, data);
-        });
+        }));
     }
-    this.$store.dispatch("entities/fetchList").then(data => {
+    pall.push(this.$store.dispatch("entities/fetchList").then(data => {
       this.entities = data;
-    });
+    }));
+
+    Promise.all(pall).then(() => {
+      this.get_entities()
+    })
   }
 };
 </script>
