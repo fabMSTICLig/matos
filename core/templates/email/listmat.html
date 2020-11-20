@@ -1,0 +1,16 @@
+<p>Les matériels empruntés sont les suivants :</p>
+<ul>
+{% for matgen in loan.loangenericitem_set.all %}
+<li>{{ matgen.material.name }} ({{ matgen.quantity  }} exemplaire{{ matgen.quantity|pluralize }})</li>
+{% endfor %}
+</ul>
+<ul>
+{% for matspec in loan.specific_materials.all|dictsort:"model.id" %}
+{% ifchanged matspec.model.id %}
+</ul></li>
+<li>{{ matspec.model.name }}
+    <ul>
+{% endifchanged %}
+        <li>{{ matspec.name }}</li>
+{% endfor %}
+</ul>

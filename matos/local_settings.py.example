@@ -2,6 +2,7 @@ import os
 
 DEBUG=True
 
+SITE_URL = "https://exemple.fr"
 # Web acces protections
 ALLOWED_HOSTS = ['localhost']
 CORS_ORIGIN_WHITELIST = [
@@ -40,6 +41,8 @@ EMAIL_TIMEOUT=10
 EMAIL_SENDER = 'admin@example.org'
 # Emails which received notification mails
 EMAIL_ADMIN = ['admin@example.org',]
+NOTIFICATION_SENDER = 'contact@exemple.fr'
+NOTIFICATION_REPLYTO = ['noreply@exemple.fr']
 
 if DEBUG == True:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
