@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+</head>
+<body>
+    <p>Attention vous devez rendre du matériel emprumté à l'entité ENTITE le {{ loan.due_date }}. {{ SITE_URL }}#/loan/{{ loan.id }}</p>
+
+    {% include "email/listmat.html" %}
+
+    <p>Si vous avez déjà rendu le matériel veuillez contacter l'entité {{ loan.entity.name }}</p>
+
+    <p>Ce mail est automatique, veuillez ne pas y répondre directement.</p>
+</body>
