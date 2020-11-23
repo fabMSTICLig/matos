@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+</head>
+<body>
+  Une nouvelle demande de matériels vient d'être faite : <a href="{{ SITE_URL }}#/loan/{{ loan.id }}">accès à la réservation</a>
+  <p>date de sortie : <b>{{loan.checkout_date}}</b></p>
+  <p>date de retour prévue: <b>{{loan.due_date}}</b></p>
+  par {{ loan.user.email }}
+  <p>pour l'entité {{loan.entity.name}}</p>
+<hr />
+
+{% include "email/listmat.html" %}
+
+<p>Ce mail est automatique, veuillez ne pas y répondre directement.</p>
+</body>

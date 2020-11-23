@@ -1,0 +1,10 @@
+{% if status == '4' %}
+Votre demande d'emprunt à été rejetée. {{ SITE_URL }}#/loan/{{ loan.id }}
+{% elif status == '3' %}
+Votre demande d'emprunt à été acceptée. {{ SITE_URL }}#/loan/{{ loan.id }}
+{% endif %}
+{% include "email/listmat.txt" %}
+
+Vous pouvez prendre contact avec l'entité {{loan.entity.name}}
+
+Ce mail est automatique, veuillez ne pas y répondre directement.

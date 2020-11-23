@@ -1,0 +1,14 @@
+{% if status == '3' %}
+<p>Votre demande d'emprunt à été validée.  <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a>
+</p>
+{% endif %}
+{% if status == '4' %}
+<p>Votre demande d'emprunt à été rejetée. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a>
+</p>
+{% endif %}
+
+<p>Vous pouvez prendre contact avec l'entité <b>{{loan.entity.name}}</b><p>
+
+{% include "email/listmat.html" %}
+
+<p>Ce mail est automatique, veuillez ne pas y répondre directement.</p>
