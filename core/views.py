@@ -16,10 +16,15 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 import datetime
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
-
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import get_template,render_to_string
+from django.template import Context
 from .serializers import *
 from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManager, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
-
+from django.core.management import call_command
+from .signals import *
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -361,6 +366,9 @@ class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
         loan = Loan.objects.filter(generic_materials__in=generic_material)
         return loan
 
+
+
+
 class LoanViewSet(viewsets.ModelViewSet):
     """
     Endpoints for loans
@@ -376,7 +384,6 @@ class LoanViewSet(viewsets.ModelViewSet):
             return self.queryset.all()
         return self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()
 
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -388,9 +395,16 @@ class LoanViewSet(viewsets.ModelViewSet):
             if serializer.validated_data['return_date']:
                 serializer.validated_data['return_date']=None
             serializer.validated_data['parent']=None
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        if serializer.is_valid():
+            loan = serializer.save()
+            headers = self.get_success_headers(serializer.data)
+            loan.save()
+            new_loan.send(sender=Loan,instance=loan,loan=loan)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -403,9 +417,12 @@ class LoanViewSet(viewsets.ModelViewSet):
             request.data.update({'parent':instance.parent.id if instance.parent else None})
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
+        if serializer.is_valid():
+            if(instance.status != request.data["status"]):
+                update_loan.send(sender=Loan,status=request.data['status'],loan=instance)
+            loan = self.perform_update(serializer)
+    
+            headers = self.get_success_headers(serializer.data)
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
