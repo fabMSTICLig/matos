@@ -5,8 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 </head>
 <body>
-<p>Attention la date de retour de votre emprumt de matériel est dépassé. {{ SITE_URL }}#/loan/{{ loan.id }}</p>
-<p>Veuillez contacter rapidement l'entité {{ loan.entity.name }} afin de leur retourner le matériel.</p>
+  {% if late %}
+  <p>Attention la date de retour de votre emprunt de matériel est dépassé. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a></p>
+  <p>Veuillez contacter rapidement l'entité {{ loan.entity.name }} afin de leur retourner le matériel.</p>
+  {% elif not late %}
+  <p>Attention la date de retour de votre emprunt de matériel approche. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a></p>
+  <p>Veuillez contacter l'entité {{ loan.entity.name }} afin de leur retourner le matériel.</p>
+  {% endif %}
 
 {% include "email/listmat.html" %}
 

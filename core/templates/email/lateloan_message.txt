@@ -1,6 +1,11 @@
-
-Attention la date de retour de votre emprumt de matériel est dépassé. {{ SITE_URL }}#/loan/{{ loan.id }}
+{% if late %}
+Attention la date de retour de votre emprunt de matériel est dépassé. {{ SITE_URL }}#/loan/{{ loan.id }}
 Veuillez contacter rapidement l'entité {{ loan.entity.name }} afin de leur retourner le matériel.
+{% elif not late %}
+Attention la date de retour de votre emprunt de matériel approche. {{ SITE_URL }}#/loan/{{ loan.id }}
+Prenez contact avec l'entité {{ loan.entity.name }} afin de leur retourner le matériel.
+{% endif %}
+
 
 {% include "email/listmat.txt" %}
 
