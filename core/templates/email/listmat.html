@@ -12,12 +12,12 @@
 {% endfor %}
 </ul>
 <ul>
-{% for matspec in loan.specific_materials.all|dictsort:"model.id" %}
-{% ifchanged matspec.model.id %}
-</ul></li>
-<li>{{ matspec.model.name }}
+{% for model,matlist in loan.get_dict_specmat.items %}
+<li>{{ model.name }}
     <ul>
-{% endifchanged %}
-        <li>{{ matspec.name }}</li>
+    {% for mat in matlist %}
+        <li>{{ mat.name }}</li>
+{% endfor %}
+    </ul></li>
 {% endfor %}
 </ul>

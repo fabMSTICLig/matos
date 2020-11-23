@@ -1,0 +1,1 @@
+[Matos]  Notification retour de matériel prévu le {{ loan.due_date }}.

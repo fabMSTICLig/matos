@@ -189,6 +189,15 @@ class Loan(models.Model):
     def __str__(self):
         return self.user.username +"(" + self.checkout_date.isoformat() + ")"
 
+    def get_dict_specmat(self):
+        dictmat = {}
+        for specmat in self.specific_materials.all():
+            if specmat.model not in dictmat:
+                dictmat[specmat.model]=[]
+            dictmat[specmat.model].append(specmat)
+        print(dictmat)
+        return dictmat
+
 
 class LoanGenericItem(models.Model):
     loan = models.ForeignKey(Loan, on_delete=models.CASCADE)
