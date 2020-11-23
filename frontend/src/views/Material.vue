@@ -13,7 +13,6 @@
               >
                 Ajouter
               </button>
-              {{objects_filtered}}
               <div
                 :class="
                   show
