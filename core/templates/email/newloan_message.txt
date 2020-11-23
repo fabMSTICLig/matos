@@ -1,0 +1,11 @@
+Une nouvelle demande de matériels vient d'être faite {{ SITE_URL }}#/loan/{{ loan.id }}
+date de sortie : {{loan.checkout_date}}
+date de retour prévue: {{loan.due_date}}
+
+par {{ loan.user.email }}
+
+
+{% include "email/listmat.txt" %}
+
+
+Ce mail est automatique, veuillez ne pas y répondre directement.
