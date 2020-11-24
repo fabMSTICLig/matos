@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 </head>
 <body>
-    <p>Attention vous devez rendre du matériel emprumté à l'entité ENTITE le {{ loan.due_date }}. {{ SITE_URL }}#/loan/{{ loan.id }}</p>
+    <p>Attention vous devez rendre du matériel emprunté à l'entité {{ loan.entity.name }} le {{ loan.due_date }}. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;">Accès emprunt</a></p>
 
     {% include "email/listmat.html" %}
 
