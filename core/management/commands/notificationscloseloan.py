@@ -17,7 +17,7 @@ class Command(BaseCommand):
         weeknot = datetime.datetime.today()+datetime.timedelta(days=7)
         midweeknot = datetime.datetime.today()+datetime.timedelta(days=3)
         daybeforenot = datetime.datetime.today()+datetime.timedelta(days=1)
-        loans = Loan.objects.filter(return_date=None).filter(Q(due_date=weeknot)|Q(due_date=midweeknot)|Q(due_date=daybeforenot))
+        loans = Loan.objects.filter(return_date=None).filter(Q(due_date=weeknot)|Q(due_date=midweeknot)|Q(due_date=daybeforenot)).filter(status=3)
 
         for loan in loans:
             context = { 'SITE_URL': settings.SITE_URL, 'loan': loan }
