@@ -8,7 +8,7 @@
 {% endif %}
 <ul>
 {% for matgen in loan.loangenericitem_set.all %}
-<li>{{ matgen.material.name }} ({{ matgen.quantity  }} exemplaire{{ matgen.quantity|pluralize }})</li>
+<li>{{ matgen.material.name }} ({{ matgen.quantity }} exemplaire{{ matgen.quantity|pluralize }})</li>
 {% endfor %}
 </ul>
 <ul>
