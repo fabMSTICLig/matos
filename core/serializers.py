@@ -145,7 +145,6 @@ class LoanSerializer(serializers.ModelSerializer):
 
     def get_models(self, obj):
         models=set()
-        print(obj)
         if hasattr(obj, 'specific_materials'):
             for item in obj.specific_materials.all():
                 if(item.model.entity_id == obj.entity.id):
