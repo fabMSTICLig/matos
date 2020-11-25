@@ -94,7 +94,7 @@ class LoanPermission(permissions.BasePermission):
         ismanager = False
         if isinstance(obj, Loan):
             ismanager = request.user in obj.entity.managers.all()
-            safeDestroy = request.user == obj.user and request.method == 'DELETE' and obj.status == Loan.Status.REQUESTED
+            safeDestroy = request.user == obj.user and request.method == 'DELETE' and obj.status == Loan.Status.CANCELED
         return ismanager or safeDestroy or (request.user == obj.user and request.method != 'DELETE')
 
     def has_permission(self, request, view):

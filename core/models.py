@@ -171,6 +171,7 @@ class Loan(models.Model):
         REQUESTED = 2, 'Demandé'
         ACCEPTED = 3, 'Accepté'
         DENIED = 4, 'Refusé'
+        CANCELED = 1, 'Annulé'
 
     status = models.PositiveSmallIntegerField(
         choices=Status.choices,

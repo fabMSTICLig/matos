@@ -24,6 +24,10 @@ const loans_extra = {
         return data;
       });
     },
+    setStatus( { commit }, { value }) {
+      commit("setStatus", value);
+      return value;
+    },
     makeChild({ commit }, { id }) {
       return ApiService.post("loans/" + id + "/make_child").then(({ data }) => {
         console.log(data);
@@ -50,12 +54,24 @@ const loans_extra = {
           console.log(error);
           return Promise.reject(error);
         });
+    },
+    destroyCanceled({ commit }, {id, data}) {
+      console.log(id)
+      console.log(data)
+      return ApiService.delete("loans/"+id+"/delete_canceled",{loan: data}).then(({ data }) => {
+        commit(
+          "destroyLoanSuccess",
+          data.map(item => item.toString())
+        );
+        return data;
+      });
     }
   },
   mutations: {
     setStatus(state, status) {
       state.status = status;
     },
+
     onLoad(state) {
       if (localStorage.getItem("pending_loan") != null) {
         var loan = JSON.parse(localStorage.getItem("pending_loan"));
@@ -91,7 +107,7 @@ const loans_extra = {
     resetPending(state) {
       state.pending_loan = {
         entity: null,
-        status: null,
+        status: 2,
         user: null,
         due_date: null,
         return_date: null,

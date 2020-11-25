@@ -109,11 +109,13 @@ const createCrud = (ressource, source) => {
         }
       },
       updateSuccess(state, data) {
-        const id = data["id"].toString();
-        Vue.set(state.entities, id, data);
-        const listIndex = state.list.indexOf(id);
-        if (listIndex >= 0) {
-          Vue.set(state.list, listIndex, id);
+        if(data["id"]) {
+          const id = data["id"].toString();
+          Vue.set(state.entities, id, data);
+          const listIndex = state.list.indexOf(id);
+          if (listIndex >= 0) {
+            Vue.set(state.list, listIndex, id);
+          }
         }
       },
       destroySuccess(state, id) {

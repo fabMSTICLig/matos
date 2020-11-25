@@ -17,5 +17,5 @@ def handle_new_loan(sender, instance, **kwargs):
 @receiver(update_loan,sender=Loan)
 def handle_status_loan(sender, status, **kwargs):
     loan = kwargs['loan']
-    if(loan.status != 2):
+    if(status != 2):
         call_command('notificationstatusloan',id=str(loan.id),status=str(status))

@@ -61,7 +61,6 @@
                     <select
                       class="form-control"
                       v-model="pending_loan.status"
-                      :disabled="!canManage"
                     >
                       <option
                         v-for="(val, key) in status"
@@ -375,13 +374,26 @@ export default {
       authUser: "authUser",
       isAdmin: "isAdmin",
       pending_loan: "loans/pending_loan",
-      status: "loans/status",
       loans: "entities/genericMaterials/loans"
     }),
+    status: {
+      get: function() {
+        return this.$store.getters["loans/status"]
+      },
+      set: function(value) {
+        this.$store.dispatch("loans/setStatus", {
+          value: value
+        }).then(data => {
+          console.log(data);
+        })
+      }
+    },
     loanMessageSent() {
       if (this.pending_loan.status == 2) return "La demande a été envoyée";
       if (this.pending_loan.status == 3) return "La demande a été acceptée";
       if (this.pending_loan.status == 4) return "La demande a été refusée";
+      if (this.pending_loan.status == 1) return "La demande a été annulée";
+
       return "La demande a été envoyée";
     },
     labelSubmit() {
@@ -518,28 +530,47 @@ export default {
       ) {
         if (this.pending_loan.return_date == "")
           this.pending_loan.return_date = null;
+
         if (this.updateMode) {
-          this.$store
-            .dispatch("loans/update", {
-              data: this.pending_loan,
-              id: this.pending_loan.id
-            })
-            .then(data => {
-              this.$store.commit("loans/setPending", data);
-              showMsgOk("Le prêt a été modifié");
-              if (this.pending_loan.status == 3) {
-                this.makeChild_btn = true;
-              }
-              this.errors = [];
-            })
-            .catch(e => {
-              if ("non_field_errors" in e.response.data) {
-                this.errors = e.response.data.non_field_errors;
-                window.scrollTo(0, 0);
-              }
-              // eslint-disable-next-line
-              console.log(e.response);
-            });
+
+          if(this.pending_loan.status == 1){
+            this.$store
+              .dispatch("loans/update", {
+                data: this.pending_loan,
+                id: this.pending_loan.id
+              })
+              .then(() => {
+                  showMsgOk("La demande de prêt a été supprimée");
+                  this.newLoan()
+              });
+          }
+          else {
+            this.$store
+              .dispatch("loans/update", {
+                data: this.pending_loan,
+                id: this.pending_loan.id
+              })
+              .then(data => {
+                this.$store.commit("loans/setPending", data);
+                showMsgOk("Le prêt a été modifié");
+                if (this.pending_loan.status == 3) {
+                  this.makeChild_btn = true;
+                }
+                if (this.pending_loan.status == 1) {
+                  //this.newLoan();
+                }
+                this.errors = [];
+              })
+              .catch(e => {
+                if ("non_field_errors" in e.response.data) {
+                  this.errors = e.response.data.non_field_errors;
+                  window.scrollTo(0, 0);
+                }
+                // eslint-disable-next-line
+                console.log(e.response);
+              });
+          }
+
         } else {
           if (this.pending_loan.user == null) {
             this.pending_loan.user = this.authUser.id;
@@ -599,6 +630,7 @@ export default {
     },
     newLoan() {
       this.$store.commit("loans/resetPending");
+      
     },
     makeUserLabel(item) {
       return item.username;
@@ -732,6 +764,7 @@ export default {
   },
   beforeMount() {
     var pall = [];
+    var self = this;
     pall.push(this.$store.dispatch("specificmaterials/fetchList"));
     pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("entities/fetchList"));
@@ -740,6 +773,19 @@ export default {
       pall.push(this.initInstances(item));
     });
     Promise.all(pall).then(() => {
+      if(!self.canManage){
+        self.status = {};
+        var keys = [1,2];
+        var values = ["Annulé","Demandé"];
+        if(this.pending_loan.id) {
+          for(var i = 0; i < keys.length; i++){
+            self.status[keys[i]] = values[i];
+          }
+        }
+        else {
+          self.status[2]="Demandé"
+        }
+      }
       this.loaded = true;
       this.genericMaterialsLoan = this.genericmaterials.filter(material => {
         return this.pending_loan.generic_materials.find(
@@ -756,9 +802,7 @@ export default {
 
       this.loadedLoans = true;
     });
-    if (this.canManage && this.emptyLoan) {
-      this.pending_loan.status = 1;
-    }
+
     if (this.pending_loan.id && this.pending_loan.status == 3) {
       this.$store
         .dispatch("loans/fetchSingle", { id: this.pending_loan.id })

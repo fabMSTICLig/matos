@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 import rest_framework
+import json
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
@@ -367,8 +368,6 @@ class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
         return loan
 
 
-
-
 class LoanViewSet(viewsets.ModelViewSet):
     """
     Endpoints for loans
@@ -411,17 +410,29 @@ class LoanViewSet(viewsets.ModelViewSet):
         if(not request.user.is_staff and request.user not in instance.entity.managers.all()):
             if instance.status == Loan.Status.DENIED or instance.status == Loan.Status.ACCEPTED :
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
-            request.data.update({'status':int(Loan.Status.REQUESTED)})
+            request.data.update({'status':int(request.data["status"])})
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})
             request.data.update({'parent':instance.parent.id if instance.parent else None})
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if not serializer.is_valid():
+            print('probleme')
+            print(serializer.errors)
         if serializer.is_valid():
+            print("valide")
+            print(request.data["status"])
+            print(Loan.Status.REQUESTED)
             if(instance.status != request.data["status"]):
-                update_loan.send(sender=Loan,status=request.data['status'],loan=instance)
+                print("update")
+                if(request.data["status"] != Loan.Status.REQUESTED):
+                    update_loan.send(sender=Loan,status=request.data['status'],loan=instance)
+                    if(request.data["status"] == Loan.Status.CANCELED):
+                        instance.delete()
+                        res = {}
+                        res["id"] = request.data["id"]
+                        return Response(json.dumps(res, indent=2))
             loan = self.perform_update(serializer)
-    
             headers = self.get_success_headers(serializer.data)
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
