@@ -416,24 +416,34 @@ class LoanViewSet(viewsets.ModelViewSet):
             request.data.update({'parent':instance.parent.id if instance.parent else None})
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        if not serializer.is_valid():
-            print('probleme')
-            print(serializer.errors)
+
+        if(instance.status != request.data["status"]):
+            change_status=True
+
+
         if serializer.is_valid():
-            print("valide")
-            print(request.data["status"])
-            print(Loan.Status.REQUESTED)
-            if(instance.status != request.data["status"]):
-                print("update")
-                if(request.data["status"] != Loan.Status.REQUESTED):
-                    update_loan.send(sender=Loan,status=request.data['status'],loan=instance)
-                    if(request.data["status"] == Loan.Status.CANCELED):
-                        instance.delete()
-                        res = {}
-                        res["id"] = request.data["id"]
-                        return Response(json.dumps(res, indent=2))
             loan = self.perform_update(serializer)
+            
+            if(request.data["status"] != Loan.Status.REQUESTED):
+                if(change_status):
+                    update_status_loan.send(sender=Loan,status=request.data['status'],loan=instance)
+                if(request.data["status"] == Loan.Status.CANCELED):
+                    instance.delete()
+                    res = {}
+                    res["id"] = request.data["id"]
+                    return Response(res)
+
+
+            #for mat in genericitem:
+            data = serializer.data
+            print(data["generic_materials"])
             headers = self.get_success_headers(serializer.data)
+
+        if serializer.errors:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
