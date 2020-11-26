@@ -78,7 +78,7 @@
                       v-model="pending_loan.checkout_date"
                       required
                       :disabled="readOnly"
-                      @change="getMaterialAvailability(pending_loan)"
+
                     />
                   </div>
                   <div class="form-group">
@@ -89,7 +89,6 @@
                       v-model="pending_loan.due_date"
                       required
                       :disabled="readOnly"
-                      @change="getMaterialAvailability(pending_loan)"
                     />
                   </div>
                   <div class="form-group" v-if="canManage">
@@ -98,7 +97,6 @@
                       class="form-control"
                       type="date"
                       v-model="pending_loan.return_date"
-                      @change="getMaterialAvailability(pending_loan)"
                     />
                   </div>
 
@@ -186,7 +184,7 @@
                           <td class="col-6">
                             <span class="text-danger"
                               >Quantité disponible dépassée :
-                              {{ loansMaterialQuantity(material_loan) }}</span
+                            </span
                             >
                           </td>
                           <td class="col-6">
@@ -337,7 +335,7 @@ import DynList from "@/components/DynList";
 import { showMsgOk } from "@/components/Modal";
 import InputDatalist from "@/components/InputDatalist";
 import { MaterialAvailability } from "@/common/mixins";
-import { DataHelper } from "@/common/helpers";
+//import { DataHelper } from "@/common/helpers";
 export default {
   name: "Loan",
   mixins: [MaterialAvailability],
@@ -503,18 +501,10 @@ export default {
         })
         .then(data => {
           Vue.set(this.specificinstances, item, data);
-          this.getMaterialAvailability(this.pending_loan);
+          //this.getMaterialAvailability(this.pending_loan);
         });
     },
-    maxQuantity(item) {
-      let materialBorrowed = this.borrowedMaterials.find(
-        material => material == item
-      );
-      let quantityAvailable = this.maxQuantitiesLoan.find(
-        material => material == item
-      );
-      return materialBorrowed || quantityAvailable ? false : true;
-    },
+
     submitLoan(e) {
       e.preventDefault();
       this.checkErrors();
@@ -639,99 +629,27 @@ export default {
           this.goTo(data.id);
         });
     },
-    getQuantityMax(genericitem) {
-      let materialLoan = this.genericMaterialsLoan.find(
-        generic_material => generic_material.id == genericitem.material
-      );
-      let materialMaxQuantity = DataHelper.hasObject(
-        genericitem,
-        "material",
-        this.maxQuantities
-      );
-      let materialMaxLoanQuantity = DataHelper.hasObject(
-        genericitem,
-        "material",
-        this.maxQuantitiesLoan
-      );
-      let indexMax = this.maxQuantities.indexOf(materialMaxQuantity);
+    getQuantityMax() {
+
+
 
       // quantité maximale dépassée
 
-      if (
-        genericitem.quantity > materialLoan.quantity &&
-        materialLoan.quantity !== 0
-      ) {
-        if (
-          (!materialMaxQuantity || !this.maxQuantities.length) &&
-          !materialMaxLoanQuantity
-        ) {
-          this.maxQuantities.push(genericitem.material);
-        }
-      }
-
-      if (
-        this.totalGenericMaterials &&
-        this.loadedLoans &&
-        materialLoan.quantity !== 0
-      ) {
-        let materialBorrowed = this.totalGenericMaterials.find(
-          material => material.id == genericitem.material
-        );
 
         // quantité empruntée supérieure ou égale au stock total
 
-        if (materialBorrowed.quantity >= materialLoan.quantity) {
-          let itemDisabled = DataHelper.hasObject(
-            genericitem,
-            "material",
-            this.disabled
-          );
 
-          if (
-            !itemDisabled &&
-            DataHelper.hasObject(
-              genericitem,
-              "material",
-              this.borrowedMaterials
-            )
-          ) {
-            this.disabled.push(genericitem.material);
-            this.maxQuantities.splice(indexMax, 1);
-          }
-          return true;
-        }
+            //this.disabled.push(genericitem.material);
+            //this.maxQuantities.splice(indexMax, 1);
 
-        let quantityDelta =
-          Number(materialLoan.quantity) - materialBorrowed.quantity;
-        let materialMaxQuantity = DataHelper.hasObject(
-          genericitem,
-          "material",
-          this.maxQuantities
-        );
-
-        if (!materialBorrowed.quantity) {
-          quantityDelta = 0;
-        }
-
-        let sumQuantity = Number(genericitem.quantity) + quantityDelta;
+          //return true;
 
         // quantité supérieure au stock disponible
 
-        if (genericitem.quantity > quantityDelta) {
-          if (!materialMaxLoanQuantity && quantityDelta > 0) {
-            this.maxQuantitiesLoan.push(genericitem.material);
-            this.maxQuantities.splice(indexMax, 1);
-          }
-        }
-
         // quantité supérieure ou égale au stock total
 
-        if (sumQuantity > materialLoan.quantity) {
-          if (!materialMaxQuantity && quantityDelta == 0) {
-            this.maxQuantities.push(genericitem.material);
-          }
-        }
-      }
+
+
 
       return false;
     },
@@ -741,15 +659,7 @@ export default {
       );
       return materialDisabled ? true : false;
     },
-    loansMaterialQuantity(item) {
-      let matgen = this.totalGenericMaterials.find(
-        material => material.id == item
-      );
-      let materialLoan = this.genericMaterialsLoan.find(
-        generic_material => generic_material.id == item
-      );
-      return materialLoan.quantity - matgen.quantity;
-    }
+
   },
   beforeMount() {
     var pall = [];
