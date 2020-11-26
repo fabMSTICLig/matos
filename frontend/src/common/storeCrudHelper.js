@@ -116,7 +116,7 @@ const createCrud = (ressource, source) => {
           if (listIndex >= 0) {
             Vue.set(state.list, listIndex, id);
           }
-        }
+        }          
       },
       destroySuccess(state, id) {
         const listIndex = state.list.indexOf(id.toString());
