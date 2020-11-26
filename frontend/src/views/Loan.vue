@@ -532,33 +532,23 @@ export default {
           this.pending_loan.return_date = null;
 
         if (this.updateMode) {
-
-          if(this.pending_loan.status == 1){
-            this.$store
-              .dispatch("loans/update", {
-                data: this.pending_loan,
-                id: this.pending_loan.id
-              })
-              .then(() => {
-                  showMsgOk("La demande de prêt a été supprimée");
-                  this.newLoan()
-              });
-          }
-          else {
             this.$store
               .dispatch("loans/update", {
                 data: this.pending_loan,
                 id: this.pending_loan.id
               })
               .then(data => {
-                this.$store.commit("loans/setPending", data);
-                showMsgOk("Le prêt a été modifié");
+                if(this.pending_loan.status == 1) {
+                  showMsgOk("La demande de prêt a été supprimée");
+                  this.newLoan()
+                } else {
+                  this.$store.commit("loans/setPending", data);
+                  showMsgOk("Le prêt a été modifié");
+                }
                 if (this.pending_loan.status == 3) {
                   this.makeChild_btn = true;
                 }
-                if (this.pending_loan.status == 1) {
-                  //this.newLoan();
-                }
+
                 this.errors = [];
               })
               .catch(e => {
@@ -569,7 +559,6 @@ export default {
                 // eslint-disable-next-line
                 console.log(e.response);
               });
-          }
 
         } else {
           if (this.pending_loan.user == null) {
@@ -630,7 +619,7 @@ export default {
     },
     newLoan() {
       this.$store.commit("loans/resetPending");
-      
+
     },
     makeUserLabel(item) {
       return item.username;
