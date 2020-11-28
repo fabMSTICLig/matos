@@ -17,14 +17,14 @@
             <ul>
               <li>
                 <p class="text-justify">
-                Une <strong>Entité</strong> peut être un laboratoire, une
-                composante universitaire, un service d'un laboratoire, une
-                plateforme technique, ...
-                Chaque entité peut avoir une granularité différente et un fonctionnement différent. Il est
-                donc conseillé de lire la description de l'entité chez qui l'on
-                souhaite emprunter du matériel. Si vous souhaitez prêter du
-                matériel et créer une entité, veuillez contacter les
-                administrateurs du site.
+                  Une <strong>Entité</strong> peut être un laboratoire, une
+                  composante universitaire, un service d'un laboratoire, une
+                  plateforme technique, ... Chaque entité peut avoir une
+                  granularité différente et un fonctionnement différent. Il est
+                  donc conseillé de lire la description de l'entité chez qui
+                  l'on souhaite emprunter du matériel. Si vous souhaitez prêter
+                  du matériel et créer une entité, veuillez contacter les
+                  administrateurs du site.
                 </p>
               </li>
               <li>
@@ -33,22 +33,22 @@
                 <ul>
                   <li>
                     <p class="text-justify">
-                    Le matériel <strong>Spécifique</strong> correspond au
-                    matériel dont on ne peut pas intervertir les instances. Par
-                    exemple le fablab possède 10 tablettes MarqueX (10
-                    instances), chaque tablette a un numéro de série, s'il prête
-                    la tablette 1 (l'instance 1), il est important que ce soit
-                    la tablette 1 qui revienne.
+                      Le matériel <strong>Spécifique</strong> correspond au
+                      matériel dont on ne peut pas intervertir les instances.
+                      Par exemple le fablab possède 10 tablettes MarqueX (10
+                      instances), chaque tablette a un numéro de série, s'il
+                      prête la tablette 1 (l'instance 1), il est important que
+                      ce soit la tablette 1 qui revienne.
                     </p>
                   </li>
                   <li>
                     <p class="text-justify">
-                    Le matériel <strong>Générique</strong> correspond au matériel
-                    dont on peut intervertir les instances. Par exemple le
-                    fablab possède des cartes Arduino Uno, quand il prête une
-                    carte Arduino Uno, il souhaite qu'une carte Arduino Uno
-                    soit retournée, mais ce n'est pas très grave si ce n'est pas
-                    la même que celle prêtée.
+                      Le matériel <strong>Générique</strong> correspond au
+                      matériel dont on peut intervertir les instances. Par
+                      exemple le fablab possède des cartes Arduino Uno, quand il
+                      prête une carte Arduino Uno, il souhaite qu'une carte
+                      Arduino Uno soit retournée, mais ce n'est pas très grave
+                      si ce n'est pas la même que celle prêtée.
                     </p>
                   </li>
                 </ul>

@@ -84,17 +84,15 @@ const routes = [
     component: () => import(/* webpackChunkName: "loan" */ "../views/Loan.vue"),
     children: [
       {
-        path:':loanid',
+        path: ":loanid",
         component: () =>
-          import(
-            /* webpackChunkName: "loan" */ "../views/Loan.vue"
-          ),
+          import(/* webpackChunkName: "loan" */ "../views/Loan.vue"),
         name: "loan_instance",
         meta: {
-          routeparam:"loanid",
+          routeparam: "loanid",
           breadcumb: {
             label: "prêt",
-            name:"loan_instance"
+            name: "loan_instance"
           }
         }
       }

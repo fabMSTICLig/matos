@@ -115,7 +115,6 @@ export default {
           });
           this.item = selected_item[0];
         }
-        console.log(this.item);
       });
   },
   mounted() {

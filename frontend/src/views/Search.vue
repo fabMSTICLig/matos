@@ -115,8 +115,7 @@
                   @click="addItem(item)"
                   :class="{
                     disabled:
-                      (pending_loan.entity &&
-                        pending_loan.entity != item.entity)
+                      pending_loan.entity && pending_loan.entity != item.entity
                   }"
                   title="Les matériels d'un prêt doivent tous appartenir à la même entité"
                 >

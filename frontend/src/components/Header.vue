@@ -139,8 +139,10 @@ export default {
     loanQuantity() {
       if (this.pending_loan)
         return (
-          this.pending_loan.generic_materials.reduce((a,v)=>a+parseInt(v.quantity),0) +
-          this.pending_loan.models.length
+          this.pending_loan.generic_materials.reduce(
+            (a, v) => a + parseInt(v.quantity),
+            0
+          ) + this.pending_loan.models.length
         );
       else return "";
     }

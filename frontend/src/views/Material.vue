@@ -22,9 +22,7 @@
                 @focusout="hide"
                 style="margin-right: 10px;"
                 v-if="isManager && filter_entities.length"
-
               >
-
                 <div
                   class="btn btn-primary dropdown-toggle"
                   id="dropdownMenuButton"
@@ -104,7 +102,7 @@ export default {
       show: false,
       prefix: "",
       loaded: false,
-      filter_entities:[]
+      filter_entities: []
     };
   },
   computed: {
@@ -143,11 +141,10 @@ export default {
       var filtered = "";
       let self = this;
       if (this.entities.length) {
-          filtered = this.entities.filter(entity => {
+        filtered = this.entities.filter(entity => {
           return this.authUser.entities.find(
             managed => managed == entity.id && managed != this.object.entity
           );
-
         });
         if (this.authUser.is_staff) {
           filtered = this.entities.filter(entity => {
@@ -155,8 +152,7 @@ export default {
           });
         }
 
-        if(filtered.length){
-
+        if (filtered.length) {
           filtered.forEach(entity => {
             if (this.ressource == "specificmaterials") {
               prefix = "entities/specificMaterials/instances";
@@ -181,10 +177,8 @@ export default {
           });
           self.loaded = true;
         }
-
       }
       self.loaded = true;
-
     },
     copyMaterial(entity) {
       var ressource = "";
@@ -211,11 +205,9 @@ export default {
     }
   },
   beforeMount() {
-
     var pall = [];
     pall.push(this.$store.dispatch("specificmaterials/fetchList"));
     pall.push(this.$store.dispatch("tags/fetchList"));
-
 
     if (this.$route.name == "specificmaterialitem") {
       this.ressource = "specificmaterials";
@@ -224,21 +216,25 @@ export default {
       this.ressource = "genericmaterials";
     }
     if (parseInt(this.$route.params[this.$route.meta.routeparam], -1) != -1) {
-      pall.push(this.$store
-        .dispatch(this.ressource + "/fetchSingle", {
-          id: this.$route.params[this.$route.meta.routeparam]
-        })
-        .then(data => {
-          this.object = Object.assign({}, data);
-        }));
+      pall.push(
+        this.$store
+          .dispatch(this.ressource + "/fetchSingle", {
+            id: this.$route.params[this.$route.meta.routeparam]
+          })
+          .then(data => {
+            this.object = Object.assign({}, data);
+          })
+      );
     }
-    pall.push(this.$store.dispatch("entities/fetchList").then(data => {
-      this.entities = data;
-    }));
+    pall.push(
+      this.$store.dispatch("entities/fetchList").then(data => {
+        this.entities = data;
+      })
+    );
 
     Promise.all(pall).then(() => {
-      this.get_entities()
-    })
+      this.get_entities();
+    });
   }
 };
 </script>
