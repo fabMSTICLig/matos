@@ -348,8 +348,10 @@ class SpecificMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
         entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
             raise PermissionDenied("You are not a manager of this entity")
-        loan = Loan.objects.filter(specific_materials__in=specific_material)
-        return loan
+        loans = Loan.objects.filter(specific_materials__in=specific_material)
+        return loans
+
+
 
 
 class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
@@ -360,12 +362,10 @@ class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (RGPDAccept, IsAuthenticated,)
     serializer_class = LoanSerializer
     def get_queryset(self, **kwargs):
-        print(self.kwargs)
         generic_material = GenericMaterial.objects.filter(pk=self.kwargs['genericmaterial_pk'])
-        print(generic_material)
-        #return self.queryset.filter(pk=self.kwargs['specificmaterial_pk'])
-        loan = Loan.objects.filter(generic_materials__in=generic_material)
-        return loan
+        loans = Loan.objects.filter(generic_materials__in=generic_material)
+        return loans
+
 
 
 class LoanViewSet(viewsets.ModelViewSet):
@@ -407,32 +407,32 @@ class LoanViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+
         if(not request.user.is_staff and request.user not in instance.entity.managers.all()):
-            if instance.status == Loan.Status.DENIED or instance.status == Loan.Status.ACCEPTED :
+            if (instance.status == Loan.Status.DENIED or instance.status == Loan.Status.ACCEPTED) :
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
             request.data.update({'status':int(request.data["status"])})
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})
             request.data.update({'parent':instance.parent.id if instance.parent else None})
+
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-
+        change_status=False
         if(instance.status != request.data["status"]):
             change_status=True
 
-
         if serializer.is_valid():
             loan = self.perform_update(serializer)
-            
-            if(request.data["status"] != Loan.Status.REQUESTED):
+            if(int(request.data["status"]) != Loan.Status.REQUESTED):
                 if(change_status):
                     update_status_loan.send(sender=Loan,status=request.data['status'],loan=instance)
-                if(request.data["status"] == Loan.Status.CANCELED):
+                if(int(request.data["status"]) == Loan.Status.CANCELED):
+                    print("annulation pret")
                     instance.delete()
                     res = {}
                     res["id"] = request.data["id"]
                     return Response(res)
-
 
             #for mat in genericitem:
             data = serializer.data

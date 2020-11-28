@@ -58,10 +58,7 @@
                   </div>
                   <div class="form-group">
                     <label>Status :</label>
-                    <select
-                      class="form-control"
-                      v-model="pending_loan.status"
-                    >
+                    <select class="form-control" v-model="pending_loan.status">
                       <option
                         v-for="(val, key) in status"
                         v-text="val"
@@ -78,7 +75,6 @@
                       v-model="pending_loan.checkout_date"
                       required
                       :disabled="readOnly"
-
                     />
                   </div>
                   <div class="form-group">
@@ -184,8 +180,7 @@
                           <td class="col-6">
                             <span class="text-danger"
                               >Quantité disponible dépassée :
-                            </span
-                            >
+                            </span>
                           </td>
                           <td class="col-6">
                             <span class="text-danger float-right">{{
@@ -358,7 +353,7 @@ export default {
       disabled: [],
       loadedLoans: false,
       borrowedMaterials: [],
-      idRoute:""
+      idRoute: ""
     };
   },
   computed: {
@@ -369,21 +364,20 @@ export default {
       smById: "specificmaterials/byId",
       entityById: "entities/byId",
       loanById: "loans/byId",
+      pending_loan: "loans/pending_loan",
       authUser: "authUser",
       isAdmin: "isAdmin",
-      pending_loan: "loans/pending_loan",
       loans: "entities/genericMaterials/loans"
     }),
     status: {
       get: function() {
-        return this.$store.getters["loans/status"]
+        return this.$store.getters["loans/status"];
       },
       set: function(value) {
-        this.$store.dispatch("loans/setStatus", {
-          value: value
-        }).then(data => {
-          console.log(data);
-        })
+        this.$store
+          .dispatch("loans/setStatus", {
+            value: value
+          })
       }
     },
     loanMessageSent() {
@@ -446,48 +440,42 @@ export default {
   watch: {
     pending_loan: {
       handler() {
-        let materials_generic = this.pending_loan.generic_materials;
-        this.maxQuantities = [];
-        this.maxQuantitiesLoan = [];
+        if (!this.canManage) {
+          this.status = {};
+          var keys = [1, 2];
+          var values = ["Annulé", "Demandé"];
 
-        materials_generic.forEach(item => {
-          let prevDisabled = this.disabled.find(
-            material => material == item.material
-          );
-          var index = this.disabled.indexOf(prevDisabled);
-          if (prevDisabled) {
-            this.disabled.splice(index, 1);
+          if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
+            for (var i = 0; i < keys.length; i++) {
+              this.status[keys[i]] = values[i];
+            }
           }
-        });
-        this.borrowedMaterials = this.getGenericMaterialAvailability(
-          this.pending_loan
-        );
-
-        this.totalGenericMaterials = this.getTotalGenericMaterial(
-          this.pending_loan
-        );
+          else if (this.pending_loan.status == 3) {
+            this.status[3] = "Accepté";
+          }
+          else if (this.pending_loan.status == 4 ) {
+            this.status[4] = "Refusé";
+          }
+        }
         this.$store.commit("loans/savePending");
       },
       deep: true
     },
-    '$route.params.loanid': {
-        handler: function(loanid) {
-           console.log(loanid);
-           this.idRoute = loanid;
-           if(loanid) {
-             this.$store.dispatch("loans/list")
-             .then(loans => {
-               let pending_loan = loans.find( loan => loan.id == loanid);
-               if(pending_loan) {
-                 this.goTo(pending_loan.id);
-               }
-             });
-           }
-
-        },
-        deep: true,
-        immediate: true
-      }
+    "$route.params.loanid": {
+      handler: function(loanid) {
+        this.idRoute = loanid;
+        if (loanid) {
+          this.$store.dispatch("loans/list").then(loans => {
+            let pending_loan = loans.find(loan => loan.id == loanid);
+            if (pending_loan) {
+              this.goTo(pending_loan.id);
+            }
+          });
+        }
+      },
+      deep: true,
+      immediate: true
+    }
   },
   methods: {
     ...mapMutations({
@@ -522,34 +510,33 @@ export default {
           this.pending_loan.return_date = null;
 
         if (this.updateMode) {
-            this.$store
-              .dispatch("loans/update", {
-                data: this.pending_loan,
-                id: this.pending_loan.id
-              })
-              .then(data => {
-                if(this.pending_loan.status == 1) {
-                  showMsgOk("La demande de prêt a été supprimée");
-                  this.newLoan()
-                } else {
-                  this.$store.commit("loans/setPending", data);
-                  showMsgOk("Le prêt a été modifié");
-                }
-                if (this.pending_loan.status == 3) {
-                  this.makeChild_btn = true;
-                }
+          this.$store
+            .dispatch("loans/update", {
+              data: this.pending_loan,
+              id: this.pending_loan.id
+            })
+            .then(data => {
+              if (this.pending_loan.status == 1) {
+                showMsgOk("La demande de prêt a été supprimée");
+                this.newLoan();
+              } else {
+                this.$store.commit("loans/setPending", data);
+                showMsgOk("Le prêt a été modifié");
+              }
+              if (this.pending_loan.status == 3) {
+                this.makeChild_btn = true;
+              }
 
-                this.errors = [];
-              })
-              .catch(e => {
-                if ("non_field_errors" in e.response.data) {
-                  this.errors = e.response.data.non_field_errors;
-                  window.scrollTo(0, 0);
-                }
-                // eslint-disable-next-line
+              this.errors = [];
+            })
+            .catch(e => {
+              if ("non_field_errors" in e.response.data) {
+                this.errors = e.response.data.non_field_errors;
+                window.scrollTo(0, 0);
+              }
+              // eslint-disable-next-line
                 console.log(e.response);
-              });
-
+            });
         } else {
           if (this.pending_loan.user == null) {
             this.pending_loan.user = this.authUser.id;
@@ -570,7 +557,11 @@ export default {
                 window.scrollTo(0, 0);
               }
               this.errors = [];
-              this.errors.push(e.response.data.non_field_errors ? e.response.data.non_field_errors[0] : e.response.data);
+              this.errors.push(
+                e.response.data.non_field_errors
+                  ? e.response.data.non_field_errors[0]
+                  : e.response.data
+              );
               console.log(this.errors);
               window.scrollTo(0, 0);
               // eslint-disable-next-line
@@ -609,7 +600,6 @@ export default {
     },
     newLoan() {
       this.$store.commit("loans/resetPending");
-
     },
     makeUserLabel(item) {
       return item.username;
@@ -630,27 +620,6 @@ export default {
         });
     },
     getQuantityMax() {
-
-
-
-      // quantité maximale dépassée
-
-
-        // quantité empruntée supérieure ou égale au stock total
-
-
-            //this.disabled.push(genericitem.material);
-            //this.maxQuantities.splice(indexMax, 1);
-
-          //return true;
-
-        // quantité supérieure au stock disponible
-
-        // quantité supérieure ou égale au stock total
-
-
-
-
       return false;
     },
     disabledItem(item) {
@@ -658,8 +627,7 @@ export default {
         material => material == item.material
       );
       return materialDisabled ? true : false;
-    },
-
+    }
   },
   beforeMount() {
     var pall = [];
@@ -672,17 +640,21 @@ export default {
       pall.push(this.initInstances(item));
     });
     Promise.all(pall).then(() => {
-      if(!self.canManage){
+      if (!self.canManage) {
         self.status = {};
-        var keys = [1,2];
-        var values = ["Annulé","Demandé"];
-        if(this.pending_loan.id) {
-          for(var i = 0; i < keys.length; i++){
+        var keys = [1, 2];
+        var values = ["Annulé", "Demandé"];
+
+        if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
+          for (var i = 0; i < keys.length; i++) {
             self.status[keys[i]] = values[i];
           }
         }
-        else {
-          self.status[2]="Demandé"
+        else if (this.pending_loan.status == 3) {
+          self.status[3] = "Accepté";
+        }
+        else if (this.pending_loan.status == 4 ) {
+          self.status[4] = "Refusé";
         }
       }
       this.loaded = true;
@@ -698,7 +670,6 @@ export default {
       this.totalGenericMaterials = this.getTotalGenericMaterial(
         this.pending_loan
       );
-
       this.loadedLoans = true;
     });
 

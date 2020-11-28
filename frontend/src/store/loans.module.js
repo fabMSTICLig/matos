@@ -24,7 +24,7 @@ const loans_extra = {
         return data;
       });
     },
-    setStatus( { commit }, { value }) {
+    setStatus({ commit }, { value }) {
       commit("setStatus", value);
       return value;
     },
@@ -54,17 +54,6 @@ const loans_extra = {
           console.log(error);
           return Promise.reject(error);
         });
-    },
-    destroyCanceled({ commit }, {id, data}) {
-      console.log(id)
-      console.log(data)
-      return ApiService.delete("loans/"+id+"/delete_canceled",{loan: data}).then(({ data }) => {
-        commit(
-          "destroyLoanSuccess",
-          data.map(item => item.toString())
-        );
-        return data;
-      });
     }
   },
   mutations: {
@@ -127,25 +116,21 @@ const loans_extra = {
         state.pending_loan.entity &&
         state.pending_loan.entity == mat.entity
       ) {
-        if("quantity" in mat)
-        {
+        if ("quantity" in mat) {
           let gen_mat_items = state.pending_loan.generic_materials;
           let gen_mat_included = gen_mat_items.find(item => {
             return item.material == mat.id;
           });
 
           if (gen_mat_included) {
-              gen_mat_included.quantity = gen_mat_included.quantity+1
+            gen_mat_included.quantity = gen_mat_included.quantity + 1;
           } else {
             state.pending_loan.generic_materials.push({
               material: mat.id,
               quantity: 1
             });
           }
-
-        }else if (
-          state.pending_loan.models.indexOf(mat.id) == -1
-        ) {
+        } else if (state.pending_loan.models.indexOf(mat.id) == -1) {
           state.pending_loan.models.push(mat.id);
         }
       }

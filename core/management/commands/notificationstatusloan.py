@@ -22,8 +22,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if(options['id']) and (options['status']):
             loan = Loan.objects.get(pk=options['id'])
-            print('options status')
-            print(options['status'])
             tpl_name=''
             if(options['status'] == '3'):
                 tpl_name = 'valide'

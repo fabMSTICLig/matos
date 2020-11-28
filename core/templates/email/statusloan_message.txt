@@ -10,6 +10,8 @@ Vous pouvez prendre contact avec l'entité {{loan.entity.name}}
 
 {% if status == '1' %}
 La demande de prêt suivante a été annulée par {{loan.user.username}}
+email: {{loan.user.email}}
+pour l'entité {{loan.entity.name}}
 
 {{loan.user.email}}
 
