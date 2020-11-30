@@ -38,6 +38,7 @@ class Command(BaseCommand):
             )
             msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [email_entity.contact])
             msg.attach_alternative(html_content, "text/html")
-            print(msg.message())
-            msg.send()
-            print('email envoyé')
+            try:
+                msg.send()
+            except:
+                print("fail to send notif to "+email_entity.contact)
