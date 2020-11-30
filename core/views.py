@@ -242,6 +242,49 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = GenericMaterialSerializer
 
+    @action(methods=['post'], detail=True)
+    def availability(self, request, *args, **kwargs):
+        """
+        Get availability of material
+        """
+        generic_material = GenericMaterial.objects.filter(pk=self.kwargs['pk'])
+        print(generic_material)
+        loans_current = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).all()
+        loans_ended = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).all()
+        if('due_date' in request.data):
+            loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).all()
+        if('return_date' in request.data):
+            loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).all()
+        quantity=generic_material.first().quantity
+        total=0
+        print(quantity)
+
+        loans_list = []
+        if loans_current:
+            loans_list.append(loans_current)
+            print("loans current")
+            print(loans_current)
+        if loans_ended :
+            loans_list.append(loans_ended)
+            print("ended loans")
+            print(loans_ended)
+
+        if loans_next:
+            loans_list.append(loans_next)
+            print("next loans")
+            print(loans_next)
+
+        for loans in loans_list:
+            for loan in loans:
+                item = loan.loangenericitem_set.filter(material=self.kwargs['pk']).first()
+                print(item)
+                total+=item.quantity
+        
+        if total > 0:
+            quantity = quantity - total
+
+        return Response({"id_mat": self.kwargs["pk"], "quantity": quantity}, status=status.HTTP_200_OK)
+
 class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Public endpoints for generic material
@@ -323,6 +366,31 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=True)
+    def availability(self, request, *args, **kwargs):
+        """
+        Get availability of material
+        """
+
+        specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['pk'])
+
+        loans_current = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).distinct().first()
+        loans_ended = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).first()
+        if('due_date' in request.data):
+            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).first()
+        if('return_date' in request.data):
+            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).first()
+
+        res = {}
+        if loans_current:
+            res["currentloans"]=loans_current.id
+        if loans_ended:
+            res["endedloans"]=loans_ended.id
+        if loans_next:
+            res["nextloans"]=loans_next.id
+
+        return Response(res, status=status.HTTP_200_OK)
 
 class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     """

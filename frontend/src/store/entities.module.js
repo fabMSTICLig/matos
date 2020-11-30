@@ -1,6 +1,6 @@
 import createCrud from "@/common/storeCrudHelper";
 import ApiService from "@/common/api.service";
-import { SET_MATERIAL_LOANS, SET_MATERIALS } from "./mutations.type";
+import { SET_MATERIAL_LOANS, SET_MATERIALS, SET_MATERIAL_AVAILABILITY } from "./mutations.type";
 
 const instances_extra = {
   state: {
@@ -96,6 +96,46 @@ const generic_extra = {
         });
     },
 
+    getMaterialAvailability({ commit }, { id_entity, id_mat, data }) {
+      console.log(id_entity)
+      console.log(id_mat)
+      /** if(model) {
+        return ApiService.query(
+          "entities/" +
+            id_entity +
+            "/specificmaterials/" +
+            model +
+            "/instances/" +
+            id_mat +
+            "/availability",
+          {}
+        ).then(({ data }) => {
+          commit(SET_MATERIAL_AVAILABILITY, data);
+          return data;
+        })
+        .catch(e => {
+          console.log(e);
+        })
+      }**/
+
+        return ApiService.post(
+          "entities/" +
+            id_entity +
+            "/genericmaterials/" +
+            id_mat +
+            "/availability",
+          data
+        )
+        .then(({ data }) => {
+          commit(SET_MATERIAL_AVAILABILITY, data);
+          return data;
+        })
+        .catch(e => {
+          console.log(e);
+        })
+
+    },
+
     getMaterials({ commit }, { id }) {
       return ApiService.query("entities/" + id + "/genericmaterials")
         .then(({ data }) => {
@@ -113,6 +153,9 @@ const generic_extra = {
     },
     setMaterials(state, materials) {
       state.materials = materials;
+    },
+    setMaterialAvailability(state, materialAvailability) {
+      state.materialAvailability = materialAvailability
     }
   }
 };

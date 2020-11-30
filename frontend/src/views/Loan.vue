@@ -125,7 +125,6 @@
                           class="d-flex"
                           v-for="item in pending_loan.generic_materials"
                           :key="'g' + item.material"
-                          :readOnly="getQuantityMax(item)"
                         >
                           <td class="col-8 disabled">
                             {{ gmById(item.material) | field("name") }}
@@ -153,38 +152,21 @@
                           </td>
                         </tr>
 
+
                         <tr
                           class="d-flex"
                           v-show="maxQuantities.length"
-                          v-for="material in maxQuantities"
-                          :key="material"
+                          v-for="material_loan in maxQuantities"
+                          :key="material_loan.id"
                         >
-                          <td class="col-6">
+                          <td class="col-7">
                             <span class="text-danger"
-                              >Quantité maximum dépassée :
-                              {{ gmById(material) | field("quantity") }}</span
-                            >
-                          </td>
-                          <td class="col-6">
-                            <span class="text-danger float-right">{{
-                              gmById(material) | field("name")
-                            }}</span>
-                          </td>
-                        </tr>
-                        <tr
-                          class="d-flex"
-                          v-show="maxQuantitiesLoan.length"
-                          v-for="material_loan in maxQuantitiesLoan"
-                          :key="material_loan"
-                        >
-                          <td class="col-6">
-                            <span class="text-danger"
-                              >Quantité disponible dépassée :
+                              >Quantité disponible dépassée : {{ material_loan.quantity }}
                             </span>
                           </td>
-                          <td class="col-6">
+                          <td class="col-5">
                             <span class="text-danger float-right">{{
-                              gmById(material_loan) | field("name")
+                              material_loan.name
                             }}</span>
                           </td>
                         </tr>
@@ -329,11 +311,8 @@ import { mapGetters, mapMutations } from "vuex";
 import DynList from "@/components/DynList";
 import { showMsgOk } from "@/components/Modal";
 import InputDatalist from "@/components/InputDatalist";
-import { MaterialAvailability } from "@/common/mixins";
-//import { DataHelper } from "@/common/helpers";
 export default {
   name: "Loan",
-  mixins: [MaterialAvailability],
   components: {
     DynList,
     InputDatalist
@@ -348,11 +327,8 @@ export default {
       selected: [],
       maxQuantities: [],
       maxQuantitiesLoan: [],
-      totalGenericMaterials: [],
       genericMaterialsLoan: [],
       disabled: [],
-      loadedLoans: false,
-      borrowedMaterials: [],
       idRoute: ""
     };
   },
@@ -435,7 +411,8 @@ export default {
         : this.updateMode
         ? "Modification prêt"
         : "Nouveau prêt";
-    }
+    },
+
   },
   watch: {
     pending_loan: {
@@ -526,7 +503,6 @@ export default {
               if (this.pending_loan.status == 3) {
                 this.makeChild_btn = true;
               }
-
               this.errors = [];
             })
             .catch(e => {
@@ -619,14 +595,21 @@ export default {
           this.goTo(data.id);
         });
     },
-    getQuantityMax() {
-      return false;
-    },
     disabledItem(item) {
       let materialDisabled = this.disabled.find(
         material => material == item.material
       );
       return materialDisabled ? true : false;
+    },
+    checkQuantities() {
+      for(let i=0; i<= this.pending_loan.generic_materials.length-1;i++) {
+        let itemgeneric = this.pending_loan.generic_materials[i]
+        let materialgeneric = this.genericmaterials.find( material => material.id == itemgeneric.material)
+
+        if(itemgeneric.quantity > materialgeneric.quantity && materialgeneric.quantity > 0) {
+          this.maxQuantities.push(materialgeneric);
+        }
+      }
     }
   },
   beforeMount() {
@@ -658,19 +641,26 @@ export default {
         }
       }
       this.loaded = true;
-      this.genericMaterialsLoan = this.genericmaterials.filter(material => {
-        return this.pending_loan.generic_materials.find(
-          generic_material => generic_material.material == material.id
-        );
-      });
-      this.borrowedMaterials = this.getGenericMaterialAvailability(
-        this.pending_loan
-      );
 
-      this.totalGenericMaterials = this.getTotalGenericMaterial(
-        this.pending_loan
-      );
-      this.loadedLoans = true;
+      for(let i=0; i<=this.pending_loan.generic_materials.length-1; i++) {
+        let materialgeneric = this.pending_loan.generic_materials[i];
+
+        this.$store.dispatch("entities/genericMaterials/getMaterialAvailability", {
+          id_entity: this.pending_loan.entity,
+          id_mat: materialgeneric.material,
+          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date }
+
+        }).then(data => {
+          let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
+          if(genericMaterial) {
+            genericMaterial.quantity = data.quantity
+          }
+        })
+      }
+      if(this.genericmaterials) {
+        this.checkQuantities();
+      }
+
     });
 
     if (this.pending_loan.id && this.pending_loan.status == 3) {

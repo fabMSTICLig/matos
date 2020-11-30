@@ -148,13 +148,13 @@
 <script>
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import { ListMixin, MaterialAvailability } from "@/common/mixins";
+import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
 import { DataHelper } from "@/common/helpers";
 
 export default {
   name: "EntityLoansList",
-  mixins: [ListMixin, MaterialAvailability],
+  mixins: [ListMixin],
   data() {
     return {
       ressource: "loans",
