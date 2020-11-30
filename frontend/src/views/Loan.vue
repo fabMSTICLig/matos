@@ -197,6 +197,7 @@
                             <div>
                               <h6>Instances</h6>
                               <DynList
+                                v-if="item in specificinstances"
                                 :ressource="specificinstances[item]"
                                 v-model="pending_loan.specific_materials"
                                 :readonly="readOnly"
@@ -441,6 +442,7 @@ export default {
     "$route.params.loanid": {
       handler: function(loanid) {
         this.idRoute = loanid;
+        this.loaded=false;
         if (loanid) {
           this.$store.dispatch("loans/list").then(loans => {
             let pending_loan = loans.find(loan => loan.id == loanid);
