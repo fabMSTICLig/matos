@@ -215,6 +215,7 @@
                             <div>
                               <h6>Instances</h6>
                               <DynList
+                                v-if="item in specificinstances"
                                 :ressource="specificinstances[item]"
                                 v-model="pending_loan.specific_materials"
                                 :readonly="readOnly"
@@ -464,6 +465,7 @@ export default {
     "$route.params.loanid": {
       handler: function(loanid) {
         this.idRoute = loanid;
+        this.loaded=false;
         if (loanid) {
           this.$store.dispatch("loans/list").then(loans => {
             let pending_loan = loans.find(loan => loan.id == loanid);
@@ -657,7 +659,6 @@ export default {
           self.status[4] = "Refusé";
         }
       }
-      this.loaded = true;
       this.genericMaterialsLoan = this.genericmaterials.filter(material => {
         return this.pending_loan.generic_materials.find(
           generic_material => generic_material.material == material.id
@@ -671,6 +672,7 @@ export default {
         this.pending_loan
       );
       this.loadedLoans = true;
+      this.loaded = true;
     });
 
     if (this.pending_loan.id && this.pending_loan.status == 3) {
