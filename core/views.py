@@ -279,7 +279,7 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
                 item = loan.loangenericitem_set.filter(material=self.kwargs['pk']).first()
                 print(item)
                 total+=item.quantity
-        
+
         if total > 0:
             quantity = quantity - total
 
@@ -549,13 +549,10 @@ class LoanViewSet(viewsets.ModelViewSet):
             checkout_date = request.data['checkout_date']
             checkout_date = datetime.datetime.strptime(checkout_date, '%Y-%m-%d')
             checkout_date = checkout_date.date()
-            print(diff)
             due_date = datetime.datetime(loan.due_date.year, loan.due_date.month, loan.due_date.day) + diff
-            print(datetime.datetime(loan.due_date.year, loan.due_date.month, loan.due_date.day))
             due_date = due_date.date()
-            print(due_date)
 
-        copy = Loan.objects.create(user=user, entity=loan.entity, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=None, due_date=due_date, checkout_date=checkout_date)
+        copy = Loan.objects.create(user=user, entity=loan.entity, comments = loan.comments, status=Loan.Status.REQUESTED, parent=None, due_date=due_date, checkout_date=checkout_date)
 
         mats = []
         if(request.data['specific_materials']):
