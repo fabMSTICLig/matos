@@ -31,7 +31,6 @@ try:
 except ImportError:
     print('error import local settings')
 
-DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,12 +44,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'core',
-    'django_cas_ng',
-    'django_cron'
+    'django_cas_ng'
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+#    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,12 +60,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'matos.urls'
-
-
-CRON_CLASSES = [
-    "core.cron.AlertLoansEnded",
-    "core.cron.AlertLoansDueDate"
-]
 
 TEMPLATES = [
     {
@@ -108,13 +100,6 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASE_NAME = "taskbuster_db"
-DATABASE_USER = "fabowner"
-DATABASE_PASSWORD = "robair"
-
-CAS_SERVER_URL = "https://cas-simsu.grenet.fr/login"
-CAS_ADMIN_PREFIX = "admin"
-
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'django_cas_ng.backends.CASBackend',
@@ -122,25 +107,12 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-DATABASES = {}
-if DEBUG == True:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-else:
-    DATABASES = {
-            'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': DATABASE_NAME,
-            'USER': DATABASE_USER,
-            'PASSWORD': DATABASE_PASSWORD,
-            'HOST': '127.0.0.1',
-            'PORT': ''
-        }
-    }
+}
 
 
 
@@ -180,14 +152,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_URL = '/static/'
-#STATIC_ROOT = '../static'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, './static'),
-]
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
