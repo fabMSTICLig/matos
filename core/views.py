@@ -134,7 +134,9 @@ class RGPDAcceptView(APIView):
 
 
 class PersonalDataView(APIView):
-    #queryset = ABC.objects.all()
+    """
+    Endpoint to get personal related data
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -245,10 +247,10 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     @action(methods=['post'], detail=True)
     def availability(self, request, *args, **kwargs):
         """
-        Get availability of material
+        Get availability of material generic with genericmaterial pk of nested router and
+        due_date, checkout_date and return_date in request
         """
         generic_material = GenericMaterial.objects.filter(pk=self.kwargs['pk'])
-        print(generic_material)
         loans_current = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).all()
         loans_ended = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).all()
         if('due_date' in request.data):
@@ -257,29 +259,19 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
             loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).all()
         quantity=generic_material.first().quantity
         total=0
-        print(quantity)
 
         loans_list = []
         if loans_current:
             loans_list.append(loans_current)
-            print("loans current")
-            print(loans_current)
         if loans_ended :
             loans_list.append(loans_ended)
-            print("ended loans")
-            print(loans_ended)
-
         if loans_next:
             loans_list.append(loans_next)
-            print("next loans")
-            print(loans_next)
 
         for loans in loans_list:
             for loan in loans:
                 item = loan.loangenericitem_set.filter(material=self.kwargs['pk']).first()
-                print(item)
                 total+=item.quantity
-
         if total > 0:
             quantity = quantity - total
 
@@ -370,9 +362,8 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=True)
     def availability(self, request, *args, **kwargs):
         """
-        Get availability of material
+        Get availability of material using pk of nested router and checkout_date, due_date in request
         """
-
         specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['pk'])
 
         loans_current = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).distinct().first()
@@ -381,7 +372,6 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
             loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).first()
         if('return_date' in request.data):
             loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).first()
-
         res = {}
         if loans_current:
             res["currentloans"]=loans_current.id
@@ -405,7 +395,7 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SpecificMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    endpoints for loan related specific material
+    Endpoints for loan related specific material
     """
     queryset = Loan.objects.all()
     permission_classes = (RGPDAccept, IsManagerOf,)
@@ -424,7 +414,7 @@ class SpecificMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
 
 class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    endpoints for loan related specific material
+    Endpoints for loan related specific material
     """
     queryset = Loan.objects.all()
     permission_classes = (RGPDAccept, IsAuthenticated,)
@@ -446,12 +436,19 @@ class LoanViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
+        Specific query to filter loans by admin or managers or by current user
         """
         if(self.request.user.is_staff):
             return self.queryset.all()
+        print(len(self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()))
         return self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()
 
     def create(self, request, *args, **kwargs):
+        """
+        Special action to validate loan creation
+        Protect data of current user, set status in requested and set parent, return_date to None value
+        If data is valid, loan is created then a notification to entity manager is sent
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if(not request.user.is_staff and request.user not in serializer.validated_data['entity'].managers.all()):
@@ -474,8 +471,16 @@ class LoanViewSet(viewsets.ModelViewSet):
 
 
     def update(self, request, *args, **kwargs):
+        """
+        Special action to update loan
+        Check if current user has rights to perform update
+        Protect data of loan user, protect status requested and set parent, return_date with requested data
+        If data is valid and status has changed, and not REQUESTED then manager of entity loan is notified by mail
+        with update_status_loan
+        If status of loan is CANCELED, object is destroyed
+        Loan is updated with validated data
+        """
         instance = self.get_object()
-
         if(not request.user.is_staff and request.user not in instance.entity.managers.all()):
             if (instance.status == Loan.Status.DENIED or instance.status == Loan.Status.ACCEPTED) :
                 raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")

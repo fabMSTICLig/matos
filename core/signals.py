@@ -5,7 +5,10 @@ from .models import Loan
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 
-
+"""
+Object Signal listening for event handle_new_loan and handle_status_loan
+https://docs.djangoproject.com/fr/3.1/ref/signals/
+"""
 new_loan = Signal(providing_args=["loan"])
 update_status_loan = Signal(providing_args=["loan"])
 

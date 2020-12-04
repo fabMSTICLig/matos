@@ -54,7 +54,9 @@ class EntitiesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_manager_update(self):
-
+        """
+        Verify that manager can update entity
+        """
         managers_lig_obj = self.lig_entity.managers.all()
         list_result = [entry for entry in managers_lig_obj]
         self.assertEqual(list_result,[self.manager1])
@@ -194,6 +196,9 @@ class UsersTests(APITestCase):
         self.superuser.save()
 
     def test_update_self_affiliations(self):
+        """
+        Test de la modification d'une affiliation
+        """
         data = { 'affiliations' : [self.affiliation.pk] }
         request = self.apiFactory.patch(reverse('user-detail', args=(2, 'pk')),data)
         force_authenticate(request, user=self.user)
@@ -240,6 +245,9 @@ class AffiliationsTests(APITestCase):
         self.user =  get_user_model().objects.create(username="max", first_name="max", email='max@univ-grenoble.fr', password='1ngF@b', rgpd_accept="2020-06-25")
 
     def test_affiliation_add(self):
+        """
+        Test de l'ajout d'une affiliation par un admin
+        """
         data = { 'name': 'CNRS', 'type': 'Recherche' }
         view = AffiliationViewSet.as_view(actions={'post': 'create'})
         request = self.apiFactory.post(reverse('affiliation-list'), data)
@@ -249,6 +257,9 @@ class AffiliationsTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_affiliation_update(self):
+        """
+        Test de la modification d'une affiliation par un admin
+        """
         data = { 'name' : 'UGA' }
         view = AffiliationViewSet.as_view(actions={'patch': 'partial_update'})
         request = self.apiFactory.patch(reverse('affiliation-detail', args=(1, 'pk')), data)
@@ -258,6 +269,7 @@ class AffiliationsTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_cant_update_affiliation(self):
+        "Test de la protection modification d'affiliation par un utilisateur sans droit"
         data = { 'name' : 'Grenoble INP' }
         view = AffiliationViewSet.as_view(actions={'patch': 'partial_update'})
         request = self.apiFactory.patch(reverse('affiliation-detail', args=(1, 'pk')),data)
@@ -267,6 +279,7 @@ class AffiliationsTests(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_cant_add_affiliation(self):
+        "Test de la protection ajout d'affiliation par un utilisateur sans droit"
         data = { 'name' : 'Inria Grenoble', 'type':'Recherche' }
         view = AffiliationViewSet.as_view(actions={'post': 'create'})
         request = self.apiFactory.post(reverse('affiliation-list'),data)
@@ -327,6 +340,9 @@ class GenericMaterialsTests(APITestCase):
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
 
     def test_not_add_material(self):
+        """
+        Test de la protection d'ajout d'un équipement
+        """
         self.client.force_authenticate(user=self.user)
         data = {'name':'iSAFT SpW', 'ref_int':'iSAFT-PCIE-FabMSTIC', 'ref_man':'TELETEL', 'localisation':'FabMSTIC', 'description':'Cartes d’interface PCIe iSAFT à 4 ou 8 ports SpaceWire','quantity':'5', 'entity': 1}
         response = self.client.post(reverse('genericmaterials-list', kwargs={'entity_pk':1}), data)
@@ -335,6 +351,9 @@ class GenericMaterialsTests(APITestCase):
         self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
 
     def test_not_update_material(self):
+        """
+        Test de la protection de modification d'un équipement
+        """
         self.client.force_authenticate(user=self.manager2)
         data = {'name':'Ensimag'}
         response = self.client.patch(reverse('genericmaterials-detail', kwargs={'pk': 1, 'entity_pk':1}), data)
@@ -377,7 +396,11 @@ class SpecificMaterialsTests(APITestCase):
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
 
     def test_not_add_material(self):
+        """
+        Test de la protection d'ajout de matériel spécifique
+        Rejet si doublon du nom existant par entité
         self.client.force_authenticate(user=self.manager2)
+        """
         data = {'name':'iSAFT SpW', 'ref_int':'iSAFT-PCIE-FabMSTIC', 'ref_man':'TELETEL', 'localisation':'armoire box électronique, 3eme etage - deuxieme tiroir ', 'description':'Cartes d’interface PCIe iSAFT à 4 ou 8 ports SpaceWire', 'entity': 1}
         response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), data)
         response.render()
@@ -394,6 +417,9 @@ class SpecificMaterialsTests(APITestCase):
         self.assertEqual(len(response.data['non_field_errors']),1)
 
     def test_not_update_material(self):
+        """
+        Test de la protection de modification de matériel spécifique
+        """
         self.client.force_authenticate(user=self.manager2)
         data = {'name':'Tablette ASUS'}
         response = self.client.patch(reverse('specificmaterials-detail', kwargs={'pk': 1, 'entity_pk':1}), data)
@@ -416,6 +442,7 @@ class SpecificMaterialsTests(APITestCase):
     def test_not_add_instance_material(self):
         """
         Test de la protection d'ajout d'une instance de matériel spécifique par un utilisateur non manager
+        Rejet si nom de l'Instance appartenant à l'entité non unique
         """
         self.client.force_authenticate(user=self.manager2)
         data = serializers.serialize('json', [ self.materials_specific_instance, ])
@@ -496,7 +523,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_return_date(self):
         """
-           date de retour et date de rendu doivent être après la date de sortie
+        date de retour et date de rendu doivent être après la date de sortie
         """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,10,8), "user" : self.user.pk , "entity" : 1, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -511,7 +538,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_entity_loan(self):
         """
-            tous les matériels rattachés à un prêt doivent appartenir à l'entité rattaché à ce prêt
+        tous les matériels rattachés à un prêt doivent appartenir à l'entité rattaché à ce prêt
         """
         self.client.force_authenticate(user=self.manager1)
         response = self.client.get(reverse('specificmaterials-list', kwargs={'entity_pk': self.entity.pk}), format='json')
@@ -530,7 +557,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_create_loan_status(self):
         """
-            un utilisateur peut uniquement créer des prêts avec le status requested
+        un utilisateur peut uniquement créer des prêts avec le status requested
         """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,6,25), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,25), "return_date" : datetime.date(2020,7,25), "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -541,7 +568,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_update_loan_status(self):
         """
-            un utilisateur peut uniquement modifier des prêts avec le status pending
+        un utilisateur peut uniquement modifier des prêts avec le status pending
         """
         data = {"status" : 2, "id": self.loan_user.pk, "checkout_date" : datetime.date(2020,6,26), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -551,7 +578,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_empty_loan(self):
         """
-            un prêt doit contenir au moins un matériel
+        un prêt doit contenir au moins un matériel
         """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -562,7 +589,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_indem_adduser_loan(self):
         """
-            un utilisateur ne peut modifier un prêt pour un autre utilisateur
+        un utilisateur ne peut modifier un prêt pour un autre utilisateur
         """
         data = {"status" : 2, "id": self.loan.pk, "checkout_date" : datetime.date(2020,6,8), "user" : self.manager1.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,24), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -572,7 +599,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_update_loan_accepted(self):
         """
-            un prêt accepté ne peut être modifié par un utilisateur sans droits
+        un prêt accepté ne peut être modifié par un utilisateur sans droits
         """
         data = {"status" : 2, "id": self.loan.pk , "checkout_date" : datetime.date(2020,6,9), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,6,24), "return_date" : datetime.date(2020,6,25), "comments" : 'modification prêt accepté', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -583,7 +610,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_child_loan_update(self):
         """
-            un prêt enfant peut être modifié si il a le statut pending
+        un prêt enfant peut être modifié si il a le statut pending
         """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,7,8), "user" : self.manager1.pk , "entity" : 1, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,7,24), "comments" : 'modification prêt enfant', 'specific_materials': [self.materials_specific_instance2.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -595,7 +622,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_indem_update_accepted_loan(self):
         """
-            un prêt ne peut être modifié si il a le status accepté
+        un prêt ne peut être modifié si il a le status accepté
         """
         data = {"status" : 3, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,14), "return_date" : datetime.date(2020,10,14), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -605,7 +632,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_manager_manage_loan(self):
         """
-            le manager d'une entité peut créer un prêt rattaché à cette entité pour une autre personne
+        le manager d'une entité peut créer un prêt rattaché à cette entité pour une autre personne
         """
         data = {"status" : 2, "id": self.loan.pk ,"checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.manager1)
@@ -615,7 +642,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_own_user_loans(self):
         """
-            un utilisateur ne peut voir uniquement les prêts qui lui sont rattachés
+        un utilisateur ne peut voir uniquement les prêts qui lui sont rattachés
         """
 
         self.client.force_authenticate(user=self.user)
@@ -625,7 +652,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_own_manager_loans(self):
         """
-            le manager d'une entité peut crée/modifier/supprimer les prêts ratachés à son entité
+        le manager d'une entité peut crée/modifier/supprimer les prêts ratachés à son entité
         """
 
         data = {"status" : 2, "id": self.loan.pk, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,6,24), "comments" : 'demande prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk, self.materials_specific_instance2.pk], 'generic_materials': [{"material": 1, "quantity": 10}] }
@@ -642,8 +669,8 @@ class LoanMaterialsTests(APITestCase):
 
     def test_child_loan(self):
         """
-            Seul un manager peut créer un prêt successeur
-            Vérification de la même entité pour la copie du prêt
+        Seul un manager peut créer un prêt successeur
+        Vérification de la même entité pour la copie du prêt
         """
         data = {"status" : 3, "checkout_date": datetime.date(2020,8,25), "user" : self.user.pk, "entity": self.entity.pk, "due_date": datetime.date(2020,9,24), "return_date" : datetime.date(2020,9,24), "comments" : 'demande de prêt tablettes info'}
         self.client.force_authenticate(user=self.user)
@@ -667,8 +694,8 @@ class LoanMaterialsTests(APITestCase):
 
     def test_protected_loan_user(self):
         """
-            un utilisateur ne peut modifier les champs, parent, return_date et
-            user (transfert vers un autre utilisateur)
+        un utilisateur ne peut modifier les champs, parent, return_date et
+        user (transfert vers un autre utilisateur)
         """
         # test protection utilisateur
         data = {"status" : 2, "checkout_date" : datetime.date(2020,6,8), "user" : self.manager2.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'prolongation du prêt de tablettes, ajout de retroprojecteur', 'specific_materials': [], 'generic_materials': [{"material": 1, "quantity": 10}] }
@@ -701,7 +728,7 @@ class LoanMaterialsTests(APITestCase):
 
     def test_available_specific_material(self):
         """
-            Si un prêt arrive à date échue, le matériel lié est de nouveau disponible
+        Si un prêt arrive à date échue, le matériel lié est de nouveau disponible
         """
         data = {"status" : 2, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,4), "return_date" : datetime.date(2020,10,4), "comments" : 'demande de prêt tablettes projet Master 1 Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
@@ -709,28 +736,38 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-    def test_delete_loan_requested(self):
+    def test_no_delete_loan_requested(self):
         """
-            Un utilisateur peut supprimer un prêt demandé
+        Un utilisateur ne peut supprimer un prêt demandé ou accepté
         """
         self.client.force_authenticate(user=self.manager2)
+        response = self.client.get(reverse('loan-detail',kwargs={'pk': self.loan_manager2.pk}))
+        response.render()
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_manager2.pk}))
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.client.force_authenticate(user=self.user)
+        loan = self.client.get(reverse('loan-detail', kwargs={'pk': self.loan_user_accepted.pk}))
+
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user_accepted.pk}))
         response.render()
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_delete_loan_requested(self):
+        """
+        Un manager peut supprimer un prêt demandé ou accepté
+        """
         self.client.force_authenticate(user=self.manager1)
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user.pk}))
         response.render()
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    #test de la protection suppression prêt refusé
+
     def test_material_availability(self):
         """
-           Test la disponibilité d'un matériel avec une date de retour
+        Test la disponibilité d'un matériel avec une date de retour
         """
         self.client.force_authenticate(user=self.manager1)
         data = {"status" : 3, "checkout_date" : datetime.date(2020,10,8), "user" : self.manager1.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,9), "return_date" : datetime.date(2020,12,20), "comments" : 'demande de prêt projecteur cours Polytech', 'specific_materials': [self.materials_specific_instance2.pk], 'generic_materials': [] }

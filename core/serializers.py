@@ -77,7 +77,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class GenericMaterialSerializer(serializers.ModelSerializer):
     """
-    Serializer for generic material objects.
+    Serializer for Generic Material objects.
     """
     class Meta:
         model = GenericMaterial
@@ -85,7 +85,7 @@ class GenericMaterialSerializer(serializers.ModelSerializer):
 
 class GenericMaterialPublicSerializer(serializers.ModelSerializer):
     """
-    Serializer for generic material objects.
+    Serializer for Generic Material objects.
     """
     class Meta:
         model = GenericMaterial
@@ -93,7 +93,7 @@ class GenericMaterialPublicSerializer(serializers.ModelSerializer):
 
 class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
     """
-    Serializer for specific material objects.
+    Serializer for Specific Material objects.
     """
     class Meta:
         model = SpecificMaterial
@@ -101,7 +101,7 @@ class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
 
 class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
     """
-    Serializer for instance of specific material.
+    Serializer for Instance of Specific Material.
     """
     class Meta:
         model = SpecificMaterialInstance
@@ -109,21 +109,21 @@ class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
 
 class SpecificMaterialSerializer(serializers.ModelSerializer):
     """
-    Serializer for specific material objects.
+    Serializer for Specific Material objects.
     """
     instances = SpecificMaterialInstanceSerializer(many=True, read_only=True)
     class Meta:
         model = SpecificMaterial
         fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation']
 
-class SpecificInstancesNestedSerializer(serializers.ModelSerializer):
-    """
-    Serializer for specific material objects.
-    """
-    instances = SpecificMaterialInstanceSerializer(many=True,read_only=True)
-    class Meta:
-        model = SpecificMaterial
-        fields = ['id','name','description','instances']
+#class SpecificInstancesNestedSerializer(serializers.ModelSerializer):
+#    """
+#    Serializer for Specific Material nested objects.
+#    """
+#    instances = SpecificMaterialInstanceSerializer(many=True,read_only=True)
+#    class Meta:
+#        model = SpecificMaterial
+#        fields = ['id','name','description','instances']
 
 class SpecificMaterialUserSerializer(serializers.ModelSerializer):
     """
@@ -134,12 +134,17 @@ class SpecificMaterialUserSerializer(serializers.ModelSerializer):
         fields = ['id','name','description']
 
 class LoanGenericItemSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for Loan generic items related
+    """
     class Meta:
         model = LoanGenericItem
         fields = ('material','quantity')
 
 class LoanSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Loan objects
+    """
     generic_materials = LoanGenericItemSerializer(source="loangenericitem_set",many=True)
     models = serializers.SerializerMethodField()
 
@@ -158,14 +163,18 @@ class LoanSerializer(serializers.ModelSerializer):
         extra_kwargs={'status':{'error_messages':{'invalid_choice':'Veuillez séléctionner un status pour le prêt'}}}
 
     def create(self, validated_data):
-        # Create the book instance
+        """
+        Create Loan object with Specific Materials and Loan Generic Item objects related and
+        return Loan
+        """
+        # Create Loan object and set materials
         specmats=validated_data.pop('specific_materials')
         genmats=validated_data.pop('loangenericitem_set')
         loan = Loan.objects.create(**validated_data)
         for mat in specmats:
             loan.specific_materials.add(mat)
         loan.save()
-        # Create or update each page instance
+        # Create Loan Generic Item
         for item in genmats:
             item = LoanGenericItem(quantity=item['quantity'],material=item['material'], loan=loan)
             item.save()
@@ -173,6 +182,9 @@ class LoanSerializer(serializers.ModelSerializer):
         return loan
 
     def update(self, instance, validated_data):
+        """
+        Update Loan with Specific Materials and Generic Materials relation and new value attributes
+        """
         loangen = validated_data.pop('loangenericitem_set')
         info = model_meta.get_field_info(instance)
         m2m_fields = []
@@ -188,13 +200,13 @@ class LoanSerializer(serializers.ModelSerializer):
             field = getattr(instance, attr)
             field.set(value)
 
-        # Delete any pages not included in the request
+        # Delete any Material Generic not included in the request
         item_ids = [item['material'].id for item in loangen]
         for item in instance.loangenericitem_set.all():
             if item.material.id not in item_ids:
                 item.delete()
 
-        # Create or update page instances that are in the request
+        # Save quantity of Material Generic in validated data
         for item in loangen:
             loan_item, created = LoanGenericItem.objects.get_or_create(material=item['material'], loan=instance)
             loan_item.quantity = item['quantity']
@@ -203,6 +215,12 @@ class LoanSerializer(serializers.ModelSerializer):
         return instance
 
     def validate(self, data):
+        """
+        Validate Loan
+        Check checkout_date and return_date and specific_materials error
+        Check Material Generic and Specific Material are included in Entity Loan
+        Check if Specific Material is not interfering with Specific Material in a current Loan, a next Loan or an ended Loan
+        """
         if('parent' in data and data['parent'] is not None):
             loan_parent = Loan.objects.get(id=data['parent'].id)
             if(data['checkout_date'] < loan_parent.checkout_date):
@@ -253,6 +271,9 @@ class LoanSerializer(serializers.ModelSerializer):
         return data
 
 class LoanNestedSerializer(serializers.ModelSerializer):
+    """
+    Serializer to get Loan nested User
+    """
     specific_materials = SpecificMaterialUserSerializer(many=True, read_only=True)
     generic_materials = GenericMaterialSerializer(many=True, read_only=True)
     class Meta:
@@ -277,7 +298,6 @@ class UserDataSerializer(serializers.ModelSerializer):
     entities = EntityNestedSerializer(many=True, read_only=True)
     loans = LoanNestedSerializer(many=True, read_only=True)
     affiliations = AffiliationSerializer(many=True, read_only=True)
-
     class Meta:
         model = get_user_model()
         fields = ('rgpd_accept', 'affiliations', 'entities', 'externe','loans')

@@ -19,6 +19,10 @@ class IsAdminOrIsSelf(permissions.BasePermission):
         return request.user.is_staff or isself
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Permission checking if user is admin
+    Allow GET, HEAD or OPTIONS requests for all user
+    """
     def has_permission(self, request, view):
         return request.user.is_staff or request.method in permissions.SAFE_METHODS
 
