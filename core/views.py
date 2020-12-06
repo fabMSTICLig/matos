@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import datetime
+import json
+import csv
+
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import get_template,render_to_string
+from django.template import Context
+from django.core.management import call_command
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 import rest_framework
-import json
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-import datetime
+from rest_framework.parsers import JSONParser, BaseParser
+
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
-from django.core.mail import send_mail, EmailMultiAlternatives
-from django.template.loader import get_template,render_to_string
-from django.template import Context
 from .serializers import *
 from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManager, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
-from django.core.management import call_command
 from .signals import *
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -233,6 +237,24 @@ class EntityMaterialMixin:
 
         return Response(serializer.data)
 
+class CSVParser(BaseParser):
+    media_type = 'text/csv'
+
+    def parse(self, stream, media_type=None, parser_context=None):
+        """
+        Return a list of lists representing the rows of a CSV file.
+        """
+
+        charset = 'utf-8'
+        media_type_params = dict([param.strip().split('=') for param in media_type.split(';')[1:]])
+        charset = media_type_params.get('charset', 'utf-8')
+        txt = stream.read().decode(charset)
+        try:
+            return list(csv.reader(txt.splitlines(), delimiter='\t'))
+        except:
+            raise ParseError("Error pasing csv data")
+
+
 class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     """
     Manager endpoints for generic material
@@ -241,6 +263,61 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     queryset = GenericMaterial.objects.all()
     permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = GenericMaterialSerializer
+
+    @action(methods=['post'], detail=False, parser_classes=[CSVParser])
+    def bulk_add(self, request, *arg, **kwargs):
+        entity = Entity.objects.get(pk=self.kwargs['entity_pk'])
+        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
+            raise PermissionDenied("Your are not a manager of this entity")
+        try:
+            rows = request.data
+            if(rows and rows[0] and rows[0][0]=="name"):
+                rows.pop(0)
+            tags_dict={}
+            mats=[]
+            mats_tags=[]
+            for row in rows:
+                if len(row) != 7:
+                    raise ParseError("Wrong CSV format")
+                row = list(v if v else None for v in row)
+                row[1] = 0 if row[1] is None else row[1]
+                mat=GenericMaterial(name = row[0],
+                quantity = row[1],
+                ref_int = row[2],
+                ref_man = row[3],
+                description = row[4],
+                localisation = row[5],
+                entity=entity
+                )
+                mats.append(mat)
+                tagstrs=list(t.strip() for t in row[6].split(","))
+                tags=[]
+                for tagstr in tagstrs:
+                    if tagstr in tags_dict:
+                        tags.append(tags_dict[tagstr])
+                    else:
+                        tag, created=Tag.objects.get_or_create(name=tagstr)
+                        tags_dict[tagstr] = tag
+                        tags.append(tag)
+                mats_tags.append(tags)
+            matsdb = GenericMaterial.objects.bulk_create(mats)
+            matids = []
+            matsret = []
+            if( matsdb[0].id is None):
+                for mat in matsdb:
+                    matsret.append(GenericMaterial.objects.get(name=mat.name, entity=entity))
+            else:
+                matsret=matsdb
+            throughs=[]
+            Modelthrough = GenericMaterial.tags.through
+            for i, mat in enumerate(matsret):
+                for tag in mats_tags[i]:
+                    throughs.append(Modelthrough(tag_id=tag.id, genericmaterial_id=mat.id))
+            Modelthrough.objects.bulk_create(throughs)
+            serializer = GenericMaterialSerializer(matsret, many=True)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            raise ParseError("Error while processing bulk_add")
 
     @action(methods=['post'], detail=True)
     def availability(self, request, *args, **kwargs):
