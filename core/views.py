@@ -372,13 +372,14 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
             loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).first()
         if('return_date' in request.data):
             loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).first()
-        res = {}
+
+        res = True
         if loans_current:
-            res["currentloans"]=loans_current.id
+            res = False
         if loans_ended:
-            res["endedloans"]=loans_ended.id
+            res = False
         if loans_next:
-            res["nextloans"]=loans_next.id
+            res = False
 
         return Response(res, status=status.HTTP_200_OK)
 
@@ -494,14 +495,12 @@ class LoanViewSet(viewsets.ModelViewSet):
         change_status=False
         if(instance.status != request.data["status"]):
             change_status=True
-
         if serializer.is_valid():
             loan = self.perform_update(serializer)
             if(int(request.data["status"]) != Loan.Status.REQUESTED):
                 if(change_status):
                     update_status_loan.send(sender=Loan,status=request.data['status'],loan=instance)
                 if(int(request.data["status"]) == Loan.Status.CANCELED):
-                    print("annulation pret")
                     instance.delete()
                     res = {}
                     res["id"] = request.data["id"]
@@ -509,7 +508,6 @@ class LoanViewSet(viewsets.ModelViewSet):
 
             #for mat in genericitem:
             data = serializer.data
-            print(data["generic_materials"])
             headers = self.get_success_headers(serializer.data)
 
         if serializer.errors:
