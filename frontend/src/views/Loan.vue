@@ -151,17 +151,20 @@
                             </button>
                           </td>
                         </tr>
-
-
                         <tr
                           class="d-flex"
                           v-show="maxQuantities.length"
                           v-for="material_loan in maxQuantities"
                           :key="material_loan.id"
                         >
-                          <td class="col-7">
+                          <td class="col-7" v-if="material_loan.quantity > 0">
                             <span class="text-danger"
                               >Quantité disponible dépassée : {{ material_loan.quantity }}
+                            </span>
+                          </td>
+                          <td class="col-7" v-if="material_loan.quantity == 0">
+                            <span class="text-danger"
+                              >Matériel indisponible
                             </span>
                           </td>
                           <td class="col-5">
@@ -174,7 +177,7 @@
                           class="d-flex"
                           v-show="disabled.length"
                           v-for="material in disabled"
-                          :key="material"
+                          :key="material.id"
                         >
                           <td class="col-6">
                             <span class="text-danger"
@@ -183,7 +186,7 @@
                           </td>
                           <td class="col-6">
                             <span class="text-danger float-right">{{
-                              gmById(material) | field("name")
+                              material.name
                             }}</span>
                           </td>
                         </tr>
@@ -416,9 +419,18 @@ export default {
 
   },
   watch: {
-    pending_loan: {
+
+    'pending_loan.specific_materials': {
       handler() {
-        if (!this.canManage) {
+        this.getMaterialAvailability();
+      },
+      deep: true
+    },
+    pending_loan: {
+
+      handler() {
+
+          if (!this.canManage) {
           this.status = {};
           var keys = [1, 2];
           var values = ["Annulé", "Demandé"];
@@ -435,6 +447,7 @@ export default {
             this.status[4] = "Refusé";
           }
         }
+        this.checkQuantities();
         this.$store.commit("loans/savePending");
       },
       deep: true
@@ -468,10 +481,22 @@ export default {
         })
         .then(data => {
           Vue.set(this.specificinstances, item, data);
-          //this.getMaterialAvailability(this.pending_loan);
         });
     },
+    getMaterialAvailability() {
+      this.disabled = [];
+      console.log("verification matériel spécifique dispo")
+      for(let i=0; i<= this.pending_loan.specific_materials.length-1;i++) {
+        let specificinstance_id = this.pending_loan.specific_materials[i];
 
+        let instances = Object.keys(this.specificinstances).filter(instances => {
+           return Object.values(this.specificinstances[instances]).find(object => object.id == specificinstance_id)
+        });
+        let model = instances[0];
+        let item = { "specificinstance":specificinstance_id, "model":model };
+        this.setMaterialAvailability(item)
+      }
+    },
     submitLoan(e) {
       e.preventDefault();
       this.checkErrors();
@@ -606,11 +631,54 @@ export default {
     checkQuantities() {
       for(let i=0; i<= this.pending_loan.generic_materials.length-1;i++) {
         let itemgeneric = this.pending_loan.generic_materials[i]
-        let materialgeneric = this.genericmaterials.find( material => material.id == itemgeneric.material)
+        let genericMaterial = this.genericmaterials.find( material => material.id == itemgeneric.material)
 
-        if(itemgeneric.quantity > materialgeneric.quantity && materialgeneric.quantity > 0) {
-          this.maxQuantities.push(materialgeneric);
+        if(parseInt(itemgeneric.quantity) > genericMaterial.quantity) {
+          this.maxQuantities.push(genericMaterial);
         }
+        if(parseInt(itemgeneric.quantity) <= genericMaterial.quantity) {
+          let index = this.maxQuantities.indexOf(Object.values(this.maxQuantities).find( obj => obj.id == genericMaterial.id));
+          if(index > -1) {
+           this.maxQuantities.splice(index,1)
+          }
+        }
+      }
+    },
+    setMaterialAvailability(item) {
+      if(item.quantity) {
+        this.$store.dispatch("entities/genericMaterials/getMaterialAvailability", {
+          id_entity: this.pending_loan.entity,
+          id_mat: item.material,
+          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date }
+
+        }).then(data => {
+          let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
+          if(genericMaterial) {
+            genericMaterial.quantity = data.quantity
+            if(item.quantity > genericMaterial.quantity) {
+              this.maxQuantities.push(genericMaterial);
+            }
+          }
+        });
+      } else {
+        let specificinstance_id = item.specificinstance;
+        let model = item.model
+
+        this.$store.dispatch("entities/specificMaterials/getMaterialAvailability", {
+          id_entity: this.pending_loan.entity,
+          id_model: model,
+          id_instance: specificinstance_id,
+          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date }
+
+        }).then(data => {
+
+            if(data == false) {
+              let specificinstance = this.specificinstances[model].find( m => m.id == specificinstance_id )
+              this.disabled.push(specificinstance)
+              console.log("indisponible")
+            }
+
+        });
       }
     }
   },
@@ -646,23 +714,19 @@ export default {
 
       for(let i=0; i<=this.pending_loan.generic_materials.length-1; i++) {
         let materialgeneric = this.pending_loan.generic_materials[i];
-
-        this.$store.dispatch("entities/genericMaterials/getMaterialAvailability", {
-          id_entity: this.pending_loan.entity,
-          id_mat: materialgeneric.material,
-          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date }
-
-        }).then(data => {
-          let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
-          if(genericMaterial) {
-            genericMaterial.quantity = data.quantity
-          }
-        })
-      }
-      if(this.genericmaterials) {
-        this.checkQuantities();
+        this.setMaterialAvailability(materialgeneric);
       }
 
+      for(let i=0; i<=this.pending_loan.specific_materials.length -1; i++) {
+        let specificinstance_id = this.pending_loan.specific_materials[i];
+        let instances = Object.keys(this.specificinstances).filter(instances => {
+            return Object.values(this.specificinstances[instances]).find(object => object.id == specificinstance_id)
+        });
+        let model = instances[0]
+
+        let item = {"specificinstance":specificinstance_id,"model":model};
+        this.setMaterialAvailability(item);
+      }
     });
 
     if (this.pending_loan.id && this.pending_loan.status == 3) {

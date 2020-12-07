@@ -60,8 +60,34 @@ const instances = createCrud("instances", instances_extra);
 const specific_extra = {
   modules: {
     instances: instances
+  },
+  actions: {
+    getMaterialAvailability({ commit }, { id_entity, id_model, id_instance, data }) {
+        return ApiService.post(
+          "entities/" +
+            id_entity +
+            "/specificmaterials/" +
+            id_model +
+            "/instances/" +
+            id_instance +
+            "/availability",
+            data
+        ).then(({ data }) => {
+          commit(SET_MATERIAL_AVAILABILITY, data);
+          return data;
+        })
+        .catch(e => {
+          console.log(e);
+      })
+    }
+  },
+  mutations: {
+    setMaterialAvailability(state, materialAvailability) {
+      state.materialAvailability = materialAvailability
+    }
   }
 };
+
 const specific = createCrud("specificmaterials", specific_extra);
 
 const generic_extra = {
@@ -97,26 +123,6 @@ const generic_extra = {
     },
 
     getMaterialAvailability({ commit }, { id_entity, id_mat, data }) {
-      console.log(id_entity)
-      console.log(id_mat)
-      /** if(model) {
-        return ApiService.query(
-          "entities/" +
-            id_entity +
-            "/specificmaterials/" +
-            model +
-            "/instances/" +
-            id_mat +
-            "/availability",
-          {}
-        ).then(({ data }) => {
-          commit(SET_MATERIAL_AVAILABILITY, data);
-          return data;
-        })
-        .catch(e => {
-          console.log(e);
-        })
-      }**/
 
         return ApiService.post(
           "entities/" +
