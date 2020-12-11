@@ -1,7 +1,8 @@
 Une nouvelle demande de matériels vient d'être faite {{ SITE_URL }}#/loan/{{ loan.id }}
 date de sortie : {{loan.checkout_date}}
 date de retour prévue: {{loan.due_date}}
-
+emprunteur:  {{ loan.user.username }}
+email: <b>{{ loan.user.email }}
 par {{ loan.user.email }}
 
 

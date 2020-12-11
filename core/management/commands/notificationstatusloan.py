@@ -22,6 +22,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if(options['id']) and (options['status']):
             loan = Loan.objects.get(pk=options['id'])
+            email_to = loan.user.email
+                      
             tpl_name=''
             if(options['status'] == '3'):
                 tpl_name = 'valide'
@@ -29,6 +31,7 @@ class Command(BaseCommand):
                 tpl_name = 'reject'
             if(options['status'] == '1'):
                 tpl_name = 'cancel'
+                email_to = loan.entity.contact
 
             context = { 'SITE_URL': settings.SITE_URL, 'loan': loan , 'status': options['status']}
             subject = render_to_string(
@@ -43,7 +46,7 @@ class Command(BaseCommand):
                 template_name='email/statusloan_message.html',
                 context=context
             )
-            msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.user.email])
+            msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [email_to])
             msg.attach_alternative(html_content, "text/html")
             try:
                 msg.send()

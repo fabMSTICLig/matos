@@ -8,7 +8,8 @@
   Une nouvelle demande de matériels vient d'être faite : <a href="{{ SITE_URL }}#/loan/{{ loan.id }}">accès à la réservation</a>
   <p>date de sortie : <b>{{loan.checkout_date}}</b></p>
   <p>date de retour prévue: <b>{{loan.due_date}}</b></p>
-  par {{ loan.user.email }}
+  <p>emprunteur:  <b>{{ loan.user.username }}</b></p>
+  <p>email: <b>{{ loan.user.email }}</b></p>
   <p>pour l'entité {{loan.entity.name}}</p>
 <hr />
 
