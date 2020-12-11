@@ -330,11 +330,20 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
         generic_material = GenericMaterial.objects.filter(pk=self.kwargs['pk'])
         loans_current = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).all()
         loans_ended = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).all()
-        if('due_date' in request.data):
+        if('due_date' in request.data and 'checkout_date' in request.data):
             loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).all()
-        if('return_date' in request.data):
+        if('return_date' in request.data and 'checkout_date' in request.data):
             loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).all()
         quantity=generic_material.first().quantity
+        
+        if('id_loan' in request.data and request.data['id_loan'] != ""):
+            print('loan not null');
+
+            loans_current = loans_current.exclude(pk=request.data['id_loan'])
+            loans_ended = loans_ended.exclude(pk=request.data['id_loan'])
+            loans_next = loans_next.exclude(pk=request.data['id_loan'])
+        print("quantité")
+        print(quantity)
         total=0
 
         loans_list = []
@@ -346,9 +355,11 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
             loans_list.append(loans_next)
 
         for loans in loans_list:
+
             for loan in loans:
                 item = loan.loangenericitem_set.filter(material=self.kwargs['pk']).first()
                 total+=item.quantity
+      
         if total > 0:
             quantity = quantity - total
 
@@ -444,19 +455,25 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
         specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['pk'])
 
         loans_current = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).distinct().first()
-        loans_ended = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).first()
+        loans_ended = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).exclude(pk=request.data['id_loan']).first()
         if('due_date' in request.data):
-            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).first()
+            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).exclude(pk=request.data['id_loan']).first()
         if('return_date' in request.data):
-            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).first()
+            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).exclude(pk=request.data['id_loan']).first()
 
+        if('id_loan' in request.data and request.data['id_loan'] != ""):
+            loans_current = loans_current.exclude(pk=request.data['id_loan'])
+            loans_ended = loans_ended.exclude(pk=request.data['id_loan'])
+            loans_next = loans_next.exclude(pk=request.data['id_loan'])
         res = True
+      
         if loans_current:
             res = False
         if loans_ended:
             res = False
         if loans_next:
             res = False
+       
 
         return Response(res, status=status.HTTP_200_OK)
 

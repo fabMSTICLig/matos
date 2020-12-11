@@ -422,8 +422,10 @@ export default {
   watch: {
     'pending_loan.specific_materials': {
       handler() {
-        if(this.pending_loan.specific_materials.length) {
-          this.getMaterialAvailability();
+        if(this.pending_loan.due_date !== null && this.pending_loan.checkout_date !== null) {
+          if(this.pending_loan.specific_materials.length) {
+            this.getMaterialAvailability();
+          }
         }
       },
       deep: true
@@ -691,11 +693,18 @@ export default {
       }
     },
     setMaterialAvailability(item) {
+     
+      let id_loan=""
+      
+      if(this.pending_loan.id) {
+        id_loan = this.pending_loan.id
+      }
+
       if(item.quantity) {
         this.$store.dispatch("entities/genericMaterials/getMaterialAvailability", {
           id_entity: this.pending_loan.entity,
           id_mat: item.material,
-          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date }
+          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date, "id_loan": id_loan }
 
         }).then(data => {
           let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
@@ -711,12 +720,13 @@ export default {
       } else {
         let specificinstance_id = item.specificinstance;
         let model = item.model
+        
 
         this.$store.dispatch("entities/specificMaterials/getMaterialAvailability", {
           id_entity: this.pending_loan.entity,
           id_model: model,
           id_instance: specificinstance_id,
-          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date }
+          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date, "id_loan": id_loan }
 
         }).then(data => {
 
@@ -761,8 +771,8 @@ export default {
       }
       this.loaded = true;
 
-      let checkDates = (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.due_date !== (null))
-                        || (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.return_date !== (null));
+      let checkDates = (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.due_date !== (null||""))
+                        || (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.return_date !== (null||""));
 
 
       if(checkDates) {
