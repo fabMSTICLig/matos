@@ -338,12 +338,13 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
         
         if('id_loan' in request.data and request.data['id_loan'] != ""):
             print('loan not null');
+            if loans_current :
+                loans_current = loans_current.exclude(pk=request.data['id_loan'])
+            if loans_ended :
+                loans_ended = loans_ended.exclude(pk=request.data['id_loan'])
+            if loans_next :
+                loans_next = loans_next.exclude(pk=request.data['id_loan'])
 
-            loans_current = loans_current.exclude(pk=request.data['id_loan'])
-            loans_ended = loans_ended.exclude(pk=request.data['id_loan'])
-            loans_next = loans_next.exclude(pk=request.data['id_loan'])
-        print("quantité")
-        print(quantity)
         total=0
 
         loans_list = []
@@ -462,9 +463,12 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
             loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).exclude(pk=request.data['id_loan']).first()
 
         if('id_loan' in request.data and request.data['id_loan'] != ""):
-            loans_current = loans_current.exclude(pk=request.data['id_loan'])
-            loans_ended = loans_ended.exclude(pk=request.data['id_loan'])
-            loans_next = loans_next.exclude(pk=request.data['id_loan'])
+            if loans_current:
+                loans_current = loans_current.exclude(pk=request.data['id_loan'])
+            if loans_ended:
+                loans_ended.exclude(pk=request.data['id_loan'])
+            if loans_next :
+                loans_next = loans_next.exclude(pk=request.data['id_loan'])
         res = True
       
         if loans_current:

@@ -243,7 +243,10 @@ export default {
       }
     },
     addItem(item) {
-      this.addMaterial(item);
+      if(item.quantity > 0) {
+        console.log(item.quantity);
+        this.addMaterial(item);
+      }
     },
     onPageChange(page) {
       this.current_page = page;

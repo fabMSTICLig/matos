@@ -129,18 +129,17 @@
                           <td class="col-8 disabled">
                             {{ gmById(item.material) | field("name") }}
                           </td>
-                          <td class="col-3 disabled">
+                          <td class="col-3 disabled" v-show="!disabledQuantity(item)">
                             <input
                               type="number"
                               class="number-input form-control form-control"
                               v-model="item.quantity"
                               :disabled="readOnly"
-                              :readOnly="disabledItem(item)"
                               v-on:change="checkQuantities()"
                             />
                           </td>
 
-                          <td class="col-1 disabled">
+                          <td class="col-1 disabled" v-show="!disabledQuantity(item)">
                             <button
                               v-if="!readOnly"
                               class="btn btn-danger"
@@ -417,7 +416,10 @@ export default {
         ? "Modification prêt"
         : "Nouveau prêt";
     },
-
+    checkDates() {
+      return ((this.pending_loan.checkout_date !== null && this.pending_loan.checkout_date !=="") && (this.pending_loan.due_date !== null && this.pending_loan.due_date !== ""))
+                        || ((this.pending_loan.checkout_date !==  null && this.pending_loan.checkout_date !== "") && (this.pending_loan.return_date !== null || this.pending_loan.return_date !== ""));
+    }
   },
   watch: {
     'pending_loan.specific_materials': {
@@ -666,21 +668,17 @@ export default {
           this.goTo(data.id);
         });
     },
-    disabledItem(item) {
-      let materialDisabled = this.disabled.find(
-        material => material == item.material
-      );
-      return materialDisabled ? true : false;
+    disabledQuantity(item){
+     let genericMaterial = this.genericmaterials.find( material => material.id == item.material);
+     console.log(genericMaterial);
+     return genericMaterial ? genericMaterial.quantity == 0 : false;
     },
     checkQuantities() {
       for(let i=0; i<= this.pending_loan.generic_materials.length-1;i++) {
         let itemgeneric = this.pending_loan.generic_materials[i]
         let genericMaterial = this.genericmaterials.find( material => material.id == itemgeneric.material)
 
-        let checkDates = (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.due_date !== (null))
-                          || (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.return_date !== (null));
-
-        if(checkDates) {
+        if(this.checkDates && genericMaterial.quantity !== 0) {
           this.setMaterialAvailability(itemgeneric);
         }
 
@@ -707,21 +705,29 @@ export default {
           data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date, "id_loan": id_loan }
 
         }).then(data => {
+         
           let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
+         
           if(genericMaterial) {
-            genericMaterial.quantity = data.quantity
-            if(parseInt(item.quantity) > genericMaterial.quantity) {
+
+          console.log(genericMaterial.quantity > 0);
+
+            if((parseInt(item.quantity) > data.quantity) && (genericMaterial.quantity > 0 )) {
+              let material = {};
+              material["name"] = genericMaterial.name;
+              material["quantity"] = data.quantity;
+              material["id"] = genericMaterial.id
               if(!this.maxQuantities.find(item => item.id == genericMaterial.id)){
-                this.maxQuantities.push(genericMaterial);
+                this.maxQuantities.push(material);
               }
             }
           }
         });
       } else {
+        
         let specificinstance_id = item.specificinstance;
         let model = item.model
         
-
         this.$store.dispatch("entities/specificMaterials/getMaterialAvailability", {
           id_entity: this.pending_loan.entity,
           id_model: model,
@@ -771,11 +777,8 @@ export default {
       }
       this.loaded = true;
 
-      let checkDates = (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.due_date !== (null||""))
-                        || (this.pending_loan.checkout_date !== (null||"") && this.pending_loan.return_date !== (null||""));
-
-
-      if(checkDates) {
+      if(this.checkDates) {
+   
         for(let i=0; i<=this.pending_loan.generic_materials.length-1; i++) {
           let materialgeneric = this.pending_loan.generic_materials[i];
           this.setMaterialAvailability(materialgeneric);
@@ -787,7 +790,6 @@ export default {
               return Object.values(this.specificinstances[instances]).find(object => object.id == specificinstance_id)
           });
           let model = instances[0]
-
           let item = {"specificinstance":specificinstance_id,"model":model};
           this.setMaterialAvailability(item);
         }
