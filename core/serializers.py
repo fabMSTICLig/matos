@@ -176,7 +176,12 @@ class LoanSerializer(serializers.ModelSerializer):
         loan.save()
         # Create Loan Generic Item
         for item in genmats:
-            item = LoanGenericItem(quantity=item['quantity'],material=item['material'], loan=loan)
+            quantity = item['quantity']
+            if item['material'].quantity == 0:
+                print('Zero')
+                print(item['material'])
+                quantity = 0
+            item = LoanGenericItem(quantity=quantity,material=item['material'], loan=loan)
             item.save()
 
         return loan

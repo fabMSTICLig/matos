@@ -435,7 +435,6 @@ class SpecificMaterialsTests(APITestCase):
         materials_specific_instance = {"model":self.materials_specific.pk, "name":"carte ARM/FPGA Soc 2", "serial_num":"002234", "description":'instance2 carte FPGA Phelma'}
         response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), materials_specific_instance)
         response.render()
-        print(response.data)
         # OK
         self.assertEquals(response.status_code,status.HTTP_201_CREATED)
 
@@ -494,6 +493,8 @@ class LoanMaterialsTests(APITestCase):
         self.materials_generic = GenericMaterial.objects.create(name="Module RF433,",ref_int="MHZRF433",ref_man="SparkFunMZ433",localisation="FabMSTIC",description="Module radio 433MHZ",quantity="20",entity=self.entity)
         self.materials_specific2 = SpecificMaterial.objects.create(name="Epson projector EBS31 RM1250,",ref_int="EBS31-RM1250_ensag",ref_man="EBS31-RM1250",localisation="perForm - salle matériels video - 1er etage",description="Besoin d'un adaptateur screenbeam pour fonctionner",entity=self.entity)
         self.materials_specific_instance2 = SpecificMaterialInstance.objects.create(model=self.materials_specific2, name="Epson projector EBS31 RM1250", serial_num="002234", description='instance Epson projector EBS31 RM1250 Ensag' )
+        self.materials_generic_2 =  GenericMaterial.objects.create(name="Détecteur DHT22,",ref_int="dht22_aip",ref_man="dht22_stutt",localisation="FabMSTIC",description="Capteur qualité air",quantity="0",entity=self.entity)
+
         self.loan = Loan.objects.create(status=3, checkout_date = datetime.date(2020,6,8), user=self.user,entity=self.entity, due_date=datetime.date(2020,6,24), return_date=datetime.date(2020,6,24), comments='demande de prêt cours arts visuel')
         self.loan.specific_materials.add(self.materials_specific_instance)
         self.loan.save()
@@ -565,12 +566,34 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         self.assertEquals(response.data['status'], 2)
 
+    def test_create_loan_zeroquantity(self):
+        """
+        un utilisateur peut faire une demande de prêt d'un matériel générique sans quantité prise en compte
+        """
+        data = {"status" : 2, "checkout_date" : datetime.date(2020,6,25), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,25), "return_date" : datetime.date(2020,7,25), "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [], 'generic_materials': [{"material": self.materials_generic.pk, "quantity": 2 }, { "material": self.materials_generic_2.pk, "quantity": 1 }] }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(reverse('loan-list'), data, format='json')
+        response.render()
+
+        loan_id = response.data['id']
+        self.assertEquals(response.data['status'], 2)
+
+        data["status"] = 3
+        self.client.force_authenticate(user=self.manager1)
+        response = self.client.patch(reverse('loan-detail', kwargs={'pk': loan_id}), data)
+        response.render()
+
+        loan = Loan.objects.get(id=loan_id)
+        genmats = loan.generic_materials.all()
+        self.assertEquals(genmats[1].quantity, 0)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
 
     def test_update_loan_status(self):
         """
         un utilisateur peut uniquement modifier des prêts avec le status pending
         """
-        data = {"status" : 2, "id": self.loan_user.pk, "checkout_date" : datetime.date(2020,6,26), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
+        data = { "status" : 2, "id": self.loan_user.pk, "checkout_date" : datetime.date(2020,6,26), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,24), "comments" : 'modification pret 1', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
         response.render()
@@ -773,7 +796,6 @@ class LoanMaterialsTests(APITestCase):
         data = {"status" : 3, "checkout_date" : datetime.date(2020,10,8), "user" : self.manager1.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,9), "return_date" : datetime.date(2020,12,20), "comments" : 'demande de prêt projecteur cours Polytech', 'specific_materials': [self.materials_specific_instance2.pk], 'generic_materials': [] }
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        print(response.data)
         self.assertGreater(datetime.date(2020,12,10), datetime.date(2020,11,11))
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
