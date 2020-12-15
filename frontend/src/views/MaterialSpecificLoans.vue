@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="selected_object">
+    <div>
       <div class="row">
         <div class="col-12 col-md-12 col-lg-7 col-sm-12">
           <div class="card">
@@ -21,7 +21,8 @@
                   <ul
                     :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
                     :id="'tooltip' + _uid"
-                    aria-labelledby="dropdownMenuButton"
+                    aria-labelledby="dropdownMenu"
+                    role="menu"
                   >
                     <li
                       class="dropdown-item"
@@ -31,10 +32,10 @@
                       type="button"
                       :class="{
                         active:
-                          selected_instance && item.id == selected_instance.id
+                          (selected_instance && item.id == selected_instance.id)
                       }"
                     >
-                      {{ item.name }}
+                     {{ item.name }}
                     </li>
                   </ul>
                 </div>
@@ -60,7 +61,7 @@
             </div>
             <div class="card-body">
               <div class="table-responsive table-hover">
-                <table class="table" v-if="objects_filtered">
+                <table class="table" v-if="objects_filtered && loaded">
                   <thead>
                     <tr>
                       <th>Utilisateur</th>
@@ -79,6 +80,7 @@
                         'table-active':
                           selected_object && loan.id == selected_object.id
                       }"
+                      v-show="selected_object"
                     >
                       <td>
                         {{ userById(loan.user) | field("username") }}
@@ -236,7 +238,8 @@ export default {
         return_date: { value: 3, label: "Date de retour" }
       },
       show: false,
-      showDelete: false
+      showDelete: false,
+      hover: false
     };
   },
   components: {
@@ -264,6 +267,7 @@ export default {
             );
           else return true;
         });
+       
         return filtered.sort((a, b) => {
           if (this.sort_input == this.sort_choices.due_date.value)
             return a.due_date.localeCompare(b.due_date);
@@ -282,16 +286,19 @@ export default {
           }
         });
       }
+
       return this.loans;
     },
     isRemoval() {
       return this.selected_object.status == 2;
     },
     loans_paginated() {
+      console.log(process.env.VUE_APP_MAXLIST);
       return this.objects_filtered.slice(
         (this.current_page - 1) * process.env.VUE_APP_MAXLIST,
         this.current_page * process.env.VUE_APP_MAXLIST
       );
+      
     },
     per_page() {
       return parseInt(process.env.VUE_APP_MAXLIST);

@@ -33,7 +33,7 @@
             v-slot="{ href, route, navigate }"
           >
             <li class="nav-item" role="presentation">
-              <a class="nav-link" :href="href" @click="navigate">Rechercher</a>
+              <a class="nav-link" :href="href" @click="navigate">Matériels</a>
             </li>
           </router-link>
 
