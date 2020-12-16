@@ -129,7 +129,7 @@
                           <td class="col-8 disabled">
                             {{ gmById(item.material) | field("name") }}
                           </td>
-                          <td class="col-3 disabled" v-show="!disabledQuantity(item)">
+                          <td class="col-3 disabled">
                             <input
                               type="number"
                               class="number-input form-control form-control"
@@ -139,7 +139,7 @@
                             />
                           </td>
 
-                          <td class="col-1 disabled" v-show="!disabledQuantity(item)">
+                          <td class="col-1 disabled">
                             <button
                               v-if="!readOnly"
                               class="btn btn-danger"
@@ -418,13 +418,13 @@ export default {
     },
     checkDates() {
       return ((this.pending_loan.checkout_date !== null && this.pending_loan.checkout_date !=="") && (this.pending_loan.due_date !== null && this.pending_loan.due_date !== ""))
-                        || ((this.pending_loan.checkout_date !==  null && this.pending_loan.checkout_date !== "") && (this.pending_loan.return_date !== null || this.pending_loan.return_date !== ""));
+                        || ((this.pending_loan.checkout_date !==  null && this.pending_loan.checkout_date !== "") && (this.pending_loan.return_date !== null && this.pending_loan.return_date !== ""));
     }
   },
   watch: {
     'pending_loan.specific_materials': {
       handler() {
-        if(this.pending_loan.due_date !== null && this.pending_loan.checkout_date !== null) {
+        if(this.checkDates) {
           if(this.pending_loan.specific_materials.length) {
             this.getMaterialAvailability();
           }
@@ -435,7 +435,7 @@ export default {
     'pending_loan.checkout_date': {
       handler() {
         this.maxQuantities = [];
-        if(this.pending_loan.due_date !== null && this.pending_loan.checkout_date !== null) {
+        if(this.checkDates) {
           if(this.pending_loan.specific_materials.length) {
             this.getMaterialAvailability();
           }
@@ -447,7 +447,7 @@ export default {
     'pending_loan.due_date': {
       handler() {
         this.maxQuantities = [];
-        if(this.pending_loan.due_date !== null && this.pending_loan.checkout_date !== null) {
+        if(this.checkDates) {
           if(this.pending_loan.specific_materials.length) {
             this.getMaterialAvailability();
           }
@@ -460,7 +460,7 @@ export default {
     'pending_loan.return_date': {
       handler() {
         this.maxQuantities = [];
-        if(this.pending_loan.checkout_date !== null && this.pending_loan.return_date !== null) {
+        if(this.checkDates) {
           if(this.pending_loan.specific_materials.length) {
             this.getMaterialAvailability();
           }
@@ -668,11 +668,6 @@ export default {
           this.goTo(data.id);
         });
     },
-    disabledQuantity(item){
-     let genericMaterial = this.genericmaterials.find( material => material.id == item.material);
-     console.log(genericMaterial);
-     return genericMaterial ? genericMaterial.quantity == 0 : false;
-    },
     checkQuantities() {
       for(let i=0; i<= this.pending_loan.generic_materials.length-1;i++) {
         let itemgeneric = this.pending_loan.generic_materials[i]
@@ -778,6 +773,7 @@ export default {
       this.loaded = true;
 
       if(this.checkDates) {
+        alert('checkdates');
    
         for(let i=0; i<=this.pending_loan.generic_materials.length-1; i++) {
           let materialgeneric = this.pending_loan.generic_materials[i];
