@@ -337,7 +337,6 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
         quantity=generic_material.first().quantity
         
         if('id_loan' in request.data and request.data['id_loan'] != ""):
-            print('loan not null');
             if loans_current :
                 loans_current = loans_current.exclude(pk=request.data['id_loan'])
             if loans_ended :
@@ -454,7 +453,6 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
         Get availability of material using pk of nested router and checkout_date, due_date in request
         """
         specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['pk'])
-
         loans_current = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).distinct().first()
         loans_ended = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).exclude(pk=request.data['id_loan']).first()
         if('due_date' in request.data):
@@ -539,7 +537,6 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         if(self.request.user.is_staff):
             return self.queryset.all()
-        print(len(self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()))
         return self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()
 
     def create(self, request, *args, **kwargs):
@@ -565,6 +562,7 @@ class LoanViewSet(viewsets.ModelViewSet):
             new_loan.send(sender=Loan,instance=loan,loan=loan)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
+
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -671,7 +669,6 @@ class LoanViewSet(viewsets.ModelViewSet):
                 material = GenericMaterial.objects.get(id=mat['material'])
                 gen_mats.append(LoanGenericItem(loan=copy, material=material, quantity=mat['quantity']))
             LoanGenericItem.objects.bulk_create(gen_mats)
-        print(LoanGenericItem)
         scopy=self.get_serializer(copy)
 
         return Response(scopy.data)
