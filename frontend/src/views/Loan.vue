@@ -132,6 +132,7 @@
                           <td class="col-3 disabled">
                             <input
                               type="number"
+                              min="1"
                               class="number-input form-control form-control"
                               v-model="item.quantity"
                               :disabled="readOnly"

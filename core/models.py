@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 from django.contrib import admin
-import uuid # Required for unique book instances
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
 

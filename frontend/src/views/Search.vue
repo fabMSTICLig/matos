@@ -40,7 +40,7 @@
               <div class="form-group">
                 <label>Tags</label>
                 <TagsInput
-                  fieldName="tags"
+                  fieldName="tags_filter"
                   :object="this"
                   ressource="tags"
                   forbidAdd
@@ -149,7 +149,7 @@ export default {
       search_input: "",
       sort_input: 1,
       type_input: 1,
-      tags: [],
+      tags_filter: [],
       current_page: 1,
       entities_filter: [],
       sort_choices: {
@@ -199,8 +199,8 @@ export default {
           entitycheck = this.entities_filter.indexOf(item.entity) > -1;
         }
         var tagcheck = true;
-        if (filterstring && this.tags.length != 0 && entitycheck) {
-          tagcheck = this.tags.some(tag => item.tags.indexOf(tag) > -1);
+        if (filterstring && this.tags_filter.length != 0 && entitycheck) {
+          tagcheck = this.tags_filter.some(tag => item.tags.indexOf(tag) > -1);
         }
         return filterstring && entitycheck && tagcheck;
       });
@@ -223,6 +223,14 @@ export default {
       return Math.ceil(
         this.objects_filtered.length / process.env.VUE_APP_MAXLIST
       );
+    },
+    search_change(){
+        return this.search_input, this.type_input, this.tags_filter, this.entities_filter;
+    }
+  },
+  watch:{
+    search_change(){
+        this.current_page=1;
     }
   },
   methods: {

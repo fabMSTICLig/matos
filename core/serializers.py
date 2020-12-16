@@ -137,6 +137,7 @@ class LoanGenericItemSerializer(serializers.ModelSerializer):
     """
     Serializer for Loan generic items related
     """
+    quantity = serializers.IntegerField(min_value=0)
     class Meta:
         model = LoanGenericItem
         fields = ('material','quantity')
