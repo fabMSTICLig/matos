@@ -251,6 +251,10 @@ export default {
       }
     },
     addItem(item) {
+      if(this.pending_loan.entity == null)
+        {
+        this.entities_filter.push(item.entity)
+        }
       this.addMaterial(item);
     },
     onPageChange(page) {
@@ -273,6 +277,13 @@ export default {
       (this.pending_loan.status == 3 || this.pending_loan.status == 4)
     ) {
       this.$store.commit("loans/resetPending");
+    }
+    else
+    {
+        if(this.pending_loan.entity != null)
+        {
+            this.entities_filter.push(this.pending_loan.entity)
+        }
     }
   }
 };
