@@ -478,8 +478,6 @@ export default {
           var values = ["Annulé", "Demandé"];
 
           if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
-            console.log("status");
-            console.log(this.pending_loan.status);
             for (var i = 0; i < keys.length; i++) {
               this.status[keys[i]] = values[i];
             }
@@ -676,12 +674,21 @@ export default {
         if(this.checkDates && genericMaterial.quantity !== 0) {
           this.setMaterialAvailability(itemgeneric);
         }
-
+  
         if(parseInt(itemgeneric.quantity) <= genericMaterial.quantity) {
           let index = this.maxQuantities.indexOf(Object.values(this.maxQuantities).find( obj => obj.id == genericMaterial.id));
           if(index > -1) {
            this.maxQuantities.splice(index,1)
           }
+        }
+
+        if(parseInt(itemgeneric.quantity) > genericMaterial.quantity) {
+          let index = this.maxQuantities.indexOf(Object.values(this.maxQuantities).find( obj => obj.id == genericMaterial.id));
+         
+          if(index == -1) {
+           this.maxQuantities.push(genericMaterial);
+          }
+
         }
       }
     },
@@ -704,8 +711,6 @@ export default {
           let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
          
           if(genericMaterial) {
-
-          console.log(genericMaterial.quantity > 0);
 
             if((parseInt(item.quantity) > data.quantity) && (genericMaterial.quantity > 0 )) {
               let material = {};
@@ -758,7 +763,10 @@ export default {
         var keys = [1, 2];
         var values = ["Annulé", "Demandé"];
 
-        if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
+        if(this.pending_loan.status == 2 && !this.pending_loan.id) {
+          self.status[2] = "Demandé"
+        }
+        if ((this.pending_loan.status == 2 || this.pending_loan.status == 1) && this.pending_loan.id){
           for (var i = 0; i < keys.length; i++) {
             self.status[keys[i]] = values[i];
           }
