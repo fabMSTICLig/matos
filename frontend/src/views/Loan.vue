@@ -133,11 +133,11 @@
                             <input
                               type="number"
                               min="1"
+                              max="10000"
                               class="number-input form-control form-control"
                               v-model="item.quantity"
                               :disabled="readOnly"
                               v-on:change="checkQuantities()"
-                              min="0"
                             />
                           </td>
 
