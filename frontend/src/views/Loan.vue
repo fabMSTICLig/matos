@@ -673,7 +673,7 @@ export default {
         let genericMaterial = this.genericmaterials.find( material => material.id == itemgeneric.material)
 
         if(this.checkDates && genericMaterial.quantity !== 0) {
-          alert(genericMaterial.quantity);
+
           this.setMaterialAvailability(itemgeneric);
         }
   
@@ -783,7 +783,6 @@ export default {
       this.loaded = true;
 
       if(this.checkDates) {
-        alert('checkdates');
    
         for(let i=0; i<=this.pending_loan.generic_materials.length-1; i++) {
           let materialgeneric = this.pending_loan.generic_materials[i];
