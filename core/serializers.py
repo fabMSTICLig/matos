@@ -176,12 +176,7 @@ class LoanSerializer(serializers.ModelSerializer):
         loan.save()
         # Create Loan Generic Item
         for item in genmats:
-            quantity = item['quantity']
-            if item['material'].quantity == 0:
-                print('Zero')
-                print(item['material'])
-                quantity = 0
-            item = LoanGenericItem(quantity=quantity,material=item['material'], loan=loan)
+            item = LoanGenericItem(quantity=item['quantity'],material=item['material'], loan=loan)
             item.save()
 
         return loan
@@ -270,8 +265,6 @@ class LoanSerializer(serializers.ModelSerializer):
 
         for item in data['loangenericitem_set']:
             if item['material'].entity != entity:
-                print(item['material'])
-                print(entity)
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité prêteuse.")
         return data
 
