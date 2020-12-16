@@ -136,6 +136,7 @@
                               v-model="item.quantity"
                               :disabled="readOnly"
                               v-on:change="checkQuantities()"
+                              min="0"
                             />
                           </td>
 
@@ -672,6 +673,7 @@ export default {
         let genericMaterial = this.genericmaterials.find( material => material.id == itemgeneric.material)
 
         if(this.checkDates && genericMaterial.quantity !== 0) {
+          alert(genericMaterial.quantity);
           this.setMaterialAvailability(itemgeneric);
         }
   
@@ -682,7 +684,7 @@ export default {
           }
         }
 
-        if(parseInt(itemgeneric.quantity) > genericMaterial.quantity) {
+        if((parseInt(itemgeneric.quantity) > genericMaterial.quantity) && genericMaterial.quantity > 0 ) {
           let index = this.maxQuantities.indexOf(Object.values(this.maxQuantities).find( obj => obj.id == genericMaterial.id));
          
           if(index == -1) {
