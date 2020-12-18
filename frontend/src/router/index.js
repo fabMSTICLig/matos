@@ -58,12 +58,6 @@ const routes = [
     component: Home
   },
   {
-    path: "/about",
-    name: "about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
-  },
-  {
     path: "/profile",
     name: "profile",
     beforeEnter: requireAuth,
@@ -396,7 +390,7 @@ const routes = [
                       labelprop: "name",
                       labelchild: "Prêts"
                     },
-                    name: "genericmaterial"
+                    name: "genericmaterialloans"
                   }
                 }
               },
