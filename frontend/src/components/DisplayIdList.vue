@@ -11,6 +11,10 @@
 </template>
 
 <script>
+  /*
+    Component used to display items in list
+    props ressource store, object and field to display
+  */
 export default {
   name: "DisplayIdList",
   props: {

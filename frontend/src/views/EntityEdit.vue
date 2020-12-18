@@ -134,6 +134,9 @@ import { EditMixin } from "@/common/mixins";
 import DynList from "@/components/DynList";
 import Markdown from "@/components/Markdown";
 
+/*
+  Vue Edition d'une Entité
+*/
 export default {
   name: "EntityEdit",
   mixins: [EditMixin],

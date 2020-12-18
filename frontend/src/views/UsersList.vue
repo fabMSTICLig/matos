@@ -84,6 +84,9 @@
 <script>
 import DisplayIdList from "@/components/DisplayIdList";
 import { ListMixin } from "@/common/mixins";
+/*
+  Vue liste Utilisateurs
+*/
 export default {
   name: "UsersList",
   mixins: [ListMixin],

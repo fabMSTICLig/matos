@@ -35,6 +35,9 @@
         <div class="card-body">
           <fieldset>
             <legend>Informations</legend>
+            <!--
+            propriété displayed markdown - utilisée pour le mode affichage seulement
+            -->
             <markdown
               :description="object.description"
               :displayed="displayed"
@@ -59,7 +62,9 @@
 import { mapGetters } from "vuex";
 import DisplayIdList from "@/components/DisplayIdList";
 import Markdown from "@/components/Markdown";
-
+/*
+  Vue Informations Entité
+*/
 export default {
   name: "Entity",
   data() {

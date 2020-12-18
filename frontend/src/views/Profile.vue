@@ -154,6 +154,13 @@ import {
 } from "@/store/actions.type";
 import { mapGetters } from "vuex";
 import { JSONRenderer } from "@/common/helpers";
+/*
+  Profile de l'utilisateur
+*/
+
+/*
+  @TODO: synchoniser les affiliations suite à la validation RGPD
+*/
 export default {
   name: "Profile",
   components: {
@@ -235,6 +242,9 @@ export default {
       });
     },
     personalData() {
+      /*
+        retourne les données personnelles d'utilisation de la plateforme
+      */
       return this.$store.dispatch(USER_DATA).then(() => {
         let dateObj = new Date();
         let month = dateObj.getMonth() + 1; //months from 1-12

@@ -164,7 +164,9 @@
 import { ListMixin } from "@/common/mixins";
 import Modal from "@/components/Modal";
 import { mapGetters } from "vuex";
-
+/*
+  Composant emprunts utilisateur
+*/
 export default {
   name: "LoansList",
   mixins: [ListMixin],
@@ -243,6 +245,7 @@ export default {
       this.$router.push({ name: "loan" });
     },
     deleteLoan() {
+      // affichage modal
       this.showDelete = true;
     }
   },

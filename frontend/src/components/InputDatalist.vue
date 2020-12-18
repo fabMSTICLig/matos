@@ -60,6 +60,11 @@ export default {
       else return this.ressource;
     },
     options() {
+      /*
+        Boucle sur les items de la liste
+        Possibilité de désactiver un item en passant la clé $isDisabled en vérifiant une propriété active d'un item
+        @see https://vue-multiselect.js.org/#sub-custom-option-template
+      */
       let options = [];
       for (let i = 0; i <= this.objects_list.length - 1; i++) {
         let option = {

@@ -69,8 +69,11 @@
 import { EditMixin } from "@/common/mixins";
 // @ is an alias to /src
 import { mapGetters } from "vuex";
+/*
+  Vue Edition Affiliation
+*/
 export default {
-  name: "AffiliaionEdit",
+  name: "AffiliationEdit",
   mixins: [EditMixin],
   data() {
     return {

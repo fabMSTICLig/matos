@@ -7,6 +7,9 @@
 
 <script>
 import Breadcumb from "@/components/Breadcumb";
+/*
+  Routeur Tags
+*/
 export default {
   name: "Tags",
   components: {

@@ -64,7 +64,9 @@
 </template>
 <script>
 // @ is an alias to /src
-
+/*
+  Vue Traitement Données Personnelles
+*/
 export default {
   name: "DataPolicy",
   components: {}

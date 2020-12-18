@@ -122,7 +122,10 @@ import { ListMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
 import Dropdown from "@/components/Dropdown";
 import Markdown from "@/components/Markdown";
-
+/*
+  Composant de gestion du matériel
+  Restreint aux managers
+*/
 export default {
   name: "MaterialsList",
   mixins: [ListMixin],

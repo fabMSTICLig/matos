@@ -219,6 +219,11 @@ import { showMsgOk } from "@/components/Modal";
 import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
 import Markdown from "@/components/Markdown";
+/*
+  Vue Edition Matériel Spécifique pour une Entité
+*/
+
+//utilisation EditMixin 
 
 export default {
   name: "SpecificMaterialEdit",

@@ -79,6 +79,10 @@
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
 // @ is an alias to /src
+
+/*
+  Vue liste des Tags
+*/
 export default {
   name: "TagList",
   mixins: [ListMixin],

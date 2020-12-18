@@ -7,6 +7,9 @@
 
 <script>
 import Breadcumb from "@/components/Breadcumb";
+/*
+  Routeur Entités
+*/
 export default {
   name: "Entities",
   components: {

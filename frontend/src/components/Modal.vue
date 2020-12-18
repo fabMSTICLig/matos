@@ -108,6 +108,10 @@ export const Modal = {
 };
 export default Modal;
 
+/*
+  Modal component 
+  event confirm / close
+*/
 import Vue from "vue";
 
 export function showMsgOk(content) {

@@ -70,7 +70,10 @@ import marked from "marked";
 import DOMPurify from "dompurify";
 import { debounce } from "vue-debounce";
 import Modal from "@/components/Modal";
-
+/* 
+Utilisation de la librairie marked et de la dépendance vue-debounce
+Composant pour afficher le markdown compilé du texte passé en propriété
+*/
 export default {
   name: "Markdown",
   props: {

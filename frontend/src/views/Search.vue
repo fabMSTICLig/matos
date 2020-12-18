@@ -135,7 +135,14 @@ import TagsInput from "@/components/TagsInput";
 import Pagination from "@/components/Pagination";
 import DisplayIdList from "@/components/DisplayIdList";
 import Markdown from "@/components/Markdown";
+/*
+  Vue recherche et ajout de matériel au prêt courant
+  permet l'accès à la vue d'un matériel
+*/
 
+/*
+  @TODO: Optimiser les appels aux tags dans la liste des matériels
+*/
 export default {
   name: "Search",
   components: {
@@ -270,7 +277,10 @@ export default {
     this.$store.dispatch("specificmaterials/fetchList");
     this.$store.dispatch("genericmaterials/fetchList");
     this.$store.dispatch("entities/fetchList");
-    //Si le prêt courant est en readonly (ajout de materiel impossible) on le reset
+    /* 
+      Si le prêt courant est en readonly (ajout de materiel impossible) on le reset
+      Vérification utilisateur non manager d'une entité
+    */
     if (
       !this.isAdmin &&
       this.authUser.entities.indexOf(this.pending_loan.entity) == -1 &&

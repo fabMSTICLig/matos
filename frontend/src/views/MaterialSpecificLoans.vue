@@ -14,7 +14,7 @@
                   <div
                     class="btn btn-primary dropdown-toggle"
                     id="dropdownMenuButton"
-                    @click="toogle"
+                    @click="toggle"
                   >
                     Instances
                   </div>
@@ -36,6 +36,9 @@
                       }"
                     >
                      {{ item.name }}
+                     <!--
+                        Mouse Over à prévoir pour la sélection d'Instances
+                     -->
                     </li>
                   </ul>
                 </div>
@@ -219,7 +222,9 @@
 import { mapGetters } from "vuex";
 import Pagination from "@/components/Pagination";
 import Modal from "@/components/Modal";
-
+/*
+  Composant permettant d'accéder à la gestion des prêts à partir d'instances de matériel
+*/
 export default {
   name: "MaterialSpecificLoans",
   data() {
@@ -327,6 +332,9 @@ export default {
     selectInstance(item) {
       this.selected_instance = Object.assign({}, item);
       this.show = false;
+      /*
+        TODO: optimisation récuperation des prêts
+      */
       this.$store
         .dispatch("entities/specificMaterials/instances/materialLoans", {
           id_entity: this.$route.params.entityid,
@@ -335,14 +343,13 @@ export default {
         })
         .then(() => {
           this.selected_object = this.objects_filtered[0];
-          console.log(this.loans);
         });
     },
     setInstance(item) {
       this.selected_instance = Object.assign({}, item);
     },
 
-    toogle(e) {
+    toggle(e) {
       e.preventDefault();
       this.show = !this.show;
     },
@@ -378,6 +385,9 @@ export default {
     pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
+    /*
+      Affectation du matériel spécifique
+    */
     pall.push(
       this.$store
         .dispatch(this.ressource + "/fetchSingle", {
@@ -395,20 +405,32 @@ export default {
         })
         .then(() => {
           if (this.objects_list.length > 0) {
+            console.log('liste materiels');
+            console.log(this.objects_list);
             this.selectInstance(this.objects_list[0]);
           }
         })
     );
     Promise.all(pall).then(() => {
-      this.$store
-        .dispatch("entities/specificMaterials/instances/materialLoans", {
-          id_entity: this.$route.params.entityid,
-          id_specificmaterial: this.$route.params.matid,
-          id_instance: this.selected_instance.id
-        })
-        .then(() => {
-          this.selected_object = this.objects_filtered[0];
-          this.loaded = true;
+      if(this.objects_list.length)
+        this.$store
+          .dispatch("entities/specificMaterials/instances/materialLoans", {
+            id_entity: this.$route.params.entityid,
+            id_specificmaterial: this.$route.params.matid,
+            id_instance: this.selected_instance.id
+          })
+          .then(() => {
+
+            // Passage du prêt séléctionné au premier élément de la liste des prêts
+
+            this.selected_object = this.objects_filtered[0];
+           
+            // Mutation des prêts getters loans
+
+            /*
+              TODO: optimisation du chargement des prêts à prévoir 
+            */
+            this.loaded = true;
         });
     });
   }

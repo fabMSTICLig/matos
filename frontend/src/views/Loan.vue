@@ -317,6 +317,9 @@ import { mapGetters, mapMutations } from "vuex";
 import DynList from "@/components/DynList";
 import { showMsgOk } from "@/components/Modal";
 import InputDatalist from "@/components/InputDatalist";
+/*
+  Composant permettant de gérer le prêt courant
+*/
 export default {
   name: "Loan",
   components: {
@@ -332,7 +335,6 @@ export default {
       makeChild_btn: false,
       selected: [],
       maxQuantities: [],
-      maxQuantitiesLoan: [],
       genericMaterialsLoan: [],
       disabled: [],
       idRoute: ""
@@ -352,6 +354,9 @@ export default {
       loans: "entities/genericMaterials/loans"
     }),
     status: {
+      /*
+        Status dynamique en fonction de l'utilisateur et de l'étape courante
+      */
       get: function() {
         return this.$store.getters["loans/status"];
       },
@@ -419,11 +424,17 @@ export default {
         : "Nouveau prêt";
     },
     checkDates() {
+      /*
+        Vérification des dates remplies pour la demande ou la modification 
+      */
       return ((this.pending_loan.checkout_date !== null && this.pending_loan.checkout_date !=="") && (this.pending_loan.due_date !== null && this.pending_loan.due_date !== ""))
                         || ((this.pending_loan.checkout_date !==  null && this.pending_loan.checkout_date !== "") && (this.pending_loan.return_date !== null && this.pending_loan.return_date !== ""));
     }
   },
   watch: {
+    /*
+      Disponibilité d'un matériel spécifique si modification d'Instances
+    */
     'pending_loan.specific_materials': {
       handler() {
         if(this.checkDates) {
@@ -434,6 +445,9 @@ export default {
       },
       deep: true
     },
+    /*
+      Vérification de la disponibilité et quantité des matériels aux changements de dates
+    */
     'pending_loan.checkout_date': {
       handler() {
         this.maxQuantities = [];
@@ -473,24 +487,29 @@ export default {
     pending_loan: {
 
       handler() {
-
+          /*
+            Changement du prêt courant pour un utilisateur
+            Attribution des status en fonction de l'état du prêt
+            Vérification des quantité de matériels disponible
+          */
           if (!this.canManage) {
-          this.status = {};
-          var keys = [1, 2];
-          var values = ["Annulé", "Demandé"];
+          
+            this.status = {};
+            var keys = [1, 2];
+            var values = ["Annulé", "Demandé"];
 
-          if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
-            for (var i = 0; i < keys.length; i++) {
-              this.status[keys[i]] = values[i];
+            if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
+              for (var i = 0; i < keys.length; i++) {
+                this.status[keys[i]] = values[i];
+              }
+            }
+            else if (this.pending_loan.status == 3) {
+              this.status[3] = "Accepté";
+            }
+            else if (this.pending_loan.status == 4 ) {
+              this.status[4] = "Refusé";
             }
           }
-          else if (this.pending_loan.status == 3) {
-            this.status[3] = "Accepté";
-          }
-          else if (this.pending_loan.status == 4 ) {
-            this.status[4] = "Refusé";
-          }
-        }
         this.checkQuantities();
         this.$store.commit("loans/savePending");
       },
@@ -498,6 +517,10 @@ export default {
     },
     "$route.params.loanid": {
       handler: function(loanid) {
+        /*
+          Synchronisation du prêt courant avec la dernière version
+          Redirection vers le prêt
+        */
         this.idRoute = loanid;
         this.loaded=false;
         if (loanid) {
@@ -528,6 +551,9 @@ export default {
         });
     },
     getMaterialAvailability() {
+      /*
+        Vérification de la disponibilité de chaque matériel spécifique inclut dans le prêt
+      */
       this.disabled = [];
       for(let i=0; i<= this.pending_loan.specific_materials.length-1;i++) {
         let specificinstance_id = this.pending_loan.specific_materials[i];
@@ -550,8 +576,7 @@ export default {
         !this.emptyLoan &&
         !this.errors.length &&
         !this.emptyInstances &&
-        !this.maxQuantities.length &&
-        !this.maxQuantitiesLoan.length
+        !this.maxQuantities.length
       ) {
         if (this.pending_loan.return_date == "")
           this.pending_loan.return_date = null;
@@ -669,10 +694,17 @@ export default {
         });
     },
     checkQuantities() {
+      /*
+        Passage des quantités maximales dans un tableau
+        Vérification dépassement du stock et retrait du tableau sinon
+      */
       for(let i=0; i<= this.pending_loan.generic_materials.length-1;i++) {
         let itemgeneric = this.pending_loan.generic_materials[i]
         let genericMaterial = this.genericmaterials.find( material => material.id == itemgeneric.material)
 
+        /*
+          Vérification sans le cas ou le stock est à zero
+        */
         if(this.checkDates && genericMaterial.quantity !== 0) {
 
           this.setMaterialAvailability(itemgeneric);
@@ -696,6 +728,12 @@ export default {
       }
     },
     setMaterialAvailability(item) {
+
+      /*
+        Passage de la disponibilité d'un matériel ou de la quantité disponible
+      */
+
+      // Affectation d'une variable id du prêt pour l'exclure de la recherche si prêt existant
      
       let id_loan=""
       
@@ -781,6 +819,7 @@ export default {
           self.status[4] = "Refusé";
         }
       }
+      //début chargement
       this.loaded = true;
 
       if(this.checkDates) {

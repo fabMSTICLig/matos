@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div class="card" v-if="object && filter_entities && loaded">
+      <div class="card" v-if="object && loaded">
         <div class="card-header">
           <h3 class="float-left" v-text="object.name"></h3>
           <div role="group" class="float-right">
@@ -26,7 +26,7 @@
                 <div
                   class="btn btn-primary dropdown-toggle"
                   id="dropdownMenuButton"
-                  @click="toogle"
+                  @click="toggle"
                 >
                   Copier
                 </div>
@@ -85,6 +85,9 @@ import DisplayIdList from "@/components/DisplayIdList";
 import { mapGetters, mapMutations } from "vuex";
 import { showMsgOk } from "@/components/Modal";
 
+/*
+    Router vue matériel spécifique / générique
+*/
 export default {
   name: "MaterialInfos",
   components: {
@@ -127,7 +130,7 @@ export default {
     make_label() {
       return this.object.name;
     },
-    toogle(e) {
+    toggle(e) {
       e.preventDefault();
       this.show = !this.show;
     },
@@ -181,6 +184,9 @@ export default {
       self.loaded = true;
     },
     copyMaterial(entity) {
+      /*
+        Copie du matériel dans une entité gérée
+      */
       var ressource = "";
       if (this.ressource == "genericmaterials") {
         ressource = "entities/genericMaterials";

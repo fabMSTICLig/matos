@@ -75,6 +75,9 @@
 import { ListMixin } from "@/common/mixins";
 // @ is an alias to /src
 import { mapGetters } from "vuex";
+/*
+  Vue liste Affiliations
+*/
 export default {
   name: "AffiliationList",
   mixins: [ListMixin],

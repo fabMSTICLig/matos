@@ -7,6 +7,9 @@
 
 <script>
 import Breadcumb from "@/components/Breadcumb";
+/*
+  Vue Affiliations
+*/
 export default {
   name: "Affiliations",
   components: {

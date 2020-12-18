@@ -150,12 +150,19 @@ export default {
   methods: {
     logout(e) {
       e.preventDefault();
+      /*
+        TODO: authentication always externe CAS
+        logout on auth django in development
+      */
       if (this.pending_loan) {
         this.$store.commit("loans/resetPending");
       }
       window.location = this.authUser.externe ? "/cas/logout" : "/auth/logout";
     },
     collapse() {
+      /*
+        Emulate bootstrap collapse menu
+      */
       if (this.collapsed == "collapse navbar-collapse") {
         this.collapsed = "navbar-collapse";
       } else {

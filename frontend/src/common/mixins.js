@@ -1,6 +1,9 @@
 import Pagination from "@/components/Pagination";
 import { showMsgOk } from "@/components/Modal";
-
+/*
+  Mixins pour liste et édition d'objets
+  https://vuejs.org/v2/guide/mixins.html
+*/
 export const ListMixin = {
   components: {
     Pagination

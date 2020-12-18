@@ -36,7 +36,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { mapGetters } from "vuex";
 import { CHECK_AUTH } from "./store/actions.type";
-
+/*
+  Initialisation de l'application
+  Cookie déposé à la première utilisation
+  Chargement des différents stores
+*/
 export default {
   name: "App",
   components: {

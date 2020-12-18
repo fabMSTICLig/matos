@@ -151,6 +151,11 @@ import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
 import { DataHelper } from "@/common/helpers";
+/*
+  Liste des prêts d'une Entité
+*/
+
+// utilisation ListMixin
 
 export default {
   name: "EntityLoansList",
@@ -181,6 +186,11 @@ export default {
       users: "users/list"
     }),
     objects_filtered() {
+      /*
+        retourne les prêts ordonnés par utilisateur
+        filtrés par entité courante
+        et filtrés par date de sortie, date de retour prévue et date de retour par sélection
+      */
       var filtered = this.objects_list
         .filter(item => {
           return item.entity == this.$route.params.entityid;

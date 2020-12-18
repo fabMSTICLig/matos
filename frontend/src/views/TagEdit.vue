@@ -56,6 +56,10 @@
 <script>
 import { EditMixin } from "@/common/mixins";
 // @ is an alias to /src
+
+/*
+  Edition d'un Tag 
+*/
 export default {
   name: "TagEdit",
   mixins: [EditMixin],

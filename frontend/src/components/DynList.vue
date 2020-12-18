@@ -43,6 +43,9 @@
 
 <script>
 import InputDatalist from "@/components/InputDatalist";
+/*
+  Component mixing list input and list group items
+*/
 export default {
   name: "DynList",
   props: {

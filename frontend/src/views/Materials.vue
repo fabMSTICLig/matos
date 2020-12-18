@@ -7,6 +7,9 @@
 </template>
 
 <script>
+  /*
+    Router vue matériels
+  */
 export default {
   name: "Materials",
   components: {},

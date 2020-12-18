@@ -183,7 +183,9 @@
 import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import Modal from "@/components/Modal";
-
+/*
+  Composant permettant d'accéder à la gestion des prêts à partir d'un matériel
+*/
 export default {
   name: "MaterialGenericLoans",
   mixins: [ListMixin],
@@ -273,6 +275,7 @@ export default {
       });
     },
     deleteLoan() {
+      // affichage de la modal
       this.showDelete = true;
     },
     editLoan(loan) {
@@ -289,6 +292,9 @@ export default {
     Promise.all(pall).then(() => {
       this.loaded = true;
     });
+    /*
+      Affectation du matériel courant
+    */
     this.$store
       .dispatch(this.ressource + "/fetchSingle", {
         id: this.$route.params.matid,
@@ -304,6 +310,7 @@ export default {
         id_genericmaterial: this.$route.params.matid
       })
       .then(() => {
+        //Affectation du premier prêt de la liste
         this.selected_object = this.objects_filtered[0];
       });
   }

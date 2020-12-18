@@ -116,6 +116,9 @@
 import { EditMixin } from "@/common/mixins";
 import TagsInput from "@/components/TagsInput";
 import Markdown from "@/components/Markdown";
+/*
+  Vue Edition Matériel Générique pour une Entité
+*/
 
 export default {
   name: "GenericMaterialEdit",

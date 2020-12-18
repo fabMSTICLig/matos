@@ -35,6 +35,10 @@
 </template>
 
 <script>
+  /*
+    Emulate Dropdown bootstrap in Vue
+    Takes in enter button mode, router links with props label and to
+  */
 export default {
   name: "simple-dropdown",
   props: {

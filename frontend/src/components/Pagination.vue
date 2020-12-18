@@ -60,6 +60,9 @@
   </nav>
 </template>
 <script>
+  /*
+    Paginate items
+  */
 export default {
   name: "pagination",
   template: "#pagination",

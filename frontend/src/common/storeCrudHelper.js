@@ -1,5 +1,6 @@
 import Vue from "vue";
 import ApiService from "@/common/api.service";
+
 function mergeDeep(...objects) {
   const isObject = obj => obj && typeof obj === "object";
 
@@ -21,6 +22,10 @@ function mergeDeep(...objects) {
   }, {});
 }
 
+/*
+  Création d'un objet commun pour les appels CRUD
+  Fusionne un store global avec les ascendents 
+*/
 const createCrud = (ressource, source) => {
   const target = {
     namespaced: true,

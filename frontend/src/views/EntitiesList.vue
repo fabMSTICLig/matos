@@ -113,7 +113,9 @@ import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import DisplayIdList from "@/components/DisplayIdList";
 import Markdown from "@/components/Markdown";
-
+/*
+  Vue Liste Entités
+*/
 export default {
   name: "EntitiesList",
   mixins: [ListMixin],

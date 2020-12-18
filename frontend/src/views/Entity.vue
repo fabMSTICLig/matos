@@ -3,6 +3,9 @@
 </template>
 
 <script>
+/*
+	Routeur entité
+*/
 export default {
   name: "Entity",
   data() {

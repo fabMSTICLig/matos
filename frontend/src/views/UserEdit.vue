@@ -117,6 +117,9 @@
 <script>
 import { EditMixin } from "@/common/mixins";
 import DynList from "@/components/DynList";
+/*
+  Edition d'un Utilisateur
+*/
 export default {
   name: "UserEdit",
   mixins: [EditMixin],

@@ -79,6 +79,11 @@ export default {
           })
         );
       }
+      /*
+        Adding a suffix to current route
+        for child component not to be resolved directly 
+        TODO: find a workaround
+      */
       if (item.meta.breadcumb) {
         if (item.meta.breadcumb.label.labelchild)
           promises.push(
