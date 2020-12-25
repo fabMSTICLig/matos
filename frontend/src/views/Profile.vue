@@ -122,7 +122,7 @@
       <p>
         Ces informations ainsi que celles liées aux prêts seront stockées 3 ans
         après que vous ayez quitté l'université ou sur demande à l'adresse
-        CONTACT
+        matos@univ-grenoble-alpes.fr
       </p>
 
       <h6>Accepter vous ces termes ?</h6>
