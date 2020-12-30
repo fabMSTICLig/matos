@@ -116,15 +116,6 @@ class SpecificMaterialSerializer(serializers.ModelSerializer):
         model = SpecificMaterial
         fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation']
 
-#class SpecificInstancesNestedSerializer(serializers.ModelSerializer):
-#    """
-#    Serializer for Specific Material nested objects.
-#    """
-#    instances = SpecificMaterialInstanceSerializer(many=True,read_only=True)
-#    class Meta:
-#        model = SpecificMaterial
-#        fields = ['id','name','description','instances']
-
 class SpecificMaterialUserSerializer(serializers.ModelSerializer):
     """
     Serializer for specific material objects.
@@ -215,6 +206,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
         return instance
 
+
     def validate(self, data):
         """
         Validate Loan
@@ -237,6 +229,10 @@ class LoanSerializer(serializers.ModelSerializer):
         for mat in data['specific_materials']:
             if mat.model.entity != entity:
                 raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité preteuse.")
+        for item in data['loangenericitem_set']:
+            if item['material'].entity != entity:
+                raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité prêteuse.")
+        # SPEC MAT
         #conflit prêts en cours
         loans = Loan.objects.filter(specific_materials__in=data['specific_materials'], status=Loan.Status.ACCEPTED, checkout_date__lte=data['checkout_date'], return_date=None, due_date__gt=data['checkout_date']).distinct()
         if('id' in self.initial_data):
@@ -256,17 +252,68 @@ class LoanSerializer(serializers.ModelSerializer):
         if('id' in self.initial_data):
             loans = loans.exclude(id=self.initial_data['id'])
         for loan in loans:
-            if data['due_date']> loan.checkout_date:
-                materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
-                raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être rendu avant le "+str(loan.checkout_date))
             if data['return_date']:
                 if data['return_date'] > loan.checkout_date:
                     materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
                     raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être retourné avant le "+str(loan.checkout_date))
-
+            elif data['due_date']> loan.checkout_date:
+                materialintersec = [ x.name for x in loan.specific_materials.all() if x in data['specific_materials']]
+                raise serializers.ValidationError("Le matériel "+str(materialintersec[0])+" doit être rendu avant le "+str(loan.checkout_date))
+        #GEN MAT
         for item in data['loangenericitem_set']:
-            if item['material'].entity != entity:
-                raise serializers.ValidationError("Tout les matériels doivent apartenir à l'entité prêteuse.")
+            if(item['material'].quantity == 0):
+                continue
+            if(item['material'].quantity < item['quantity']):
+                raise serializers.ValidationError("Pas assez de "+item['material'].name+" en stock "+str(item['material'].quantity)+" max")
+            loanslist = []
+            structlist=[]
+            #Creation d'une structure contenant l'ensemble des prêts checvauchant le prêt courant
+            #conflit prêt en cours
+            loans = Loan.objects.filter(generic_materials__id=item['material'].id, status=Loan.Status.ACCEPTED, checkout_date__lte=data['checkout_date'], return_date=None, due_date__gt=data['checkout_date']).distinct()
+            if('id' in self.initial_data):
+                loans = loans.exclude(id=self.initial_data['id'])
+            loanslist.extend(loans)
+            #conflit prêts en fini
+            loans = Loan.objects.filter(generic_materials__id=item['material'].id, status=Loan.Status.ACCEPTED, checkout_date__lte=data['checkout_date'], return_date__gt=data['checkout_date'])
+            if('id' in self.initial_data):
+                loans = loans.exclude(id=self.initial_data['id'])
+            loanslist.extend(loans)
+            #conflit prêts dans le future
+            if data['return_date']:
+                loans = Loan.objects.filter(generic_materials__id=item['material'].id, status=Loan.Status.ACCEPTED, checkout_date__range=(data['checkout_date'], data['return_date'])).distinct()
+            else:
+                loans = Loan.objects.filter(generic_materials__id=item['material'].id, status=Loan.Status.ACCEPTED, checkout_date__range=(data['checkout_date'], data['due_date'])).distinct()
+            if('id' in self.initial_data):
+                loans = loans.exclude(id=self.initial_data['id'])
+            loanslist.extend(loans)
+            for loan in loanslist:
+                quantity = loan.loangenericitem_set.get(material=item['material']).quantity
+                struct = {'id':loan.id, 'quantity': quantity, 'checkout_date': loan.checkout_date, 'end_date': loan.return_date if loan.return_date else loan.due_date }
+                structlist.append(struct)
+            structlist.append({'id':-1, 'quantity': item['quantity'], 'checkout_date': data['checkout_date'], 'end_date': data['return_date'] if data['return_date'] else data['due_date'] })
+            #liste ordonnée par date de sortie
+            structlist.sort(key=lambda x:x['checkout_date']) 
+            lenlist = len(structlist)
+            i = 0
+            index=-1
+            maxtot=0
+            while i<lenlist:
+                if index==-1 and structlist[i]['id']==-1:
+                    index=i
+                #on commence que quand on est tombé sur le prêt courant
+                if index != -1:
+                    y = 0
+                    total = structlist[i]['quantity']
+                    while y < lenlist:
+                        if i!=y and  structlist[i]['checkout_date'] >= structlist[y]['checkout_date'] and structlist[i]['checkout_date'] < structlist[y]['end_date']:
+                            total = total + structlist[y]['quantity']
+                        y = y+1
+                    if(total > item['material'].quantity):
+                        maxtot = maxtot if total-item['material'].quantity <= maxtot else total-item['material'].quantity
+                i = i+1
+            if(maxtot > 0):
+                raise serializers.ValidationError("Pas assez de quantité en stock pour "+item['material'].name+" ( "+str(maxtot)+" manquant(s) ) pour les dates selectionnées" )
+
         return data
 
 class LoanNestedSerializer(serializers.ModelSerializer):

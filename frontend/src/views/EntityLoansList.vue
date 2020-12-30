@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>{{ entityById($route.params.entityid) | field("name") }}</h2>
+    <h2 v-if="!matid">{{ entityById($route.params.entityid) | field("name") }}</h2>
     <div class="row">
       <div class="col-12 col-md-6">
         <div class="card">
@@ -146,7 +146,6 @@
 </template>
 
 <script>
-import Vue from "vue";
 import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
@@ -170,11 +169,10 @@ export default {
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
       },
-      specificinstances: {},
       copyObj: {}
     };
   },
-  props: ["entityid"],
+  props: ["entityid","matid"],
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
     ...mapGetters(["authUser"]),
@@ -192,9 +190,6 @@ export default {
         et filtrés par date de sortie, date de retour prévue et date de retour par sélection
       */
       var filtered = this.objects_list
-        .filter(item => {
-          return item.entity == this.$route.params.entityid;
-        })
         .filter(item => {
           var user = this.userById(item.user);
           if (user)
@@ -233,23 +228,22 @@ export default {
     entityid: function() {
       this.selected_object = this.objects_filtered[0];
     },
-    selected_object: function() {
-      this.selected_object.models.forEach(item => {
-        this.initInstances(item);
-      });
-    }
   },
   methods: {
     initComponent() {
       return this.$store.dispatch("loans/fetchStatus");
     },
-    initInstances(item) {
-      return this.$store
-        .dispatch("specificmaterials/instances/fetchList", {
-          prefix: "specificmaterials/" + item + "/"
-        })
-        .then(data => {
-          Vue.set(this.specificinstances, item, data);
+    initList() {
+        let params = {}
+        if(this.$route.name=="loansmaterialgeneric") params.gm=this.matid;
+        else if(this.$route.name=="loansmaterialspecific") params.sm=this.matid;
+        else params.entity=this.entityid;
+      this.$store
+        .dispatch("loans/fetchList", { prefix: this.prefix, params:{params:params}})
+        .then(() => {
+          if (this.objects_filtered.length > 0) {
+            this.selected_object = this.objects_filtered[0];
+          }
         });
     },
     setCopy() {

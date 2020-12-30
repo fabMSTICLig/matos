@@ -166,7 +166,7 @@ class EntitiesTests(APITestCase):
         response = self.client.post(reverse('loan-list'),data)
         response.render()
 
-        response = self.client.get(reverse('loans-list', kwargs={'entity_pk':self.lig_entity.pk,'specificmaterial_pk':specificmaterial_pk,'instance_pk':instance_pk}))
+        response = self.client.get(reverse('loan-list'), {'smi':instance_pk})
         response.render()
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), 1)

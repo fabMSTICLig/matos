@@ -235,7 +235,7 @@ export default {
   },
   data() {
     return {
-      ressource: "entities/specificMaterials",
+      ressource: "specificmaterials",
       new_label: "Nouveau Matériel Spécifique",
       object_name: "Matériel",
       selected_object: null,
@@ -252,7 +252,7 @@ export default {
       return "entities/" + this.$route.params.entityid + "/";
     },
     objects_list() {
-      return this.$store.getters["entities/specificMaterials/instances/list"];
+      return this.$store.getters["specificmaterials/instances/list"];
     },
     instancePrefix() {
       return (
@@ -316,7 +316,7 @@ export default {
         return Promise.resolve();
       } else {
         return this.$store
-          .dispatch("entities/specificMaterials/instances/fetchList", {
+          .dispatch("specificmaterials/instances/fetchList", {
             prefix: this.instancePrefix
           })
           .then(() => {
@@ -331,7 +331,7 @@ export default {
     },
     removeObject(item) {
       this.$store
-        .dispatch("entities/specificMaterials/instances/destroy", {
+        .dispatch("specificmaterials/instances/destroy", {
           id: item.id,
           prefix: this.instancePrefix
         })
@@ -346,7 +346,7 @@ export default {
 
       if (this.new_object_name != "" && !this.errors.length) {
         this.$store
-          .dispatch("entities/specificMaterials/instances/create", {
+          .dispatch("specificmaterials/instances/create", {
             data: {
               name: this.new_object_name,
               model: this.object.id,
@@ -368,7 +368,7 @@ export default {
       this.checkErrors();
       if (!this.errors.length) {
         this.$store
-          .dispatch("entities/specificMaterials/instances/update", {
+          .dispatch("specificmaterials/instances/update", {
             data: this.selected_object,
             id: this.selected_object.id,
             prefix: this.instancePrefix

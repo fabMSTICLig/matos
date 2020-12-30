@@ -1,24 +1,9 @@
+<p>Votre demande d'emprunt à été {{ status }}.  <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a>
+</p>
+
 {% if status == '3' %}
-<p>Votre demande d'emprunt à été validée.  <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a>
-</p>
+<p>Vous pouvez prendre contact avec l'entité <a href="mailto:{{loan.entity.contact}}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">{{loan.entity.name}}</a><p>
 {% endif %}
-{% if status == '4' %}
-<p>Votre demande d'emprunt à été rejetée. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a>
-</p>
-{% endif %}
-
-{% if status != '1' and status != '2' %}
-<p>Vous pouvez prendre contact avec l'entité <b>{{loan.entity.name}}</b><p>
-{% endif %}
-
-{% if status == '1' %}
-<p>La demande de prêt suivante a été annulée par <b>{{loan.user.username}}</b><p>
-<p>email: <b>{{loan.user.email}}</b></p>
-<p>pour l'entité {{loan.entity.name}}</p>
-<p>Date d'emprunt: <b>{{loan.checkout_date}}</b></p>
-<p>Date de retour prévue: <b>{{loan.due_date}}</b></p>
-{% endif %}
-
 {% include "email/listmat.html" %}
 
 <p>Ce mail est automatique, veuillez ne pas y répondre directement.</p>

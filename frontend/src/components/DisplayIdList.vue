@@ -29,6 +29,10 @@ export default {
     fieldName: {
       type: String,
       required: true
+    },
+    autoload:{
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -43,7 +47,7 @@ export default {
   },
   methods: {},
   beforeMount() {
-    this.$store.dispatch(this.ressource + "/fetchList");
+    if(this.autoload)this.$store.dispatch(this.ressource + "/fetchList");
   }
 };
 </script>

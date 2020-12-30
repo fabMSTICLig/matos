@@ -29,7 +29,21 @@ from rest_framework.parsers import JSONParser, BaseParser
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 from .serializers import *
 from .permissions import EntityPermission, RGPDAccept, IsManagerCreateOrReadOnly, IsManager, IsManagerOf, IsAdminOrIsSelf, IsAdminOrReadOnly, LoanPermission
-from .signals import *
+from .emails import Emails
+
+class EntityFilterBackend(filters.BaseFilterBackend):
+    """
+    Filter against entity
+    """
+    def filter_queryset(self, request, queryset, view):
+        entityid = request.query_params.get('entity', None)
+        if entityid is not None:
+            try:
+                entityid = int(entityid)
+                return queryset.filter(entity__id=entityid).distinct()
+            except ValueError:
+                pass
+        return queryset
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -321,50 +335,6 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
         except:
             raise ParseError("Error while processing bulk_add")
 
-    @action(methods=['post'], detail=True)
-    def availability(self, request, *args, **kwargs):
-        """
-        Get availability of material generic with genericmaterial pk of nested router and
-        due_date, checkout_date and return_date in request
-        """
-        generic_material = GenericMaterial.objects.filter(pk=self.kwargs['pk'])
-        loans_current = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).all()
-        loans_ended = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).all()
-        if('due_date' in request.data and 'checkout_date' in request.data):
-            loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).all()
-        if('return_date' in request.data and 'checkout_date' in request.data):
-            loans_next = Loan.objects.filter(generic_materials__in=generic_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).all()
-        quantity=generic_material.first().quantity
-        
-        if('id_loan' in request.data and request.data['id_loan'] != ""):
-            if loans_current :
-                loans_current = loans_current.exclude(pk=request.data['id_loan'])
-            if loans_ended :
-                loans_ended = loans_ended.exclude(pk=request.data['id_loan'])
-            if loans_next :
-                loans_next = loans_next.exclude(pk=request.data['id_loan'])
-
-        total=0
-
-        loans_list = []
-        if loans_current:
-            loans_list.append(loans_current)
-        if loans_ended :
-            loans_list.append(loans_ended)
-        if loans_next:
-            loans_list.append(loans_next)
-
-        for loans in loans_list:
-
-            for loan in loans:
-                item = loan.loangenericitem_set.filter(material=self.kwargs['pk']).first()
-                total+=item.quantity
-      
-        if total > 0:
-            quantity = quantity - total
-
-        return Response({"id_mat": self.kwargs["pk"], "quantity": quantity}, status=status.HTTP_200_OK)
-
 class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Public endpoints for generic material
@@ -447,38 +417,6 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=True)
-    def availability(self, request, *args, **kwargs):
-        """
-        Get availability of material using pk of nested router and checkout_date, due_date in request
-        """
-        specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['pk'])
-        loans_current = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date=None, due_date__gt=request.data['checkout_date']).distinct().first()
-        loans_ended = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__lte=request.data['checkout_date'], return_date__gt=request.data['checkout_date']).exclude(pk=request.data['id_loan']).first()
-        if('due_date' in request.data):
-            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['due_date']).exclude(pk=request.data['id_loan']).first()
-        if('return_date' in request.data):
-            loans_next = Loan.objects.filter(specific_materials__in=specific_material, status=Loan.Status.ACCEPTED, checkout_date__gte=request.data['checkout_date'], checkout_date__lte=request.data['return_date']).exclude(pk=request.data['id_loan']).first()
-
-        if('id_loan' in request.data and request.data['id_loan'] != ""):
-            if loans_current:
-                loans_current = loans_current.exclude(pk=request.data['id_loan'])
-            if loans_ended:
-                loans_ended.exclude(pk=request.data['id_loan'])
-            if loans_next :
-                loans_next = loans_next.exclude(pk=request.data['id_loan'])
-        res = True
-      
-        if loans_current:
-            res = False
-        if loans_ended:
-            res = False
-        if loans_next:
-            res = False
-       
-
-        return Response(res, status=status.HTTP_200_OK)
-
 class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Public endpoints for specific material instance
@@ -490,46 +428,46 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
 
 
-class SpecificMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
+class MaterialFilterBackend(filters.BaseFilterBackend):
     """
-    Endpoints for loan related specific material
+    Filter against materials
     """
-    queryset = Loan.objects.all()
-    permission_classes = (RGPDAccept, IsManagerOf,)
-    serializer_class = LoanSerializer
-
-    def get_queryset(self, **kwargs):
-        specific_material = SpecificMaterialInstance.objects.filter(pk=self.kwargs['instance_pk'])
-        entity = get_object_or_404(Entity.objects, pk=self.kwargs['entity_pk'])
-        if not self.request.user.is_staff and not self.request.user in entity.managers.all():
-            raise PermissionDenied("You are not a manager of this entity")
-        loans = Loan.objects.filter(specific_materials__in=specific_material)
-        return loans
-
-
-
-
-class GenericMaterialLoanViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Endpoints for loan related specific material
-    """
-    queryset = Loan.objects.all()
-    permission_classes = (RGPDAccept, IsAuthenticated,)
-    serializer_class = LoanSerializer
-    def get_queryset(self, **kwargs):
-        generic_material = GenericMaterial.objects.filter(pk=self.kwargs['genericmaterial_pk'])
-        loans = Loan.objects.filter(generic_materials__in=generic_material)
-        return loans
-
+    def filter_queryset(self, request, queryset, view):
+        #Filter generic material
+        gmid = request.query_params.get('gm', None)
+        if gmid is not None:
+            try:
+                gmid = int(gmid)
+                return queryset.filter(generic_materials__id=gmid).distinct()
+            except ValueError:
+                pass
+        #filter specific material instance
+        smiid = request.query_params.get('smi', None)
+        if smiid is not None:
+            try:
+                smiid = int(smiid)
+                return queryset.filter(specific_materials__id=smiid).distinct()
+            except ValueError:
+                pass
+        #filter specific material
+        smid = request.query_params.get('sm', None)
+        if smid is not None:
+            try:
+                smid = int(smid)
+                return queryset.filter(specific_materials__model__id=smid).distinct()
+            except ValueError:
+                pass
+        return queryset
 
 
 class LoanViewSet(viewsets.ModelViewSet):
     """
     Endpoints for loans
     """
-    queryset = Loan.objects.select_related("child")
+    queryset = Loan.objects.all()
     permission_classes = (RGPDAccept, LoanPermission,)
     serializer_class = LoanSerializer
+    filter_backends = (MaterialFilterBackend,EntityFilterBackend)
 
     def get_queryset(self):
         """
@@ -556,13 +494,16 @@ class LoanViewSet(viewsets.ModelViewSet):
                 serializer.validated_data['return_date']=None
             serializer.validated_data['parent']=None
         if serializer.is_valid():
+            manager = request.user.is_staff or request.user in serializer.validated_data['entity'].managers.all()
             loan = serializer.save()
             headers = self.get_success_headers(serializer.data)
             loan.save()
-            new_loan.send(sender=Loan,instance=loan,loan=loan)
+            if not manager:
+                Emails.send_manager(loan)
+            elif (loan.status == Loan.Status.ACCEPTED):
+                Emails.send_status(loan)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
-
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -579,8 +520,8 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_object()
         if(not request.user.is_staff and request.user not in instance.entity.managers.all()):
-            if (instance.status == Loan.Status.DENIED or instance.status == Loan.Status.ACCEPTED) :
-                raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté ou refusé")
+            if (instance.status != Loan.Status.REQUESTED) :
+                raise PermissionDenied("Vous ne pouvez pas modifier un prêt qui a été accepté, refusé ou annulé")
             request.data.update({'status':int(request.data["status"])})
             request.data.update({'user':instance.user.id})
             request.data.update({'return_date':instance.return_date})
@@ -588,29 +529,20 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        change_status=False
-        if(instance.status != request.data["status"]):
-            change_status=True
         if serializer.is_valid():
+            change_status=False
+            if(instance.status != request.data["status"]):
+                change_status=True
             loan = self.perform_update(serializer)
-            if(int(request.data["status"]) != Loan.Status.REQUESTED):
-                if(change_status):
-                    update_status_loan.send(sender=Loan,status=request.data['status'],loan=instance)
-                if(int(request.data["status"]) == Loan.Status.CANCELED):
-                    instance.delete()
-                    res = {}
-                    res["id"] = request.data["id"]
-                    return Response(res)
-
-            #for mat in genericitem:
-            data = serializer.data
-            headers = self.get_success_headers(serializer.data)
-
+            if(change_status):
+                if request.user.is_staff or request.user in serializer.validated_data['entity'].managers.all():
+                    Emails.send_status(instance)
+                else:
+                    #only possible when a user cancel a loan
+                    Emails.send_manager(instance)
         if serializer.errors:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-
-
         if getattr(instance, '_prefetched_objects_cache', None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
@@ -626,53 +558,6 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         return Response(dict((x, y) for x, y in Loan.Status.choices), status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=True)
-    def copy(self, request,pk=None):
-        """
-        Create a copy of the loan
-        """
-        loan = get_object_or_404(Loan,pk=pk)
-
-        user=loan.user
-        checkout_date = loan.checkout_date
-        due_date = loan.due_date
-
-        if(request.data['user']):
-            user = get_user_model().objects.get(id=request.data['user'])
-        if(request.data['checkout_date']):
-            checkout_date = request.data['checkout_date'].split('-')
-            checkout_date = datetime.datetime(int(checkout_date[0]),int(checkout_date[1]),int(checkout_date[2]))
-            loan_checkout_date = loan.checkout_date
-            loan_checkout_date = datetime.datetime(loan_checkout_date.year,loan_checkout_date.month,loan_checkout_date.day)
-            diff = checkout_date - loan_checkout_date
-            checkout_date = request.data['checkout_date']
-            checkout_date = datetime.datetime.strptime(checkout_date, '%Y-%m-%d')
-            checkout_date = checkout_date.date()
-            due_date = datetime.datetime(loan.due_date.year, loan.due_date.month, loan.due_date.day) + diff
-            due_date = due_date.date()
-
-        copy = Loan.objects.create(user=user, entity=loan.entity, comments = loan.comments, status=Loan.Status.REQUESTED, parent=None, due_date=due_date, checkout_date=checkout_date)
-
-        mats = []
-        if(request.data['specific_materials']):
-            for mat in request.data['specific_materials']:
-                mats.append(SpecificMaterialInstance.objects.get(id=mat))
-
-        if(len(mats) > 0):
-            copy.specific_materials.set(mats)
-        else:
-            copy.specific_materials.set(loan.specific_materials.all())
-
-        gen_mats = []
-        if(request.data['generic_materials']):
-            for mat in request.data['generic_materials']:
-                material = GenericMaterial.objects.get(id=mat['material'])
-                gen_mats.append(LoanGenericItem(loan=copy, material=material, quantity=mat['quantity']))
-            LoanGenericItem.objects.bulk_create(gen_mats)
-        scopy=self.get_serializer(copy)
-
-        return Response(scopy.data)
-
 
     @action(methods=['post'], detail=True)
     def make_child(self, request,pk=None):
@@ -684,14 +569,13 @@ class LoanViewSet(viewsets.ModelViewSet):
         if(hasattr(loan, "child")):
             raise serializers.ValidationError("Le prêt a déjà un successeur.")
         if(loan.status != Loan.Status.ACCEPTED):
-            raise serializers.ValidationError("Vous ne pouvez copier qu'un prêt qui a été accepté.")
+            raise serializers.ValidationError("Vous pouvez copier uniquement un prêt qui a été accepté.")
 
         if loan.return_date is None:
             loan.return_date = timezone.now().date()
         loan.save()
 
         child = Loan.objects.create(user=loan.user, entity=loan.entity, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=loan, due_date=loan.due_date, checkout_date=loan.return_date)
-
         child.specific_materials.set(loan.specific_materials.all())
 
         mats = []
@@ -701,6 +585,5 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         sloan=self.get_serializer(loan)
         schild=self.get_serializer(child)
-
 
         return Response({"parent":sloan.data, "child":schild.data})

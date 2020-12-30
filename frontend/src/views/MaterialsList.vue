@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row" v-if="loaded">
     <div class="col-12 col-md-12 col-lg-6">
       <div class="card">
         <div class="card-header input-group">
@@ -136,9 +136,10 @@ export default {
   },
   data() {
     return {
+      loaded: false,
       type_input: 1,
       search_fields: ["name"],
-      ressource: "entities/genericMaterials",
+      ressource: "genericmaterials",
       newmaterialroutes: [
         {
           to: { name: "genericmaterial", params: { matid: "new" } },
@@ -158,13 +159,13 @@ export default {
     },
     objects_list() {
       if (this.type_input == 2)
-        return this.$store.getters["entities/genericMaterials/list"];
+        return this.$store.getters["genericmaterials/list"];
       else if (this.type_input == 3)
-        return this.$store.getters["entities/specificMaterials/list"];
+        return this.$store.getters["specificmaterials/list"];
       else {
-        if (this.$store.getters["entities/specificMaterials/list"])
-          return this.$store.getters["entities/genericMaterials/list"]
-            .concat(this.$store.getters["entities/specificMaterials/list"])
+        if (this.$store.getters["specificmaterials/list"])
+          return this.$store.getters["genericmaterials/list"]
+            .concat(this.$store.getters["specificmaterials/list"])
             .sort((a, b) => {
               if (a.name > b.name) return -1;
               if (a.name < b.name) return 1;
@@ -200,18 +201,19 @@ export default {
   methods: {
     initList() {
       this.$store
-        .dispatch("entities/genericMaterials/fetchList", {
+        .dispatch("genericmaterials/fetchList", {
           prefix: this.prefix
         })
         .then(() => {
           this.$store
-            .dispatch("entities/specificMaterials/fetchList", {
+            .dispatch("specificmaterials/fetchList", {
               prefix: this.prefix
             })
             .then(() => {
               if (this.objects_list.length > 0) {
                 this.selected_object = this.objects_list[0];
               }
+              this.loaded=true;
             });
         });
     }

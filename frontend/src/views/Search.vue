@@ -106,6 +106,7 @@
                     fieldName="tags"
                     :object="item"
                     ressource="tags"
+                    :autoload="false"
                   />
                 </p>
 

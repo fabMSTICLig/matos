@@ -1,4 +1,6 @@
 import createCrud from "@/common/storeCrudHelper";
+
+/*
 import ApiService from "@/common/api.service";
 import { SET_MATERIAL_LOANS, SET_MATERIALS, SET_MATERIAL_AVAILABILITY } from "./mutations.type";
 
@@ -165,12 +167,12 @@ const generic_extra = {
     }
   }
 };
-const generic = createCrud("genericmaterials", generic_extra);
+const generic = createCrud("genericmaterials", generic_extra);*/
 const entities_extra = {
-  modules: {
+/*  modules: {
     genericMaterials: generic,
     specificMaterials: specific
-  }
+  }*/
 };
 const entities = createCrud("entities", entities_extra);
 export default entities;

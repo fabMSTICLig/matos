@@ -1,0 +1,1 @@
+[Matos] Notification: Votre demande d'emprumt est {{ status }}.

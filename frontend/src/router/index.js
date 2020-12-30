@@ -356,7 +356,7 @@ const routes = [
                   routedelete: "materialslist",
                   breadcumb: {
                     label: {
-                      ressource: "entities/genericMaterials",
+                      ressource: "genericmaterials",
                       prefix: [
                         {
                           ressource: "entities",
@@ -374,13 +374,13 @@ const routes = [
                 name: "loansmaterialgeneric",
                 component: () =>
                   import(
-                    /* webpackChunkName: "loansmaterialgeneric" */ "../views/MaterialGenericLoans.vue"
+                    /* webpackChunkName: "entityloanlist" */ "../views/EntityLoansList.vue"
                   ),
                 meta: {
                   routeparam: "matid",
                   breadcumb: {
                     label: {
-                      ressource: "entities/genericMaterials",
+                      ressource: "genericmaterials",
                       prefix: [
                         {
                           ressource: "entities",
@@ -390,9 +390,10 @@ const routes = [
                       labelprop: "name",
                       labelchild: "Prêts"
                     },
-                    name: "genericmaterialloans"
+                    name: "genericmaterial"
                   }
-                }
+                },
+                props: true
               },
               {
                 path: "s/:matid",
@@ -406,7 +407,7 @@ const routes = [
                   routedelete: "materialslist",
                   breadcumb: {
                     label: {
-                      ressource: "entities/specificMaterials",
+                      ressource: "specificmaterials",
                       prefix: [
                         {
                           ressource: "entities",
@@ -424,13 +425,13 @@ const routes = [
                 name: "loansmaterialspecific",
                 component: () =>
                   import(
-                    /* webpackChunkName: "loansmaterialspecific" */ "../views/MaterialSpecificLoans.vue"
+                    /* webpackChunkName: "entityloanlist" */ "../views/EntityLoansList.vue"
                   ),
                 meta: {
                   routeparam: "matid",
                   breadcumb: {
                     label: {
-                      ressource: "entities/specificMaterials",
+                      ressource: "specificmaterials",
                       prefix: [
                         {
                           ressource: "entities",
@@ -442,7 +443,8 @@ const routes = [
                     },
                     name: "specificmaterial"
                   }
-                }
+                },
+                props: true
               }
             ]
           },

@@ -39,7 +39,7 @@
             <form class="form" @submit="submitLoan">
               <div class="form-row">
                 <div class="col-12 col-md-5 col-lg-5">
-                  <div class="form-group" v-if="canManage && !isBorrowed">
+                  <div class="form-group" v-if="canManage">
                     <label>Utilisateur :</label>
                     <input-datalist
                       v-model="pending_loan.user"
@@ -58,7 +58,7 @@
                   </div>
                   <div class="form-group">
                     <label>Status :</label>
-                    <select class="form-control" v-model="pending_loan.status">
+                    <select class="form-control" v-model="pending_loan.status" :disabled="!canManage">
                       <option
                         v-for="(val, key) in status"
                         v-text="val"
@@ -349,24 +349,10 @@ export default {
       entityById: "entities/byId",
       loanById: "loans/byId",
       pending_loan: "loans/pending_loan",
+      status: "loans/status",
       authUser: "authUser",
       isAdmin: "isAdmin",
-      loans: "entities/genericMaterials/loans"
     }),
-    status: {
-      /*
-        Status dynamique en fonction de l'utilisateur et de l'étape courante
-      */
-      get: function() {
-        return this.$store.getters["loans/status"];
-      },
-      set: function(value) {
-        this.$store
-          .dispatch("loans/setStatus", {
-            value: value
-          })
-      }
-    },
     loanMessageSent() {
       if (this.pending_loan.status == 2) return "La demande a été envoyée";
       if (this.pending_loan.status == 3) return "La demande a été acceptée";
@@ -395,12 +381,6 @@ export default {
         ? this.pending_loan.specific_materials.length == 0
         : false;
     },
-
-    isBorrowed() {
-      return this.canManage
-        ? false
-        : this.pending_loan.user == this.authUser.id;
-    },
     canManage() {
       return (
         this.isAdmin ||
@@ -413,7 +393,7 @@ export default {
     readOnly() {
       return (
         !this.canManage &&
-        (this.pending_loan.status == 3 || this.pending_loan.status == 4)
+        (this.pending_loan.status != 2)
       );
     },
     title() {

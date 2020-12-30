@@ -13,9 +13,6 @@ const loans_extra = {
     status(state) {
       return state.status;
     },
-    loans(state) {
-      return state.loans;
-    }
   },
   actions: {
     fetchStatus({ commit }) {
@@ -23,10 +20,6 @@ const loans_extra = {
         commit("setStatus", data);
         return data;
       });
-    },
-    setStatus({ commit }, { value }) {
-      commit("setStatus", value);
-      return value;
     },
     makeChild({ commit }, { id }) {
       return ApiService.post("loans/" + id + "/make_child").then(({ data }) => {
@@ -36,25 +29,6 @@ const loans_extra = {
         return data.child;
       });
     },
-    list({ commit }) {
-      return ApiService.get("loans").then(({ data }) => {
-        console.log(data);
-        commit("setList", data);
-        return data;
-      });
-    },
-    copy({ commit }, { id, data }) {
-      return ApiService.post("loans/" + id + "/copy", data)
-        .then(({ data }) => {
-          console.log(data);
-          commit("createSuccess", data);
-          return data;
-        })
-        .catch(error => {
-          console.log(error);
-          return Promise.reject(error);
-        });
-    }
   },
   mutations: {
     setStatus(state, status) {
@@ -107,6 +81,12 @@ const loans_extra = {
         generic_materials: []
       };
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+    },
+    copyPending(state, data){
+        state.pending_loan = data;
+        state.pending_loan.status = null;
+        delete state.pending_loan.id;
+        localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
     addMaterial(state, mat) {
       if (state.pending_loan.entity == null) {
@@ -171,9 +151,6 @@ const loans_extra = {
     savePending(state) {
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
-    setList(state, loans) {
-      state.loans = loans;
-    }
   }
 };
 const loans = createCrud("loans", loans_extra);

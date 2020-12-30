@@ -1,11 +1,7 @@
-{% if status == '4' %}
-Votre demande d'emprunt à été rejetée. {{ SITE_URL }}#/loan/{{ loan.id }}
-{% elif status == '3' %}
-Votre demande d'emprunt à été acceptée. {{ SITE_URL }}#/loan/{{ loan.id }}
-{% endif %}
+Votre demande d'emprunt à été {{ status }}. {{ SITE_URL }}#/loan/{{ loan.id }}
 
-{% if status != '1' and status != '2' %}
-Vous pouvez prendre contact avec l'entité {{loan.entity.name}}
+{% if loan.status == '3' %}
+Vous pouvez prendre contact avec l'entité {{loan.entity.name}} {{loan.entity.contact}}
 {% endif %}
 
 {% if status == '1' %}

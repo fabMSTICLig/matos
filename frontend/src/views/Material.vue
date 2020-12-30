@@ -21,7 +21,8 @@
                 "
                 @focusout="hide"
                 style="margin-right: 10px;"
-                v-if="isManager && filter_entities.length"
+                v-if="isManager && filtered_entities.length"
+                ref="dropcopy"
               >
                 <div
                   class="btn btn-primary dropdown-toggle"
@@ -37,7 +38,7 @@
                 >
                   <button
                     class="dropdown-item"
-                    v-for="item in filter_entities"
+                    v-for="item in filtered_entities"
                     :key="item.id"
                     @click="copyMaterial(item)"
                     type="button"
@@ -101,87 +102,44 @@ export default {
       ressource: "",
       object_name: "Matériel",
       displayed: true,
-      entities: [],
       show: false,
       prefix: "",
       loaded: false,
-      filter_entities: []
     };
   },
   computed: {
     ...mapGetters({
       tags: "tags/list",
-      pending_loan: "loans/pending_loan"
+      entityById: "entities/byId",
+      entities: "entities/list"
     }),
     ...mapGetters(["authUser"]),
-    materialTags() {
-      return this.tags.filter(item => {
-        return this.object["tags"].includes(item.id);
-      });
-    },
     isManager() {
       return this.authUser.entities.length || this.authUser.is_staff;
+    },
+    filtered_entities(){
+        if(this.entities.length) {
+            let ret = this.authUser.entities.slice()
+            ret.splice(ret.indexOf(this.object.entity),1)
+            return ret.map((id) => { console.log(id);return this.entityById(id)});
+        }
+        else {
+            return []
+        }
     }
   },
   methods: {
     ...mapMutations({
       addMaterial: "loans/addMaterial"
     }),
-    make_label() {
-      return this.object.name;
-    },
     toggle(e) {
       e.preventDefault();
       this.show = !this.show;
     },
     hide(e) {
-      if (!this.$el.contains(e.relatedTarget)) {
+      if (!this.$refs.dropcopy.contains(e.relatedTarget)) {
         this.show = false;
       }
-    },
-    get_entities() {
-      var prefix = "";
-      var filtered = "";
-      let self = this;
-      if (this.entities.length) {
-        filtered = this.entities.filter(entity => {
-          return this.authUser.entities.find(
-            managed => managed == entity.id && managed != this.object.entity
-          );
-        });
-        if (this.authUser.is_staff) {
-          filtered = this.entities.filter(entity => {
-            return entity.id != this.object.entity;
-          });
-        }
-
-        if (filtered.length) {
-          filtered.forEach(entity => {
-            if (this.ressource == "specificmaterials") {
-              prefix = "entities/specificMaterials/instances";
-            }
-            if (this.ressource == "genericmaterials") {
-              prefix = "entities/genericMaterials";
-            }
-
-            this.$store
-              .dispatch(prefix + "/getMaterials", {
-                id: entity.id
-              })
-              .then(materials => {
-                let presentMaterial = materials.filter(material => {
-                  return material.name == this.object.name;
-                });
-
-                if (!presentMaterial.length) {
-                  self.filter_entities.push(entity);
-                }
-              });
-          });
-          self.loaded = true;
-        }
-      }
-      self.loaded = true;
     },
     copyMaterial(entity) {
       /*
@@ -189,10 +147,10 @@ export default {
       */
       var ressource = "";
       if (this.ressource == "genericmaterials") {
-        ressource = "entities/genericMaterials";
+        ressource = "genericmaterials";
       }
       if (this.ressource == "specificmaterials") {
-        ressource = "entities/specificMaterials";
+        ressource = "specificmaterials";
       }
       var prefix = "entities/" + entity.id + "/";
 
@@ -205,8 +163,10 @@ export default {
           showMsgOk("le matériel a été ajouté à l'entité");
         })
         .catch(error => {
-          // eslint-disable-next-line
-          console.log(JSON.stringify(error));
+          if(error.response.data.non_field_errors)
+          {
+            showMsgOk("La copie a échouée, vous avez déjà un matériel avec ce nom.");
+          }
         });
     }
   },
@@ -233,13 +193,11 @@ export default {
       );
     }
     pall.push(
-      this.$store.dispatch("entities/fetchList").then(data => {
-        this.entities = data;
-      })
+      this.$store.dispatch("entities/fetchList")
     );
 
     Promise.all(pall).then(() => {
-      this.get_entities();
+      this.loaded=true;
     });
   }
 };

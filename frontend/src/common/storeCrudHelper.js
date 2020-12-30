@@ -43,8 +43,8 @@ const createCrud = (ressource, source) => {
       }
     },
     actions: {
-      fetchList({ commit, getters }, { prefix = "" } = {}) {
-        return ApiService.query(prefix + ressource, {})
+      fetchList({ commit, getters }, { prefix = "", params={} } = {}) {
+        return ApiService.query(prefix + ressource, params)
           .then(({ data }) => {
             commit("fetchListSuccess", data);
             return Promise.resolve(getters.list);

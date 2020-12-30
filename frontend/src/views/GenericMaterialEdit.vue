@@ -129,7 +129,7 @@ export default {
   },
   data() {
     return {
-      ressource: "entities/genericMaterials",
+      ressource: "genericmaterials",
       new_label: "Nouveau Matériel Générique",
       object_name: "Matériel",
       showHelp: false,
