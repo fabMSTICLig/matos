@@ -43,7 +43,7 @@ const createCrud = (ressource, source) => {
       }
     },
     actions: {
-      fetchList({ commit, getters }, { prefix = "", params={} } = {}) {
+      fetchList({ commit, getters }, { prefix = "", params = {} } = {}) {
         return ApiService.query(prefix + ressource, params)
           .then(({ data }) => {
             commit("fetchListSuccess", data);
@@ -114,14 +114,14 @@ const createCrud = (ressource, source) => {
         }
       },
       updateSuccess(state, data) {
-        if(data["id"]) {
+        if (data["id"]) {
           const id = data["id"].toString();
           Vue.set(state.entities, id, data);
           const listIndex = state.list.indexOf(id);
           if (listIndex >= 0) {
             Vue.set(state.list, listIndex, id);
           }
-        }          
+        }
       },
       destroySuccess(state, id) {
         const listIndex = state.list.indexOf(id.toString());

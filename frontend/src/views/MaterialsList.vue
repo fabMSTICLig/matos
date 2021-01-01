@@ -213,7 +213,7 @@ export default {
               if (this.objects_list.length > 0) {
                 this.selected_object = this.objects_list[0];
               }
-              this.loaded=true;
+              this.loaded = true;
             });
         });
     }

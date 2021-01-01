@@ -11,7 +11,7 @@
 </template>
 
 <script>
-  /*
+/*
     Component used to display items in list
     props ressource store, object and field to display
   */
@@ -30,7 +30,7 @@ export default {
       type: String,
       required: true
     },
-    autoload:{
+    autoload: {
       type: Boolean,
       default: true
     }
@@ -47,7 +47,7 @@ export default {
   },
   methods: {},
   beforeMount() {
-    if(this.autoload)this.$store.dispatch(this.ressource + "/fetchList");
+    if (this.autoload) this.$store.dispatch(this.ressource + "/fetchList");
   }
 };
 </script>

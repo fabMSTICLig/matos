@@ -32,11 +32,11 @@
                       type="button"
                       :class="{
                         active:
-                          (selected_instance && item.id == selected_instance.id)
+                          selected_instance && item.id == selected_instance.id
                       }"
                     >
-                     {{ item.name }}
-                     <!--
+                      {{ item.name }}
+                      <!--
                         Mouse Over à prévoir pour la sélection d'Instances
                      -->
                     </li>
@@ -272,7 +272,7 @@ export default {
             );
           else return true;
         });
-       
+
         return filtered.sort((a, b) => {
           if (this.sort_input == this.sort_choices.due_date.value)
             return a.due_date.localeCompare(b.due_date);
@@ -303,7 +303,6 @@ export default {
         (this.current_page - 1) * process.env.VUE_APP_MAXLIST,
         this.current_page * process.env.VUE_APP_MAXLIST
       );
-      
     },
     per_page() {
       return parseInt(process.env.VUE_APP_MAXLIST);
@@ -405,14 +404,14 @@ export default {
         })
         .then(() => {
           if (this.objects_list.length > 0) {
-            console.log('liste materiels');
+            console.log("liste materiels");
             console.log(this.objects_list);
             this.selectInstance(this.objects_list[0]);
           }
         })
     );
     Promise.all(pall).then(() => {
-      if(this.objects_list.length)
+      if (this.objects_list.length)
         this.$store
           .dispatch("entities/specificMaterials/instances/materialLoans", {
             id_entity: this.$route.params.entityid,
@@ -420,18 +419,17 @@ export default {
             id_instance: this.selected_instance.id
           })
           .then(() => {
-
             // Passage du prêt séléctionné au premier élément de la liste des prêts
 
             this.selected_object = this.objects_filtered[0];
-           
+
             // Mutation des prêts getters loans
 
             /*
               TODO: optimisation du chargement des prêts à prévoir 
             */
             this.loaded = true;
-        });
+          });
     });
   }
 };

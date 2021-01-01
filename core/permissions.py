@@ -88,9 +88,8 @@ class LoanPermission(permissions.BasePermission):
     """
     Special permission for a loan
     User must be anthentificated
-    GET PUT PATCH owner
+    GET PUT PATCH DELETE owner
     POST autenticated user
-    DELETE manager of entity
     """
     def has_object_permission(self, request, view, obj):
         if request.user.is_staff:
@@ -98,7 +97,7 @@ class LoanPermission(permissions.BasePermission):
         ismanager = False
         if isinstance(obj, Loan):
             ismanager = request.user in obj.entity.managers.all()
-            safeDestroy = request.user == obj.user and request.method == 'DELETE' and obj.status == Loan.Status.CANCELED
+            safeDestroy = request.user == obj.user and request.method == 'DELETE' and obj.status == Loan.Status.REQUESTED
         return ismanager or safeDestroy or (request.user == obj.user and request.method != 'DELETE')
 
     def has_permission(self, request, view):

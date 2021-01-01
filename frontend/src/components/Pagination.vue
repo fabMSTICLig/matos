@@ -60,7 +60,7 @@
   </nav>
 </template>
 <script>
-  /*
+/*
     Paginate items
   */
 export default {

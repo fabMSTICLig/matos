@@ -223,7 +223,7 @@ import Markdown from "@/components/Markdown";
   Vue Edition Matériel Spécifique pour une Entité
 */
 
-//utilisation EditMixin 
+//utilisation EditMixin
 
 export default {
   name: "SpecificMaterialEdit",

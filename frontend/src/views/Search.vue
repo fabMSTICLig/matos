@@ -232,13 +232,18 @@ export default {
         this.objects_filtered.length / process.env.VUE_APP_MAXLIST
       );
     },
-    search_change(){
-        return this.search_input, this.type_input, this.tags_filter, this.entities_filter;
+    search_change() {
+      return (
+        this.search_input,
+        this.type_input,
+        this.tags_filter,
+        this.entities_filter
+      );
     }
   },
-  watch:{
-    search_change(){
-        this.current_page=1;
+  watch: {
+    search_change() {
+      this.current_page = 1;
     }
   },
   methods: {
@@ -259,10 +264,9 @@ export default {
       }
     },
     addItem(item) {
-      if(this.pending_loan.entity == null)
-        {
-        this.entities_filter.push(item.entity)
-        }
+      if (this.pending_loan.entity == null) {
+        this.entities_filter.push(item.entity);
+      }
       this.addMaterial(item);
     },
     onPageChange(page) {
@@ -288,13 +292,10 @@ export default {
       (this.pending_loan.status == 3 || this.pending_loan.status == 4)
     ) {
       this.$store.commit("loans/resetPending");
-    }
-    else
-    {
-        if(this.pending_loan.entity != null)
-        {
-            this.entities_filter.push(this.pending_loan.entity)
-        }
+    } else {
+      if (this.pending_loan.entity != null) {
+        this.entities_filter.push(this.pending_loan.entity);
+      }
     }
   }
 };

@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  /*
+/*
     Tags Input for saving tags
   */
 export default {

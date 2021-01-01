@@ -12,7 +12,7 @@ const loans_extra = {
     },
     status(state) {
       return state.status;
-    },
+    }
   },
   actions: {
     fetchStatus({ commit }) {
@@ -28,7 +28,7 @@ const loans_extra = {
         commit("createSuccess", data.child);
         return data.child;
       });
-    },
+    }
   },
   mutations: {
     setStatus(state, status) {
@@ -82,11 +82,11 @@ const loans_extra = {
       };
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
-    copyPending(state, data){
-        state.pending_loan = data;
-        state.pending_loan.status = null;
-        delete state.pending_loan.id;
-        localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+    copyPending(state, data) {
+      state.pending_loan = data;
+      state.pending_loan.status = null;
+      delete state.pending_loan.id;
+      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
     addMaterial(state, mat) {
       if (state.pending_loan.entity == null) {
@@ -150,7 +150,7 @@ const loans_extra = {
     },
     savePending(state) {
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
-    },
+    }
   }
 };
 const loans = createCrud("loans", loans_extra);

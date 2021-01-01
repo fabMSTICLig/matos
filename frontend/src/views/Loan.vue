@@ -58,7 +58,11 @@
                   </div>
                   <div class="form-group">
                     <label>Status :</label>
-                    <select class="form-control" v-model="pending_loan.status" :disabled="!canManage">
+                    <select
+                      class="form-control"
+                      v-model="pending_loan.status"
+                      :disabled="!canManage"
+                    >
                       <option
                         v-for="(val, key) in status"
                         v-text="val"
@@ -137,7 +141,6 @@
                               class="number-input form-control form-control"
                               v-model="item.quantity"
                               :disabled="readOnly"
-                              v-on:change="checkQuantities()"
                             />
                           </td>
 
@@ -151,45 +154,6 @@
                             >
                               X
                             </button>
-                          </td>
-                        </tr>
-                        <tr
-                          class="d-flex"
-                          v-show="maxQuantities.length"
-                          v-for="material_loan in maxQuantities"
-                          :key="material_loan.id"
-                        >
-                          <td class="col-7" v-if="material_loan.quantity > 0">
-                            <span class="text-danger"
-                              >Quantité disponible dépassée : {{ material_loan.quantity }}
-                            </span>
-                          </td>
-                          <td class="col-7" v-if="material_loan.quantity == 0">
-                            <span class="text-danger"
-                              >Matériel indisponible
-                            </span>
-                          </td>
-                          <td class="col-5">
-                            <span class="text-danger float-right">{{
-                              material_loan.name
-                            }}</span>
-                          </td>
-                        </tr>
-                        <tr
-                          class="d-flex"
-                          v-show="disabled.length"
-                          v-for="material in disabled"
-                          :key="material.id"
-                        >
-                          <td class="col-6">
-                            <span class="text-danger"
-                              >Matériel indisponible :
-                            </span>
-                          </td>
-                          <td class="col-6">
-                            <span class="text-danger float-right">{{
-                              material.name
-                            }}</span>
                           </td>
                         </tr>
                         <tr
@@ -284,6 +248,23 @@
                     {{ updateMode ? "Modifier" : labelSubmit }}
                   </button>
                   <button
+                    class="btn btn-danger float-left"
+                    type="button"
+                    v-if="updateMode && !canManage && !readOnly"
+                    @click="cancelLoan"
+                  >
+                    Annuler la demande
+                  </button>
+                  <button
+                    class="btn btn-danger float-left"
+                    type="button"
+                    v-if="updateMode && canManage"
+                    @click="destroyLoan"
+                  >
+                    Supprimer
+                  </button>
+
+                  <button
                     v-if="!updateMode"
                     class="btn btn-danger"
                     type="button"
@@ -331,13 +312,7 @@ export default {
       specificinstances: {},
       loaded: false,
       errors: [],
-      prevRoute: null,
-      makeChild_btn: false,
-      selected: [],
-      maxQuantities: [],
-      genericMaterialsLoan: [],
-      disabled: [],
-      idRoute: ""
+      makeChild_btn: false
     };
   },
   computed: {
@@ -351,7 +326,7 @@ export default {
       pending_loan: "loans/pending_loan",
       status: "loans/status",
       authUser: "authUser",
-      isAdmin: "isAdmin",
+      isAdmin: "isAdmin"
     }),
     loanMessageSent() {
       if (this.pending_loan.status == 2) return "La demande a été envoyée";
@@ -391,10 +366,7 @@ export default {
       return "id" in this.pending_loan;
     },
     readOnly() {
-      return (
-        !this.canManage &&
-        (this.pending_loan.status != 2)
-      );
+      return !this.canManage && this.pending_loan.status != 2;
     },
     title() {
       return this.readOnly
@@ -407,115 +379,19 @@ export default {
       /*
         Vérification des dates remplies pour la demande ou la modification 
       */
-      return ((this.pending_loan.checkout_date !== null && this.pending_loan.checkout_date !=="") && (this.pending_loan.due_date !== null && this.pending_loan.due_date !== ""))
-                        || ((this.pending_loan.checkout_date !==  null && this.pending_loan.checkout_date !== "") && (this.pending_loan.return_date !== null && this.pending_loan.return_date !== ""));
+      return (
+        (this.pending_loan.checkout_date !== null &&
+          this.pending_loan.checkout_date !== "" &&
+          this.pending_loan.due_date !== null &&
+          this.pending_loan.due_date !== "") ||
+        (this.pending_loan.checkout_date !== null &&
+          this.pending_loan.checkout_date !== "" &&
+          this.pending_loan.return_date !== null &&
+          this.pending_loan.return_date !== "")
+      );
     }
   },
-  watch: {
-    /*
-      Disponibilité d'un matériel spécifique si modification d'Instances
-    */
-    'pending_loan.specific_materials': {
-      handler() {
-        if(this.checkDates) {
-          if(this.pending_loan.specific_materials.length) {
-            this.getMaterialAvailability();
-          }
-        }
-      },
-      deep: true
-    },
-    /*
-      Vérification de la disponibilité et quantité des matériels aux changements de dates
-    */
-    'pending_loan.checkout_date': {
-      handler() {
-        this.maxQuantities = [];
-        if(this.checkDates) {
-          if(this.pending_loan.specific_materials.length) {
-            this.getMaterialAvailability();
-          }
-          this.checkQuantities();
-        }
-      },
-      deep: true
-    },
-    'pending_loan.due_date': {
-      handler() {
-        this.maxQuantities = [];
-        if(this.checkDates) {
-          if(this.pending_loan.specific_materials.length) {
-            this.getMaterialAvailability();
-          }
-          this.checkQuantities();
-        }
-      },
-      deep: true
-
-    },
-    'pending_loan.return_date': {
-      handler() {
-        this.maxQuantities = [];
-        if(this.checkDates) {
-          if(this.pending_loan.specific_materials.length) {
-            this.getMaterialAvailability();
-          }
-          this.checkQuantities();
-        }
-      }
-    },
-    pending_loan: {
-
-      handler() {
-          /*
-            Changement du prêt courant pour un utilisateur
-            Attribution des status en fonction de l'état du prêt
-            Vérification des quantité de matériels disponible
-          */
-          if (!this.canManage) {
-          
-            this.status = {};
-            var keys = [1, 2];
-            var values = ["Annulé", "Demandé"];
-
-            if (this.pending_loan.status == 2 || this.pending_loan.status == 1) {
-              for (var i = 0; i < keys.length; i++) {
-                this.status[keys[i]] = values[i];
-              }
-            }
-            else if (this.pending_loan.status == 3) {
-              this.status[3] = "Accepté";
-            }
-            else if (this.pending_loan.status == 4 ) {
-              this.status[4] = "Refusé";
-            }
-          }
-        this.checkQuantities();
-        this.$store.commit("loans/savePending");
-      },
-      deep: true
-    },
-    "$route.params.loanid": {
-      handler: function(loanid) {
-        /*
-          Synchronisation du prêt courant avec la dernière version
-          Redirection vers le prêt
-        */
-        this.idRoute = loanid;
-        this.loaded=false;
-        if (loanid) {
-          this.$store.dispatch("loans/list").then(loans => {
-            let pending_loan = loans.find(loan => loan.id == loanid);
-            if (pending_loan) {
-              this.goTo(pending_loan.id);
-            }
-          });
-        }
-      },
-      deep: true,
-      immediate: true
-    }
-  },
+  watch: {},
   methods: {
     ...mapMutations({
       removeMaterial: "loans/removeMaterial"
@@ -530,34 +406,13 @@ export default {
           Vue.set(this.specificinstances, item, data);
         });
     },
-    getMaterialAvailability() {
-      /*
-        Vérification de la disponibilité de chaque matériel spécifique inclut dans le prêt
-      */
-      this.disabled = [];
-      for(let i=0; i<= this.pending_loan.specific_materials.length-1;i++) {
-        let specificinstance_id = this.pending_loan.specific_materials[i];
-
-        let instances = Object.keys(this.specificinstances).filter(instances => {
-           return Object.values(this.specificinstances[instances]).find(object => object.id == specificinstance_id)
-        });
-        let model = instances[0];
-        let item = { "specificinstance":specificinstance_id, "model":model };
-        this.setMaterialAvailability(item)
-      }
-    },
     submitLoan(e) {
       e.preventDefault();
       this.checkErrors();
       if (this.errors.length) {
         window.scrollTo(0, 0);
       }
-      if (
-        !this.emptyLoan &&
-        !this.errors.length &&
-        !this.emptyInstances &&
-        !this.maxQuantities.length
-      ) {
+      if (!this.emptyLoan && !this.errors.length && !this.emptyInstances) {
         if (this.pending_loan.return_date == "")
           this.pending_loan.return_date = null;
 
@@ -648,12 +503,23 @@ export default {
     cleanMaterials() {
       this.$store.commit("loans/resetPending");
       this.$store.commit("loans/cleanMaterials");
-      this.maxQuantities=[];
     },
     newLoan() {
       this.$store.commit("loans/resetPending");
-      this.maxQuantities=[];
-
+    },
+    cancelLoan() {
+      this.$store
+        .dispatch("loans/destroy", { id: this.pending_loan.id })
+        .then(() => {
+          this.goTo(this.pending_loan.id);
+        });
+    },
+    destroyLoan() {
+      this.$store
+        .dispatch("loans/destroy", { id: this.pending_loan.id })
+        .then(() => {
+          this.newLoan();
+        });
     },
     makeUserLabel(item) {
       return item.username;
@@ -672,105 +538,10 @@ export default {
         .then(data => {
           this.goTo(data.id);
         });
-    },
-    checkQuantities() {
-      /*
-        Passage des quantités maximales dans un tableau
-        Vérification dépassement du stock et retrait du tableau sinon
-      */
-      for(let i=0; i<= this.pending_loan.generic_materials.length-1;i++) {
-        let itemgeneric = this.pending_loan.generic_materials[i]
-        let genericMaterial = this.genericmaterials.find( material => material.id == itemgeneric.material)
-
-        /*
-          Vérification sans le cas ou le stock est à zero
-        */
-        if(this.checkDates && genericMaterial.quantity !== 0) {
-
-          this.setMaterialAvailability(itemgeneric);
-        }
-  
-        if(parseInt(itemgeneric.quantity) <= genericMaterial.quantity) {
-          let index = this.maxQuantities.indexOf(Object.values(this.maxQuantities).find( obj => obj.id == genericMaterial.id));
-          if(index > -1) {
-           this.maxQuantities.splice(index,1)
-          }
-        }
-
-        if((parseInt(itemgeneric.quantity) > genericMaterial.quantity) && genericMaterial.quantity > 0 ) {
-          let index = this.maxQuantities.indexOf(Object.values(this.maxQuantities).find( obj => obj.id == genericMaterial.id));
-         
-          if(index == -1) {
-           this.maxQuantities.push(genericMaterial);
-          }
-
-        }
-      }
-    },
-    setMaterialAvailability(item) {
-
-      /*
-        Passage de la disponibilité d'un matériel ou de la quantité disponible
-      */
-
-      // Affectation d'une variable id du prêt pour l'exclure de la recherche si prêt existant
-     
-      let id_loan=""
-      
-      if(this.pending_loan.id) {
-        id_loan = this.pending_loan.id
-      }
-
-      if(item.quantity) {
-        this.$store.dispatch("entities/genericMaterials/getMaterialAvailability", {
-          id_entity: this.pending_loan.entity,
-          id_mat: item.material,
-          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date, "id_loan": id_loan }
-
-        }).then(data => {
-         
-          let genericMaterial = this.genericmaterials.find( material => material.id == data.id_mat)
-         
-          if(genericMaterial) {
-
-            if((parseInt(item.quantity) > data.quantity) && (genericMaterial.quantity > 0 )) {
-              let material = {};
-              material["name"] = genericMaterial.name;
-              material["quantity"] = data.quantity;
-              material["id"] = genericMaterial.id
-              if(!this.maxQuantities.find(item => item.id == genericMaterial.id)){
-                this.maxQuantities.push(material);
-              }
-            }
-          }
-        });
-      } else {
-        
-        let specificinstance_id = item.specificinstance;
-        let model = item.model
-        
-        this.$store.dispatch("entities/specificMaterials/getMaterialAvailability", {
-          id_entity: this.pending_loan.entity,
-          id_model: model,
-          id_instance: specificinstance_id,
-          data: { "checkout_date": this.pending_loan.checkout_date,"due_date": this.pending_loan.due_date, "id_loan": id_loan }
-
-        }).then(data => {
-
-            if(data == false) {
-              let specificinstance = this.specificinstances[model].find( m => m.id == specificinstance_id )
-              if(!this.disabled.find(item => item.id == specificinstance.id)) {
-                this.disabled.push(specificinstance)
-              }
-            }
-
-        });
-      }
     }
   },
   beforeMount() {
     var pall = [];
-    var self = this;
     pall.push(this.$store.dispatch("specificmaterials/fetchList"));
     pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("entities/fetchList"));
@@ -779,51 +550,11 @@ export default {
       pall.push(this.initInstances(item));
     });
     Promise.all(pall).then(() => {
-      if (!self.canManage) {
-        self.status = {};
-        var keys = [1, 2];
-        var values = ["Annulé", "Demandé"];
-
-        if(this.pending_loan.status == 2 && !this.pending_loan.id) {
-          self.status[2] = "Demandé"
-        }
-        if ((this.pending_loan.status == 2 || this.pending_loan.status == 1) && this.pending_loan.id){
-          for (var i = 0; i < keys.length; i++) {
-            self.status[keys[i]] = values[i];
-          }
-        }
-        else if (this.pending_loan.status == 3) {
-          self.status[3] = "Accepté";
-        }
-        else if (this.pending_loan.status == 4 ) {
-          self.status[4] = "Refusé";
-        }
-      }
       //début chargement
       this.loaded = true;
-
-      if(this.checkDates) {
-   
-        for(let i=0; i<=this.pending_loan.generic_materials.length-1; i++) {
-          let materialgeneric = this.pending_loan.generic_materials[i];
-          this.setMaterialAvailability(materialgeneric);
-        }
-
-        for(let i=0; i<=this.pending_loan.specific_materials.length -1; i++) {
-          let specificinstance_id = this.pending_loan.specific_materials[i];
-          let instances = Object.keys(this.specificinstances).filter(instances => {
-              return Object.values(this.specificinstances[instances]).find(object => object.id == specificinstance_id)
-          });
-          let model = instances[0]
-          let item = {"specificinstance":specificinstance_id,"model":model};
-          this.setMaterialAvailability(item);
-        }
-      }
-
-
     });
 
-    if (this.pending_loan.id && this.pending_loan.status == 3) {
+    if (this.pending_loan.id) {
       this.$store
         .dispatch("loans/fetchSingle", { id: this.pending_loan.id })
         .then(data => {
@@ -832,7 +563,8 @@ export default {
           } else {
             this.makeChild_btn = true;
           }
-        });
+        })
+        .catch(() => this.newLoan());
     }
   }
 };

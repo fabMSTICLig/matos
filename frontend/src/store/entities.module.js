@@ -169,7 +169,7 @@ const generic_extra = {
 };
 const generic = createCrud("genericmaterials", generic_extra);*/
 const entities_extra = {
-/*  modules: {
+  /*  modules: {
     genericMaterials: generic,
     specificMaterials: specific
   }*/

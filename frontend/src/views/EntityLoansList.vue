@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h2 v-if="!matid">{{ entityById($route.params.entityid) | field("name") }}</h2>
+    <h2 v-if="!matid">
+      {{ entityById($route.params.entityid) | field("name") }}
+    </h2>
     <div class="row">
       <div class="col-12 col-md-6">
         <div class="card">
@@ -172,7 +174,7 @@ export default {
       copyObj: {}
     };
   },
-  props: ["entityid","matid"],
+  props: ["entityid", "matid"],
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
     ...mapGetters(["authUser"]),
@@ -189,17 +191,16 @@ export default {
         filtrés par entité courante
         et filtrés par date de sortie, date de retour prévue et date de retour par sélection
       */
-      var filtered = this.objects_list
-        .filter(item => {
-          var user = this.userById(item.user);
-          if (user)
-            return (
-              user.username
-                .toLowerCase()
-                .indexOf(this.search_input.toLowerCase()) > -1
-            );
-          else return true;
-        });
+      var filtered = this.objects_list.filter(item => {
+        var user = this.userById(item.user);
+        if (user)
+          return (
+            user.username
+              .toLowerCase()
+              .indexOf(this.search_input.toLowerCase()) > -1
+          );
+        else return true;
+      });
       return filtered.sort((a, b) => {
         if (this.sort_input == this.sort_choices.due_date.value)
           return a.due_date.localeCompare(b.due_date);
@@ -227,19 +228,23 @@ export default {
   watch: {
     entityid: function() {
       this.selected_object = this.objects_filtered[0];
-    },
+    }
   },
   methods: {
     initComponent() {
       return this.$store.dispatch("loans/fetchStatus");
     },
     initList() {
-        let params = {}
-        if(this.$route.name=="loansmaterialgeneric") params.gm=this.matid;
-        else if(this.$route.name=="loansmaterialspecific") params.sm=this.matid;
-        else params.entity=this.entityid;
+      let params = {};
+      if (this.$route.name == "loansmaterialgeneric") params.gm = this.matid;
+      else if (this.$route.name == "loansmaterialspecific")
+        params.sm = this.matid;
+      else params.entity = this.entityid;
       this.$store
-        .dispatch("loans/fetchList", { prefix: this.prefix, params:{params:params}})
+        .dispatch("loans/fetchList", {
+          prefix: this.prefix,
+          params: { params: params }
+        })
         .then(() => {
           if (this.objects_filtered.length > 0) {
             this.selected_object = this.objects_filtered[0];

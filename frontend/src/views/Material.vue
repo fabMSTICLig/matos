@@ -104,7 +104,7 @@ export default {
       displayed: true,
       show: false,
       prefix: "",
-      loaded: false,
+      loaded: false
     };
   },
   computed: {
@@ -117,15 +117,17 @@ export default {
     isManager() {
       return this.authUser.entities.length || this.authUser.is_staff;
     },
-    filtered_entities(){
-        if(this.entities.length) {
-            let ret = this.authUser.entities.slice()
-            ret.splice(ret.indexOf(this.object.entity),1)
-            return ret.map((id) => { console.log(id);return this.entityById(id)});
-        }
-        else {
-            return []
-        }
+    filtered_entities() {
+      if (this.entities.length) {
+        let ret = this.authUser.entities.slice();
+        ret.splice(ret.indexOf(this.object.entity), 1);
+        return ret.map(id => {
+          console.log(id);
+          return this.entityById(id);
+        });
+      } else {
+        return [];
+      }
     }
   },
   methods: {
@@ -163,9 +165,10 @@ export default {
           showMsgOk("le matériel a été ajouté à l'entité");
         })
         .catch(error => {
-          if(error.response.data.non_field_errors)
-          {
-            showMsgOk("La copie a échouée, vous avez déjà un matériel avec ce nom.");
+          if (error.response.data.non_field_errors) {
+            showMsgOk(
+              "La copie a échouée, vous avez déjà un matériel avec ce nom."
+            );
           }
         });
     }
@@ -192,12 +195,10 @@ export default {
           })
       );
     }
-    pall.push(
-      this.$store.dispatch("entities/fetchList")
-    );
+    pall.push(this.$store.dispatch("entities/fetchList"));
 
     Promise.all(pall).then(() => {
-      this.loaded=true;
+      this.loaded = true;
     });
   }
 };

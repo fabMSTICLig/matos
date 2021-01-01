@@ -550,6 +550,18 @@ class LoanViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if(not request.user.is_staff and request.user not in instance.entity.managers.all()):
+            if(instance.status == Loan.Status.REQUESTED):
+                instance.status = Loan.Status.CANCELED
+                instance.save()
+                Emails.send_manager(instance)
+            else:
+                raise PermissionDenied("Vous ne pouvez pas annuler un prêt qui a été accepté, refusé ou annulé")
+        else:
+            self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['get'], detail=False)
     def status(self, request):
