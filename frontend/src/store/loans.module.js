@@ -84,7 +84,7 @@ const loans_extra = {
     },
     copyPending(state, data) {
       state.pending_loan = data;
-      state.pending_loan.status = null;
+      state.pending_loan.status = 3;
       delete state.pending_loan.id;
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },

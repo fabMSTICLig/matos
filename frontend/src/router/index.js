@@ -72,25 +72,11 @@ const routes = [
       import(/* webpackChunkName: "search" */ "../views/Search.vue")
   },
   {
-    path: "/loan",
+    path: "/loan/:loanid?",
     name: "loan",
     beforeEnter: requireAuth,
     component: () => import(/* webpackChunkName: "loan" */ "../views/Loan.vue"),
-    children: [
-      {
-        path: ":loanid",
-        component: () =>
-          import(/* webpackChunkName: "loan" */ "../views/Loan.vue"),
-        name: "loan_instance",
-        meta: {
-          routeparam: "loanid",
-          breadcumb: {
-            label: "prêt",
-            name: "loan_instance"
-          }
-        }
-      }
-    ]
+    props: true
   },
   {
     path: "/loans",

@@ -195,8 +195,7 @@
                       updateMode &&
                         (pending_loan.child ||
                           pending_loan.parent ||
-                          pending_loan.status == 3) &&
-                        makeChild_btn
+                          pending_loan.status == 3)
                     "
                   >
                     <label>Historique :</label>
@@ -307,12 +306,12 @@ export default {
     DynList,
     InputDatalist
   },
+  props: ["loanid"],
   data() {
     return {
       specificinstances: {},
       loaded: false,
-      errors: [],
-      makeChild_btn: false
+      errors: []
     };
   },
   computed: {
@@ -423,16 +422,8 @@ export default {
               id: this.pending_loan.id
             })
             .then(data => {
-              if (this.pending_loan.status == 1) {
-                showMsgOk("La demande de prêt a été supprimée");
-                this.newLoan();
-              } else {
-                this.$store.commit("loans/setPending", data);
-                showMsgOk("Le prêt a été modifié");
-              }
-              if (this.pending_loan.status == 3) {
-                this.makeChild_btn = true;
-              }
+              this.$store.commit("loans/setPending", data);
+              showMsgOk("Le prêt a été modifié");
               this.errors = [];
             })
             .catch(e => {
@@ -506,6 +497,7 @@ export default {
     },
     newLoan() {
       this.$store.commit("loans/resetPending");
+      this.$router.push({ name: "loan" });
     },
     cancelLoan() {
       this.$store
@@ -524,13 +516,18 @@ export default {
     makeUserLabel(item) {
       return item.username;
     },
-    goTo(id) {
-      this.$store.dispatch("loans/fetchSingle", { id: id }).then(data => {
-        this.$store.commit("loans/setPending", data);
-        this.pending_loan.models.forEach(item => {
-          this.initInstances(item);
-        });
-      });
+    goTo(id, load = true) {
+      if (load) this.$router.push({ name: "loan", params: { loanid: id } });
+      this.$store
+        .dispatch("loans/fetchSingle", { id: id })
+        .then(data => {
+          this.$store.commit("loans/setPending", data);
+          this.pending_loan.models.forEach(item => {
+            this.initInstances(item);
+          });
+          if (this.updateMode) this.make;
+        })
+        .catch(() => this.newLoan());
     },
     makeChild() {
       this.$store
@@ -553,18 +550,14 @@ export default {
       //début chargement
       this.loaded = true;
     });
-
-    if (this.pending_loan.id) {
-      this.$store
-        .dispatch("loans/fetchSingle", { id: this.pending_loan.id })
-        .then(data => {
-          if (data.status !== 3) {
-            this.makeChild_btn = false;
-          } else {
-            this.makeChild_btn = true;
-          }
-        })
-        .catch(() => this.newLoan());
+    let id = null;
+    if (this.loanid) {
+      id = parseInt(this.loanid);
+    } else if (this.pending_loan.id) {
+      id = this.pending_loan.id;
+    }
+    if (id) {
+      this.goTo(id, false);
     }
   }
 };

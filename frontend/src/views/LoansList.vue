@@ -68,14 +68,6 @@
             >
               {{ isEditable ? "Modifier" : "Consulter" }}
             </button>
-            <button
-              class="btn btn-dark"
-              role="button"
-              @click="deleteLoan()"
-              v-if="isRemoval"
-            >
-              Supprimer
-            </button>
           </div>
         </div>
         <div class="card-body">
@@ -127,42 +119,12 @@
           </ul>
         </div>
       </div>
-      <modal
-        id="modal-delete"
-        title="Annuler demande de prêt"
-        v-model="showDelete"
-        hideFooter
-      >
-        <p>
-          Confirmer l'annulation de la demande de prêt
-        </p>
-
-        <div>
-          <div class="btn-group" role="group" aria-label="Supprimer la demande">
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="validDestroy(selected_object)"
-            >
-              Oui
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              @click="showDelete = false"
-            >
-              Non
-            </button>
-          </div>
-        </div>
-      </modal>
     </div>
   </div>
 </template>
 
 <script>
 import { ListMixin } from "@/common/mixins";
-import Modal from "@/components/Modal";
 import { mapGetters } from "vuex";
 /*
   Composant emprunts utilisateur
@@ -170,9 +132,6 @@ import { mapGetters } from "vuex";
 export default {
   name: "LoansList",
   mixins: [ListMixin],
-  components: {
-    Modal
-  },
   data() {
     return {
       ressource: "loans",
@@ -219,34 +178,8 @@ export default {
           return a.due_date.localeCompare(b.due_date);
         });
     },
-    validDestroy(item) {
-      this.$store
-        .dispatch("loans/destroy", {
-          data: item,
-          id: item.id
-        })
-        .then(() => {
-          this.$store.commit("loans/resetPending");
-          if (this.objects_filtered.length > 0) {
-            this.selected_object = this.objects_filtered[0];
-          }
-          this.showDelete = false;
-          this.errors = [];
-        })
-        .catch(e => {
-          if ("non_field_errors" in e.response.data) {
-            this.errors = e.response.data.non_field_errors;
-          }
-          console.log(e.response);
-        });
-    },
     editLoan(item) {
-      this.$store.commit("loans/setPending", item);
-      this.$router.push({ name: "loan" });
-    },
-    deleteLoan() {
-      // affichage modal
-      this.showDelete = true;
+      this.$router.push({ name: "loan", params: { loanid: item.id } });
     }
   },
   beforeMount() {

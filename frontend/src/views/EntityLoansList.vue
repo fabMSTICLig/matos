@@ -151,7 +151,6 @@
 import { mapGetters } from "vuex";
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
-import { DataHelper } from "@/common/helpers";
 /*
   Liste des prêts d'une Entité
 */
@@ -170,8 +169,7 @@ export default {
         due_date: { value: 1, label: "Date retour prévue" },
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
-      },
-      copyObj: {}
+      }
     };
   },
   props: ["entityid", "matid"],
@@ -252,15 +250,11 @@ export default {
         });
     },
     setCopy() {
-      this.copyObj = DataHelper.copy(this.selected_object);
-      this.$store.dispatch("loans/copy", {
-        id: this.copyObj.id,
-        data: this.copyObj
-      });
+      this.$store.commit("loans/copyPending", this.selected_object);
+      this.$router.push({ name: "loan" });
     },
     editLoan(loan) {
-      this.$store.commit("loans/setPending", loan);
-      this.$router.push({ name: "loan" });
+      this.$router.push({ name: "loan", params: { loanid: loan.id } });
     },
     destroyLoan(item) {
       showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?").then(value => {
