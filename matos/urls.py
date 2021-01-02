@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.shortcuts import redirect
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 import django_cas_ng.views
@@ -23,8 +23,10 @@ urlpatterns = [
     re_path(r'^$', view=TemplateView.as_view(template_name='index.html')),
     re_path(r'^legalnotice$', view=TemplateView.as_view(template_name='legalnotice.html')),
     re_path(r'^su/', include('django_su.urls')),
+    path('admin/login/', lambda r: redirect("/")),
+    path('admin/logout/', lambda r: redirect("/")),
     path('admin/', admin.site.urls),
-    path('auth/', include('django.contrib.auth.urls')),
+#    path('auth/', include('django.contrib.auth.urls')),
     path('cas/login/', django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
     path('cas/logout/', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     path('api/', include('core.urls')),
