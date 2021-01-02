@@ -72,7 +72,7 @@
                 <legend>Managers</legend>
                 <div class="form-group">
                   <DynList
-                    ressource="users"
+                    options="users"
                     v-model="object.managers"
                     :makeLabel="makeManagerLabel"
                   >
@@ -90,7 +90,7 @@
                 <legend>Affiliations</legend>
                 <div class="form-group">
                   <DynList
-                    ressource="affiliations"
+                    options="affiliations"
                     v-model="object.affiliations"
                   ></DynList>
                 </div>

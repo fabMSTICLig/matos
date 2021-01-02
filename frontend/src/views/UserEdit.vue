@@ -63,7 +63,7 @@
                   <legend>Affiliations</legend>
                   <div class="form-group">
                     <DynList
-                      ressource="affiliations"
+                      options="affiliations"
                       v-model="object.affiliations"
                     ></DynList>
                   </div>
@@ -74,7 +74,7 @@
                   <legend>Entities</legend>
                   <div class="form-group">
                     <DynList
-                      ressource="entities"
+                      options="entities"
                       v-model="object.entities"
                     ></DynList>
                   </div>

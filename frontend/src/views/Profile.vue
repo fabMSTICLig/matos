@@ -95,7 +95,7 @@
         <div class="form-group">
           <label>Affiliations</label>
           <DynList
-            ressource="affiliations"
+            options="affiliations"
             v-model="authUser.affiliations"
           ></DynList>
         </div>
@@ -261,6 +261,9 @@ export default {
     if (!this.authUser.rgpd_accept) {
       this.showRGPD = true;
     }
+  },
+  beforeMount() {
+    //this.$store.dispatch("affiliations/fetchList");
   }
 };
 </script>

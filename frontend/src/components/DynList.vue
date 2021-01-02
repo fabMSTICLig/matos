@@ -1,26 +1,29 @@
 <template>
   <div>
-    <form v-if="!readonly" :id="_uid" @submit="addObject">
+    <div v-if="!readonly" :id="_uid">
       <div class="input-group" style="height:43px;">
-        <div class="input-group-prepend">
+        <!--<div class="input-group-prepend">
           <span class="input-group-text">Ajouter</span>
-        </div>
-        <input-datalist
-          v-model="new_object_id"
-          :ressource="ressource"
-          :makeLabel="makeLabel"
-        ></input-datalist>
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="submit">
-            Valider
-          </button>
-        </div>
+        </div>-->
+        <multiselect
+          :value="valueIntern"
+          :options="optionsIntern"
+          :multiple="true"
+          track-by="id"
+          :custom-label="makeLabel"
+          label="name"
+          hide-selected
+          placeholder="Pick a value"
+          :reset-after="true"
+          @select="addObject"
+          ><template slot="tag"><span></span></template>
+        </multiselect>
       </div>
-    </form>
+    </div>
     <ul class="list-group">
       <li
         class="list-group-item d-flex justify-content-between align-items-center"
-        v-for="item in objects_filtered"
+        v-for="item in valueIntern"
         :key="item.id"
       >
         <span>
@@ -31,7 +34,7 @@
         <button
           class="btn btn-danger"
           type="button"
-          @click="removeObject(item.id)"
+          @click="removeObject(item)"
           v-if="!readonly"
         >
           X
@@ -42,14 +45,14 @@
 </template>
 
 <script>
-import InputDatalist from "@/components/InputDatalist";
+import Multiselect from "vue-multiselect";
 /*
   Component mixing list input and list group items
 */
 export default {
   name: "DynList",
   props: {
-    ressource: {
+    options: {
       type: [String, Array],
       required: true
     },
@@ -68,47 +71,39 @@ export default {
     }
   },
   components: {
-    InputDatalist
+    Multiselect
   },
   data() {
-    return {
-      new_object_id: 0,
-      id_mat: ""
-    };
+    return {};
   },
   computed: {
-    objects_list() {
-      if (typeof this.ressource == "string")
-        return this.$store.getters[this.ressource + "/list"];
-      else return this.ressource;
+    optionsIntern() {
+      if (typeof this.options == "string")
+        return this.$store.getters[this.options + "/list"];
+      else return this.options;
     },
-    objects_filtered() {
-      return this.objects_list.filter(item => {
-        return this.value.indexOf(item.id) > -1;
-      });
+    valueIntern() {
+      return this.optionsIntern.filter(el => this.value.includes(el.id));
     }
   },
   methods: {
-    addObject(e) {
-      e.preventDefault();
-      if (this.value.indexOf(this.new_object_id) > -1) {
-        this.new_object_id = 0;
-      } else if (
-        this.value.indexOf(this.new_object_id) == -1 &&
-        this.objects_list.some(item => item.id == this.new_object_id)
-      ) {
-        this.value.push(this.new_object_id);
-        this.$emit("input", this.value);
-        this.new_object_id = 0;
-      }
+    addObject(item) {
+      this.$emit("input", [item.id].concat(this.value));
     },
-    removeObject(id) {
-      const index = this.value.indexOf(id);
+    removeObject(item) {
+      const index = this.value.indexOf(item.id);
       if (index > -1) {
-        this.value.splice(index, 1);
-        this.$emit("input", this.value);
+        let ret = [];
+        ret = ret.concat(this.value);
+        ret.splice(index, 1);
+        this.$emit("input", ret);
       }
     }
+  },
+  beforeMount() {
+    if (typeof this.options == "string")
+      this.$store.dispatch(this.options + "/fetchList");
   }
 };
 </script>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

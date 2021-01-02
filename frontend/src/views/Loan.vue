@@ -41,11 +41,22 @@
                 <div class="col-12 col-md-5 col-lg-5">
                   <div class="form-group" v-if="canManage">
                     <label>Utilisateur :</label>
-                    <input-datalist
+                    <multiselect
+                      v-model="loanUser"
+                      :options="users"
+                      track-by="id"
+                      label="name"
+                      :searchable="true"
+                      :allow-empty="true"
+                      select-label=""
+                      :custom-label="makeUserLabel"
+                    ></multiselect>
+
+                    <!-- <input-datalist
                       v-model="pending_loan.user"
                       ressource="users"
                       :makeLabel="makeUserLabel"
-                    ></input-datalist>
+                    ></input-datalist>-->
                   </div>
                   <div class="form-group">
                     <label>Entité :</label>
@@ -167,7 +178,7 @@
                               <h6>Instances</h6>
                               <DynList
                                 v-if="item in specificinstances"
-                                :ressource="specificinstances[item]"
+                                :options="specificinstances[item]"
                                 v-model="pending_loan.specific_materials"
                                 :readonly="readOnly"
                               ></DynList>
@@ -293,10 +304,10 @@
 
 <script>
 import Vue from "vue";
+import Multiselect from "vue-multiselect";
 import { mapGetters, mapMutations } from "vuex";
 import DynList from "@/components/DynList";
 import { showMsgOk } from "@/components/Modal";
-import InputDatalist from "@/components/InputDatalist";
 /*
   Composant permettant de gérer le prêt courant
 */
@@ -304,7 +315,7 @@ export default {
   name: "Loan",
   components: {
     DynList,
-    InputDatalist
+    Multiselect
   },
   props: ["loanid"],
   data() {
@@ -316,6 +327,8 @@ export default {
   },
   computed: {
     ...mapGetters({
+      users: "users/list",
+      userById: "users/byId",
       genericmaterials: "genericmaterials/list",
       gmById: "genericmaterials/byId",
       specificmaterials: "specificmaterials/list",
@@ -342,7 +355,17 @@ export default {
         return "Envoyer la demande";
       }
     },
-
+    loanUser: {
+      get() {
+        if (this.pending_loan.user) {
+          return this.userById(this.pending_loan.user);
+        } else return null;
+      },
+      set(val) {
+        if (val) this.pending_loan.user = val.id;
+        else this.pending_loan.user = null;
+      }
+    },
     emptyLoan() {
       return (
         this.pending_loan.generic_materials.length == 0 &&
@@ -351,9 +374,13 @@ export default {
     },
 
     emptyInstances() {
-      return this.pending_loan.models.length
-        ? this.pending_loan.specific_materials.length == 0
-        : false;
+      let ret = true;
+      this.pending_loan.models.forEach(m => {
+        ret &= this.specificinstances[m].some(el =>
+          this.pending_loan.specific_materials.includes(el.id)
+        );
+      });
+      return !ret;
     },
     canManage() {
       return (
@@ -539,6 +566,7 @@ export default {
   },
   beforeMount() {
     var pall = [];
+    if (this.isAdmin) pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("specificmaterials/fetchList"));
     pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("entities/fetchList"));
