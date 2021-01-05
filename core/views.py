@@ -24,7 +24,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-from rest_framework.parsers import JSONParser, BaseParser
+from rest_framework.parsers import JSONParser, FileUploadParser, MultiPartParser, FormParser
 
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 from .serializers import *
@@ -253,24 +253,6 @@ class EntityMaterialMixin:
 
         return Response(serializer.data)
 
-class CSVParser(BaseParser):
-    media_type = 'text/csv'
-
-    def parse(self, stream, media_type=None, parser_context=None):
-        """
-        Return a list of lists representing the rows of a CSV file.
-        """
-
-        charset = 'utf-8'
-        media_type_params = dict([param.strip().split('=') for param in media_type.split(';')[1:]])
-        charset = media_type_params.get('charset', 'utf-8')
-        txt = stream.read().decode(charset)
-        try:
-            return list(csv.reader(txt.splitlines(), delimiter='\t'))
-        except:
-            raise ParseError("Error pasing csv data")
-
-
 class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     """
     Manager endpoints for generic material
@@ -280,60 +262,83 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = GenericMaterialSerializer
 
-    @action(methods=['post'], detail=False, parser_classes=[CSVParser])
+    @action(methods=['post'], detail=False, parser_classes=[ MultiPartParser, FormParser, FileUploadParser])
     def bulk_add(self, request, *arg, **kwargs):
         entity = Entity.objects.get(pk=self.kwargs['entity_pk'])
         if not self.request.user.is_staff and not self.request.user in entity.managers.all():
-            raise PermissionDenied("Your are not a manager of this entity")
-        try:
-            rows = request.data
+            raise PermissionDenied("Vous n'êtes pas manager de cette entité")
+        data=None
+        text=None
+        if( 'file' in request.data):
+            text=request.data['file'].read().decode('utf-8')
+        elif('text' in request.data):
+            text=request.data['text']
+        if(text):
+            try:
+                data=list(csv.reader(text.splitlines(), delimiter='\t'))
+            except:
+                raise ParseError("Fichier csv au mauvais format")
+            rows = data
             if(rows and rows[0] and rows[0][0]=="name"):
                 rows.pop(0)
             tags_dict={}
             mats=[]
+            matnames=[]
             mats_tags=[]
-            for row in rows:
-                if len(row) != 7:
-                    raise ParseError("Wrong CSV format")
-                row = list(v if v else None for v in row)
-                row[1] = 0 if row[1] is None else row[1]
-                mat=GenericMaterial(name = row[0],
-                quantity = row[1],
-                ref_int = row[2],
-                ref_man = row[3],
-                description = row[4],
-                localisation = row[5],
-                entity=entity
-                )
-                mats.append(mat)
-                tagstrs=list(t.strip() for t in row[6].split(","))
-                tags=[]
-                for tagstr in tagstrs:
-                    if tagstr in tags_dict:
-                        tags.append(tags_dict[tagstr])
-                    else:
-                        tag, created=Tag.objects.get_or_create(name=tagstr)
-                        tags_dict[tagstr] = tag
-                        tags.append(tag)
-                mats_tags.append(tags)
-            matsdb = GenericMaterial.objects.bulk_create(mats)
-            matids = []
-            matsret = []
-            if( matsdb[0].id is None):
-                for mat in matsdb:
-                    matsret.append(GenericMaterial.objects.get(name=mat.name, entity=entity))
-            else:
-                matsret=matsdb
-            throughs=[]
-            Modelthrough = GenericMaterial.tags.through
-            for i, mat in enumerate(matsret):
-                for tag in mats_tags[i]:
-                    throughs.append(Modelthrough(tag_id=tag.id, genericmaterial_id=mat.id))
-            Modelthrough.objects.bulk_create(throughs)
-            serializer = GenericMaterialSerializer(matsret, many=True)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except:
-            raise ParseError("Error while processing bulk_add")
+            try:
+                for row in rows:
+                    if len(row) != 7:
+                        raise ParseError("Wrong CSV format")
+                    row = list(v if v else None for v in row)
+                    row[1] = 0 if row[1] is None else row[1]
+                    mat=GenericMaterial(name = row[0],
+                    quantity = row[1],
+                    ref_int = row[2],
+                    ref_man = row[3],
+                    description = row[4],
+                    localisation = row[5],
+                    entity=entity
+                    )
+                    matnames.append(mat.name)
+                    mats.append(mat)
+                    tagstrs=list(t.strip() for t in row[6].split(","))
+                    tags=[]
+                    for tagstr in tagstrs:
+                        if tagstr in tags_dict:
+                            tags.append(tags_dict[tagstr])
+                        else:
+                            tag, created=Tag.objects.get_or_create(name=tagstr)
+                            tags_dict[tagstr] = tag
+                            tags.append(tag)
+                    mats_tags.append(tags)
+            except:
+                raise ParseError("Une erreur c'est produite lors de l'ajout massif (ex nom déjà existant)")
+            
+            names_conflict = GenericMaterial.objects.filter(entity=entity, name__in=matnames).values_list('name', flat=True).all()
+            if(names_conflict):
+                raise ParseError("Ajout impossible: l'entité contient déjà les matériels "+str(list(names_conflict)))
+            
+            try:
+                matsdb = GenericMaterial.objects.bulk_create(mats)
+                matids = []
+                matsret = []
+                if( matsdb[0].id is None):
+                    for mat in matsdb:
+                        matsret.append(GenericMaterial.objects.get(name=mat.name, entity=entity))
+                else:
+                    matsret=matsdb
+                throughs=[]
+                Modelthrough = GenericMaterial.tags.through
+                for i, mat in enumerate(matsret):
+                    for tag in mats_tags[i]:
+                        throughs.append(Modelthrough(tag_id=tag.id, genericmaterial_id=mat.id))
+                Modelthrough.objects.bulk_create(throughs)
+                serializer = GenericMaterialSerializer(matsret, many=True)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                raise ParseError("Une erreur c'est produite lors de l'ajout massif (ex nom déjà existant)")
+        else:
+            raise ParseError("Aucune donnée reçue")
 
 class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     """

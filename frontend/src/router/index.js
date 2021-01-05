@@ -331,6 +331,23 @@ const routes = [
                   )
               },
               {
+                path: "g/bulk",
+                name: "genericmaterialbulk",
+                component: () =>
+                  import(
+                    /* webpackChunkName: "genmaterialbulk" */ "../views/GenericMaterialBulk.vue"
+                  ),
+                meta: {
+                  routeparam: "matid",
+                  routedelete: "materialslist",
+                  breadcumb: {
+                    label: "Ajout Massif",
+                    name: "genericmaterialbulk"
+                  }
+                }
+              },
+
+              {
                 path: "g/:matid",
                 name: "genericmaterial",
                 component: () =>

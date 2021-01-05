@@ -148,6 +148,10 @@ export default {
         {
           to: { name: "specificmaterial", params: { matid: "new" } },
           label: "Spécifique"
+        },
+        {
+          to: { name: "genericmaterialbulk" },
+          label: "Générique massif"
         }
       ],
       displayed: true
