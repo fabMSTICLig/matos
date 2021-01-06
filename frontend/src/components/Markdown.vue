@@ -78,8 +78,7 @@ export default {
   name: "Markdown",
   props: {
     description: {
-      type: String,
-      required: true
+      type: String
     },
     displayed: {
       type: Boolean
@@ -99,7 +98,8 @@ export default {
   },
   computed: {
     compiledMarkdown() {
-      return DOMPurify.sanitize(marked(this.description));
+      if (this.description) return DOMPurify.sanitize(marked(this.description));
+      else return "";
     }
   },
   watch: {

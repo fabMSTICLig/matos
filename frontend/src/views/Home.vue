@@ -22,9 +22,12 @@
                   plateforme technique, ... Chaque entité peut avoir une
                   granularité différente et un fonctionnement différent. Il est
                   donc conseillé de lire la description de l'entité chez qui
-                  l'on souhaite emprunter du matériel. Si vous faite partie de l'université et que vous souhaitez prêter
-                  du matériel et créer une entité, veuillez contacter les
-                  administrateurs du site <a href="mailto:matos@univ-grenoble-alpes.fr">matos@univ-grenoble-alpes.fr</a>.
+                  l'on souhaite emprunter du matériel. Si vous faite partie de
+                  l'université et que vous souhaitez prêter du matériel et créer
+                  une entité, veuillez contacter les administrateurs du site
+                  <a href="mailto:matos@univ-grenoble-alpes.fr"
+                    >matos@univ-grenoble-alpes.fr</a
+                  >.
                 </p>
               </li>
               <li>
