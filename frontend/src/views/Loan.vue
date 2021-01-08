@@ -581,8 +581,6 @@ export default {
     let id = null;
     if (this.loanid) {
       id = parseInt(this.loanid);
-    } else if (this.pending_loan.id) {
-      id = this.pending_loan.id;
     }
     if (id) {
       this.goTo(id, false);

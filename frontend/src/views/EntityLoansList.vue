@@ -76,13 +76,9 @@
               Copier
             </button>
             <div class="btn-group float-right" role="group">
-              <button
-                class="btn btn-primary"
-                role="button"
-                @click="editLoan(selected_object)"
+              <router-link class="btn btn-primary" role="button" :to="editRoute"
+                >Modifier</router-link
               >
-                Modifier
-              </button>
               <button
                 class="btn btn-danger"
                 role="button"
@@ -221,6 +217,9 @@ export default {
           }
         }
       });
+    },
+    editRoute() {
+      return { name: "loan", params: { loanid: this.selected_object.id } };
     }
   },
   watch: {
