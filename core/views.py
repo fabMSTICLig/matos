@@ -288,6 +288,7 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
             try:
                 for row in rows:
                     if len(row) != 7:
+                        print("wrong format"+str(len(row)))
                         raise ParseError("Wrong CSV format")
                     row = list(v if v else None for v in row)
                     row[1] = 0 if row[1] is None else row[1]
@@ -301,19 +302,22 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
                     )
                     matnames.append(mat.name)
                     mats.append(mat)
-                    tagstrs=list(t.strip() for t in row[6].split(","))
-                    tags=[]
-                    for tagstr in tagstrs:
-                        if tagstr in tags_dict:
-                            tags.append(tags_dict[tagstr])
-                        else:
-                            tag, created=Tag.objects.get_or_create(name=tagstr)
-                            tags_dict[tagstr] = tag
-                            tags.append(tag)
-                    mats_tags.append(tags)
+                    if(row[6]):
+                        tagstrs=list(t.strip() for t in row[6].split(","))
+                        tags=[]
+                        for tagstr in tagstrs:
+                            if tagstr in tags_dict:
+                                tags.append(tags_dict[tagstr])
+                            else:
+                                tag, created=Tag.objects.get_or_create(name=tagstr)
+                                tags_dict[tagstr] = tag
+                                tags.append(tag)
+                        mats_tags.append(tags)
+                    else:
+                        mats_tags.append([])
             except:
                 raise ParseError("Une erreur c'est produite lors de l'ajout massif (ex nom déjà existant)")
-            
+            print(mats) 
             names_conflict = GenericMaterial.objects.filter(entity=entity, name__in=matnames).values_list('name', flat=True).all()
             if(names_conflict):
                 raise ParseError("Ajout impossible: l'entité contient déjà les matériels "+str(list(names_conflict)))
