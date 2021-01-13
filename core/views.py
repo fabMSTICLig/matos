@@ -270,7 +270,10 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
         data=None
         text=None
         if( 'file' in request.data):
-            text=request.data['file'].read().decode('utf-8')
+            try:
+                text=request.data['file'].read().decode('utf-8')
+            except UnicodeDecodeError:
+                raise ParseError("Le fichier doit être encoder en utf-8")
         elif('text' in request.data):
             text=request.data['text']
         if(text):
