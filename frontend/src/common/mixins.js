@@ -59,21 +59,23 @@ export const ListMixin = {
       this.current_page = page;
     },
     initList() {
-      this.$store
+      return this.$store
         .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
         .then(() => {
           if (this.objects_filtered.length > 0) {
             this.selected_object = this.objects_filtered[0];
           }
+          return Promise.resolve();
         });
     },
     initComponent() {
       return Promise.resolve();
-    }
+    },
+    listInitiated() {}
   },
   beforeMount() {
     this.initComponent().then(() => {
-      this.initList();
+      this.initList().then(() => this.listInitiated());
     });
   }
 };

@@ -181,6 +181,7 @@
                                 :options="specificinstances[item]"
                                 v-model="pending_loan.specific_materials"
                                 :readonly="readOnly"
+                                :make-label="makeLabelInstance"
                               ></DynList>
                             </div>
                           </td>
@@ -320,7 +321,6 @@ export default {
   props: ["loanid"],
   data() {
     return {
-      specificinstances: {},
       loaded: false,
       errors: []
     };
@@ -329,10 +329,9 @@ export default {
     ...mapGetters({
       users: "users/list",
       userById: "users/byId",
-      genericmaterials: "genericmaterials/list",
-      gmById: "genericmaterials/byId",
-      specificmaterials: "specificmaterials/list",
-      smById: "specificmaterials/byId",
+      gmById: "materials/gmById",
+      smById: "materials/smById",
+      smiById: "materials/smiById",
       entityById: "entities/byId",
       loanById: "loans/byId",
       pending_loan: "loans/pending_loan",
@@ -372,7 +371,19 @@ export default {
         this.pending_loan.specific_materials.length == 0
       );
     },
-
+    specificinstances() {
+      let ret = {};
+      this.pending_loan.models.forEach(id => {
+        ret[id] = [];
+        let sm = this.smById(id);
+        sm.instances.forEach(iid => {
+          let ins = this.smiById(iid);
+          if (!ins.active && !this.canManage) ins.$isDisabled = true;
+          ret[id].push(ins);
+        });
+      });
+      return ret;
+    },
     emptyInstances() {
       let ret = true;
       this.pending_loan.models.forEach(m => {
@@ -401,6 +412,7 @@ export default {
         ? "Modification prêt"
         : "Nouveau prêt";
     },
+
     checkDates() {
       /*
         Vérification des dates remplies pour la demande ou la modification 
@@ -543,18 +555,23 @@ export default {
     makeUserLabel(item) {
       return item.username;
     },
+    makeLabelInstance(item) {
+      return item.name + (item.active ? "" : " (inactif)");
+    },
     goTo(id, load = true) {
       if (load) this.$router.push({ name: "loan", params: { loanid: id } });
       this.$store
         .dispatch("loans/fetchSingle", { id: id })
         .then(data => {
-          this.$store.commit("loans/setPending", data);
-          this.pending_loan.models.forEach(item => {
-            this.initInstances(item);
-          });
-          if (this.updateMode) this.make;
+          this.$store
+            .dispatch("materials/fetchMaterialsByLoans", { loanids: [data.id] })
+            .then(() => {
+              this.$store.commit("loans/setPending", data);
+            });
         })
-        .catch(() => this.newLoan());
+        .catch(() => {
+          this.newLoan();
+        });
     },
     makeChild() {
       this.$store
@@ -567,24 +584,26 @@ export default {
   beforeMount() {
     var pall = [];
     if (this.isAdmin) pall.push(this.$store.dispatch("users/fetchList"));
-    pall.push(this.$store.dispatch("specificmaterials/fetchList"));
-    pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("entities/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
-    this.pending_loan.models.forEach(item => {
-      pall.push(this.initInstances(item));
-    });
-    Promise.all(pall).then(() => {
-      //début chargement
-      this.loaded = true;
-    });
     let id = null;
     if (this.loanid) {
       id = parseInt(this.loanid);
     }
     if (id) {
       this.goTo(id, false);
+    } else {
+      pall.push(
+        this.$store.dispatch("materials/fetchMaterialsByIds", {
+          gmids: this.pending_loan.generic_materials.map(m => m.material),
+          smids: this.pending_loan.models
+        })
+      );
     }
+    Promise.all(pall).then(() => {
+      //début chargement
+      this.loaded = true;
+    });
   }
 };
 </script>

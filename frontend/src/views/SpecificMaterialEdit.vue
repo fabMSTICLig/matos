@@ -66,6 +66,17 @@
                       ressource="tags"
                     />
                   </div>
+                  <div class="form-group custom-control custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      v-model="object.active"
+                      id="check-active"
+                    />
+                    <label class="custom-control-label" for="check-active"
+                      >Visible</label
+                    >
+                  </div>
                 </fieldset>
               </form>
               <div class="btn-group" role="group">
@@ -185,6 +196,19 @@
                             v-model="selected_object.description"
                           ></textarea>
                         </div>
+                        <div class="form-group custom-control custom-switch">
+                          <input
+                            type="checkbox"
+                            class="custom-control-input"
+                            v-model="selected_object.active"
+                            id="check-active-instance"
+                          />
+                          <label
+                            class="custom-control-label"
+                            for="check-active-instance"
+                            >Visible</label
+                          >
+                        </div>
                       </fieldset>
                       <div class="btn-group" role="group">
                         <button class="btn btn-primary" type="submit">
@@ -285,7 +309,8 @@ export default {
         localisation: null,
         description: "",
         entity: this.$route.params.entityid,
-        tags: []
+        tags: [],
+        active: true
       };
     },
     validateForm() {
@@ -295,10 +320,12 @@ export default {
     checkErrors() {
       var instancesName = "";
       this.errors = [];
-
       if (this.selected_object)
         instancesName = this.objects_paginated.filter(object => {
-          return this.selected_object.name == object.name;
+          return (
+            this.selected_object.name == object.name &&
+            this.selected_object.id != object.id
+          );
         });
 
       if (this.new_object_name.length)

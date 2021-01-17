@@ -173,8 +173,8 @@ export default {
     ...mapGetters("loans", { loan_status: "status" }),
     ...mapGetters(["authUser"]),
     ...mapGetters({
-      gmById: "genericmaterials/byId",
-      smById: "specificmaterials/byId",
+      gmById: "materials/gmById",
+      smById: "materials/smById",
       userById: "users/byId",
       entityById: "entities/byId",
       users: "users/list"
@@ -237,15 +237,21 @@ export default {
       else if (this.$route.name == "loansmaterialspecific")
         params.sm = this.matid;
       else params.entity = this.entityid;
-      this.$store
+      return this.$store
         .dispatch("loans/fetchList", {
           prefix: this.prefix,
           params: { params: params }
         })
         .then(() => {
-          if (this.objects_filtered.length > 0) {
-            this.selected_object = this.objects_filtered[0];
-          }
+          this.$store
+            .dispatch("materials/fetchMaterialsByLoans", {
+              loanids: this.objects_list.map(o => o.id)
+            })
+            .then(() => {
+              if (this.objects_filtered.length > 0) {
+                this.selected_object = this.objects_filtered[0];
+              }
+            });
         });
     },
     setCopy() {
@@ -272,8 +278,6 @@ export default {
 
   beforeMount() {
     var pall = [];
-    pall.push(this.$store.dispatch("specificmaterials/fetchList"));
-    pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
 

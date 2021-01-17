@@ -43,7 +43,8 @@
                     'table-active':
                       selected_object &&
                       item.id + item.name ==
-                        selected_object.id + selected_object.name
+                        selected_object.id + selected_object.name,
+                    'table-danger': !item.active
                   }"
                 >
                   <td v-text="item.name"></td>
@@ -100,6 +101,10 @@
             <tr v-if="isGeneric">
               <th scope="row">Quantité</th>
               <td>{{ selected_object.quantity }}</td>
+            </tr>
+            <tr v-if="!selected_object.active" class="text-danger">
+              <th scope="row">Visibilité</th>
+              <td>Invisible</td>
             </tr>
           </table>
 

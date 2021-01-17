@@ -118,6 +118,8 @@ class Material(models.Model):
     description = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name="%(class)ss")
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="%(class)ss")
+    active = models.BooleanField(default=True)
+
     def __str__(self):
         return self.name
 
@@ -158,6 +160,7 @@ class SpecificMaterialInstance(models.Model):
     serial_num = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     model = models.ForeignKey(SpecificMaterial, on_delete=models.CASCADE, related_name="instances")
+    active = models.BooleanField(default=True)
     def __str__(self):
         return self.model.name +"(" + self.name + ")"
 

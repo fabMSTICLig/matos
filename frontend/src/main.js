@@ -4,6 +4,12 @@ import router from "./router";
 import store from "./store";
 import { CHECK_AUTH } from "./store/actions.type";
 import ApiService from "./common/api.service";
+import vueDebounce from "vue-debounce";
+
+// Setting a different event to listen to
+Vue.use(vueDebounce, {
+  listenTo: "input"
+});
 
 Vue.config.productionTip = false;
 

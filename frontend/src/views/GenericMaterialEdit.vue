@@ -68,6 +68,17 @@
                       ressource="tags"
                     />
                   </div>
+                  <div class="form-group custom-control custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      v-model="object.active"
+                      id="check-active"
+                    />
+                    <label class="custom-control-label" for="check-active"
+                      >Visible</label
+                    >
+                  </div>
                 </fieldset>
               </div>
               <div class="md col-12 col-md-6 col-lg-6">
@@ -152,7 +163,8 @@ export default {
         description: "",
         quantity: 0,
         entity: this.$route.params["entityid"],
-        tags: []
+        tags: [],
+        active: true
       };
     },
     make_label() {

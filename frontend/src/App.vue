@@ -119,6 +119,7 @@ export default {
               "specificmaterials",
               module.specificmaterials
             );
+            this.$store.registerModule("materials", module.materials);
           })
         );
         Promise.all(pall).then(() => {

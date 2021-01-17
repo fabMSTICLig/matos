@@ -89,7 +89,7 @@ class GenericMaterialPublicSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = GenericMaterial
-        exclude = ['localisation']
+        exclude = ['localisation', 'active']
 
 class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
     """
@@ -114,7 +114,7 @@ class SpecificMaterialSerializer(serializers.ModelSerializer):
     instances = SpecificMaterialInstanceSerializer(many=True, read_only=True)
     class Meta:
         model = SpecificMaterial
-        fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation']
+        fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation', 'active']
 
 class SpecificMaterialUserSerializer(serializers.ModelSerializer):
     """

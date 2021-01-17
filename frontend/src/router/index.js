@@ -31,13 +31,8 @@ function requireManager(to, from, next) {
       user.entities.indexOf(parseInt(to.params["entityid"])) > -1 ||
       store.getters.isAdmin
     ) {
-      console.log(user.entities);
       next();
     } else {
-      console.log("redirection");
-      console.log(parseInt(to.params["entityid"]));
-      console.log(user.entities);
-
       next("/");
     }
   }

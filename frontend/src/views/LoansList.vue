@@ -144,8 +144,8 @@ export default {
     ...mapGetters("loans", { loan_status: "status" }),
     ...mapGetters(["authUser"]),
     ...mapGetters({
-      gmById: "genericmaterials/byId",
-      smById: "specificmaterials/byId",
+      gmById: "materials/gmById",
+      smById: "materials/smById",
       entityById: "entities/byId"
     }),
     isManager() {
@@ -166,6 +166,11 @@ export default {
     initComponent() {
       return this.$store.dispatch("loans/fetchStatus");
     },
+    listInitiated() {
+      this.$store.dispatch("materials/fetchMaterialsByLoans", {
+        loanids: this.objects_filtered.map(o => o.id)
+      });
+    },
     search_fields(list) {
       return list
         .filter(item => {
@@ -184,8 +189,6 @@ export default {
   },
   beforeMount() {
     var pall = [];
-    pall.push(this.$store.dispatch("specificmaterials/fetchList"));
-    pall.push(this.$store.dispatch("genericmaterials/fetchList"));
     pall.push(this.$store.dispatch("entities/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
     Promise.all(pall).then(() => {

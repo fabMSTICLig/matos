@@ -16,14 +16,15 @@
                   class="form-control"
                   placeholder="Arduino"
                   v-model="search_input"
+                  v-debounce:400ms="refreshSearch"
                 />
               </div>
               <div class="form-group">
                 <label>Type</label>
                 <select class="form-control" v-model="type_input">
-                  <option value="1">Les deux</option>
-                  <option value="2">Generique</option>
-                  <option value="3">Specifique</option>
+                  <option value="">Les deux</option>
+                  <option value="g">Generique</option>
+                  <option value="s">Specifique</option>
                 </select>
               </div>
 
@@ -46,6 +47,20 @@
                   forbidAdd
                 />
               </div>
+              <div
+                v-if="isAdmin || authUser.entities.length"
+                class="form-group custom-control custom-switch"
+              >
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  v-model="hidden"
+                  id="check-active"
+                />
+                <label class="custom-control-label" for="check-active"
+                  >Invisible</label
+                >
+              </div>
             </form>
           </div>
         </div>
@@ -53,23 +68,9 @@
       <div class="col">
         <div class="card">
           <div class="card-header">
-            <form class="form form-inline">
-              <div class="form-group">
-                <label class="mr-1">Ordre : </label>
-                <select class="form-control" v-model="sort_input">
-                  <option
-                    v-for="item in sort_choices"
-                    :value="item.value"
-                    :key="item.value"
-                    >{{ item.label }}</option
-                  >
-                </select>
-              </div>
-            </form>
-
             <pagination
               :total-pages="pages_count"
-              :total="objects_filtered.length"
+              :total="objects_list.length"
               :per-page="10"
               :current-page="current_page"
               @pagechanged="onPageChange"
@@ -78,7 +79,7 @@
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li
-                v-for="item in objects_paginated"
+                v-for="item in objects_list"
                 :key="item.name + item.id"
                 class="list-group-item list-group-item-action flex-column align-items-start"
               >
@@ -141,9 +142,6 @@ import Markdown from "@/components/Markdown";
   permet l'accès à la vue d'un matériel
 */
 
-/*
-  @TODO: Optimiser les appels aux tags dans la liste des matériels
-*/
 export default {
   name: "Search",
   components: {
@@ -155,23 +153,21 @@ export default {
   data() {
     return {
       search_input: "",
-      sort_input: 1,
-      type_input: 1,
+      type_input: "",
       tags_filter: [],
+      hidden: false,
       current_page: 1,
+      count: 0,
+      per_page: process.env.VUE_APP_MAXLIST,
       entities_filter: [],
-      sort_choices: {
-        name: { value: 1, label: "Nom" },
-        entity: { value: 2, label: "Entité" }
-      },
+      genericmaterials: [],
+      specificmaterials: [],
       displayed: true
     };
   },
   computed: {
     ...mapGetters({
       entities: "entities/list",
-      genericmaterials: "genericmaterials/list",
-      specificmaterials: "specificmaterials/list",
       entityById: "entities/byId",
       authUser: "authUser",
       isAdmin: "isAdmin",
@@ -179,71 +175,34 @@ export default {
     }),
 
     objects_list() {
-      if (this.type_input == 2) return this.genericmaterials;
-      else if (this.type_input == 3) return this.specificmaterials;
-      else {
-        if (this.genericmaterials)
-          return this.genericmaterials
-            .concat(this.specificmaterials)
-            .sort((a, b) => {
-              if (a.name > b.name) return -1;
-              if (a.name < b.name) return 1;
-              return 0;
-            });
-        else return [];
-      }
-    },
-    objects_filtered() {
-      var filtered = this.objects_list.filter(item => {
-        var filterstring = ["name", "ref_int", "ref_man"].some(field => {
-          if (item[field] == null) return false;
-          return (
-            item[field].toLowerCase().indexOf(this.search_input.toLowerCase()) >
-            -1
-          );
-        });
-        var entitycheck = true;
-        if (filterstring && this.entities_filter.length != 0) {
-          entitycheck = this.entities_filter.indexOf(item.entity) > -1;
-        }
-        var tagcheck = true;
-        if (filterstring && this.tags_filter.length != 0 && entitycheck) {
-          tagcheck = this.tags_filter.some(tag => item.tags.indexOf(tag) > -1);
-        }
-        return filterstring && entitycheck && tagcheck;
-      });
-      return filtered.sort((a, b) => {
-        if (this.sort_input == this.sort_choices.name.value)
-          return a.name.localeCompare(b.name);
-        if (this.sort_input == this.sort_choices.entity.value)
-          return this.entityById(a.entity).name.localeCompare(
-            this.entityById(b.entity).name
-          );
-      });
-    },
-    objects_paginated() {
-      return this.objects_filtered.slice(
-        (this.current_page - 1) * process.env.VUE_APP_MAXLIST,
-        this.current_page * process.env.VUE_APP_MAXLIST
-      );
+      return this.genericmaterials.concat(this.specificmaterials);
     },
     pages_count() {
-      return Math.ceil(
-        this.objects_filtered.length / process.env.VUE_APP_MAXLIST
-      );
+      return Math.ceil(this.count / process.env.VUE_APP_MAXLIST);
     },
     search_change() {
       return (
-        this.search_input,
-        this.type_input,
-        this.tags_filter,
-        this.entities_filter
+        this.type_input, this.hidden, this.tags_filter, this.entities_filter
       );
+    },
+    query_params() {
+      return {
+        params: {
+          limit: this.per_page,
+          offset: (this.current_page - 1) * this.per_page,
+          type: this.type_input,
+          search: this.search_input,
+          entities: this.entities_filter.join(),
+          tags: this.tags_filter.join(),
+          hidden: this.hidden
+        }
+      };
     }
   },
   watch: {
     search_change() {
       this.current_page = 1;
+      this.refreshSearch();
     }
   },
   methods: {
@@ -271,16 +230,24 @@ export default {
     },
     onPageChange(page) {
       this.current_page = page;
+      this.refreshSearch();
     },
     getEntityName(id) {
       var entity = this.entityById(id);
       if (entity) return entity.name;
       else return "";
+    },
+    refreshSearch() {
+      this.$store
+        .dispatch("materials/searchMaterials", this.query_params)
+        .then(data => {
+          this.count = data.count;
+          this.genericmaterials = data.results.generic_materials;
+          this.specificmaterials = data.results.specific_materials;
+        });
     }
   },
   beforeMount() {
-    this.$store.dispatch("specificmaterials/fetchList");
-    this.$store.dispatch("genericmaterials/fetchList");
     this.$store.dispatch("entities/fetchList");
     /* 
       Si le prêt courant est en readonly (ajout de materiel impossible) on le reset
@@ -297,6 +264,7 @@ export default {
         this.entities_filter.push(this.pending_loan.entity);
       }
     }
+    this.refreshSearch();
   }
 };
 </script>

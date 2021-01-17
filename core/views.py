@@ -21,10 +21,11 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, I
 from rest_framework import viewsets, mixins, status
 from rest_framework import filters
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied, ParseError
+from rest_framework.exceptions import PermissionDenied, ParseError, NotFound
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser, FileUploadParser, MultiPartParser, FormParser
+from rest_framework.pagination import LimitOffsetPagination
 
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 from .serializers import *
@@ -351,7 +352,7 @@ class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Public endpoints for generic material
     """
-    queryset = GenericMaterial.objects.all()
+    queryset = GenericMaterial.objects.filter(active=True)
     permission_classes = (RGPDAccept, IsAuthenticated,)
     serializer_class = GenericMaterialPublicSerializer
 
@@ -368,7 +369,7 @@ class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Public endpoints for specific material
     """
-    queryset = SpecificMaterial.objects.all()
+    queryset = SpecificMaterial.objects.filter(active=True)
     permission_classes = (RGPDAccept, IsAuthenticated,)
     serializer_class = SpecificMaterialPublicSerializer
 
@@ -433,11 +434,195 @@ class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Public endpoints for specific material instance
     """
-    queryset = SpecificMaterialInstance.objects.all()
+    queryset = SpecificMaterialInstance.objects.filter(active=True)
     permission_classes = (IsAuthenticated,)
     serializer_class = SpecificMaterialInstanceSerializer
     def get_queryset(self):
         return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
+
+class LimitOffsetPaginationMulti(LimitOffsetPagination):
+
+    def paginate_queryset(self, querysets, request, view=None):
+        self.offset = self.get_offset(request)
+        self.limit = self.get_limit(request)
+        self.count = 0
+        ret = []
+        for queryset in querysets:
+            self.count = self.count + self.get_count(queryset)
+        if self.limit is None:
+            for queryset in querysets:
+                ret.append([])
+            return tuple(ret)
+
+        self.request = request
+        if self.count > self.limit and self.template is not None:
+            self.display_page_controls = True
+
+        if self.count == 0 or self.offset > self.count:
+            ret = []
+            for queryset in querysets:
+                ret.append([])
+            return tuple(ret)
+        locoffset=self.offset
+        loclimit=self.limit
+        for queryset in querysets:
+            if locoffset >= self.get_count(queryset):
+                ret.append([])
+                locoffset = locoffset - self.get_count(queryset)
+            elif loclimit > 0:
+                l=[]
+                if(locoffset+loclimit >= self.get_count(queryset)):
+                    l=list(queryset[locoffset:])
+                else:
+                    l=list(queryset[locoffset:locoffset+loclimit])
+                locoffset=0
+                loclimit=loclimit-len(l)
+                ret.append(l)
+            else:
+                ret.append([])
+
+        return tuple(ret)
+
+class MaterialsByLoansView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None):
+       
+        loans = request.query_params.get('loans', None)
+        loansid = []
+        if(loans is not None):
+            loanst = loans.split(',')
+            try:
+                for i, v in enumerate(loanst):
+                    loanst[i]=int(v)
+                loansid=loanst
+            except:
+                pass
+        gms = request.query_params.get('gmids', None)
+        gmids = []
+        if(gms is not None):
+            gmst = gms.split(',')
+            try:
+                for i, v in enumerate(gmst):
+                    gmst[i]=int(v)
+                gmids=gmst
+            except:
+                pass
+        sms = request.query_params.get('smids', None)
+        smids = []
+        if(sms is not None):
+            smst = sms.split(',')
+            try:
+                for i, v in enumerate(smst):
+                    smst[i]=int(v)
+                smids=smst
+            except:
+                pass
+
+        loans = []
+        for lid in loansid:
+            loan = get_object_or_404(Loan.objects, pk=lid)
+            if (request.user.is_staff or request.user in loan.entity.managers.all() or request.user == loan.user):
+                loans.append(loan)
+        if loansid and not loans:
+            raise NotFound()
+        genmats = []
+        spemats = []
+        spematinsts = []
+        if loans:
+            genmats = set([ mat for loan in loans for mat in loan.generic_materials.all() ])
+            spemats = SpecificMaterial.objects.filter(instances__loans__in=loans).distinct()
+            spematinsts = SpecificMaterialInstance.objects.filter(model__in=spemats)
+        elif gmids or smids:
+            genmats = GenericMaterial.objects.filter(pk__in=gmids)
+            spemats = SpecificMaterial.objects.filter(pk__in=smids)
+            spematinsts = SpecificMaterialInstance.objects.filter(model__in=spemats)
+        genmatsser= GenericMaterialPublicSerializer(genmats, many=True)
+        spematsser= SpecificMaterialPublicSerializer(spemats, many=True)
+        spematinstsser= SpecificMaterialInstanceSerializer(spematinsts, many=True)
+        
+        return Response({"generic_materials": genmatsser.data,"specific_materials": spematsser.data, "specific_material_instances": spematinstsser.data})
+
+
+
+class MaterialsSearchView(APIView):
+    """
+    Endpoint to see materials
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+   
+       #Filter search
+        search = request.query_params.get('search', None)
+
+        hidden = request.query_params.get('hidden', False)
+
+        if hidden and hidden != "true" or not (request.user.is_staff or len(resquest.user.entities)):
+            hidden = False
+
+        mattype = request.query_params.get('type', None)
+        if(mattype is not None and mattype!= 's' and mattype!= 'g'):
+            mattype=None
+        entities = request.query_params.get('entities', None)
+        entitiesid = []
+        if(entities is not None):
+            ents = entities.split(',')
+            try:
+                for i, v in enumerate(ents):
+                    ents[i]=int(v)
+                entitiesid=ents
+            except:
+                pass
+
+        tags = request.query_params.get('tags', None)
+        tagsid = []
+        if(tags is not None):
+            tagst = tags.split(',')
+            try:
+                for i, v in enumerate(tagst):
+                    tagst[i]=int(v)
+                tagsid=tagst
+            except:
+                pass
+        
+        genmats = GenericMaterial.objects.all()
+        spemats = SpecificMaterial.objects.all()
+
+        if not hidden:
+            genmats = genmats.filter(active=True)
+            spemats = spemats.filter(active=True)
+        elif (not request.user.is_staff):
+            genmats = genmats.filter(entity__in=request.user.entities.all())
+            spemats = spemats.filter(entity__in=request.user.entities.all())
+
+        if search:
+            searchQ = Q(name__icontains=search) | Q(ref_int__icontains=search) | Q(ref_man__icontains=search)
+            genmats = genmats.filter(searchQ).distinct()
+            spemats = spemats.filter(searchQ).distinct()
+
+        if mattype:
+            if mattype == 'g':
+                spemats = spemats.none()
+            elif mattype == 's':
+                genmats = genmats.none()
+
+        if entitiesid:
+            genmats = genmats.filter(entity__in=entitiesid).distinct()
+            spemats = spemats.filter(entity__in=entitiesid).distinct()
+
+        if tagsid:
+            genmats = genmats.filter(tags__in=tagsid).distinct()
+            spemats = spemats.filter(tags__in=tagsid).distinct()
+        
+        paginator = LimitOffsetPaginationMulti()
+        genmats,spemats = paginator.paginate_queryset([genmats,spemats], request)
+        
+        genmatsser= GenericMaterialPublicSerializer(genmats, many=True)
+        spematsser= SpecificMaterialPublicSerializer(spemats, many=True)
+
+        return paginator.get_paginated_response({"generic_materials": genmatsser.data,"specific_materials": spematsser.data})
+
 
 
 class MaterialFilterBackend(filters.BaseFilterBackend):

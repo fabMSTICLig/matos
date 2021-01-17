@@ -158,7 +158,7 @@ export default {
         });
     },
     initList() {
-      this.$store
+      return this.$store
         .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
         .then(() => {
           if ("select" in this.$route.query) {
