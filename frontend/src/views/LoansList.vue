@@ -148,6 +148,9 @@ export default {
       smById: "materials/smById",
       entityById: "entities/byId"
     }),
+    search_change() {
+      return this.search_input, this.inprogress;
+    },
     isManager() {
       return (
         (this.selected_object &&

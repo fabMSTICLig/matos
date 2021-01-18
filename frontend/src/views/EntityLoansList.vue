@@ -192,6 +192,9 @@ export default {
       entityById: "entities/byId",
       users: "users/list"
     }),
+    search_change() {
+      return this.search_input, this.inprogress, this.sort_input;
+    },
     objects_filtered() {
       /*
         retourne les prêts ordonnés par utilisateur

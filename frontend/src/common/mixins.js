@@ -17,9 +17,17 @@ export const ListMixin = {
       selected_object: null
     };
   },
+  watch: {
+    search_change() {
+      this.current_page = 1;
+    }
+  },
   computed: {
     prefix() {
       return "";
+    },
+    search_change() {
+      return this.search_input;
     },
     objects_list() {
       return this.$store.getters[this.ressource + "/list"];

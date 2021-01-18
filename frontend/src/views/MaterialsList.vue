@@ -163,6 +163,9 @@ export default {
     };
   },
   computed: {
+    search_change() {
+      return this.search_input, this.type_input;
+    },
     prefix() {
       return "entities/" + this.$route.params.entityid + "/";
     },

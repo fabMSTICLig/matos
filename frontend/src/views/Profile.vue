@@ -101,11 +101,11 @@
         </div>
         <div class="btn-group" role="group">
           <button class="btn btn-primary" type="button" @click="update">
-            Modifier
+            Valider
           </button>
         </div>
         <div class="btn btn-primary float-right" @click="personalData">
-          Consulter mes données
+          Télécharger mes données
         </div>
       </form>
     </div>
@@ -158,9 +158,6 @@ import { JSONRenderer } from "@/common/helpers";
   Profile de l'utilisateur
 */
 
-/*
-  @TODO: synchoniser les affiliations suite à la validation RGPD
-*/
 export default {
   name: "Profile",
   components: {
@@ -239,6 +236,7 @@ export default {
     accept() {
       this.$store.dispatch(UPDATE_RGPD).then(() => {
         this.showRGPD = false;
+        this.$store.dispatch("affiliations/fetchList");
       });
     },
     personalData() {
@@ -262,8 +260,6 @@ export default {
       this.showRGPD = true;
     }
   },
-  beforeMount() {
-    //this.$store.dispatch("affiliations/fetchList");
-  }
+  beforeMount() {}
 };
 </script>
