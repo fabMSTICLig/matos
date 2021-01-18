@@ -1,9 +1,9 @@
 <template>
-  <div id="app" class="container">
+  <div id="app" class="container-fluid">
     <link rel="stylesheet" href="/static/bootstrap.min.css" />
     <div v-if="loaded">
       <Header />
-      <router-view />
+      <router-view class="mr-5 ml-5" />
       <Footer />
     </div>
     <modal

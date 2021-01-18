@@ -1,30 +1,26 @@
 <template>
   <footer>
-    <div class="container mt-3 mb-3 border-top border-dark">
-      <div class="row d-inline-flex">
-        <div class="col col-lg-6">
-          <div class="row mt-5">
-            <div class="col">
-              <a class="logo-font" href="/">
-                Matos
-              </a>
-              |
-              <a class="logo-font" href="/legalnotice">
-                Legal notice
-              </a>
-            </div>
-          </div>
+    <div class="container-fluid mt-3 mb-3 border-top border-dark">
+      <div class="row mt-3">
+        <div class="col">
+          <a class="logo-font" href="/">
+            Matos
+          </a>
+          |
+          <a class="logo-font" href="/legalnotice">
+            Legal notice
+          </a>
         </div>
-        <div class="col col-lg-6 media">
+        <div class="col align-self-end media">
           <img
             :src="`${publicPath}logos-inp-uga.jpg`"
-            width="50%"
-            class="mr-4"
+            width="30%"
+            class="mr-4 float-right"
           />
           <img
             :src="`${publicPath}nanoelec-logo.jpg`"
-            width="40%"
-            class="mr-3"
+            width="20%"
+            class="mr-3 float-right"
           />
         </div>
       </div>

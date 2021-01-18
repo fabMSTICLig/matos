@@ -6,24 +6,36 @@
     <div class="row">
       <div class="col-12 col-md-6">
         <div class="card">
-          <div class="card-header input-group">
+          <div class="card-header form-inline">
             <input
               class="form-control"
               v-model="search_input"
               type="search"
               placeholder="Search"
             />
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="typeselect">Ordre : </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="typeselect"
+                  >Ordre :
+                </label>
+              </div>
+              <select class="custom-select" v-model="sort_input">
+                <option
+                  v-for="item in sort_choices"
+                  :value="item.value"
+                  :key="item.value"
+                  >{{ item.label }}</option
+                >
+              </select>
             </div>
-            <select class="form-control" v-model="sort_input">
-              <option
-                v-for="item in sort_choices"
-                :value="item.value"
-                :key="item.value"
-                >{{ item.label }}</option
-              >
-            </select>
+            <div class="form-group ml-2">
+              <label class="mr-1">En cours : </label>
+              <input
+                type="checkbox"
+                aria-label="Checkbox pour prêt en cours"
+                v-model="inprogress"
+              />
+            </div>
           </div>
           <div class="card-body">
             <div class="table-responsive table-hover">
@@ -165,7 +177,8 @@ export default {
         due_date: { value: 1, label: "Date retour prévue" },
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
-      }
+      },
+      inprogress: true
     };
   },
   props: ["entityid", "matid"],
@@ -186,6 +199,7 @@ export default {
         et filtrés par date de sortie, date de retour prévue et date de retour par sélection
       */
       var filtered = this.objects_list.filter(item => {
+        if (this.inprogress && item.return_date != null) return false;
         var user = this.userById(item.user);
         if (user)
           return (

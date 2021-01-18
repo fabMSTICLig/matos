@@ -75,7 +75,8 @@ export const ListMixin = {
   },
   beforeMount() {
     this.initComponent().then(() => {
-      this.initList().then(() => this.listInitiated());
+      let retinit = this.initList();
+      if (retinit) retinit.then(() => this.listInitiated());
     });
   }
 };

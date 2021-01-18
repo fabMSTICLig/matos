@@ -8,7 +8,7 @@
         <div class="card-body">
           <form id="editor-form">
             <div class="form-row">
-              <div class="col col-6 col-md-6 col-xs-12">
+              <div class="col col-12 col-md-6">
                 <fieldset>
                   <legend>Informations</legend>
                   <div class="form-group">
@@ -81,7 +81,8 @@
                   </div>
                 </fieldset>
               </div>
-              <div class="md col-12 col-md-6 col-lg-6">
+              <div class="md col-12 col-md-6">
+                <h4>Aperçu description</h4>
                 <markdown
                   :description="object.description"
                   :showhelp="showHelp"

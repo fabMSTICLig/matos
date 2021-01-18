@@ -221,6 +221,7 @@
               </div>
               <div class="row mt-4">
                 <div class="col col-lg-12 col-md-12">
+                  <h4>Aperçu description</h4>
                   <markdown
                     :description="object.description"
                     :showhelp="showHelp"
