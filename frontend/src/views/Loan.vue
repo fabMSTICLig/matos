@@ -553,7 +553,15 @@ export default {
         });
     },
     makeUserLabel(item) {
-      return item.username;
+      return (
+        "@" +
+        item.username +
+        " (" +
+        item.first_name +
+        " " +
+        item.last_name +
+        ")"
+      );
     },
     makeLabelInstance(item) {
       return item.name + (item.active ? "" : " (inactif)");

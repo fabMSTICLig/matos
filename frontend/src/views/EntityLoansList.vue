@@ -105,7 +105,15 @@
               <tr>
                 <th scope="row">Utilisateur</th>
                 <td>
-                  {{ userById(selected_object.user) | field("username") }}
+                  <a
+                    href=""
+                    v-on:click.prevent="
+                      current_user = userById(selected_object.user);
+                      showUser = true;
+                    "
+                  >
+                    {{ userById(selected_object.user) | field("username") }}</a
+                  >
                 </td>
               </tr>
               <tr>
@@ -152,11 +160,31 @@
         </div>
       </div>
     </div>
+    <modal id="modal-user" title="Utilisateur" v-model="showUser">
+      <p class="card-text">
+        <span
+          ><strong>{{ current_user.username }} :&nbsp;</strong></span
+        >{{ current_user.first_name }} {{ current_user.last_name }}
+      </p>
+      <p>
+        <span><strong>Email :&nbsp;</strong></span
+        ><a :href="'mailto:' + current_user.email">{{ current_user.email }}</a>
+      </p>
+      <h5>Affiliations</h5>
+      <DisplayIdList
+        fieldName="affiliations"
+        :object="current_user"
+        ressource="affiliations"
+        :autoload="false"
+      />
+    </modal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import DisplayIdList from "@/components/DisplayIdList";
+import { Modal } from "@/components/Modal";
 import { ListMixin } from "@/common/mixins";
 import { showMsgConfirm } from "@/components/Modal";
 /*
@@ -167,6 +195,10 @@ import { showMsgConfirm } from "@/components/Modal";
 
 export default {
   name: "EntityLoansList",
+  components: {
+    DisplayIdList,
+    Modal
+  },
   mixins: [ListMixin],
   data() {
     return {
@@ -178,7 +210,15 @@ export default {
         checkout_date: { value: 2, label: "Date sortie" },
         return_date: { value: 3, label: "Date de retour" }
       },
-      inprogress: true
+      inprogress: true,
+      current_user: {
+        username: "",
+        first_name: "",
+        last_name: "",
+        email: "",
+        affiliations: []
+      },
+      showUser: false
     };
   },
   props: ["entityid", "matid"],
@@ -295,6 +335,7 @@ export default {
 
   beforeMount() {
     var pall = [];
+    pall.push(this.$store.dispatch("affiliations/fetchList"));
     pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
 
