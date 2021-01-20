@@ -52,8 +52,8 @@ class UserPublicSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
-        read_only_fields = ('username', 'email', 'first_name', 'last_name')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'affiliations')
+        read_only_fields = ('username', 'email', 'first_name', 'last_name', 'affiliations')
 
     def get_externe(self, obj):
         return len(obj.password)==0

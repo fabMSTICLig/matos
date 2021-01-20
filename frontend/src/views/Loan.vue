@@ -43,14 +43,26 @@
                     <label>Utilisateur :</label>
                     <multiselect
                       v-model="loanUser"
+                      placeholder="Selectionner un utilisateur"
                       :options="users"
                       track-by="id"
                       label="name"
                       :searchable="true"
+                      :loading="usersLoading"
+                      :internal-search="false"
                       :allow-empty="true"
                       select-label=""
                       :custom-label="makeUserLabel"
-                    ></multiselect>
+                      @search-change="searchUser"
+                    >
+                      <span slot="noResult"
+                        >Pas de résultat. Modifier la recherche (3 lettres
+                        min)</span
+                      >
+                      <span slot="noOptions"
+                        >Veuillez taper au moins 3 lettres</span
+                      >
+                    </multiselect>
 
                     <!-- <input-datalist
                       v-model="pending_loan.user"
@@ -322,6 +334,7 @@ export default {
   data() {
     return {
       loaded: false,
+      usersLoading: false,
       errors: []
     };
   },
@@ -434,7 +447,11 @@ export default {
     ...mapMutations({
       removeMaterial: "loans/removeMaterial"
     }),
-
+    searchUser(query) {
+      this.$store.dispatch("users/fetchList", {
+        params: { params: { search: query } }
+      });
+    },
     initInstances(item) {
       return this.$store
         .dispatch("specificmaterials/instances/fetchList", {

@@ -52,8 +52,19 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('username', 'email')
+
+    def get_queryset(self):
+        search = self.request.query_params.get('search', None)
+        if search is None:
+            if self.request.user.is_staff:
+                return get_user_model().objects.all()
+            else:
+                return get_user_model().objects.filter(loans__entity__in=self.request.user.entities.values_list('id', flat=True))
+        else:
+            if(len(search)<3):
+                return get_user_model().objects.none()
+            searchQ = Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search)
+            return get_user_model().objects.filter(searchQ)
 
     def get_serializer_class(self):
         """
