@@ -94,7 +94,7 @@
         </ul>
         <ul v-else class="nav navbar-nav">
           <li class="nav-item" role="presentation">
-            <a class="nav-link" v-if="cas" href="/cas/login">{{ cas }}</a>
+            <a class="nav-link" v-if="cas" href="/cas/login">Login</a>
           </li>
           <li class="nav-item" role="presentation" v-if="false">
             <a class="nav-link" href="/auth/login">Login</a>

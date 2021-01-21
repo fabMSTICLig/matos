@@ -59,12 +59,13 @@ class UserViewSet(viewsets.ModelViewSet):
             if self.request.user.is_staff:
                 return get_user_model().objects.all()
             else:
-                return get_user_model().objects.filter(loans__entity__in=self.request.user.entities.values_list('id', flat=True))
+                searchQ = Q(pk=self.request.user.id) | Q(loans__entity__in=self.request.user.entities.values_list('id', flat=True))
+                return get_user_model().objects.filter(searchQ).distinct()
         else:
             if(len(search)<3):
                 return get_user_model().objects.none()
-            searchQ = Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search)
-            return get_user_model().objects.filter(searchQ)
+            searchQ = Q(pk=self.request.user.id) | Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search)
+            return get_user_model().objects.filter(searchQ).distinct()
 
     def get_serializer_class(self):
         """
