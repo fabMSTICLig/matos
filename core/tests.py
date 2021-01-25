@@ -211,7 +211,7 @@ class UsersTests(APITestCase):
         Test de la protection de l'affiliation d'un autre utilisateur
         """
         data = { 'affiliations' : [self.affiliation2.pk] }
-        request = self.apiFactory.patch(reverse('user-detail', args=(1, 'pk')),data)
+        request = self.apiFactory.patch(reverse('user-detail', args=(self.user.id, 'pk')),data)
         force_authenticate(request, user=self.user2)
         response = self.view(request, pk=self.user.id)
         response.render()
@@ -768,7 +768,7 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_manager2.pk}))
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.client.force_authenticate(user=self.user)
         loan = self.client.get(reverse('loan-detail', kwargs={'pk': self.loan_user_accepted.pk}))

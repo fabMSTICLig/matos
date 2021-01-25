@@ -5,20 +5,23 @@
         <div class="card-header">
           <h3 class="float-left" v-text="object.name"></h3>
           <div role="group" class="float-right">
-            <div class="input-group">
+            <div class="btn-group">
               <button
-                class="btn btn-primary input-group-append"
+                class="btn btn-primary"
                 type="button"
                 @click="addMaterial(object)"
               >
                 Ajouter
               </button>
+              <router-link
+                v-if="isManager"
+                class="btn btn-primary"
+                role="button"
+                :to="editRoute"
+                >Modifier</router-link
+              >
               <div
-                :class="
-                  show
-                    ? 'dropdown show input-goup-append'
-                    : 'dropdown input-group-append'
-                "
+                :class="show ? 'dropdown show' : 'dropdown'"
                 @focusout="hide"
                 style="margin-right: 10px;"
                 v-if="isManager && filtered_entities.length"
@@ -117,9 +120,20 @@ export default {
     isManager() {
       return this.authUser.entities.length || this.authUser.is_staff;
     },
+    editRoute() {
+      var name = "specificmaterial";
+      if ("quantity" in this.object) {
+        name = "genericmaterial";
+      }
+      return {
+        name: name,
+        params: { matid: this.object.id, entityid: this.object.entity }
+      };
+    },
+
     filtered_entities() {
       if (this.entities.length) {
-        let ret = this.authUser.entities.slice();
+        let ret = this.authUser.entities.slice(); //simple copy
         ret.splice(ret.indexOf(this.object.entity), 1);
         return ret.map(id => {
           console.log(id);
@@ -175,7 +189,6 @@ export default {
   },
   beforeMount() {
     var pall = [];
-    pall.push(this.$store.dispatch("specificmaterials/fetchList"));
     pall.push(this.$store.dispatch("tags/fetchList"));
 
     if (this.$route.name == "specificmaterialitem") {
@@ -195,7 +208,7 @@ export default {
           })
       );
     }
-    pall.push(this.$store.dispatch("entities/fetchList"));
+    if (this.isManager) pall.push(this.$store.dispatch("entities/fetchList"));
 
     Promise.all(pall).then(() => {
       this.loaded = true;
