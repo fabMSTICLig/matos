@@ -1,4 +1,4 @@
-Votre demande d'emprunt à été {{ status }}. {{ SITE_URL }}#/loan/{{ loan.id }}
+Votre demande d'emprunt a été {{ status }}. {{ SITE_URL }}#/loan/{{ loan.id }}
 
 {% if loan.status == '3' %}
 Vous pouvez prendre contact avec l'entité {{loan.entity.name}} {{loan.entity.contact}}

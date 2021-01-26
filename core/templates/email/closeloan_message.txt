@@ -2,6 +2,6 @@ Attention vous devez rendre du matériel emprumté à l'entité {{ loan.entity.n
 
 {% include "email/listmat.txt" %}
 
-Si vous avez déjà rendu le matériel veuillez contacter l'entité {{ loan.entity.name }}
+Si vous avez déjà rendu le matériel, veuillez contacter l'entité {{ loan.entity.name }}
 
 Ce mail est automatique, veuillez ne pas y répondre directement.
