@@ -55,8 +55,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
+        userid = self.request.query_params.get('userid', None)
         if search is None:
-            if self.request.user.is_staff:
+            if userid:
+                #Used to get the user of one loan but still checking the manager status of request user
+                return get_user_model().objects.filter(loans__entity__in=self.request.user.entities.values_list('id', flat=True)).filter(pk=userid).distinct()
+            elif self.request.user.is_staff:
                 return get_user_model().objects.all()
             else:
                 searchQ = Q(pk=self.request.user.id) | Q(loans__entity__in=self.request.user.entities.values_list('id', flat=True))

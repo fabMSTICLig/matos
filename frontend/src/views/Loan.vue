@@ -593,6 +593,9 @@ export default {
             .then(() => {
               this.$store.commit("loans/setPending", data);
             });
+          this.$store.dispatch("users/fetchList", {
+            params: { params: { userid: data.user } }
+          });
         })
         .catch(() => {
           this.newLoan();
@@ -624,6 +627,13 @@ export default {
           smids: this.pending_loan.models
         })
       );
+      if (this.canManage) {
+        pall.push(
+          this.$store.dispatch("users/fetchList", {
+            params: { params: { userid: this.pending_loan.user } }
+          })
+        );
+      }
     }
     Promise.all(pall).then(() => {
       //début chargement
