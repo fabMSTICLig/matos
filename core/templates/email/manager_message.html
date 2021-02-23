@@ -22,5 +22,10 @@
 
 {% include "email/listmat.html" %}
 
-<p>Ce mail est automatique, veuillez ne pas y répondre directement.</p>
+
+<h6>Commentaire:</h6>
+{% autoescape on %}
+<p>{{ loan.comments }}</p>
+{% endautoescape %}
+
 </body>

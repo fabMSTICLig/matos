@@ -10,5 +10,5 @@ Date de retour prévue: {{loan.due_date}}
 
 {% include "email/listmat.txt" %}
 
-
-Ce mail est automatique, veuillez ne pas y répondre directement.
+Commentaire:
+{{ loan.comments }}

@@ -60,7 +60,7 @@ class Emails:
             template_name='email/manager_message.html',
             context=context
         )
-        msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.entity.contact])
+        msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.entity.contact], reply_to=[loan.user.email])
         msg.attach_alternative(html_content, "text/html")
         try:
             msg.send()
