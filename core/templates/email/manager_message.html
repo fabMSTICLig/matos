@@ -17,15 +17,15 @@
 <br/>
 <p>Date d'emprunt: {{loan.checkout_date}}</p>
 <p>Date de retour prévue: {{loan.due_date}}</p>
+<br/>
+<p>Commentaire:</p>
+{% autoescape on %}
+<p>{{ loan.comments }}</p>
+{% endautoescape %}
 
 <hr />
 
 {% include "email/listmat.html" %}
 
-
-<h6>Commentaire:</h6>
-{% autoescape on %}
-<p>{{ loan.comments }}</p>
-{% endautoescape %}
 
 </body>
