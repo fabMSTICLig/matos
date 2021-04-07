@@ -168,8 +168,8 @@ class EntitiesTests(APITestCase):
 
         response = self.client.get(reverse('loan-list'), {'smi':instance_pk})
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
 
 
 
@@ -204,7 +204,7 @@ class UsersTests(APITestCase):
         force_authenticate(request, user=self.user)
         response = self.view(request, pk=self.user.id)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_not_update_user_affiliation(self):
         """
@@ -215,7 +215,7 @@ class UsersTests(APITestCase):
         force_authenticate(request, user=self.user2)
         response = self.view(request, pk=self.user.id)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
     def test_rgpd_acceptance_input(self):
@@ -227,7 +227,7 @@ class UsersTests(APITestCase):
         force_authenticate(request, user=self.superuser)
         response = self.view(request, pk=self.user.id)
         response.render()
-        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -276,7 +276,7 @@ class AffiliationsTests(APITestCase):
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.user.pk)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_cant_add_affiliation(self):
         "Test de la protection ajout d'affiliation par un utilisateur sans droit"
@@ -286,7 +286,7 @@ class AffiliationsTests(APITestCase):
         force_authenticate(request, user=self.user)
         response = view(request)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class GenericMaterialsTests(APITestCase):
@@ -315,7 +315,7 @@ class GenericMaterialsTests(APITestCase):
         response = self.client.get(reverse('genericmaterials-list', kwargs={'entity_pk': 1}))
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
     def test_modify_material(self):
         """
@@ -326,7 +326,7 @@ class GenericMaterialsTests(APITestCase):
         response = self.client.patch(reverse('genericmaterials-detail', kwargs={'entity_pk':1, 'pk' : 1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
 
     def test_add_material(self):
         """
@@ -337,7 +337,7 @@ class GenericMaterialsTests(APITestCase):
         response = self.client.post(reverse('genericmaterials-list', kwargs={'entity_pk':1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 
     def test_not_add_material(self):
         """
@@ -348,7 +348,7 @@ class GenericMaterialsTests(APITestCase):
         response = self.client.post(reverse('genericmaterials-list', kwargs={'entity_pk':1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
     def test_not_update_material(self):
         """
@@ -359,7 +359,7 @@ class GenericMaterialsTests(APITestCase):
         response = self.client.patch(reverse('genericmaterials-detail', kwargs={'pk': 1, 'entity_pk':1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
         # def test_available_generic_material
         # test pour retourner la disponibilité d'un matériel sur des dates données
@@ -393,7 +393,7 @@ class SpecificMaterialsTests(APITestCase):
         response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), material_specific)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 
     def test_not_add_material(self):
         """
@@ -405,7 +405,7 @@ class SpecificMaterialsTests(APITestCase):
         response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
         # test champs unique nom matériel et entité
         self.client.force_authenticate(user=self.manager1)
         data = serializers.serialize('json', [ self.materials_specific, ])
@@ -413,7 +413,7 @@ class SpecificMaterialsTests(APITestCase):
         material = struct[0]['fields']
         response = self.client.post(reverse('specificmaterials-list', kwargs={'entity_pk':1 }), material)
         response.render()
-        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
         self.assertEqual(len(response.data['non_field_errors']),1)
 
     def test_not_update_material(self):
@@ -425,7 +425,7 @@ class SpecificMaterialsTests(APITestCase):
         response = self.client.patch(reverse('specificmaterials-detail', kwargs={'pk': 1, 'entity_pk':1}), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
     def test_add_instance_material(self):
         """
@@ -436,7 +436,7 @@ class SpecificMaterialsTests(APITestCase):
         response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), materials_specific_instance)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 
     def test_not_add_instance_material(self):
         """
@@ -450,7 +450,7 @@ class SpecificMaterialsTests(APITestCase):
         response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), material)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
         # test champs unique nom instance et materiel spécifique
         self.client.force_authenticate(user=self.manager1)
         data = serializers.serialize('json', [ self.materials_specific_instance, ])
@@ -458,7 +458,7 @@ class SpecificMaterialsTests(APITestCase):
         material = struct[0]['fields']
         response = self.client.post(reverse('instances-list', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk }), material)
         response.render()
-        self.assertEquals(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
         self.assertEqual(len(response.data['non_field_errors']),1)
 
     def test_not_update_instance_material(self):
@@ -470,7 +470,7 @@ class SpecificMaterialsTests(APITestCase):
         response = self.client.patch(reverse('instances-detail', kwargs={'entity_pk':1, 'specificmaterial_pk': self.materials_specific.pk, 'pk': self.materials_specific_instance.pk }), data)
         response.render()
         # OK
-        self.assertEquals(response.status_code,status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code,status.HTTP_403_FORBIDDEN)
 
 class LoanMaterialsTests(APITestCase):
 
@@ -530,12 +530,12 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         data = {"status" : 2, "checkout_date" : datetime.date(2020,10,8), "user" : self.user.pk , "entity" : 1, "due_date" : datetime.date(2020,10,18), "return_date" : datetime.date(2020,6,24), "comments" : 'demande de prêt cours arts visuel', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_entity_loan(self):
         """
@@ -554,7 +554,7 @@ class LoanMaterialsTests(APITestCase):
 
         for key, value in enumerate(struct):
             if not 'instances' in value['fields']:
-                self.assertEquals(value['fields']['entity'], self.entity.pk)
+                self.assertEqual(value['fields']['entity'], self.entity.pk)
 
     def test_create_loan_status(self):
         """
@@ -564,7 +564,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        self.assertEquals(response.data['status'], 2)
+        self.assertEqual(response.data['status'], 2)
 
     def test_create_loan_zeroquantity(self):
         """
@@ -576,7 +576,7 @@ class LoanMaterialsTests(APITestCase):
         response.render()
 
         loan_id = response.data['id']
-        self.assertEquals(response.data['status'], 2)
+        self.assertEqual(response.data['status'], 2)
 
         data["status"] = 3
         self.client.force_authenticate(user=self.manager1)
@@ -585,8 +585,8 @@ class LoanMaterialsTests(APITestCase):
 
         loan = Loan.objects.get(id=loan_id)
         genmats = loan.generic_materials.all()
-        self.assertEquals(genmats[1].quantity, 0)
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(genmats[1].quantity, 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
     def test_update_loan_status(self):
@@ -597,7 +597,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
         response.render()
-        self.assertEquals(response.data['status'], 2)
+        self.assertEqual(response.data['status'], 2)
 
     def test_empty_loan(self):
         """
@@ -607,7 +607,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan2.pk }), data)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_indem_adduser_loan(self):
@@ -618,7 +618,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}),data)
         response.render()
-        self.assertEquals(response.data['user'], self.user.pk)
+        self.assertEqual(response.data['user'], self.user.pk)
 
     def test_update_loan_accepted(self):
         """
@@ -628,7 +628,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk }), data)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
     def test_child_loan_update(self):
@@ -639,8 +639,8 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user.pk }), data, format='json')
         response.render()
-        self.assertEquals(response.data['user'], self.user.pk)
-        self.assertEquals(response.data['status'], 2)
+        self.assertEqual(response.data['user'], self.user.pk)
+        self.assertEqual(response.data['status'], 2)
 
 
     def test_indem_update_accepted_loan(self):
@@ -651,7 +651,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan_user_accepted.pk}),data)
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_manager_manage_loan(self):
         """
@@ -661,7 +661,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk }), data, format='json')
         response.render()
-        self.assertEquals(response.data['user'], self.user.pk)
+        self.assertEqual(response.data['user'], self.user.pk)
 
     def test_own_user_loans(self):
         """
@@ -671,7 +671,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(reverse('loan-list'), format='json')
         response.render()
-        self.assertEquals(len(response.data), 4)
+        self.assertEqual(len(response.data), 4)
 
     def test_own_manager_loans(self):
         """
@@ -682,13 +682,13 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.patch(reverse('loan-detail', kwargs={'pk': self.loan.pk }), data, format='json')
         response.render()
-        self.assertEquals(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
 
         data = {"status" : 2, "checkout_date" : datetime.date(2020,9,24), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,10,15), "return_date" : datetime.date(2020,10,16), "comments" : 'prêt n°2 ', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [{"material": 1, "quantity": 10}] }
         self.client.force_authenticate(user=self.manager1)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        self.assertEquals(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 
     def test_child_loan(self):
         """
@@ -699,21 +699,21 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-make-child', kwargs= {'pk': self.loan_user_accepted.pk}), data)
         response.render()
-        self.assertEquals(response.data['parent']['id'], self.loan_user_accepted.pk),
+        self.assertEqual(response.data['parent']['id'], self.loan_user_accepted.pk),
 
     def test_protected_loan_return_date(self):
         data = {"status" : 2, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}]}
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        self.assertEquals(response.data['return_date'], "2020-08-24")
+        self.assertEqual(response.data['return_date'], "2020-08-24")
 
     def test_protected_loan_parent(self):
         data = {"status" : 2, "checkout_date" : datetime.date(2020,6,8), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,7,24), "return_date" : datetime.date(2020,8,26), "comments" : 'modification date retour', 'specific_materials': [], 'generic_materials': [{"material":self.materials_generic.pk, "quantity":1}],  'parent': self.loan_manager.pk}
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(reverse('loan-detail',  kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        self.assertEquals(response.data['parent'], self.loan.pk)
+        self.assertEqual(response.data['parent'], self.loan.pk)
 
     def test_protected_loan_user(self):
         """
@@ -725,7 +725,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.put(reverse('loan-detail', kwargs={'pk': self.loan_user.pk}), data)
         response.render()
-        self.assertEquals(response.data['user'], self.user.pk)
+        self.assertEqual(response.data['user'], self.user.pk)
 
     def test_specific_material_instance(self):
         """
@@ -740,13 +740,13 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         data = {"status" : 2, "checkout_date" : datetime.date(2020,5,1), "user" : self.user.pk , "entity" : self.entity.pk, "due_date" : datetime.date(2020,5,4), "return_date" : datetime.date(2020,5,5), "comments" : 'demande de prêt projet etudes Ensimag', 'specific_materials': [self.materials_specific_instance.pk], 'generic_materials': [] }
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_available_specific_material(self):
@@ -757,7 +757,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.post(reverse('loan-list'), data, format='json')
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_no_delete_loan_requested(self):
         """
@@ -768,14 +768,14 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_manager2.pk}))
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.client.force_authenticate(user=self.user)
         loan = self.client.get(reverse('loan-detail', kwargs={'pk': self.loan_user_accepted.pk}))
 
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user_accepted.pk}))
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_loan_requested(self):
         """
@@ -784,7 +784,7 @@ class LoanMaterialsTests(APITestCase):
         self.client.force_authenticate(user=self.manager1)
         response = self.client.delete(reverse('loan-detail',kwargs={'pk': self.loan_user.pk}))
         response.render()
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     #test de la protection suppression prêt refusé
 
@@ -798,4 +798,4 @@ class LoanMaterialsTests(APITestCase):
         response.render()
         self.assertGreater(datetime.date(2020,12,10), datetime.date(2020,11,11))
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

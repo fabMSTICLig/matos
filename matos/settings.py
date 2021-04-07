@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'core',
+    'core.apps.CoreConfig',
     'django_cas_ng'
 ]
 
@@ -80,6 +80,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'matos.wsgi.application'
 
 SILENCED_SYSTEM_CHECKS = ["fields.W342"]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':
