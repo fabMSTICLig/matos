@@ -71,17 +71,44 @@
               <fieldset>
                 <legend>Managers</legend>
                 <div class="form-group">
-                  <DynList
-                    options="users"
-                    v-model="object.managers"
-                    :makeLabel="makeManagerLabel"
-                  >
-                    <template v-slot:default="slotProps">
-                      <strong>@{{ slotProps.item.username }} :</strong>
-                      {{ slotProps.item.first_name }}
-                      {{ slotProps.item.last_name }}
-                    </template>
-                  </DynList>
+                  <div :id="_uid">
+                    <div class="input-group" style="height:43px;">
+                      <multiselect
+                        :value="managers"
+                        :options="userslist"
+                        :multiple="true"
+                        track-by="id"
+                        :custom-label="makeManagerLabel"
+                        label="name"
+                        hide-selected
+                        placeholder="Rentrer au moins 3 lettres"
+                        :reset-after="true"
+                        @select="addManager"
+                        @search-change="searchChange"
+                        ><template slot="tag"><span></span></template>
+                      </multiselect>
+                    </div>
+                  </div>
+                  <ul class="list-group">
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center"
+                      v-for="item in managers"
+                      :key="item.id"
+                    >
+                      <span>
+                        <strong>@{{ item.username }} :</strong>
+                        {{ item.first_name }}
+                        {{ item.last_name }}
+                      </span>
+                      <button
+                        class="btn btn-danger"
+                        type="button"
+                        @click="removeManager(item)"
+                      >
+                        X
+                      </button>
+                    </li>
+                  </ul>
                 </div>
               </fieldset>
             </div>
@@ -130,9 +157,11 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import { EditMixin } from "@/common/mixins";
 import DynList from "@/components/DynList";
 import Markdown from "@/components/Markdown";
+import Multiselect from "vue-multiselect";
 
 /*
   Vue Edition d'une Entité
@@ -142,7 +171,8 @@ export default {
   mixins: [EditMixin],
   components: {
     DynList,
-    Markdown
+    Markdown,
+    Multiselect
   },
   data() {
     return {
@@ -150,10 +180,18 @@ export default {
       new_label: "Nouvelle Entité",
       object_name: "Entité",
       showHelp: false,
-      msg: "mise à jour"
+      msg: "mise à jour",
+      userslist: []
     };
   },
-  computed: {},
+  computed: {
+    ...mapGetters({
+      users: "users/list"
+    }),
+    managers() {
+      return this.userslist.filter(el => this.object.managers.includes(el.id));
+    }
+  },
   methods: {
     get_empty() {
       return {
@@ -164,6 +202,29 @@ export default {
         managers: []
       };
     },
+    searchUser(query) {
+      this.$store
+        .dispatch("users/fetchList", {
+          params: { params: { search: query } }
+        })
+        .then(data => {
+          data.forEach(user => {
+            if (this.userslist.findIndex(u => u.id == user.id) === -1) {
+              this.userslist.push(user);
+            }
+          });
+        });
+    },
+    addManager(item) {
+      this.object.managers.push(item.id);
+    },
+    removeManager(item) {
+      const index = this.object.managers.indexOf(item.id);
+      if (index > -1) {
+        this.object.managers.splice(index, 1);
+      }
+    },
+
     make_label() {
       return this.object.name;
     },
@@ -172,7 +233,26 @@ export default {
     },
     showMessage() {
       this.showHelp = true;
+    },
+    searchChange(query) {
+      this.$store
+        .dispatch("users/fetchList", {
+          params: { params: { search: query } }
+        })
+        .then(data => {
+          data.forEach(user => {
+            const index = this.userslist.findIndex(u => u.id == user.id);
+            if (index == -1) {
+              this.userslist.push(user);
+            }
+          });
+        });
     }
+  },
+  beforeMount() {
+    this.$store.dispatch("users/fetchList").then(data => {
+      data.forEach(user => this.userslist.push(user));
+    });
   }
 };
 </script>

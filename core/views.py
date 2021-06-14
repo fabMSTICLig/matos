@@ -63,7 +63,8 @@ class UserViewSet(viewsets.ModelViewSet):
             elif self.request.user.is_staff:
                 return get_user_model().objects.all()
             else:
-                searchQ = Q(pk=self.request.user.id) | Q(loans__entity__in=self.request.user.entities.values_list('id', flat=True))
+                searchQ = Q(pk=self.request.user.id) | Q(loans__entity__in=self.request.user.entities.values_list('id', flat=True)) | Q(entities__in=self.request.user.entities.values_list('id', flat=True))
+
                 return get_user_model().objects.filter(searchQ).distinct()
         else:
             if(len(search)<3):
