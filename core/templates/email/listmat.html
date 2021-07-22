@@ -1,3 +1,8 @@
+<p>Commentaire:</p>
+{% autoescape on %}
+<p>{{ loan.comments }}</p>
+{% endautoescape %}
+
 <p>Les matériels empruntés sont les suivants :</p>
 <ul>
 {% for matgen in loan.loangenericitem_set.all %}
