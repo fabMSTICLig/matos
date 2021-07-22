@@ -31,6 +31,7 @@
             type="text"
             v-model="authUser.first_name"
             required
+            readonly
           />
         </div>
         <div class="form-group">
@@ -40,6 +41,7 @@
             type="text"
             v-model="authUser.last_name"
             required
+            readonly
           />
         </div>
         <div class="form-group">
@@ -49,6 +51,7 @@
             type="email"
             v-model="authUser.email"
             required
+            readonly
           />
         </div>
         <template v-if="!authUser.externe">

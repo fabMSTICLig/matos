@@ -6,6 +6,6 @@ from django_auth_ldap.backend import LDAPBackend
 def cas_user_authenticated_callback(sender, **kwargs):
     args = {}
     args.update(kwargs)
-    user = LDAPBackend().populate_user(args.get('user'))
+    user = LDAPBackend().populate_user(args.get('user').username)
     if user is not None:
         user.save()
