@@ -24,7 +24,7 @@
         v-for="item in items"
         :key="item.label"
         :to="item.to"
-        v-slot="{ href, route, navigate }"
+        v-slot="{ href, navigate }"
       >
         <a :href="href" class="dropdown-item" @click="goto($event, navigate)">{{
           item.label
@@ -44,27 +44,27 @@ export default {
   props: {
     items: {
       type: Array,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     button: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
     classtoogle: {
       type: String,
       required: false,
-      default: ""
-    }
+      default: "",
+    },
   },
   data() {
     return {
       show: false,
-      id: null
+      id: null,
     };
   },
   computed: {},
@@ -81,7 +81,7 @@ export default {
     goto(event, navigate) {
       this.show = false;
       navigate(event);
-    }
-  }
+    },
+  },
 };
 </script>

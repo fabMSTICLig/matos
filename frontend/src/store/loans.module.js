@@ -4,7 +4,7 @@ import ApiService from "@/common/api.service";
 const loans_extra = {
   state: {
     pending_loan: null,
-    status: {}
+    status: {},
   },
   getters: {
     pending_loan(state) {
@@ -12,7 +12,7 @@ const loans_extra = {
     },
     status(state) {
       return state.status;
-    }
+    },
   },
   actions: {
     fetchStatus({ commit }) {
@@ -28,7 +28,7 @@ const loans_extra = {
         commit("createSuccess", data.child);
         return data.child;
       });
-    }
+    },
   },
   mutations: {
     setStatus(state, status) {
@@ -50,7 +50,7 @@ const loans_extra = {
           comments: null,
           specific_materials: [],
           models: [],
-          generic_materials: []
+          generic_materials: [],
         };
         localStorage.setItem(
           "pending_loan",
@@ -78,7 +78,7 @@ const loans_extra = {
         comments: null,
         specific_materials: [],
         models: [],
-        generic_materials: []
+        generic_materials: [],
       };
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
     },
@@ -98,7 +98,7 @@ const loans_extra = {
       ) {
         if ("quantity" in mat) {
           let gen_mat_items = state.pending_loan.generic_materials;
-          let gen_mat_included = gen_mat_items.find(item => {
+          let gen_mat_included = gen_mat_items.find((item) => {
             return item.material == mat.id;
           });
 
@@ -107,7 +107,7 @@ const loans_extra = {
           } else {
             state.pending_loan.generic_materials.push({
               material: mat.id,
-              quantity: 1
+              quantity: 1,
             });
           }
         } else if (state.pending_loan.models.indexOf(mat.id) == -1) {
@@ -118,17 +118,19 @@ const loans_extra = {
     },
     removeMaterial(state, mat) {
       if ("quantity" in mat) {
-        state.pending_loan.generic_materials = state.pending_loan.generic_materials.filter(
-          item => item.material != mat.id
-        );
+        state.pending_loan.generic_materials =
+          state.pending_loan.generic_materials.filter(
+            (item) => item.material != mat.id
+          );
       } else if (state.pending_loan.models.indexOf(mat.id) > -1) {
         state.pending_loan.models.splice(
           state.pending_loan.models.indexOf(mat.id),
           1
         );
-        state.pending_loan.specific_materials = state.pending_loan.specific_materials.filter(
-          instance => !mat.instances.includes(instance)
-        );
+        state.pending_loan.specific_materials =
+          state.pending_loan.specific_materials.filter(
+            (instance) => !mat.instances.includes(instance)
+          );
       }
       if (
         state.pending_loan.status == null &&
@@ -150,8 +152,8 @@ const loans_extra = {
     },
     savePending(state) {
       localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
-    }
-  }
+    },
+  },
 };
 const loans = createCrud("loans", loans_extra);
 export default loans;

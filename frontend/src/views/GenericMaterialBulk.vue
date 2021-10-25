@@ -88,14 +88,14 @@ export default {
     return {
       file: null,
       textinput:
-        "name	quantity	ref_int	ref_fab	desc	loc	tags\narduino uno	10	fabardui	A000073	https://www.arduino.cc/	S03/A1/E3	arduino, elec"
+        "name	quantity	ref_int	ref_fab	desc	loc	tags\narduino uno	10	fabardui	A000073	https://www.arduino.cc/	S03/A1/E3	arduino, elec",
     };
   },
 
   computed: {
     prefix() {
       return "entities/" + this.$route.params.entityid + "/";
-    }
+    },
   },
   methods: {
     changeFile(f) {
@@ -110,8 +110,8 @@ export default {
         data.append("file", this.file);
         params = {
           headers: {
-            "Content-Type": "multipart/form-data"
-          }
+            "Content-Type": "multipart/form-data",
+          },
         };
       } else if (this.textinput) {
         data = new FormData();
@@ -130,17 +130,17 @@ export default {
           .then(() => {
             this.$router.push({
               name: "materialslist",
-              params: this.$route.params
+              params: this.$route.params,
             });
           })
-          .catch(e => {
+          .catch((e) => {
             if (e.response) {
               console.log(e.response.data.detail);
               showMsgOk(e.response.data.detail);
             } else console.log(e);
           });
       }
-    }
-  }
+    },
+  },
 };
 </script>

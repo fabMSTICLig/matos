@@ -124,14 +124,14 @@ export default {
   name: "UserEdit",
   mixins: [EditMixin],
   components: {
-    DynList
+    DynList,
   },
   data() {
     return {
       ressource: "users",
       new_label: "Nouvel Utilisateur",
       object_name: "User",
-      msg: "mis à jour"
+      msg: "mis à jour",
     };
   },
   computed: {},
@@ -142,12 +142,12 @@ export default {
         first_name: "",
         last_name: "",
         email: "",
-        affiliations: []
+        affiliations: [],
       };
     },
     make_label() {
       return this.object.username;
-    }
-  }
+    },
+  },
 };
 </script>

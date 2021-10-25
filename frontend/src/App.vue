@@ -46,22 +46,22 @@ export default {
   components: {
     Header,
     Footer,
-    Modal
+    Modal,
   },
   data() {
     return {
       loaded: false,
-      showCookie: false
+      showCookie: false,
     };
   },
   computed: {
-    ...mapGetters(["authUser"])
+    ...mapGetters(["authUser"]),
   },
   methods: {
     validCookie() {
       localStorage.setItem("cookiepopup", "true");
       this.showCookie = false;
-    }
+    },
   },
   mounted() {
     document.title = process.env.VUE_APP_TITLE;
@@ -74,35 +74,35 @@ export default {
         pall.push(
           import(
             /* webpackChunkName: "store-affiliations" */ "@/store/affiliations.module"
-          ).then(module => {
+          ).then((module) => {
             this.$store.registerModule("affiliations", module.default);
           })
         );
         pall.push(
           import(
             /* webpackChunkName: "store-tags" */ "@/store/tags.module"
-          ).then(module => {
+          ).then((module) => {
             this.$store.registerModule("tags", module.default);
           })
         );
         pall.push(
           import(
             /* webpackChunkName: "store-users" */ "@/store/users.module"
-          ).then(module => {
+          ).then((module) => {
             this.$store.registerModule("users", module.default);
           })
         );
         pall.push(
           import(
             /* webpackChunkName: "store-entities" */ "@/store/entities.module"
-          ).then(module => {
+          ).then((module) => {
             this.$store.registerModule("entities", module.default);
           })
         );
         pall.push(
           import(
             /* webpackChunkName: "store-loans" */ "@/store/loans.module"
-          ).then(module => {
+          ).then((module) => {
             this.$store.registerModule("loans", module.default);
             this.$store.commit("loans/onLoad");
           })
@@ -110,7 +110,7 @@ export default {
         pall.push(
           import(
             /* webpackChunkName: "store-materials" */ "@/store/materials.module"
-          ).then(module => {
+          ).then((module) => {
             this.$store.registerModule(
               "genericmaterials",
               module.genericmaterials
@@ -136,6 +136,6 @@ export default {
     if (localStorage.getItem("cookiepopup") == null) {
       this.showCookie = true;
     }
-  }
+  },
 };
 </script>

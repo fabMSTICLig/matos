@@ -21,7 +21,7 @@ export default {
       if (entity) {
         return entity.name;
       } else return "";
-    }
-  }
+    },
+  },
 };
 </script>

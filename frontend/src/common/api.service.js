@@ -36,7 +36,7 @@ const ApiService = {
 
   delete(resource, slug = "") {
     return Vue.axios.delete(resource + "/" + (slug == "" ? "" : slug + "/"));
-  }
+  },
 };
 
 export default ApiService;

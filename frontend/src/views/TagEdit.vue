@@ -68,19 +68,19 @@ export default {
       ressource: "tags",
       new_label: "Nouveau Tag",
       object_name: "Tag",
-      msg: "mis à jour"
+      msg: "mis à jour",
     };
   },
   computed: {},
   methods: {
     get_empty() {
       return {
-        name: ""
+        name: "",
       };
     },
     make_label() {
       return this.object.name;
-    }
-  }
+    },
+  },
 };
 </script>

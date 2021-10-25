@@ -23,7 +23,7 @@
               <div
                 :class="show ? 'dropdown show' : 'dropdown'"
                 @focusout="hide"
-                style="margin-right: 10px;"
+                style="margin-right: 10px"
                 v-if="isManager && filtered_entities.length"
                 ref="dropcopy"
               >
@@ -96,7 +96,7 @@ export default {
   name: "MaterialInfos",
   components: {
     Markdown,
-    DisplayIdList
+    DisplayIdList,
   },
 
   data() {
@@ -107,14 +107,14 @@ export default {
       displayed: true,
       show: false,
       prefix: "",
-      loaded: false
+      loaded: false,
     };
   },
   computed: {
     ...mapGetters({
       tags: "tags/list",
       entityById: "entities/byId",
-      entities: "entities/list"
+      entities: "entities/list",
     }),
     ...mapGetters(["authUser"]),
     isManager() {
@@ -127,7 +127,7 @@ export default {
       }
       return {
         name: name,
-        params: { matid: this.object.id, entityid: this.object.entity }
+        params: { matid: this.object.id, entityid: this.object.entity },
       };
     },
 
@@ -135,18 +135,18 @@ export default {
       if (this.entities.length) {
         let ret = this.authUser.entities.slice(); //simple copy
         ret.splice(ret.indexOf(this.object.entity), 1);
-        return ret.map(id => {
+        return ret.map((id) => {
           console.log(id);
           return this.entityById(id);
         });
       } else {
         return [];
       }
-    }
+    },
   },
   methods: {
     ...mapMutations({
-      addMaterial: "loans/addMaterial"
+      addMaterial: "loans/addMaterial",
     }),
     toggle(e) {
       e.preventDefault();
@@ -173,19 +173,19 @@ export default {
       this.$store
         .dispatch(ressource + "/create", {
           data: this.object,
-          prefix: prefix
+          prefix: prefix,
         })
         .then(() => {
           showMsgOk("le matériel a été ajouté à l'entité");
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.data.non_field_errors) {
             showMsgOk(
               "La copie a échouée, vous avez déjà un matériel avec ce nom."
             );
           }
         });
-    }
+    },
   },
   beforeMount() {
     var pall = [];
@@ -201,9 +201,9 @@ export default {
       pall.push(
         this.$store
           .dispatch(this.ressource + "/fetchSingle", {
-            id: this.$route.params[this.$route.meta.routeparam]
+            id: this.$route.params[this.$route.meta.routeparam],
           })
-          .then(data => {
+          .then((data) => {
             this.object = Object.assign({}, data);
           })
       );
@@ -213,6 +213,6 @@ export default {
     Promise.all(pall).then(() => {
       this.loaded = true;
     });
-  }
+  },
 };
 </script>

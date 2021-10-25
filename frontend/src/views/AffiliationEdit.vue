@@ -80,19 +80,19 @@ export default {
       ressource: "affiliations",
       new_label: "Nouvelle Affiliation",
       object_name: "Affiliation",
-      msg: "mise à jour"
+      msg: "mise à jour",
     };
   },
   computed: {
     ...mapGetters("affiliations", {
-      affiliation_types: "types"
-    })
+      affiliation_types: "types",
+    }),
   },
   methods: {
     get_empty() {
       return {
         type: Object.keys(this.affiliation_types)[0],
-        name: ""
+        name: "",
       };
     },
     make_label() {
@@ -100,7 +100,7 @@ export default {
     },
     initComponent() {
       return this.$store.dispatch("affiliations/fetchTypes");
-    }
-  }
+    },
+  },
 };
 </script>

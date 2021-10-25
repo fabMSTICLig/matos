@@ -61,8 +61,9 @@
                   <div class="form-group">
                     <label>Tags</label>
                     <TagsInput
-                      fieldName="tags"
-                      :object="object"
+                      :list="object.tags"
+                      v-on:add="addTag($event)"
+                      v-on:remove="removeTag($event)"
                       ressource="tags"
                     />
                   </div>
@@ -137,13 +138,18 @@
                     </form>
                     <ul class="list-group">
                       <li
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                        class="
+                          list-group-item list-group-item-action
+                          d-flex
+                          justify-content-between
+                          align-items-center
+                        "
                         v-for="item in objects_paginated"
                         :key="item.id"
                         v-on:click="selectObject(item)"
                         :class="{
                           active:
-                            selected_object && item.id == selected_object.id
+                            selected_object && item.id == selected_object.id,
                         }"
                       >
                         <span>
@@ -256,7 +262,7 @@ export default {
   components: {
     TagsInput,
     Pagination,
-    Markdown
+    Markdown,
   },
   data() {
     return {
@@ -269,7 +275,7 @@ export default {
       showHelp: false,
       msg: "mis à jour",
       errors: [],
-      emptyInstances: null
+      emptyInstances: null,
     };
   },
   computed: {
@@ -299,7 +305,7 @@ export default {
     },
     per_page() {
       return parseInt(process.env.VUE_APP_MAXLIST);
-    }
+    },
   },
   methods: {
     get_empty() {
@@ -311,7 +317,7 @@ export default {
         description: "",
         entity: this.$route.params.entityid,
         tags: [],
-        active: true
+        active: true,
       };
     },
     validateForm() {
@@ -322,7 +328,7 @@ export default {
       var instancesName = "";
       this.errors = [];
       if (this.selected_object)
-        instancesName = this.objects_paginated.filter(object => {
+        instancesName = this.objects_paginated.filter((object) => {
           return (
             this.selected_object.name == object.name &&
             this.selected_object.id != object.id
@@ -330,7 +336,7 @@ export default {
         });
 
       if (this.new_object_name.length)
-        instancesName = this.objects_paginated.filter(object => {
+        instancesName = this.objects_paginated.filter((object) => {
           return this.new_object_name == object.name;
         });
 
@@ -345,7 +351,7 @@ export default {
       } else {
         return this.$store
           .dispatch("specificmaterials/instances/fetchList", {
-            prefix: this.instancePrefix
+            prefix: this.instancePrefix,
           })
           .then(() => {
             if (this.objects_list.length > 0) {
@@ -361,7 +367,7 @@ export default {
       this.$store
         .dispatch("specificmaterials/instances/destroy", {
           id: item.id,
-          prefix: this.instancePrefix
+          prefix: this.instancePrefix,
         })
         .then(() => {
           if (this.selected_object && this.selected_object.id == item.id)
@@ -378,11 +384,11 @@ export default {
             data: {
               name: this.new_object_name,
               model: this.object.id,
-              serial_num: null
+              serial_num: null,
             },
-            prefix: this.instancePrefix
+            prefix: this.instancePrefix,
           })
-          .then(data => {
+          .then((data) => {
             this.new_object_name = "";
             this.selectObject(data);
           });
@@ -399,9 +405,9 @@ export default {
           .dispatch("specificmaterials/instances/update", {
             data: this.selected_object,
             id: this.selected_object.id,
-            prefix: this.instancePrefix
+            prefix: this.instancePrefix,
           })
-          .then(data => {
+          .then((data) => {
             this.selectObject(data);
             showMsgOk("Instance mise à jour");
           });
@@ -409,13 +415,22 @@ export default {
     },
     showMessage() {
       this.showHelp = true;
-    }
+    },
+    addTag(tagid) {
+      this.object.tags.push(tagid);
+    },
+    removeTag(tagid) {
+      var index = this.object.tags.indexOf(tagid);
+      if (index > -1) {
+        this.object.tags.splice(index, 1);
+      }
+    },
   },
 
   watch: {
     new_object_name() {
       this.errors = [];
-    }
-  }
+    },
+  },
 };
 </script>

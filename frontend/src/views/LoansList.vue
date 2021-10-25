@@ -34,7 +34,7 @@
                   v-on:click="selected_object = item"
                   :class="{
                     'table-active':
-                      selected_object && item.id == selected_object.id
+                      selected_object && item.id == selected_object.id,
                   }"
                 >
                   <td>{{ entityById(item.entity) | field("name") }}</td>
@@ -137,7 +137,7 @@ export default {
       ressource: "loans",
       loaded: false,
       showDelete: false,
-      inprogress: false
+      inprogress: false,
     };
   },
   computed: {
@@ -146,7 +146,7 @@ export default {
     ...mapGetters({
       gmById: "materials/gmById",
       smById: "materials/smById",
-      entityById: "entities/byId"
+      entityById: "entities/byId",
     }),
     search_change() {
       return this.search_input, this.inprogress;
@@ -163,7 +163,7 @@ export default {
     },
     isRemoval() {
       return this.selected_object.status == 2 && !this.isManager;
-    }
+    },
   },
   methods: {
     initComponent() {
@@ -171,12 +171,12 @@ export default {
     },
     listInitiated() {
       this.$store.dispatch("materials/fetchMaterialsByLoans", {
-        loanids: this.objects_filtered.map(o => o.id)
+        loanids: this.objects_filtered.map((o) => o.id),
       });
     },
     search_fields(list) {
       return list
-        .filter(item => {
+        .filter((item) => {
           return (
             item.user == this.authUser.id &&
             (this.inprogress ? item.return_date == null : true)
@@ -188,7 +188,7 @@ export default {
     },
     editLoan(item) {
       this.$router.push({ name: "loan", params: { loanid: item.id } });
-    }
+    },
   },
   beforeMount() {
     var pall = [];
@@ -197,6 +197,6 @@ export default {
     Promise.all(pall).then(() => {
       this.loaded = true;
     });
-  }
+  },
 };
 </script>

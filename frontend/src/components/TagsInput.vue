@@ -43,25 +43,21 @@ export default {
   props: {
     ressource: {
       type: String,
-      required: true
+      required: true,
     },
-    object: {
-      type: Object,
-      required: true
-    },
-    fieldName: {
-      type: String,
-      required: true
+    list: {
+      type: Array,
+      required: true,
     },
     forbidAdd: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       input_value: "",
-      activeDset: true
+      activeDset: true,
     };
   },
   computed: {
@@ -69,13 +65,13 @@ export default {
       return this.$store.getters[this.ressource + "/list"];
     },
     objects_filtered() {
-      return this.objects_list.filter(item => {
-        return this.object[this.fieldName].includes(item.id);
+      return this.objects_list.filter((item) => {
+        return this.list.includes(item.id);
       });
     },
     objects_datalist() {
-      return this.objects_list.filter(item => {
-        return !this.object[this.fieldName].includes(item.id);
+      return this.objects_list.filter((item) => {
+        return !this.list.includes(item.id);
       });
     },
 
@@ -83,7 +79,7 @@ export default {
       get() {
         if (this.value) {
           var item = this.objects_list.find(
-            item => item.id.toString() == this.value.toString()
+            (item) => item.id.toString() == this.value.toString()
           );
         }
         if (item != undefined) {
@@ -95,7 +91,7 @@ export default {
       set(val) {
         var item = undefined;
         if (Number(val)) {
-          item = this.objects_list.find(item => item.id.toString() == val);
+          item = this.objects_list.find((item) => item.id.toString() == val);
         }
         if (item != undefined) {
           this.input_value = this.makeLabelOrName(item);
@@ -105,33 +101,35 @@ export default {
           this.activeDset = true;
           this.input_value = val;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     addTag() {
       if (this.input_value == "") return;
       var tag = this.objects_datalist.find(
-        item => item.name == this.input_value
+        (item) => item.name == this.input_value
       );
       if (tag) {
-        this.object[this.fieldName].push(tag.id);
+        this.$emit("add", tag.id);
         this.input_value = "";
       } else if (!this.forbidAdd) {
-        tag = this.objects_filtered.find(item => item.name == this.input_value);
+        tag = this.objects_filtered.find(
+          (item) => item.name == this.input_value
+        );
         if (tag) this.input_value = "";
         else {
           this.$store
             .dispatch(this.ressource + "/create", {
-              data: { name: this.input_value }
+              data: { name: this.input_value },
             })
-            .then(data => {
+            .then((data) => {
               // eslint-disable-next-line
               console.log("Tag created");
-              this.object[this.fieldName].push(data.id);
+              this.$emit("add", data.id);
               this.input_value = "";
             })
-            .catch(error => {
+            .catch((error) => {
               // eslint-disable-next-line
               console.log(JSON.stringify(error));
             });
@@ -139,14 +137,11 @@ export default {
       }
     },
     removeTag(tag) {
-      var index = this.object[this.fieldName].indexOf(tag.id);
-      if (index > -1) {
-        this.object[this.fieldName].splice(index, 1);
-      }
-    }
+      this.$emit("remove", tag.id);
+    },
   },
   beforeMount() {
     this.$store.dispatch(this.ressource + "/fetchList");
-  }
+  },
 };
 </script>

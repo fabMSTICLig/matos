@@ -69,6 +69,6 @@
 */
 export default {
   name: "DataPolicy",
-  components: {}
+  components: {},
 };
 </script>

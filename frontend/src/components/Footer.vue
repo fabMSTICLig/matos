@@ -3,13 +3,9 @@
     <div class="container-fluid mt-3 mb-3 border-top border-dark">
       <div class="row mt-3">
         <div class="col">
-          <a class="logo-font" href="/">
-            Matos
-          </a>
+          <a class="logo-font" href="/"> Matos </a>
           |
-          <a class="logo-font" href="/legalnotice">
-            Legal notice
-          </a>
+          <a class="logo-font" href="/legalnotice"> Legal notice </a>
         </div>
         <div class="col align-self-end media">
           <img
@@ -42,8 +38,8 @@ export default {
   name: "Footer",
   data() {
     return {
-      publicPath: process.env.BASE_URL
+      publicPath: process.env.BASE_URL,
     };
-  }
+  },
 };
 </script>

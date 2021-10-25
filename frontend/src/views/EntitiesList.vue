@@ -30,7 +30,7 @@
                   v-on:click="selected_object = item"
                   :class="{
                     'table-active':
-                      selected_object && item.id == selected_object.id
+                      selected_object && item.id == selected_object.id,
                   }"
                 >
                   <td v-text="item.name"></td>
@@ -58,7 +58,7 @@
               role="button"
               :to="{
                 name: 'entityedit',
-                params: { entityid: selected_object.id }
+                params: { entityid: selected_object.id },
               }"
               v-show="isManager"
               >Modifier</router-link
@@ -68,7 +68,7 @@
               role="button"
               :to="{
                 name: 'materialslist',
-                params: { entityid: selected_object.id }
+                params: { entityid: selected_object.id },
               }"
               v-show="isManager"
               >Matériels</router-link
@@ -78,7 +78,7 @@
               role="button"
               :to="{
                 name: 'entityloans',
-                params: { entityid: selected_object.id }
+                params: { entityid: selected_object.id },
               }"
               v-show="isManager"
               >Prêts</router-link
@@ -121,12 +121,12 @@ export default {
   mixins: [ListMixin],
   components: {
     DisplayIdList,
-    Markdown
+    Markdown,
   },
   data() {
     return {
       ressource: "entities",
-      displayed: true
+      displayed: true,
     };
   },
   computed: {
@@ -137,13 +137,13 @@ export default {
           this.authUser.entities.indexOf(this.selected_object.id) > -1) ||
         this.authUser.is_staff
       );
-    }
+    },
   },
   methods: {
     search_fields(objects_list, search_input) {
       return objects_list
-        .filter(item => {
-          return ["name"].some(field => {
+        .filter((item) => {
+          return ["name"].some((field) => {
             return (
               item[field].toLowerCase().indexOf(search_input.toLowerCase()) > -1
             );
@@ -167,10 +167,13 @@ export default {
             );
             if (ent) this.selected_object = ent;
           } else if (this.objects_filtered.length > 0) {
-            this.selected_object = this.objects_list[0];
+            this.selected_object =
+              this.objects_list[
+                (this.current_page - 1) * process.env.VUE_APP_MAXLIST
+              ];
           }
         });
-    }
-  }
+    },
+  },
 };
 </script>

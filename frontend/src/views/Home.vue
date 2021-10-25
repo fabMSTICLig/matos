@@ -65,12 +65,8 @@
               Une personne souhaite emprunter du matériel.
             </p>
             <ul>
-              <li>
-                Elle se connecte au site.
-              </li>
-              <li>
-                Elle recherche sur le site le matériel qu'elle a besoin.
-              </li>
+              <li>Elle se connecte au site.</li>
+              <li>Elle recherche sur le site le matériel qu'elle a besoin.</li>
               <li>
                 Elle remplir l'équivalent d'un panier d'un site de commerce.
               </li>
@@ -85,16 +81,12 @@
                 L'entité peut alors prendre contact par mail avec le demandeur
                 afin d'avoir des précisions.
               </li>
-              <li>
-                L'entité valide ensuite le prêt.
-              </li>
+              <li>L'entité valide ensuite le prêt.</li>
               <li>
                 Une fois la matériel rendu l'entité inscrit la date de retour
                 effective du matériel.
               </li>
-              <li>
-                Le prêt est clos.
-              </li>
+              <li>Le prêt est clos.</li>
             </ul>
 
             <p class="text-justify">
@@ -202,6 +194,6 @@
 
 <script>
 export default {
-  name: "Home"
+  name: "Home",
 };
 </script>

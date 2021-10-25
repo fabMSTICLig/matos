@@ -5,13 +5,13 @@ import {
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD,
   UPDATE_RGPD,
-  USER_DATA
+  USER_DATA,
 } from "./actions.type";
 import { SET_AUTHUSER, PURGE_AUTH, SET_USERDATA } from "./mutations.type";
 
 const state = {
   authUser: {},
-  userData: {}
+  userData: {},
 };
 
 const getters = {
@@ -26,7 +26,7 @@ const getters = {
   },
   userData(state) {
     return state.userData;
-  }
+  },
 };
 
 const actions = {
@@ -37,7 +37,7 @@ const actions = {
           context.commit(SET_AUTHUSER, data.user);
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
           context.commit(PURGE_AUTH);
           reject();
@@ -65,17 +65,17 @@ const actions = {
     });
   },
   [USER_DATA](context) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       ApiService.query("self/data", {})
         .then(({ data }) => {
           context.commit(SET_USERDATA, data.user);
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     });
-  }
+  },
 };
 
 const mutations = {
@@ -87,12 +87,12 @@ const mutations = {
   },
   [SET_USERDATA](state, userData) {
     state.userData = userData;
-  }
+  },
 };
 
 export default {
   state,
   actions,
   mutations,
-  getters
+  getters,
 };

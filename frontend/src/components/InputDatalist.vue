@@ -20,30 +20,30 @@ export default {
   props: {
     value: {
       type: null,
-      required: true
+      required: true,
     },
     ressource: {
       type: [String, Array],
-      required: true
+      required: true,
     },
     makeLabel: {
       type: Function,
-      required: false
-    }
+      required: false,
+    },
   },
   data() {
     return {
       input_value: "",
       activeDset: true,
       id: "",
-      item: null
+      item: null,
     };
   },
   components: {
-    Multiselect
+    Multiselect,
   },
   watch: {
-    value: function(newval) {
+    value: function (newval) {
       if (newval == 0) {
         this.activeDset = true;
         this.input_value = "";
@@ -51,7 +51,7 @@ export default {
     },
     item() {
       this.$emit("input", this.item.value.id);
-    }
+    },
   },
   computed: {
     objects_list() {
@@ -70,7 +70,7 @@ export default {
         let option = {
           value: this.objects_list[i],
           name: this.makeLabelOrName(this.objects_list[i]),
-          $isDisabled: this.objects_list[i].borrowed ? true : false
+          $isDisabled: this.objects_list[i].borrowed ? true : false,
         };
         options.push(option);
       }
@@ -81,7 +81,7 @@ export default {
       get() {
         if (this.value) {
           var item = this.objects_list.find(
-            item => item.id.toString() == this.value.toString()
+            (item) => item.id.toString() == this.value.toString()
           );
         }
         if (item != undefined) {
@@ -93,7 +93,7 @@ export default {
       set(val) {
         var item = undefined;
         if (Number(val)) {
-          item = this.objects_list.find(item => item.id.toString() == val);
+          item = this.objects_list.find((item) => item.id.toString() == val);
         }
         if (item != undefined) {
           this.input_value = this.makeLabelOrName(item);
@@ -103,19 +103,19 @@ export default {
           this.activeDset = true;
           this.input_value = val;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     makeLabelOrName(item) {
       return this.makeLabel ? this.makeLabel(item) : item.name;
-    }
+    },
   },
   beforeMount() {
     if (typeof this.ressource == "string")
       this.$store.dispatch(this.ressource + "/fetchList").then(() => {
         if (this.value && this.options) {
-          let selected_item = this.options.filter(item => {
+          let selected_item = this.options.filter((item) => {
             return item.value.id == this.value;
           });
           this.item = selected_item[0];
@@ -125,7 +125,7 @@ export default {
   mounted() {
     this.id = String(this._uid);
   },
-  created() {}
+  created() {},
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

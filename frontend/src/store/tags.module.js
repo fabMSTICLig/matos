@@ -8,11 +8,11 @@ const tags_extra = {
       return ApiService.delete("tags/delete_unused").then(({ data }) => {
         commit(
           "destroyUnusedSuccess",
-          data.map(item => item.toString())
+          data.map((item) => item.toString())
         );
         return data;
       });
-    }
+    },
   },
   mutations: {
     destroyUnusedSuccess(state, tag_ids) {
@@ -23,8 +23,8 @@ const tags_extra = {
           state.list.splice(i, 1);
         }
       }
-    }
-  }
+    },
+  },
 };
 const tags = createCrud("tags", tags_extra);
 export default tags;

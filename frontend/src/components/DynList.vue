@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!readonly" :id="_uid">
-      <div class="input-group" style="height:43px;">
+      <div class="input-group" style="height: 43px">
         <!--<div class="input-group-prepend">
           <span class="input-group-text">Ajouter</span>
         </div>-->
@@ -22,7 +22,12 @@
     </div>
     <ul class="list-group">
       <li
-        class="list-group-item d-flex justify-content-between align-items-center"
+        class="
+          list-group-item
+          d-flex
+          justify-content-between
+          align-items-center
+        "
         v-for="item in valueIntern"
         :key="item.id"
       >
@@ -54,24 +59,24 @@ export default {
   props: {
     options: {
       type: [String, Array],
-      required: true
+      required: true,
     },
     value: {
       type: Array,
-      required: true
+      required: true,
     },
     makeLabel: {
       type: Function,
-      required: false
+      required: false,
     },
     readonly: {
       type: Boolean,
       required: false,
-      default: false
-    }
+      default: false,
+    },
   },
   components: {
-    Multiselect
+    Multiselect,
   },
   data() {
     return {};
@@ -83,8 +88,8 @@ export default {
       else return this.options;
     },
     valueIntern() {
-      return this.optionsIntern.filter(el => this.value.includes(el.id));
-    }
+      return this.optionsIntern.filter((el) => this.value.includes(el.id));
+    },
   },
   methods: {
     addObject(item) {
@@ -98,12 +103,12 @@ export default {
         ret.splice(index, 1);
         this.$emit("input", ret);
       }
-    }
+    },
   },
   beforeMount() {
     if (typeof this.options == "string")
       this.$store.dispatch(this.options + "/fetchList");
-  }
+  },
 };
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

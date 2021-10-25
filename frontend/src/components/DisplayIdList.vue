@@ -20,34 +20,34 @@ export default {
   props: {
     ressource: {
       type: String,
-      required: true
+      required: true,
     },
     object: {
       type: Object,
-      required: true
+      required: true,
     },
     fieldName: {
       type: String,
-      required: true
+      required: true,
     },
     autoload: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   computed: {
     objects_list() {
       return this.$store.getters[this.ressource + "/list"];
     },
     objects_filtered() {
-      return this.objects_list.filter(item => {
+      return this.objects_list.filter((item) => {
         return this.object[this.fieldName].includes(item.id);
       });
-    }
+    },
   },
   methods: {},
   beforeMount() {
     if (this.autoload) this.$store.dispatch(this.ressource + "/fetchList");
-  }
+  },
 };
 </script>

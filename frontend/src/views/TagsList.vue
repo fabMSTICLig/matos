@@ -59,7 +59,7 @@
               role="button"
               :to="{
                 name: 'tag',
-                params: { tagid: selected_object.id }
+                params: { tagid: selected_object.id },
               }"
               >Modifier</router-link
             >
@@ -89,17 +89,17 @@ export default {
   data() {
     return {
       search_fields: ["name"],
-      ressource: "tags"
+      ressource: "tags",
     };
   },
   methods: {
     destroyUnused() {
       showMsgConfirm(
         "Voulez vous vraiment supprimer tout les tags non utilisés ?"
-      ).then(val => {
+      ).then((val) => {
         if (val) this.$store.dispatch("tags/destroyUnused");
       });
-    }
-  }
+    },
+  },
 };
 </script>

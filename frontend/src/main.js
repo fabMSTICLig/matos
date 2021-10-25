@@ -8,15 +8,22 @@ import vueDebounce from "vue-debounce";
 
 // Setting a different event to listen to
 Vue.use(vueDebounce, {
-  listenTo: "input"
+  listenTo: "input",
 });
 
 Vue.config.productionTip = false;
 
-Vue.filter("field", function(value, field) {
+Vue.filter("field", function (value, field) {
   if (!value || !(field in value)) return "";
   return value[field];
 });
+
+Vue.prototype.$removeFromArray = (array, elem) => {
+  var index = array.indexOf(elem);
+  if (index > -1) {
+    array.splice(index, 1);
+  }
+};
 
 ApiService.init();
 
@@ -29,5 +36,5 @@ router.beforeEach((to, from, next) => {
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount("#app");

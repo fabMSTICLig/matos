@@ -70,24 +70,24 @@ export default {
     maxVisibleButtons: {
       type: Number,
       required: false,
-      default: 3
+      default: 3,
     },
     totalPages: {
       type: Number,
-      required: true
+      required: true,
     },
     total: {
       type: Number,
-      required: true
+      required: true,
     },
     perPage: {
       type: Number,
-      required: true
+      required: true,
     },
     currentPage: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     startPage() {
@@ -112,7 +112,7 @@ export default {
       for (let i = this.startPage; i <= this.endPage; i += 1) {
         range.push({
           name: i,
-          isDisabled: i === this.currentPage
+          isDisabled: i === this.currentPage,
         });
       }
 
@@ -123,7 +123,7 @@ export default {
     },
     isInLastPage() {
       return this.currentPage === this.totalPages;
-    }
+    },
   },
   methods: {
     onClickFirstPage() {
@@ -143,7 +143,7 @@ export default {
     },
     isPageActive(page) {
       return this.currentPage === page;
-    }
-  }
+    },
+  },
 };
 </script>

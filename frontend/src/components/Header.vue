@@ -19,7 +19,7 @@
             active-class="active"
             exact
             :to="{ name: 'home' }"
-            v-slot="{ href, route, navigate }"
+            v-slot="{ href, navigate }"
           >
             <li class="nav-item" role="presentation">
               <a class="nav-link" :href="href" @click="navigate">Home</a>
@@ -30,7 +30,7 @@
             active-class="active"
             exact
             :to="{ name: 'search' }"
-            v-slot="{ href, route, navigate }"
+            v-slot="{ href, navigate }"
           >
             <li class="nav-item" role="presentation">
               <a class="nav-link" :href="href" @click="navigate">Matériels</a>
@@ -42,7 +42,7 @@
             active-class="active"
             exact
             :to="{ name: 'entitieslist' }"
-            v-slot="{ href, route, navigate }"
+            v-slot="{ href, navigate }"
           >
             <li class="nav-item" role="presentation">
               <a class="nav-link" :href="href" @click="navigate">Entités</a>
@@ -111,7 +111,7 @@ import Dropdown from "@/components/Dropdown";
 export default {
   name: "Header",
   components: {
-    Dropdown
+    Dropdown,
   },
   data() {
     return {
@@ -121,27 +121,27 @@ export default {
       adminroutes: [
         {
           to: { name: "users" },
-          label: "Utilisateurs"
+          label: "Utilisateurs",
         },
         {
           to: { name: "tags" },
-          label: "Tags"
+          label: "Tags",
         },
         {
           to: { name: "affiliations" },
-          label: "Affiliations"
-        }
+          label: "Affiliations",
+        },
       ],
       userroutes: [
         {
           to: { name: "profile" },
-          label: "Profile"
+          label: "Profile",
         },
         {
           to: { name: "authloans" },
-          label: "Mes prêts"
-        }
-      ]
+          label: "Mes prêts",
+        },
+      ],
     };
   },
 
@@ -157,7 +157,7 @@ export default {
           ) + this.pending_loan.models.length
         );
       else return "";
-    }
+    },
   },
   methods: {
     logout(e) {
@@ -180,7 +180,7 @@ export default {
       } else {
         this.collapsed = "collapse navbar-collapse";
       }
-    }
-  }
+    },
+  },
 };
 </script>

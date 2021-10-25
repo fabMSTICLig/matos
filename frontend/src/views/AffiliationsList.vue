@@ -55,7 +55,7 @@
               role="button"
               :to="{
                 name: 'affiliation',
-                params: { affid: selected_object.id }
+                params: { affid: selected_object.id },
               }"
               >Modifier</router-link
             >
@@ -84,16 +84,16 @@ export default {
   data() {
     return {
       search_fields: ["name"],
-      ressource: "affiliations"
+      ressource: "affiliations",
     };
   },
   computed: {
-    ...mapGetters("affiliations", { affiliation_types: "types" })
+    ...mapGetters("affiliations", { affiliation_types: "types" }),
   },
   methods: {
     initComponent() {
       return this.$store.dispatch("affiliations/fetchTypes");
-    }
-  }
+    },
+  },
 };
 </script>

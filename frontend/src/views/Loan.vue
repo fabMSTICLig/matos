@@ -11,7 +11,7 @@
                 role="button"
                 :to="{
                   name: 'entityloans',
-                  params: { entityid: pending_loan.entity }
+                  params: { entityid: pending_loan.entity },
                 }"
                 v-if="updateMode && canManage"
                 >Retour entité</router-link
@@ -20,7 +20,7 @@
                 class="btn btn-primary"
                 role="button"
                 :to="{
-                  name: 'authloans'
+                  name: 'authloans',
                 }"
                 v-if="updateMode && !canManage"
                 >Mes prêts</router-link
@@ -173,7 +173,7 @@
                               class="btn btn-danger"
                               type="button"
                               @click="removeMaterial(gmById(item.material))"
-                              style="margin-left: -10px;"
+                              style="margin-left: -10px"
                             >
                               X
                             </button>
@@ -204,7 +204,7 @@
                               class="btn btn-danger"
                               type="button"
                               @click="removeMaterial(smById(item))"
-                              style="margin-left: -10px;"
+                              style="margin-left: -10px"
                             >
                               X
                             </button>
@@ -217,9 +217,9 @@
                     class="form-group"
                     v-if="
                       updateMode &&
-                        (pending_loan.child ||
-                          pending_loan.parent ||
-                          pending_loan.status == 3)
+                      (pending_loan.child ||
+                        pending_loan.parent ||
+                        pending_loan.status == 3)
                     "
                   >
                     <label>Historique :</label>
@@ -236,9 +236,9 @@
                         <button
                           v-if="
                             updateMode &&
-                              canManage &&
-                              !pending_loan.child &&
-                              pending_loan.status == 3
+                            canManage &&
+                            !pending_loan.child &&
+                            pending_loan.status == 3
                           "
                           class="btn btn-info"
                           type="button"
@@ -328,14 +328,14 @@ export default {
   name: "Loan",
   components: {
     DynList,
-    Multiselect
+    Multiselect,
   },
   props: ["loanid"],
   data() {
     return {
       loaded: false,
       usersLoading: false,
-      errors: []
+      errors: [],
     };
   },
   computed: {
@@ -350,7 +350,7 @@ export default {
       pending_loan: "loans/pending_loan",
       status: "loans/status",
       authUser: "authUser",
-      isAdmin: "isAdmin"
+      isAdmin: "isAdmin",
     }),
     loanMessageSent() {
       if (this.pending_loan.status == 2) return "La demande a été envoyée";
@@ -376,7 +376,7 @@ export default {
       set(val) {
         if (val) this.pending_loan.user = val.id;
         else this.pending_loan.user = null;
-      }
+      },
     },
     emptyLoan() {
       return (
@@ -386,10 +386,10 @@ export default {
     },
     specificinstances() {
       let ret = {};
-      this.pending_loan.models.forEach(id => {
+      this.pending_loan.models.forEach((id) => {
         ret[id] = [];
         let sm = this.smById(id);
-        sm.instances.forEach(iid => {
+        sm.instances.forEach((iid) => {
           let ins = this.smiById(iid);
           if (!ins.active && !this.canManage) ins.$isDisabled = true;
           ret[id].push(ins);
@@ -399,8 +399,8 @@ export default {
     },
     emptyInstances() {
       let ret = true;
-      this.pending_loan.models.forEach(m => {
-        ret &= this.specificinstances[m].some(el =>
+      this.pending_loan.models.forEach((m) => {
+        ret &= this.specificinstances[m].some((el) =>
           this.pending_loan.specific_materials.includes(el.id)
         );
       });
@@ -440,24 +440,24 @@ export default {
           this.pending_loan.return_date !== null &&
           this.pending_loan.return_date !== "")
       );
-    }
+    },
   },
   watch: {},
   methods: {
     ...mapMutations({
-      removeMaterial: "loans/removeMaterial"
+      removeMaterial: "loans/removeMaterial",
     }),
     searchUser(query) {
       this.$store.dispatch("users/fetchList", {
-        params: { params: { search: query } }
+        params: { params: { search: query } },
       });
     },
     initInstances(item) {
       return this.$store
         .dispatch("specificmaterials/instances/fetchList", {
-          prefix: "specificmaterials/" + item + "/"
+          prefix: "specificmaterials/" + item + "/",
         })
-        .then(data => {
+        .then((data) => {
           Vue.set(this.specificinstances, item, data);
         });
     },
@@ -475,14 +475,14 @@ export default {
           this.$store
             .dispatch("loans/update", {
               data: this.pending_loan,
-              id: this.pending_loan.id
+              id: this.pending_loan.id,
             })
-            .then(data => {
+            .then((data) => {
               this.$store.commit("loans/setPending", data);
               showMsgOk("Le prêt a été modifié");
               this.errors = [];
             })
-            .catch(e => {
+            .catch((e) => {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
                 window.scrollTo(0, 0);
@@ -499,12 +499,12 @@ export default {
           }
           this.$store
             .dispatch("loans/create", { data: this.pending_loan })
-            .then(data => {
+            .then((data) => {
               this.$store.commit("loans/setPending", data);
               showMsgOk(this.loanMessageSent);
               this.errors = [];
             })
-            .catch(e => {
+            .catch((e) => {
               if ("non_field_errors" in e.response.data) {
                 this.errors = e.response.data.non_field_errors;
                 window.scrollTo(0, 0);
@@ -587,14 +587,14 @@ export default {
       if (load) this.$router.push({ name: "loan", params: { loanid: id } });
       this.$store
         .dispatch("loans/fetchSingle", { id: id })
-        .then(data => {
+        .then((data) => {
           this.$store
             .dispatch("materials/fetchMaterialsByLoans", { loanids: [data.id] })
             .then(() => {
               this.$store.commit("loans/setPending", data);
             });
           this.$store.dispatch("users/fetchList", {
-            params: { params: { userid: data.user } }
+            params: { params: { userid: data.user } },
           });
         })
         .catch(() => {
@@ -604,10 +604,10 @@ export default {
     makeChild() {
       this.$store
         .dispatch("loans/makeChild", { id: this.pending_loan.id })
-        .then(data => {
+        .then((data) => {
           this.goTo(data.id);
         });
-    }
+    },
   },
   beforeMount() {
     var pall = [];
@@ -623,14 +623,14 @@ export default {
     } else {
       pall.push(
         this.$store.dispatch("materials/fetchMaterialsByIds", {
-          gmids: this.pending_loan.generic_materials.map(m => m.material),
-          smids: this.pending_loan.models
+          gmids: this.pending_loan.generic_materials.map((m) => m.material),
+          smids: this.pending_loan.models,
         })
       );
       if (this.canManage) {
         pall.push(
           this.$store.dispatch("users/fetchList", {
-            params: { params: { userid: this.pending_loan.user } }
+            params: { params: { userid: this.pending_loan.user } },
           })
         );
       }
@@ -639,6 +639,6 @@ export default {
       //début chargement
       this.loaded = true;
     });
-  }
+  },
 };
 </script>

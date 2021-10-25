@@ -91,13 +91,13 @@ export default {
   name: "UsersList",
   mixins: [ListMixin],
   components: {
-    DisplayIdList
+    DisplayIdList,
   },
   data() {
     return {
       search_fields: ["username", "first_name", "last_name"],
-      ressource: "users"
+      ressource: "users",
     };
-  }
+  },
 };
 </script>

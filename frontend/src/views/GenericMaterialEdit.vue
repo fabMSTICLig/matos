@@ -63,8 +63,9 @@
                   <div class="form-group">
                     <label>Tags</label>
                     <TagsInput
-                      fieldName="tags"
-                      :object="object"
+                      :list="object.tags"
+                      v-on:add="addTag($event)"
+                      v-on:remove="removeTag($event)"
                       ressource="tags"
                     />
                   </div>
@@ -137,7 +138,7 @@ export default {
   mixins: [EditMixin],
   components: {
     TagsInput,
-    Markdown
+    Markdown,
   },
   data() {
     return {
@@ -145,14 +146,14 @@ export default {
       new_label: "Nouveau Matériel Générique",
       object_name: "Matériel",
       showHelp: false,
-      msg: "mis à jour"
+      msg: "mis à jour",
     };
   },
 
   computed: {
     prefix() {
       return "entities/" + this.$route.params.entityid + "/";
-    }
+    },
   },
   methods: {
     get_empty() {
@@ -165,7 +166,7 @@ export default {
         quantity: 0,
         entity: this.$route.params["entityid"],
         tags: [],
-        active: true
+        active: true,
       };
     },
     make_label() {
@@ -173,7 +174,16 @@ export default {
     },
     showMessage() {
       this.showHelp = true;
-    }
-  }
+    },
+    addTag(tagid) {
+      this.object.tags.push(tagid);
+    },
+    removeTag(tagid) {
+      var index = this.object.tags.indexOf(tagid);
+      if (index > -1) {
+        this.object.tags.splice(index, 1);
+      }
+    },
+  },
 };
 </script>

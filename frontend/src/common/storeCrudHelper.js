@@ -2,10 +2,10 @@ import Vue from "vue";
 import ApiService from "@/common/api.service";
 
 function mergeDeep(...objects) {
-  const isObject = obj => obj && typeof obj === "object";
+  const isObject = (obj) => obj && typeof obj === "object";
 
   return objects.reduce((prev, obj) => {
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       const pVal = prev[key];
       const oVal = obj[key];
 
@@ -32,15 +32,15 @@ const createCrud = (ressource, source) => {
 
     state: {
       entities: {},
-      list: []
+      list: [],
     },
     getters: {
       list(state) {
-        return state.list.map(id => state.entities[id.toString()]);
+        return state.list.map((id) => state.entities[id.toString()]);
       },
       byId(state) {
-        return id => (id ? state.entities[id.toString()] : null);
-      }
+        return (id) => (id ? state.entities[id.toString()] : null);
+      },
     },
     actions: {
       fetchList({ commit, getters }, { prefix = "", params = {} } = {}) {
@@ -49,7 +49,7 @@ const createCrud = (ressource, source) => {
             commit("fetchListSuccess", data);
             return Promise.resolve(getters.list);
           })
-          .catch(error => {
+          .catch((error) => {
             return Promise.reject(error);
           });
       },
@@ -59,7 +59,7 @@ const createCrud = (ressource, source) => {
             commit("fetchSingleSuccess", data);
             return data;
           })
-          .catch(error => {
+          .catch((error) => {
             return Promise.reject(error);
           });
       },
@@ -69,7 +69,7 @@ const createCrud = (ressource, source) => {
             commit("createSuccess", data);
             return data;
           })
-          .catch(error => {
+          .catch((error) => {
             return Promise.reject(error);
           });
       },
@@ -79,7 +79,7 @@ const createCrud = (ressource, source) => {
             commit("updateSuccess", data);
             return data;
           })
-          .catch(error => {
+          .catch((error) => {
             return Promise.reject(error);
           });
       },
@@ -89,18 +89,18 @@ const createCrud = (ressource, source) => {
             commit("destroySuccess", id);
             return data;
           })
-          .catch(error => {
+          .catch((error) => {
             return Promise.reject(error);
           });
-      }
+      },
     },
 
     mutations: {
       fetchListSuccess(state, data) {
-        data.forEach(m => {
+        data.forEach((m) => {
           Vue.set(state.entities, m["id"].toString(), m);
         });
-        state.list = data.map(m => m["id"].toString());
+        state.list = data.map((m) => m["id"].toString());
       },
       fetchSingleSuccess(state, data) {
         const id = data["id"].toString();
@@ -129,8 +129,8 @@ const createCrud = (ressource, source) => {
           Vue.delete(state.list, listIndex);
         }
         Vue.delete(state.entities, id.toString());
-      }
-    }
+      },
+    },
   };
   return mergeDeep(target, source);
 };

@@ -64,33 +64,33 @@ export const Modal = {
   name: "modal",
   model: {
     prop: "show",
-    event: "change"
+    event: "change",
   },
   props: {
     content: {
       type: null,
-      default: ""
+      default: "",
     },
     hideHeader: {
       type: Boolean,
-      default: false
+      default: false,
     },
     hideFooter: {
       type: Boolean,
-      default: false
+      default: false,
     },
     title: {
       type: String,
-      default: "Title"
+      default: "Title",
     },
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     confirmFooter: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {};
@@ -103,8 +103,8 @@ export const Modal = {
     },
     confirm(val) {
       this.$emit("confirm", val);
-    }
-  }
+    },
+  },
 };
 export default Modal;
 
@@ -117,7 +117,7 @@ import Vue from "vue";
 export function showMsgOk(content) {
   var ComponentClass = Vue.extend(Modal);
   var instance = new ComponentClass({
-    propsData: { content: content, show: true, hideHeader: true }
+    propsData: { content: content, show: true, hideHeader: true },
   });
   const div = document.createElement("div");
   document.body.appendChild(div);
@@ -134,8 +134,8 @@ export function showMsgConfirm(content) {
       content: content,
       show: true,
       hideHeader: true,
-      confirmFooter: true
-    }
+      confirmFooter: true,
+    },
   });
   const div = document.createElement("div");
   document.body.appendChild(div);
@@ -146,7 +146,7 @@ export function showMsgConfirm(content) {
       instance.$destroy(true);
       reject();
     });
-    instance.$on(["confirm"], val => {
+    instance.$on(["confirm"], (val) => {
       document.body.removeChild(instance.$el);
       instance.$destroy(true);
       resolve(val);

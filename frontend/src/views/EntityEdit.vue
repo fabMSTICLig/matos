@@ -9,7 +9,7 @@
             role="button"
             :to="{
               name: 'materialslist',
-              params: { entityid: object.id }
+              params: { entityid: object.id },
             }"
             >Matériels</router-link
           >
@@ -18,7 +18,7 @@
             role="button"
             :to="{
               name: 'entityloans',
-              params: { entityid: object.id }
+              params: { entityid: object.id },
             }"
             >Prêts</router-link
           >
@@ -72,7 +72,7 @@
                 <legend>Managers</legend>
                 <div class="form-group">
                   <div :id="_uid">
-                    <div class="input-group" style="height:43px;">
+                    <div class="input-group" style="height: 43px">
                       <multiselect
                         :value="managers"
                         :options="userslist"
@@ -91,7 +91,12 @@
                   </div>
                   <ul class="list-group">
                     <li
-                      class="list-group-item d-flex justify-content-between align-items-center"
+                      class="
+                        list-group-item
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                      "
                       v-for="item in managers"
                       :key="item.id"
                     >
@@ -172,7 +177,7 @@ export default {
   components: {
     DynList,
     Markdown,
-    Multiselect
+    Multiselect,
   },
   data() {
     return {
@@ -181,16 +186,18 @@ export default {
       object_name: "Entité",
       showHelp: false,
       msg: "mise à jour",
-      userslist: []
+      userslist: [],
     };
   },
   computed: {
     ...mapGetters({
-      users: "users/list"
+      users: "users/list",
     }),
     managers() {
-      return this.userslist.filter(el => this.object.managers.includes(el.id));
-    }
+      return this.userslist.filter((el) =>
+        this.object.managers.includes(el.id)
+      );
+    },
   },
   methods: {
     get_empty() {
@@ -199,17 +206,17 @@ export default {
         description: "",
         contact: "",
         affiliations: [],
-        managers: []
+        managers: [],
       };
     },
     searchUser(query) {
       this.$store
         .dispatch("users/fetchList", {
-          params: { params: { search: query } }
+          params: { params: { search: query } },
         })
-        .then(data => {
-          data.forEach(user => {
-            if (this.userslist.findIndex(u => u.id == user.id) === -1) {
+        .then((data) => {
+          data.forEach((user) => {
+            if (this.userslist.findIndex((u) => u.id == user.id) === -1) {
               this.userslist.push(user);
             }
           });
@@ -237,22 +244,22 @@ export default {
     searchChange(query) {
       this.$store
         .dispatch("users/fetchList", {
-          params: { params: { search: query } }
+          params: { params: { search: query } },
         })
-        .then(data => {
-          data.forEach(user => {
-            const index = this.userslist.findIndex(u => u.id == user.id);
+        .then((data) => {
+          data.forEach((user) => {
+            const index = this.userslist.findIndex((u) => u.id == user.id);
             if (index == -1) {
               this.userslist.push(user);
             }
           });
         });
-    }
+    },
   },
   beforeMount() {
-    this.$store.dispatch("users/fetchList").then(data => {
-      data.forEach(user => this.userslist.push(user));
+    this.$store.dispatch("users/fetchList").then((data) => {
+      data.forEach((user) => this.userslist.push(user));
     });
-  }
+  },
 };
 </script>

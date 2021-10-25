@@ -8,8 +8,8 @@
         <p
           v-if="
             !$store.getters.authUser.first_name ||
-              !$store.getters.authUser.last_name ||
-              !$store.getters.authUser.email
+            !$store.getters.authUser.last_name ||
+            !$store.getters.authUser.email
           "
           class="text-danger"
         >
@@ -153,7 +153,7 @@ import {
   UPDATE_AUTHUSER,
   UPDATE_PASSWORD,
   UPDATE_RGPD,
-  USER_DATA
+  USER_DATA,
 } from "@/store/actions.type";
 import { mapGetters } from "vuex";
 import { JSONRenderer } from "@/common/helpers";
@@ -165,7 +165,7 @@ export default {
   name: "Profile",
   components: {
     DynList,
-    Modal
+    Modal,
   },
   data() {
     return {
@@ -174,8 +174,8 @@ export default {
       form: {
         old_password: "",
         new_password: "",
-        new_password2: ""
-      }
+        new_password2: "",
+      },
     };
   },
   computed: {
@@ -195,7 +195,7 @@ export default {
         return false;
       if (this.form.new_password != this.form.new_password2) return false;
       return true;
-    }
+    },
   },
   methods: {
     update() {
@@ -214,7 +214,7 @@ export default {
               this.form.new_password = "";
               this.form.new_password2 = "";
             })
-            .catch(e => {
+            .catch((e) => {
               if (e.response.status == 400) {
                 this.goodpassword = false;
                 showMsgOk("Mot de passe incorrect");
@@ -256,13 +256,13 @@ export default {
         JSONRenderer.download(this.userData, labelData, "text/plain");
         console.log(this.userData);
       });
-    }
+    },
   },
   mounted() {
     if (!this.authUser.rgpd_accept) {
       this.showRGPD = true;
     }
   },
-  beforeMount() {}
+  beforeMount() {},
 };
 </script>

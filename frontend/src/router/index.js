@@ -17,7 +17,7 @@ function requireAuth(to, from, next) {
       next();
     } else {
       next({
-        name: "profile"
+        name: "profile",
       });
     }
   } else {
@@ -42,7 +42,7 @@ function requireAdmin(to, from, next) {
     next();
   } else {
     next({
-      name: "home"
+      name: "home",
     });
   }
 }
@@ -50,35 +50,35 @@ const routes = [
   {
     path: "/",
     name: "home",
-    component: Home
+    component: Home,
   },
   {
     path: "/profile",
     name: "profile",
     beforeEnter: requireAuth,
     component: () =>
-      import(/* webpackChunkName: "profile" */ "../views/Profile.vue")
+      import(/* webpackChunkName: "profile" */ "../views/Profile.vue"),
   },
   {
     path: "/search",
     name: "search",
     beforeEnter: requireAuth,
     component: () =>
-      import(/* webpackChunkName: "search" */ "../views/Search.vue")
+      import(/* webpackChunkName: "search" */ "../views/Search.vue"),
   },
   {
     path: "/loan/:loanid?",
     name: "loan",
     beforeEnter: requireAuth,
     component: () => import(/* webpackChunkName: "loan" */ "../views/Loan.vue"),
-    props: true
+    props: true,
   },
   {
     path: "/loans",
     name: "authloans",
     beforeEnter: requireAuth,
     component: () =>
-      import(/* webpackChunkName: "loans" */ "../views/LoansList.vue")
+      import(/* webpackChunkName: "loans" */ "../views/LoansList.vue"),
   },
   {
     path: "/materials",
@@ -88,8 +88,8 @@ const routes = [
     meta: {
       breadcumb: {
         label: "Materiels",
-        name: "materials"
-      }
+        name: "materials",
+      },
     },
     children: [
       {
@@ -103,9 +103,9 @@ const routes = [
           routeparam: "matid",
           breadcumb: {
             label: "materiel générique",
-            name: "genericmaterialitem"
-          }
-        }
+            name: "genericmaterialitem",
+          },
+        },
       },
       {
         path: "s/:matid",
@@ -118,11 +118,11 @@ const routes = [
           routeparam: "matid",
           breadcumb: {
             label: "materiel spécifique",
-            name: "specificmaterialitem"
-          }
-        }
-      }
-    ]
+            name: "specificmaterialitem",
+          },
+        },
+      },
+    ],
   },
   {
     path: "/affiliations",
@@ -132,8 +132,8 @@ const routes = [
     meta: {
       breadcumb: {
         label: "Affiliations",
-        name: "affiliations"
-      }
+        name: "affiliations",
+      },
     },
     children: [
       {
@@ -142,7 +142,7 @@ const routes = [
         component: () =>
           import(
             /* webpackChunkName: "affiliationlist" */ "../views/AffiliationsList.vue"
-          )
+          ),
       },
       {
         path: ":affid",
@@ -153,17 +153,17 @@ const routes = [
           breadcumb: {
             label: {
               ressource: "affiliations",
-              labelprop: "name"
+              labelprop: "name",
             },
-            name: "affiliation"
-          }
+            name: "affiliation",
+          },
         },
         component: () =>
           import(
             /* webpackChunkName: "affiliationedit" */ "../views/AffiliationEdit.vue"
-          )
-      }
-    ]
+          ),
+      },
+    ],
   },
   {
     path: "/tags",
@@ -172,15 +172,15 @@ const routes = [
     meta: {
       breadcumb: {
         label: "Tags",
-        name: "tags"
-      }
+        name: "tags",
+      },
     },
     children: [
       {
         path: "",
         name: "tags",
         component: () =>
-          import(/* webpackChunkName: "taglist" */ "../views/TagsList.vue")
+          import(/* webpackChunkName: "taglist" */ "../views/TagsList.vue"),
       },
       {
         path: ":tagid",
@@ -191,15 +191,15 @@ const routes = [
           breadcumb: {
             label: {
               ressource: "tags",
-              labelprop: "name"
+              labelprop: "name",
             },
-            name: "tag"
-          }
+            name: "tag",
+          },
         },
         component: () =>
-          import(/* webpackChunkName: "tagedit" */ "../views/TagEdit.vue")
-      }
-    ]
+          import(/* webpackChunkName: "tagedit" */ "../views/TagEdit.vue"),
+      },
+    ],
   },
   {
     path: "/users",
@@ -209,15 +209,15 @@ const routes = [
     meta: {
       breadcumb: {
         label: "Utilisateurs",
-        name: "users"
-      }
+        name: "users",
+      },
     },
     children: [
       {
         path: "",
         name: "users",
         component: () =>
-          import(/* webpackChunkName: "userlist" */ "../views/UsersList.vue")
+          import(/* webpackChunkName: "userlist" */ "../views/UsersList.vue"),
       },
       {
         path: ":userid",
@@ -228,15 +228,15 @@ const routes = [
           breadcumb: {
             label: {
               ressource: "users",
-              labelprop: "username"
+              labelprop: "username",
             },
-            name: "user"
-          }
+            name: "user",
+          },
         },
         component: () =>
-          import(/* webpackChunkName: "useredit" */ "../views/UserEdit.vue")
-      }
-    ]
+          import(/* webpackChunkName: "useredit" */ "../views/UserEdit.vue"),
+      },
+    ],
   },
   {
     path: "/entities",
@@ -246,8 +246,8 @@ const routes = [
     meta: {
       breadcumb: {
         label: "Entités",
-        name: "entitieslist"
-      }
+        name: "entitieslist",
+      },
     },
     children: [
       {
@@ -256,7 +256,7 @@ const routes = [
         component: () =>
           import(
             /* webpackChunkName: "entitylist" */ "../views/EntitiesList.vue"
-          )
+          ),
       },
       {
         path: ":entityid",
@@ -268,10 +268,10 @@ const routes = [
           breadcumb: {
             label: {
               ressource: "entities",
-              labelprop: "name"
+              labelprop: "name",
             },
-            name: "entityinfos"
-          }
+            name: "entityinfos",
+          },
         },
         children: [
           {
@@ -279,12 +279,12 @@ const routes = [
             name: "entityinfos",
             meta: {
               routeparam: "entityid",
-              routedelete: "entities"
+              routedelete: "entities",
             },
             component: () =>
               import(
                 /* webpackChunkName: "entityinfos" */ "../views/EntityInfos.vue"
-              )
+              ),
           },
           {
             path: "edit",
@@ -295,13 +295,13 @@ const routes = [
               routedelete: "entities",
               breadcumb: {
                 label: "Edit",
-                name: "entityedit"
-              }
+                name: "entityedit",
+              },
             },
             component: () =>
               import(
                 /* webpackChunkName: "entityedit" */ "../views/EntityEdit.vue"
-              )
+              ),
           },
           {
             path: "materials",
@@ -309,8 +309,8 @@ const routes = [
             meta: {
               breadcumb: {
                 label: "Materiels",
-                name: "materialslist"
-              }
+                name: "materialslist",
+              },
             },
             component: () =>
               import(
@@ -323,7 +323,7 @@ const routes = [
                 component: () =>
                   import(
                     /* webpackChunkName: "materialslist" */ "../views/MaterialsList.vue"
-                  )
+                  ),
               },
               {
                 path: "g/bulk",
@@ -337,9 +337,9 @@ const routes = [
                   routedelete: "materialslist",
                   breadcumb: {
                     label: "Ajout Massif",
-                    name: "genericmaterialbulk"
-                  }
-                }
+                    name: "genericmaterialbulk",
+                  },
+                },
               },
 
               {
@@ -358,14 +358,14 @@ const routes = [
                       prefix: [
                         {
                           ressource: "entities",
-                          param: "entityid"
-                        }
+                          param: "entityid",
+                        },
                       ],
-                      labelprop: "name"
+                      labelprop: "name",
                     },
-                    name: "genericmaterial"
-                  }
-                }
+                    name: "genericmaterial",
+                  },
+                },
               },
               {
                 path: "g/:matid/loans",
@@ -382,16 +382,16 @@ const routes = [
                       prefix: [
                         {
                           ressource: "entities",
-                          param: "entityid"
-                        }
+                          param: "entityid",
+                        },
                       ],
                       labelprop: "name",
-                      labelchild: "Prêts"
+                      labelchild: "Prêts",
                     },
-                    name: "genericmaterial"
-                  }
+                    name: "genericmaterial",
+                  },
                 },
-                props: true
+                props: true,
               },
               {
                 path: "s/:matid",
@@ -409,14 +409,14 @@ const routes = [
                       prefix: [
                         {
                           ressource: "entities",
-                          param: "entityid"
-                        }
+                          param: "entityid",
+                        },
                       ],
-                      labelprop: "name"
+                      labelprop: "name",
                     },
-                    name: "specificmaterial"
-                  }
-                }
+                    name: "specificmaterial",
+                  },
+                },
               },
               {
                 path: "s/:matid/loans",
@@ -433,18 +433,18 @@ const routes = [
                       prefix: [
                         {
                           ressource: "entities",
-                          param: "entityid"
-                        }
+                          param: "entityid",
+                        },
                       ],
                       labelprop: "name",
-                      labelchild: "Prêts"
+                      labelchild: "Prêts",
                     },
-                    name: "specificmaterial"
-                  }
+                    name: "specificmaterial",
+                  },
                 },
-                props: true
-              }
-            ]
+                props: true,
+              },
+            ],
           },
           {
             path: "loans",
@@ -454,23 +454,23 @@ const routes = [
               routeparam: "entityid",
               breadcumb: {
                 label: "Prêts",
-                name: "entityloans"
-              }
+                name: "entityloans",
+              },
             },
             component: () =>
               import(
                 /* webpackChunkName: "entityloanlist" */ "../views/EntityLoansList.vue"
               ),
-            props: true
-          }
-        ]
-      }
-    ]
-  }
+            props: true,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({
-  routes
+  routes,
 });
 
 export default router;

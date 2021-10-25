@@ -1,5 +1,5 @@
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 module.exports = {
   publicPath: "/static/",
@@ -9,11 +9,11 @@ module.exports = {
       splitChunks: {
         minSize: 10000,
         maxSize: 250000,
-        chunks: "all"
-      }
-    }
+        chunks: "all",
+      },
+    },
   },
-  chainWebpack: config => {
+  chainWebpack: (config) => {
     config.plugins.delete("prefetch");
-  }
+  },
 };

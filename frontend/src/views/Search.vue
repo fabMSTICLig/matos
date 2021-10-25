@@ -31,8 +31,9 @@
               <div class="form-group">
                 <label>Entités</label>
                 <TagsInput
-                  fieldName="entities_filter"
-                  :object="this"
+                  :list="entities_filter"
+                  v-on:add="entities_filter.push($event)"
+                  v-on:remove="$removeFromArray(entities_filter, $event)"
                   ressource="entities"
                   forbidAdd
                 />
@@ -41,8 +42,9 @@
               <div class="form-group">
                 <label>Tags</label>
                 <TagsInput
-                  fieldName="tags_filter"
-                  :object="this"
+                  :list="tags_filter"
+                  v-on:add="tags_filter.push($event)"
+                  v-on:remove="$removeFromArray(tags_filter, $event)"
                   ressource="tags"
                   forbidAdd
                 />
@@ -81,7 +83,11 @@
               <li
                 v-for="item in objects_list"
                 :key="item.name + item.id"
-                class="list-group-item list-group-item-action flex-column align-items-start"
+                class="
+                  list-group-item list-group-item-action
+                  flex-column
+                  align-items-start
+                "
               >
                 <div class="d-flex w-100 justify-content-between">
                   <a href="#" @click.prevent="goToMaterial(item)"
@@ -91,7 +97,7 @@
                     ><router-link
                       :to="{
                         name: 'entityinfos',
-                        params: { entityid: item.entity }
+                        params: { entityid: item.entity },
                       }"
                       >{{ getEntityName(item.entity) }}</router-link
                     ></strong
@@ -117,7 +123,7 @@
                   @click="addItem(item)"
                   :class="{
                     disabled:
-                      pending_loan.entity && pending_loan.entity != item.entity
+                      pending_loan.entity && pending_loan.entity != item.entity,
                   }"
                   title="Les matériels d'un prêt doivent tous appartenir à la même entité"
                 >
@@ -148,7 +154,7 @@ export default {
     TagsInput,
     Pagination,
     DisplayIdList,
-    Markdown
+    Markdown,
   },
   data() {
     return {
@@ -162,7 +168,7 @@ export default {
       entities_filter: [],
       genericmaterials: [],
       specificmaterials: [],
-      displayed: true
+      displayed: true,
     };
   },
   computed: {
@@ -171,7 +177,7 @@ export default {
       entityById: "entities/byId",
       authUser: "authUser",
       isAdmin: "isAdmin",
-      pending_loan: "loans/pending_loan"
+      pending_loan: "loans/pending_loan",
     }),
 
     objects_list() {
@@ -194,31 +200,31 @@ export default {
           search: this.search_input,
           entities: this.entities_filter.join(),
           tags: this.tags_filter.join(),
-          hidden: this.hidden
-        }
+          hidden: this.hidden,
+        },
       };
-    }
+    },
   },
   watch: {
     search_change() {
       this.current_page = 1;
       this.refreshSearch();
-    }
+    },
   },
   methods: {
     ...mapMutations({
-      addMaterial: "loans/addMaterial"
+      addMaterial: "loans/addMaterial",
     }),
     goToMaterial(item) {
       if (item.instances) {
         this.$router.push({
           name: "specificmaterialitem",
-          params: { matid: item.id }
+          params: { matid: item.id },
         });
       } else {
         this.$router.push({
           name: "genericmaterialitem",
-          params: { matid: item.id }
+          params: { matid: item.id },
         });
       }
     },
@@ -240,12 +246,12 @@ export default {
     refreshSearch() {
       this.$store
         .dispatch("materials/searchMaterials", this.query_params)
-        .then(data => {
+        .then((data) => {
           this.count = data.count;
           this.genericmaterials = data.results.generic_materials;
           this.specificmaterials = data.results.specific_materials;
         });
-    }
+    },
   },
   beforeMount() {
     this.$store.dispatch("entities/fetchList");
@@ -265,6 +271,6 @@ export default {
       }
     }
     this.refreshSearch();
-  }
+  },
 };
 </script>

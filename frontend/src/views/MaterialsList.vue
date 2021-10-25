@@ -44,7 +44,7 @@
                       selected_object &&
                       item.id + item.name ==
                         selected_object.id + selected_object.name,
-                    'table-danger': !item.active
+                    'table-danger': !item.active,
                   }"
                 >
                   <td v-text="item.name"></td>
@@ -137,7 +137,7 @@ export default {
   components: {
     DisplayIdList,
     Dropdown,
-    Markdown
+    Markdown,
   },
   data() {
     return {
@@ -148,18 +148,18 @@ export default {
       newmaterialroutes: [
         {
           to: { name: "genericmaterial", params: { matid: "new" } },
-          label: "Générique"
+          label: "Générique",
         },
         {
           to: { name: "specificmaterial", params: { matid: "new" } },
-          label: "Spécifique"
+          label: "Spécifique",
         },
         {
           to: { name: "genericmaterialbulk" },
-          label: "Générique massif"
-        }
+          label: "Générique massif",
+        },
       ],
-      displayed: true
+      displayed: true,
     };
   },
   computed: {
@@ -205,30 +205,33 @@ export default {
         name: name,
         params: {
           matid: this.selected_object.id,
-          entityid: this.$route.params.entityid
-        }
+          entityid: this.$route.params.entityid,
+        },
       };
-    }
+    },
   },
   methods: {
     initList() {
       this.$store
         .dispatch("genericmaterials/fetchList", {
-          prefix: this.prefix
+          prefix: this.prefix,
         })
         .then(() => {
           this.$store
             .dispatch("specificmaterials/fetchList", {
-              prefix: this.prefix
+              prefix: this.prefix,
             })
             .then(() => {
               if (this.objects_list.length > 0) {
-                this.selected_object = this.objects_list[0];
+                this.selected_object =
+                  this.objects_list[
+                    (this.current_page - 1) * process.env.VUE_APP_MAXLIST
+                  ];
               }
               this.loaded = true;
             });
         });
-    }
-  }
+    },
+  },
 };
 </script>

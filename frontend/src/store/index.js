@@ -15,7 +15,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
-    auth
+    auth,
     /*
     affiliations,
     tags,
@@ -25,5 +25,5 @@ export default new Vuex.Store({
     genericmaterials,
     specificmaterials
 */
-  }
+  },
 });

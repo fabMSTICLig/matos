@@ -6,21 +6,21 @@ import { showMsgOk } from "@/components/Modal";
 */
 export const ListMixin = {
   components: {
-    Pagination
+    Pagination,
   },
 
-  data: function() {
+  data: function () {
     return {
       ressource: "",
       search_input: "",
       current_page: 1,
-      selected_object: null
+      selected_object: null,
     };
   },
   watch: {
     search_change() {
       this.current_page = 1;
-    }
+    },
   },
   computed: {
     prefix() {
@@ -36,8 +36,8 @@ export const ListMixin = {
       if (typeof this.search_fields === "function") {
         return this.search_fields(this.objects_list, this.search_input);
       } else {
-        return this.objects_list.filter(item => {
-          return this.search_fields.some(field => {
+        return this.objects_list.filter((item) => {
+          return this.search_fields.some((field) => {
             return (
               item[field]
                 .toLowerCase()
@@ -60,18 +60,22 @@ export const ListMixin = {
     },
     per_page() {
       return parseInt(process.env.VUE_APP_MAXLIST);
-    }
+    },
   },
   methods: {
     onPageChange(page) {
       this.current_page = page;
+      localStorage.setItem(this.$options.name + "_page", page);
     },
     initList() {
       return this.$store
         .dispatch(this.ressource + "/fetchList", { prefix: this.prefix })
         .then(() => {
           if (this.objects_filtered.length > 0) {
-            this.selected_object = this.objects_filtered[0];
+            this.selected_object =
+              this.objects_filtered[
+                (this.current_page - 1) * process.env.VUE_APP_MAXLIST
+              ];
           }
           return Promise.resolve();
         });
@@ -79,14 +83,21 @@ export const ListMixin = {
     initComponent() {
       return Promise.resolve();
     },
-    listInitiated() {}
+    listInitiated() {},
   },
   beforeMount() {
     this.initComponent().then(() => {
       let retinit = this.initList();
       if (retinit) retinit.then(() => this.listInitiated());
     });
-  }
+  },
+  mounted() {
+    if (localStorage.getItem(this.$options.name + "_page")) {
+      this.onPageChange(
+        parseInt(localStorage.getItem(this.$options.name + "_page"))
+      );
+    }
+  },
 };
 
 export const EditMixin = {
@@ -95,7 +106,7 @@ export const EditMixin = {
       ressource: "",
       object: null,
       new_label: "",
-      object_name: ""
+      object_name: "",
     };
   },
   computed: {
@@ -107,7 +118,7 @@ export const EditMixin = {
     },
     cardName() {
       return this.is_new ? this.new_label : this.make_label();
-    }
+    },
   },
   methods: {
     get_empty() {
@@ -126,9 +137,9 @@ export const EditMixin = {
         this.$store
           .dispatch(this.ressource + "/fetchSingle", {
             id: route.params[route.meta.routeparam],
-            prefix: this.prefix
+            prefix: this.prefix,
           })
-          .then(data => {
+          .then((data) => {
             this.object = Object.assign({}, data);
           });
       }
@@ -139,9 +150,9 @@ export const EditMixin = {
           .dispatch(this.ressource + "/update", {
             id: this.object.id,
             data: this.object,
-            prefix: this.prefix
+            prefix: this.prefix,
           })
-          .then(data => {
+          .then((data) => {
             this.object = Object.assign({}, data);
             // eslint-disable-next-line
             console.log(this.object_name + " updated");
@@ -156,9 +167,9 @@ export const EditMixin = {
         this.$store
           .dispatch(this.ressource + "/create", {
             data: this.object,
-            prefix: this.prefix
+            prefix: this.prefix,
           })
-          .then(data => {
+          .then((data) => {
             // eslint-disable-next-line
             console.log(this.object_name + " created");
             showMsgOk(this.object_name + " created");
@@ -166,10 +177,10 @@ export const EditMixin = {
             params[this.$route.meta.routeparam] = data.id;
             this.$router.push({
               name: this.$route.name,
-              params: params
+              params: params,
             });
           })
-          .catch(error => {
+          .catch((error) => {
             // eslint-disable-next-line
             console.log(JSON.stringify(error));
           });
@@ -181,14 +192,14 @@ export const EditMixin = {
       this.$store
         .dispatch(this.ressource + "/destroy", {
           id: this.object.id,
-          prefix: this.prefix
+          prefix: this.prefix,
         })
         .then(() => {
           this.$router.push({
-            name: this.$route.meta.routedelete
+            name: this.$route.meta.routedelete,
           });
         });
-    }
+    },
   },
   beforeMount() {
     this.initComponent().then(() => {
@@ -200,5 +211,5 @@ export const EditMixin = {
       this.initObject(to);
       next();
     });
-  }
+  },
 };

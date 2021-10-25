@@ -24,8 +24,9 @@
                   v-for="item in sort_choices"
                   :value="item.value"
                   :key="item.value"
-                  >{{ item.label }}</option
                 >
+                  {{ item.label }}
+                </option>
               </select>
             </div>
             <div class="form-group ml-2">
@@ -56,7 +57,7 @@
                     v-on:click="selected_object = item"
                     :class="{
                       'table-active':
-                        selected_object && item.id == selected_object.id
+                        selected_object && item.id == selected_object.id,
                     }"
                   >
                     <td>
@@ -197,7 +198,7 @@ export default {
   name: "EntityLoansList",
   components: {
     DisplayIdList,
-    Modal
+    Modal,
   },
   mixins: [ListMixin],
   data() {
@@ -208,7 +209,7 @@ export default {
       sort_choices: {
         due_date: { value: 1, label: "Date retour prévue" },
         checkout_date: { value: 2, label: "Date sortie" },
-        return_date: { value: 3, label: "Date de retour" }
+        return_date: { value: 3, label: "Date de retour" },
       },
       inprogress: true,
       current_user: {
@@ -216,9 +217,9 @@ export default {
         first_name: "",
         last_name: "",
         email: "",
-        affiliations: []
+        affiliations: [],
       },
-      showUser: false
+      showUser: false,
     };
   },
   props: ["entityid", "matid"],
@@ -230,7 +231,7 @@ export default {
       smById: "materials/smById",
       userById: "users/byId",
       entityById: "entities/byId",
-      users: "users/list"
+      users: "users/list",
     }),
     search_change() {
       return this.search_input, this.inprogress, this.sort_input;
@@ -241,7 +242,7 @@ export default {
         filtrés par entité courante
         et filtrés par date de sortie, date de retour prévue et date de retour par sélection
       */
-      var filtered = this.objects_list.filter(item => {
+      var filtered = this.objects_list.filter((item) => {
         if (this.inprogress && item.return_date != null) return false;
         var user = this.userById(item.user);
         if (user)
@@ -277,12 +278,15 @@ export default {
     },
     editRoute() {
       return { name: "loan", params: { loanid: this.selected_object.id } };
-    }
+    },
   },
   watch: {
-    entityid: function() {
-      this.selected_object = this.objects_filtered[0];
-    }
+    entityid: function () {
+      this.selected_object =
+        this.objects_filtered[
+          (this.current_page - 1) * process.env.VUE_APP_MAXLIST
+        ];
+    },
   },
   methods: {
     initComponent() {
@@ -297,16 +301,19 @@ export default {
       return this.$store
         .dispatch("loans/fetchList", {
           prefix: this.prefix,
-          params: { params: params }
+          params: { params: params },
         })
         .then(() => {
           this.$store
             .dispatch("materials/fetchMaterialsByLoans", {
-              loanids: this.objects_list.map(o => o.id)
+              loanids: this.objects_list.map((o) => o.id),
             })
             .then(() => {
               if (this.objects_filtered.length > 0) {
-                this.selected_object = this.objects_filtered[0];
+                this.selected_object =
+                  this.objects_filtered[
+                    (this.current_page - 1) * process.env.VUE_APP_MAXLIST
+                  ];
               }
             });
         });
@@ -319,18 +326,23 @@ export default {
       this.$router.push({ name: "loan", params: { loanid: loan.id } });
     },
     destroyLoan(item) {
-      showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?").then(value => {
-        if (value)
-          this.$store.dispatch("loans/destroy", { id: item.id }).then(() => {
-            if (this.objects_filtered.length > 0) {
-              this.selected_object = this.objects_filtered[0];
-            }
-          });
-      });
+      showMsgConfirm("Voulez vous vraiment supprimer ce prêt ?").then(
+        (value) => {
+          if (value)
+            this.$store.dispatch("loans/destroy", { id: item.id }).then(() => {
+              if (this.objects_filtered.length > 0) {
+                this.selected_object =
+                  this.objects_filtered[
+                    (this.current_page - 1) * process.env.VUE_APP_MAXLIST
+                  ];
+              }
+            });
+        }
+      );
     },
     makeUserLabel(item) {
       return item.username;
-    }
+    },
   },
 
   beforeMount() {
@@ -342,6 +354,6 @@ export default {
     Promise.all(pall).then(() => {
       this.loaded = true;
     });
-  }
+  },
 };
 </script>

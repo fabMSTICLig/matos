@@ -13,12 +13,12 @@ import Breadcumb from "@/components/Breadcumb";
 export default {
   name: "Entities",
   components: {
-    Breadcumb
+    Breadcumb,
   },
   data() {
     return {};
   },
   computed: {},
-  methods: {}
+  methods: {},
 };
 </script>

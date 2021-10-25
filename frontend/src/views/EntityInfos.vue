@@ -16,7 +16,7 @@
               role="button"
               :to="{
                 name: 'entityedit',
-                params: { entityid: object.id }
+                params: { entityid: object.id },
               }"
               v-show="isManager"
               >Modifier</router-link
@@ -25,7 +25,7 @@
               class="btn btn-primary float-right"
               role="button"
               :to="{
-                name: 'entitieslist'
+                name: 'entitieslist',
               }"
               v-if="isManager"
               >Retour</router-link
@@ -71,12 +71,12 @@ export default {
     return {
       object: null,
       ressource: "entities",
-      displayed: true
+      displayed: true,
     };
   },
   components: {
     DisplayIdList,
-    Markdown
+    Markdown,
   },
   computed: {
     ...mapGetters(["authUser"]),
@@ -85,7 +85,7 @@ export default {
         (this.object && this.authUser.entities.indexOf(this.object.id) > -1) ||
         this.authUser.is_staff
       );
-    }
+    },
   },
   beforeMount() {
     if (
@@ -94,12 +94,12 @@ export default {
     ) {
       this.$store
         .dispatch(this.ressource + "/fetchSingle", {
-          id: this.$route.params[this.$route.meta.routeparam]
+          id: this.$route.params[this.$route.meta.routeparam],
         })
-        .then(data => {
+        .then((data) => {
           this.object = Object.assign({}, data);
         });
     }
-  }
+  },
 };
 </script>
