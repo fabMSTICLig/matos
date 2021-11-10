@@ -181,6 +181,7 @@ class Loan(models.Model):
     checkout_date =  models.DateField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="loans")
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="loans")
+    affiliation = models.ForeignKey(Affiliation, null=True, blank=True, on_delete=models.SET_NULL, related_name="loans")
     due_date =  models.DateField()
     return_date =  models.DateField(null=True, blank=True)
     comments = models.TextField(null=True, blank=True)
@@ -198,7 +199,6 @@ class Loan(models.Model):
             if specmat.model not in dictmat:
                 dictmat[specmat.model]=[]
             dictmat[specmat.model].append(specmat)
-        print(dictmat)
         return dictmat
 
 

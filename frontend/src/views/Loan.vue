@@ -80,6 +80,28 @@
                     />
                   </div>
                   <div class="form-group">
+                    <label>Affiliation :</label>
+                    <multiselect
+                      v-model="loanAffiliation"
+                      placeholder="Selectionner une affiliation"
+                      :options="affiliations"
+                      track-by="id"
+                      label="name"
+                      :searchable="false"
+                      :allow-empty="true"
+                      :show-labels="false"
+                    >
+                      <span slot="noResult"
+                        >Pas de résultat. Modifier la recherche (3 lettres
+                        min)</span
+                      >
+                      <span slot="noOptions"
+                        >Veuillez taper au moins 3 lettres</span
+                      >
+                    </multiselect>
+                  </div>
+
+                  <div class="form-group">
                     <label>Status :</label>
                     <select
                       class="form-control"
@@ -341,6 +363,8 @@ export default {
   computed: {
     ...mapGetters({
       users: "users/list",
+      affiliations: "affiliations/list",
+      affiliationById: "affiliations/byId",
       userById: "users/byId",
       gmById: "materials/gmById",
       smById: "materials/smById",
@@ -378,6 +402,18 @@ export default {
         else this.pending_loan.user = null;
       },
     },
+    loanAffiliation: {
+      get() {
+        if (this.pending_loan.affiliation) {
+          return this.affiliationById(this.pending_loan.affiliation);
+        } else return null;
+      },
+      set(val) {
+        if (val) this.pending_loan.affiliation = val.id;
+        else this.pending_loan.affiliation = null;
+      },
+    },
+
     emptyLoan() {
       return (
         this.pending_loan.generic_materials.length == 0 &&
@@ -613,6 +649,7 @@ export default {
     var pall = [];
     if (this.isAdmin) pall.push(this.$store.dispatch("users/fetchList"));
     pall.push(this.$store.dispatch("entities/fetchList"));
+    pall.push(this.$store.dispatch("affiliations/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
     let id = null;
     if (this.loanid) {

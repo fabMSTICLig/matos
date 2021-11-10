@@ -151,7 +151,7 @@ class LoanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Loan
-        fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
+        fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'affiliation', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
         read_only_fields=('child', 'models')
         extra_kwargs={'status':{'error_messages':{'invalid_choice':'Veuillez séléctionner un status pour le prêt'}}}
 
@@ -317,15 +317,30 @@ class LoanSerializer(serializers.ModelSerializer):
 
         return data
 
+class LoanGenericItemStringSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Loan generic items related
+    """
+    quantity = serializers.IntegerField(min_value=1, max_value=10000)
+    material = serializers.StringRelatedField()
+    class Meta:
+        model = LoanGenericItem
+        fields = ('material','quantity')
+
+
 class LoanNestedSerializer(serializers.ModelSerializer):
     """
     Serializer to get Loan nested User
     """
-    specific_materials = SpecificMaterialUserSerializer(many=True, read_only=True)
-    generic_materials = GenericMaterialSerializer(many=True, read_only=True)
+    user = serializers.StringRelatedField()
+    entity = serializers.StringRelatedField()
+    affiliation = serializers.StringRelatedField()
+    specific_materials = serializers.StringRelatedField(many=True)
+    generic_materials = LoanGenericItemStringSerializer(source="loangenericitem_set",many=True)
+    status = serializers.CharField(source='get_status_display')
     class Meta:
         model = Loan
-        fields = ('id','status', 'checkout_date', 'user', 'entity', 'due_date', 'return_date', 'comments','specific_materials', 'generic_materials', 'parent', 'child')
+        fields = ('id','status', 'checkout_date', 'user', 'entity', 'affiliation', 'due_date', 'return_date', 'comments','specific_materials', 'generic_materials', 'parent', 'child')
 
 
 class EntityNestedSerializer(serializers.ModelSerializer):

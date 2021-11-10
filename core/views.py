@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import datetime
+from datetime import datetime
 import json
 import csv
 
@@ -18,7 +18,7 @@ from django.dispatch import receiver
 
 import rest_framework
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAdminUser
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, generics
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, ParseError, NotFound
@@ -602,14 +602,22 @@ class MaterialsSearchView(APIView):
                 tagsid=tagst
             except:
                 pass
-        
+
         genmats = GenericMaterial.objects.all()
         spemats = SpecificMaterial.objects.all()
+
+        if mattype:
+            if mattype == 'g':
+                spemats = spemats.none()
+            elif mattype == 's':
+                genmats = genmats.none()
+
 
         if not hidden:
             genmats = genmats.filter(active=True)
             spemats = spemats.filter(active=True)
-        elif (not request.user.is_staff):
+
+        if (not request.user.is_staff):
             genmats = genmats.filter(entity__in=request.user.entities.all())
             spemats = spemats.filter(entity__in=request.user.entities.all())
 
@@ -617,12 +625,6 @@ class MaterialsSearchView(APIView):
             searchQ = Q(name__icontains=search) | Q(ref_int__icontains=search) | Q(ref_man__icontains=search)
             genmats = genmats.filter(searchQ).distinct()
             spemats = spemats.filter(searchQ).distinct()
-
-        if mattype:
-            if mattype == 'g':
-                spemats = spemats.none()
-            elif mattype == 's':
-                genmats = genmats.none()
 
         if entitiesid:
             genmats = genmats.filter(entity__in=entitiesid).distinct()
@@ -673,6 +675,99 @@ class MaterialFilterBackend(filters.BaseFilterBackend):
                 pass
         return queryset
 
+class DateFilterBackend(filters.BaseFilterBackend):
+    """
+    Filter against date
+    """
+    def filter_queryset(self, request, queryset, view):
+        print(request.query_params)
+        params = {}
+        dd = request.query_params.get('dd', None)
+        dds = request.query_params.get('dds', 'l')
+        if dds=='l':
+            dds='__lte'
+        elif dds=='g':
+            dds='__gte'
+        else:
+            dds=''
+        if dd is not None:
+            params['due_date'+dds]=dd
+
+        cd = request.query_params.get('cd', None)
+        cds = request.query_params.get('cds', 'g')
+        if cds=='l':
+            cds='__lte'
+        elif cds=='g':
+            cds='__gte'
+        else:
+            cds=''
+        if cd is not None:
+            params['checkout_date'+cds]=cd
+
+        rd = request.query_params.get('rd', None)
+        rds = request.query_params.get('rds', 'l')
+        if rds=='l':
+            rds='__lte'
+        elif rds=='g':
+            rds='__gte'
+        else:
+            rds=''
+        if rd is not None:
+            params['return_date'+rds]=rd
+        if params:
+            queryset = queryset.filter(**params).distinct()
+
+        return queryset
+
+class StatusFilterBackend(filters.BaseFilterBackend):
+    """
+    Filter against status
+    """
+    def filter_queryset(self, request, queryset, view):
+        status = request.query_params.get('status', None)
+        if status is not None:
+            try:
+                status = int(status)
+                return queryset.filter(status=status).distinct()
+            except ValueError:
+                pass
+        return queryset
+
+class UserFilterBackend(filters.BaseFilterBackend):
+    """
+    Filter against user
+    """
+    def filter_queryset(self, request, queryset, view):
+        userid = request.query_params.get('userid', None)
+        if userid is not None:
+            try:
+                userid = int(userid)
+                return queryset.filter(user=userid).distinct()
+            except ValueError:
+                pass
+        return queryset
+
+class TagFilterBackend(filters.BaseFilterBackend):
+    """
+    Filter against material tag
+    """
+    def filter_queryset(self, request, queryset, view):
+        tags = request.query_params.get('tags', None)
+        tagsid = []
+        if(tags is not None):
+            tagst = tags.split(',')
+            try:
+                for i, v in enumerate(tagst):
+                    tagst[i]=int(v)
+                tagsid=tagst
+                searchQ = Q(specific_materials__tags__in=tagsid) | Q(generic_materials__tags__in=tagsid)
+                return queryset.filter(searchQ).distinct()
+            except:
+                pass
+        return queryset
+
+
+
 
 class LoanViewSet(viewsets.ModelViewSet):
     """
@@ -681,7 +776,7 @@ class LoanViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all()
     permission_classes = (RGPDAccept, LoanPermission,)
     serializer_class = LoanSerializer
-    filter_backends = (MaterialFilterBackend,EntityFilterBackend)
+    filter_backends = (MaterialFilterBackend,EntityFilterBackend,DateFilterBackend, UserFilterBackend, StatusFilterBackend, TagFilterBackend)
 
     def get_queryset(self):
         """
@@ -813,3 +908,17 @@ class LoanViewSet(viewsets.ModelViewSet):
         schild=self.get_serializer(child)
 
         return Response({"parent":sloan.data, "child":schild.data})
+
+class LoanStatsView(generics.ListAPIView):
+    queryset = Loan.objects.all()
+    permission_classes = (RGPDAccept, LoanPermission,)
+    serializer_class = LoanNestedSerializer
+    filter_backends = (MaterialFilterBackend,EntityFilterBackend,DateFilterBackend)
+
+    def get_queryset(self):
+        """
+        Specific query to filter loans by admin or managers or by current user
+        """
+        if(self.request.user.is_staff):
+            return self.queryset.all()
+        return self.queryset.filter(Q(user=self.request.user) | Q(entity__managers__in = [self.request.user])).distinct()

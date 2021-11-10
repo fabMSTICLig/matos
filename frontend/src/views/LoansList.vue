@@ -76,6 +76,14 @@
               <th scope="row">Entité</th>
               <td>{{ entityById(selected_object.entity) | field("name") }}</td>
             </tr>
+            <tr>
+              <th scope="row">Affiliation</th>
+              <td>
+                {{
+                  affiliationById(selected_object.affiliation) | field("name")
+                }}
+              </td>
+            </tr>
 
             <tr>
               <th scope="row">Status</th>
@@ -147,6 +155,7 @@ export default {
       gmById: "materials/gmById",
       smById: "materials/smById",
       entityById: "entities/byId",
+      affiliationById: "affiliations/byId",
     }),
     search_change() {
       return this.search_input, this.inprogress;
@@ -193,6 +202,7 @@ export default {
   beforeMount() {
     var pall = [];
     pall.push(this.$store.dispatch("entities/fetchList"));
+    pall.push(this.$store.dispatch("affiliations/fetchList"));
     pall.push(this.$store.dispatch("loans/fetchStatus"));
     Promise.all(pall).then(() => {
       this.loaded = true;

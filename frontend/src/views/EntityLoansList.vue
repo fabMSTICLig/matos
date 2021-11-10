@@ -118,6 +118,15 @@
                 </td>
               </tr>
               <tr>
+                <th scope="row">Affiliation</th>
+                <td>
+                  {{
+                    affiliationById(selected_object.affiliation) | field("name")
+                  }}
+                </td>
+              </tr>
+
+              <tr>
                 <th scope="row">Status</th>
                 <td>{{ loan_status[selected_object.status] }}</td>
               </tr>
@@ -225,11 +234,12 @@ export default {
   props: ["entityid", "matid"],
   computed: {
     ...mapGetters("loans", { loan_status: "status" }),
-    ...mapGetters(["authUser"]),
+    ...mapGetters(["authUser", "affiliations"]),
     ...mapGetters({
       gmById: "materials/gmById",
       smById: "materials/smById",
       userById: "users/byId",
+      affiliationById: "affiliations/byId",
       entityById: "entities/byId",
       users: "users/list",
     }),
