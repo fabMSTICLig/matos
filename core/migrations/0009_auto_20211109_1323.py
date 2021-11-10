@@ -3,6 +3,15 @@
 from django.db import migrations, models
 import django.db.models.deletion
 
+def setAffDefault(apps, schema_editor):
+    Loan = apps.get_model("core", "Loan")
+    db_alias = schema_editor.connection.alias
+    for loan in Loan.objects.using(db_alias).all():
+        if (loan.user.affiliations.first()):
+            loan.affiliation=loan.user.affiliations.first()
+            loan.save()
+def empty(apps, schema_editor):
+    pass
 
 class Migration(migrations.Migration):
 
@@ -16,6 +25,7 @@ class Migration(migrations.Migration):
             name='affiliation',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='loans', to='core.affiliation'),
         ),
+        migrations.RunPython(setAffDefault, empty),
         migrations.AlterField(
             model_name='user',
             name='first_name',
