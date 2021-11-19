@@ -474,7 +474,6 @@ class LimitOffsetPaginationMulti(LimitOffsetPagination):
         self.request = request
         if self.count > self.limit and self.template is not None:
             self.display_page_controls = True
-
         if self.count == 0 or self.offset > self.count:
             ret = []
             for queryset in querysets:
@@ -575,7 +574,7 @@ class MaterialsSearchView(APIView):
 
         hidden = request.query_params.get('hidden', False)
 
-        if hidden and hidden != "true" or not (request.user.is_staff or len(resquest.user.entities)):
+        if hidden and hidden != "true" or not (request.user.is_staff or request.user.entities.count()):
             hidden = False
 
         mattype = request.query_params.get('type', None)
@@ -616,10 +615,6 @@ class MaterialsSearchView(APIView):
         if not hidden:
             genmats = genmats.filter(active=True)
             spemats = spemats.filter(active=True)
-
-        if (not request.user.is_staff):
-            genmats = genmats.filter(entity__in=request.user.entities.all())
-            spemats = spemats.filter(entity__in=request.user.entities.all())
 
         if search:
             searchQ = Q(name__icontains=search) | Q(ref_int__icontains=search) | Q(ref_man__icontains=search)
