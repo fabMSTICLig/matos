@@ -41,8 +41,6 @@
               <Dropdown
                 :items="newMaterialRoutes"
                 label="Ajouter"
-                classtoogle="btn-primary"
-                :button="true"
               />
             </div>
           </div>

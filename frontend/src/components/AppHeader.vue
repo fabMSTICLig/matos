@@ -18,71 +18,54 @@
         :class="collapsed"
       >
         <ul class="nav navbar-nav me-auto">
-          <router-link
-            v-slot="{ href, navigate }"
-            active-class="active"
-            exact
-            :to="{ name: 'home' }"
-          >
-            <li
-              class="nav-item"
-              role="presentation"
-            >
-              <a
-                class="nav-link"
-                :href="href"
-                @click="navigate"
-              >Home</a>
-            </li>
-          </router-link>
-          <router-link
-            v-if="isAuthenticated"
-            v-slot="{ href, navigate }"
-            active-class="active"
-            exact
-            :to="{ name: 'search' }"
-          >
-            <li
-              class="nav-item"
-              role="presentation"
-            >
-              <a
-                class="nav-link"
-                :href="href"
-                @click="navigate"
-              >Matériels</a>
-            </li>
-          </router-link>
-
-          <router-link
-            v-if="isAuthenticated"
-            v-slot="{ href, navigate }"
-            active-class="active"
-            exact
-            :to="{ name: 'entitieslist' }"
-          >
-            <li
-              class="nav-item"
-              role="presentation"
-            >
-              <a
-                class="nav-link"
-                :href="href"
-                @click="navigate"
-              >Entités</a>
-            </li>
-          </router-link>
           <li
-            v-if="isAdmin"
             class="nav-item"
             role="presentation"
           >
-            <Dropdown
-              :items="adminroutes"
-              label="Admin"
-              classtoogle="nav-link"
-            />
+            <router-link
+              active-class="active"
+              class="nav-link"
+              exact
+              :to="{ name: 'home' }"
+            >
+              Home
+            </router-link>
           </li>
+          <li
+            v-if="isAuthenticated"
+            class="nav-item"
+            role="presentation"
+          >
+            <router-link
+              active-class="active"
+              class="nav-link"
+              exact
+              :to="{ name: 'search' }"
+            >
+              Matériels
+            </router-link>
+          </li>
+
+          <li
+            v-if="isAuthenticated"
+            class="nav-item"
+            role="presentation"
+          >
+            <router-link
+              active-class="active"
+              class="nav-link"
+              exact
+              :to="{ name: 'entitieslist' }"
+            >
+              Entités
+            </router-link>
+          </li>
+          <Dropdown
+            v-if="isAdmin"
+            :items="adminroutes"
+            label="Admin"
+            is-nav
+          />
         </ul>
         <ul
           v-if="isAuthenticated"
@@ -115,16 +98,11 @@
             </router-link>
           </li>
 
-          <li
-            class="nav-item"
-            role="presentation"
-          >
-            <Dropdown
-              :items="userroutes"
-              :label="authUser.username"
-              classtoogle="nav-link"
-            />
-          </li>
+          <Dropdown
+            :items="userroutes"
+            :label="authUser.username"
+            is-nav
+          />
 
           <li
             class="nav-item"
@@ -227,11 +205,12 @@ function logout() {
 }
 
 const loanQuantity = computed(() => {
-    return (
-      store.getters["loans/pendingLoan"].generic_materials.reduce(
-        (a, v) => a + parseInt(v.quantity),
-        0
-      ) + Object.keys(store.getters["loans/pendingLoan"].specific_materials).length
-    );
+  return (
+    store.getters["loans/pendingLoan"].generic_materials.reduce(
+      (a, v) => a + parseInt(v.quantity),
+      0
+    ) +
+    Object.keys(store.getters["loans/pendingLoan"].specific_materials).length
+  );
 });
 </script>

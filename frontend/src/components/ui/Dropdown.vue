@@ -1,43 +1,39 @@
 <template>
   <div
     ref="root"
-    :class="show ? 'dropdown show' : 'dropdown'"
+    class="dropdown"
+    :class="{ 'nav-item':isNav }"
     @focusout="hide"
   >
     <a
-      v-if="!button"
       :id="'button' + uid"
       href=""
-      :class="classtoogle + ' dropdown-toggle'"
+      class="dropdown-toggle"
+      :class="[isNav ? 'nav-link' : 'btn btn-primary', { 'show': show }]"
       @click.prevent="toogle"
     >{{ label }}</a>
-    <button
-      v-if="button"
-      :id="'button' + uid"
-      :class="classtoogle + ' btn dropdown-toggle'"
-      @click.prevent="toogle"
-    >
-      {{ label }}
-    </button>
-    <div
+    <ul
       :id="'tooltip' + uid"
-      :class="show ? 'dropdown-menu show' : 'dropdown-menu'"
+      class="dropdown-menu"
+      :class="{ 'show': show }"
     >
-      <router-link
+      <li
         v-for="item in items"
         :key="item.label"
-        v-slot="{ href, navigate }"
-        :to="item.to"
       >
-        <a
-          :href="href"
-          class="dropdown-item"
-          @click="goto($event, navigate)"
-        >{{
-          item.label
-        }}</a>
-      </router-link>
-    </div>
+        <router-link
+          v-slot="{ href, navigate }"
+          :to="item.to"
+          custom
+        >
+          <a
+            :href="href"
+            class="dropdown-item"
+            @click="goto($event, navigate)"
+          >{{ item.label }}</a>
+        </router-link>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -54,15 +50,10 @@ defineProps({
     type: String,
     required: true,
   },
-  button: {
+  isNav: {
     type: Boolean,
     required: false,
     default: false,
-  },
-  classtoogle: {
-    type: String,
-    required: false,
-    default: "",
   },
 });
 const uid = uuidv4();

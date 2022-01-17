@@ -49,7 +49,8 @@
                   Copier
                 </button>
                 <ul
-                  :class="showDropdown ? 'dropdown-menu show' : 'dropdown-menu'"
+                  :class="{'show': showDropdown}"
+                  class="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                   :style="dropdownStyle"
                 >
