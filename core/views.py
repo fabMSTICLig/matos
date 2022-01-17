@@ -26,6 +26,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser, FileUploadParser, MultiPartParser, FormParser
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.exceptions import ParseError
 
 from .models import Entity, Affiliation,Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 from .serializers import *
@@ -52,6 +53,8 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+    search_fields = ['username', 'first_name', 'last_name', 'email']
+    ordering_fields = ['username', 'first_name', 'last_name', 'email']
 
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
@@ -187,6 +190,8 @@ class EntityViewSet(viewsets.ModelViewSet):
     queryset = Entity.objects.all()
     serializer_class = EntitySerializer
     permission_classes = (RGPDAccept, EntityPermission,)
+    search_fields = ['name']
+    ordering_fields = ['name']
 
 class AffiliationViewSet(viewsets.ModelViewSet):
     """
@@ -195,6 +200,8 @@ class AffiliationViewSet(viewsets.ModelViewSet):
     queryset = Affiliation.objects.all()
     serializer_class = AffiliationSerializer
     permission_classes = (RGPDAccept, IsAdminOrReadOnly,)
+    search_fields = ['name']
+    ordering_fields = ['name', 'type']
 
     @action(methods=['get'], detail=False)
     def types(self, request):
@@ -210,6 +217,8 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     permission_classes = (RGPDAccept, IsManagerCreateOrReadOnly,)
     serializer_class = TagSerializer
+    search_fields = ['name']
+    ordering_fields = ['name']
 
     @action(methods=['delete'], detail=False)
     def delete_unused(self, request):
@@ -279,6 +288,8 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     queryset = GenericMaterial.objects.all()
     permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = GenericMaterialSerializer
+    search_fields = ['name', 'ref_man', 'ref_int']
+    ordering_fields = ['name']
 
     @action(methods=['post'], detail=False, parser_classes=[ MultiPartParser, FormParser, FileUploadParser])
     def bulk_add(self, request, *arg, **kwargs):
@@ -338,7 +349,6 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
                         mats_tags.append([])
             except:
                 raise ParseError("Une erreur c'est produite lors de l'ajout massif (ex nom déjà existant)")
-            print(mats) 
             names_conflict = GenericMaterial.objects.filter(entity=entity, name__in=matnames).values_list('name', flat=True).all()
             if(names_conflict):
                 raise ParseError("Ajout impossible: l'entité contient déjà les matériels "+str(list(names_conflict)))
@@ -365,14 +375,6 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
         else:
             raise ParseError("Aucune donnée reçue")
 
-class GenericMaterialViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Public endpoints for generic material
-    """
-    queryset = GenericMaterial.objects.filter(active=True)
-    permission_classes = (RGPDAccept, IsAuthenticated,)
-    serializer_class = GenericMaterialPublicSerializer
-
 class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     """
     Endpoints for specific material
@@ -381,15 +383,8 @@ class EntitySpecificMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
     queryset = SpecificMaterial.objects.all()
     permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = SpecificMaterialSerializer
-
-class SpecificMaterialViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Public endpoints for specific material
-    """
-    queryset = SpecificMaterial.objects.filter(active=True)
-    permission_classes = (RGPDAccept, IsAuthenticated,)
-    serializer_class = SpecificMaterialPublicSerializer
-
+    search_fields = ['name', 'ref_int', 'ref_man']
+    ordering_fields = ['name']
 
 class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     """
@@ -399,6 +394,9 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
     queryset = SpecificMaterialInstance.objects.all()
     permission_classes = (RGPDAccept, IsManagerOf,)
     serializer_class = SpecificMaterialInstanceSerializer
+    search_fields = ['name', 'serial_num']
+    ordering_fields = ['name']
+
     def get_queryset(self):
         """
         Filter the queryset using entity_pk and specificmaterial_pk of the nested router
@@ -447,16 +445,6 @@ class EntitySpecificMaterialInstanceViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-class SpecificMaterialInstanceViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Public endpoints for specific material instance
-    """
-    queryset = SpecificMaterialInstance.objects.filter(active=True)
-    permission_classes = (IsAuthenticated,)
-    serializer_class = SpecificMaterialInstanceSerializer
-    def get_queryset(self):
-        return self.queryset.filter(model=self.kwargs['specificmaterial_pk'])
-
 class LimitOffsetPaginationMulti(LimitOffsetPagination):
 
     def paginate_queryset(self, querysets, request, view=None):
@@ -499,21 +487,50 @@ class LimitOffsetPaginationMulti(LimitOffsetPagination):
 
         return tuple(ret)
 
-class MaterialsByLoansView(APIView):
-    permission_classes = [IsAuthenticated]
+
+class RetrieveGenericMaterialsView(generics.RetrieveAPIView):
+    queryset = GenericMaterial.objects.filter(active=True)
+    permission_classes = (RGPDAccept, IsAuthenticated,)
+    serializer_class = GenericMaterialPublicSerializer
+
+class RetrieveSpecificMaterialsView(generics.RetrieveAPIView):
+    queryset = SpecificMaterial.objects.filter(active=True)
+    permission_classes = (RGPDAccept, IsAuthenticated,)
+    serializer_class = SpecificMaterialPublicSerializer
+
+
+class MaterialsView(APIView):
+    permission_classes = (RGPDAccept, IsAuthenticated,)
     
-    def get(self, request, format=None):
-       
-        loans = request.query_params.get('loans', None)
-        loansid = []
-        if(loans is not None):
-            loanst = loans.split(',')
+    def get(self, request, format=None, entity_pk=None):
+        
+
+        entitiesid = []
+        if(entity_pk is not None):
+            entitiesid = [entity_pk]
+            entity = get_object_or_404(Entity,pk=entity_pk)
+            if not request.user.is_staff and request.user not in entity.managers.all():
+                raise PermissionDenied()
+        else:
+            entities = request.query_params.get('entities', None)
+            if(entities is not None):
+                ents = entities.split(',')
+                try:
+                    for i, v in enumerate(ents):
+                        ents[i]=int(v)
+                    entitiesid=ents
+                except:
+                    pass
+
+        loanid = request.query_params.get('loan', None)
+        loan = None
+        if(loanid is not None):
             try:
-                for i, v in enumerate(loanst):
-                    loanst[i]=int(v)
-                loansid=loanst
+                loanid = int(loanid)
+                loan=get_object_or_404(Loan,pk=loanid)
             except:
-                pass
+                raise ParseError(loanid+' not a number')
+        
         gms = request.query_params.get('gmids', None)
         gmids = []
         if(gms is not None):
@@ -534,42 +551,8 @@ class MaterialsByLoansView(APIView):
                 smids=smst
             except:
                 pass
-
-        loans = []
-        for lid in loansid:
-            loan = get_object_or_404(Loan.objects, pk=lid)
-            if (request.user.is_staff or request.user in loan.entity.managers.all() or request.user == loan.user):
-                loans.append(loan)
-        if loansid and not loans:
-            raise NotFound()
-        genmats = []
-        spemats = []
-        spematinsts = []
-        if loans:
-            genmats = set([ mat for loan in loans for mat in loan.generic_materials.all() ])
-            spemats = SpecificMaterial.objects.filter(instances__loans__in=loans).distinct()
-            spematinsts = SpecificMaterialInstance.objects.filter(model__in=spemats)
-        elif gmids or smids:
-            genmats = GenericMaterial.objects.filter(pk__in=gmids)
-            spemats = SpecificMaterial.objects.filter(pk__in=smids)
-            spematinsts = SpecificMaterialInstance.objects.filter(model__in=spemats)
-        genmatsser= GenericMaterialPublicSerializer(genmats, many=True)
-        spematsser= SpecificMaterialPublicSerializer(spemats, many=True)
-        spematinstsser= SpecificMaterialInstanceSerializer(spematinsts, many=True)
-        
-        return Response({"generic_materials": genmatsser.data,"specific_materials": spematsser.data, "specific_material_instances": spematinstsser.data})
-
-
-
-class MaterialsSearchView(APIView):
-    """
-    Endpoint to see materials
-    """
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
    
-       #Filter search
+        #Filter search
         search = request.query_params.get('search', None)
 
         hidden = request.query_params.get('hidden', False)
@@ -580,17 +563,7 @@ class MaterialsSearchView(APIView):
         mattype = request.query_params.get('type', None)
         if(mattype is not None and mattype!= 's' and mattype!= 'g'):
             mattype=None
-        entities = request.query_params.get('entities', None)
-        entitiesid = []
-        if(entities is not None):
-            ents = entities.split(',')
-            try:
-                for i, v in enumerate(ents):
-                    ents[i]=int(v)
-                entitiesid=ents
-            except:
-                pass
-
+        
         tags = request.query_params.get('tags', None)
         tagsid = []
         if(tags is not None):
@@ -601,6 +574,7 @@ class MaterialsSearchView(APIView):
                 tagsid=tagst
             except:
                 pass
+
 
         genmats = GenericMaterial.objects.all()
         spemats = SpecificMaterial.objects.all()
@@ -629,15 +603,26 @@ class MaterialsSearchView(APIView):
             genmats = genmats.filter(tags__in=tagsid).distinct()
             spemats = spemats.filter(tags__in=tagsid).distinct()
         
+
+        spematinsts = []
+        if loan:
+            genmats = genmats.filter(pk__in=loan.generic_materials.all())
+            spemats = spemats.filter(instances__loans__in=[loan]).distinct()
+        elif gmids or smids:
+            genmats = genmats.filter(pk__in=gmids)
+            spemats = spemats.filter(pk__in=smids)
+
         paginator = LimitOffsetPaginationMulti()
         genmats,spemats = paginator.paginate_queryset([genmats,spemats], request)
         
-        genmatsser= GenericMaterialPublicSerializer(genmats, many=True)
-        spematsser= SpecificMaterialPublicSerializer(spemats, many=True)
+        if(entity_pk is not None):
+            genmatsser= GenericMaterialSerializer(genmats, many=True)
+            spematsser= SpecificMaterialSerializer(spemats, many=True)
+        else:
+            genmatsser= GenericMaterialPublicSerializer(genmats, many=True)
+            spematsser= SpecificMaterialPublicSerializer(spemats, many=True)
 
         return paginator.get_paginated_response({"generic_materials": genmatsser.data,"specific_materials": spematsser.data})
-
-
 
 class MaterialFilterBackend(filters.BaseFilterBackend):
     """
@@ -705,6 +690,9 @@ class DateFilterBackend(filters.BaseFilterBackend):
             rds='__lte'
         elif rds=='g':
             rds='__gte'
+        elif rds=='null':
+            rds='__isnull'
+            rd=True
         else:
             rds=''
         if rd is not None:
@@ -733,7 +721,7 @@ class UserFilterBackend(filters.BaseFilterBackend):
     Filter against user
     """
     def filter_queryset(self, request, queryset, view):
-        userid = request.query_params.get('userid', None)
+        userid = request.query_params.get('user', None)
         if userid is not None:
             try:
                 userid = int(userid)
@@ -771,7 +759,9 @@ class LoanViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all()
     permission_classes = (RGPDAccept, LoanPermission,)
     serializer_class = LoanSerializer
-    filter_backends = (MaterialFilterBackend,EntityFilterBackend,DateFilterBackend, UserFilterBackend, StatusFilterBackend, TagFilterBackend)
+    filter_backends = (filters.SearchFilter,filters.OrderingFilter,MaterialFilterBackend,EntityFilterBackend,DateFilterBackend, UserFilterBackend, StatusFilterBackend, TagFilterBackend)
+    search_fields = ['user__username','affiliation__name']
+    ordering_fields = ['due_date', 'return_date', 'checkout_date']
 
     def get_queryset(self):
         """
@@ -891,7 +881,7 @@ class LoanViewSet(viewsets.ModelViewSet):
             loan.return_date = timezone.now().date()
         loan.save()
 
-        child = Loan.objects.create(user=loan.user, entity=loan.entity, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=loan, due_date=loan.due_date, checkout_date=loan.return_date)
+        child = Loan.objects.create(user=loan.user, entity=loan.entity, affiliation=loan.affiliation, comments = loan.comments, status=Loan.Status.ACCEPTED, parent=loan, due_date=loan.due_date, checkout_date=loan.return_date)
         child.specific_materials.set(loan.specific_materials.all())
 
         mats = []
@@ -908,7 +898,9 @@ class LoanStatsView(generics.ListAPIView):
     queryset = Loan.objects.all()
     permission_classes = (RGPDAccept, LoanPermission,)
     serializer_class = LoanNestedSerializer
-    filter_backends = (MaterialFilterBackend,EntityFilterBackend,DateFilterBackend)
+    filter_backends = (filters.SearchFilter,filters.OrderingFilter,MaterialFilterBackend,EntityFilterBackend,DateFilterBackend, UserFilterBackend, StatusFilterBackend, TagFilterBackend)
+    search_fields = ['user__username','affiliation__name']
+    ordering_fields = ['due_date', 'return_date', 'checkout_date']
 
     def get_queryset(self):
         """

@@ -1,103 +1,54 @@
-import createCrud from "@/common/storeCrudHelper";
-import ApiService from "@/common/api.service";
+import createCrud from "./crud.factory";
+import ApiService from "../common/api.service";
 
 const loans_extra = {
   state: {
-    pending_loan: null,
+    pendingLoan: null,
     status: {},
   },
   getters: {
-    pending_loan(state) {
-      return state.pending_loan;
+    pendingLoan(state) {
+      return state.pendingLoan;
     },
     status(state) {
       return state.status;
     },
   },
   actions: {
-    fetchStatus({ commit }) {
-      return ApiService.query("loans/status", {}).then(({ data }) => {
-        commit("setStatus", data);
-        return data;
-      });
+    async fetchStatus({ commit }) {
+      const { data } = await ApiService.query("loans/status");
+      commit("setStatus", data);
+      return data;
     },
-    makeChild({ commit }, { id }) {
-      return ApiService.post("loans/" + id + "/make_child").then(({ data }) => {
-        console.log(data);
-        commit("updateSuccess", data.parent);
-        commit("createSuccess", data.child);
-        return data.child;
-      });
+    async makeChild({ commit }, { id }) {
+      const { data } = await ApiService.post("loans/" + id + "/make_child");
+      commit("updateSuccess", data.parent);
+      commit("createSuccess", data.child);
+      return data.child;
     },
-  },
-  mutations: {
-    setStatus(state, status) {
-      state.status = status;
-    },
-
-    onLoad(state) {
-      if (localStorage.getItem("pending_loan") != null) {
-        var loan = JSON.parse(localStorage.getItem("pending_loan"));
-        state.pending_loan = loan;
+    async onLoad({ commit, state, dispatch }, id) {
+      if (id) commit("setPending", await dispatch("fetchSingle", { id: id }));
+      else if (localStorage.getItem("pendingLoan") != null) {
+        let loan = JSON.parse(localStorage.getItem("pendingLoan"));
+        if (loan.id)
+          commit("setPending", await dispatch("fetchSingle", { id: loan.id }));
+        else
+          commit("setPending", loan);
       } else {
-        state.pending_loan = {
-          entity: null,
-          status: 2,
-          user: null,
-          due_date: null,
-          return_date: null,
-          checkout_date: null,
-          comments: null,
-          specific_materials: [],
-          models: [],
-          generic_materials: [],
-        };
-        localStorage.setItem(
-          "pending_loan",
-          JSON.stringify(state.pending_loan)
-        );
+        commit("resetPending");
       }
     },
-    setPending(state, data) {
-      if (data) {
-        state.pending_loan = data;
-        localStorage.setItem(
-          "pending_loan",
-          JSON.stringify(state.pending_loan)
-        );
+    copyPending({ commit, state }, data) {
+      commit("setPending", Object.assign({}, data, { id: null, status: 3 }));
+    },
+    addMaterial({ commit, state }, mat) {
+      let loan = Object.assign({}, state.pendingLoan);
+      if (loan.entity == null) {
+        loan.entity = mat.entity;
       }
-    },
-    resetPending(state) {
-      state.pending_loan = {
-        entity: null,
-        status: 2,
-        user: null,
-        due_date: null,
-        return_date: null,
-        checkout_date: null,
-        comments: null,
-        specific_materials: [],
-        models: [],
-        generic_materials: [],
-      };
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
-    },
-    copyPending(state, data) {
-      state.pending_loan = data;
-      state.pending_loan.status = 3;
-      delete state.pending_loan.id;
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
-    },
-    addMaterial(state, mat) {
-      if (state.pending_loan.entity == null) {
-        state.pending_loan.entity = mat.entity;
-      }
-      if (
-        state.pending_loan.entity &&
-        state.pending_loan.entity == mat.entity
-      ) {
+      if (loan.entity && loan.entity == mat.entity) {
         if ("quantity" in mat) {
-          let gen_mat_items = state.pending_loan.generic_materials;
+          let gen_mat_items = loan.generic_materials;
           let gen_mat_included = gen_mat_items.find((item) => {
             return item.material == mat.id;
           });
@@ -105,53 +56,72 @@ const loans_extra = {
           if (gen_mat_included) {
             gen_mat_included.quantity = gen_mat_included.quantity + 1;
           } else {
-            state.pending_loan.generic_materials.push({
+            loan.generic_materials.push({
               material: mat.id,
               quantity: 1,
             });
           }
-        } else if (state.pending_loan.models.indexOf(mat.id) == -1) {
-          state.pending_loan.models.push(mat.id);
+        } else if (!(mat.id in loan.specific_materials)) {
+          loan.specific_materials[mat.id] = [];
         }
       }
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+      commit("setPending", loan);
     },
-    removeMaterial(state, mat) {
+    removeMaterial({ commit, state }, mat) {
+      let loan = Object.assign({}, state.pendingLoan);
       if ("quantity" in mat) {
-        state.pending_loan.generic_materials =
-          state.pending_loan.generic_materials.filter(
-            (item) => item.material != mat.id
-          );
-      } else if (state.pending_loan.models.indexOf(mat.id) > -1) {
-        state.pending_loan.models.splice(
-          state.pending_loan.models.indexOf(mat.id),
-          1
+        loan.generic_materials = loan.generic_materials.filter(
+          (item) => item.material != mat.id
         );
-        state.pending_loan.specific_materials =
-          state.pending_loan.specific_materials.filter(
-            (instance) => !mat.instances.includes(instance)
-          );
+      } else if (mat.id in loan.specific_materials) {
+        delete loan.specific_materials[mat.id];
       }
       if (
-        state.pending_loan.status == null &&
-        state.pending_loan.specific_materials.length == 0 &&
-        state.pending_loan.generic_materials.length == 0
+        loan.status == null &&
+        Object.keys(loan.specific_materials).length == 0 &&
+        loan.generic_materials.length == 0
       ) {
-        state.pending_loan.entity = null;
+        loan.entity = null;
       }
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+      commit("setPending", loan);
     },
-    cleanMaterials(state) {
-      state.pending_loan.generic_materials = [];
-      state.pending_loan.specific_materials = [];
-      state.pending_loan.models = [];
-      if (state.pending_loan.status == null) {
-        state.pending_loan.entity = null;
+    cleanMaterials({ commit, state }) {
+      let loan = Object.assign({}, state.pendingLoan);
+      loan.generic_materials = [];
+      loan.specific_materials = {};
+      if (loan.status == null) {
+        loan.entity = null;
       }
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+      commit("setPending", loan);
+    },
+  },
+  mutations: {
+    setStatus(state, status) {
+      state.status = status;
     },
     savePending(state) {
-      localStorage.setItem("pending_loan", JSON.stringify(state.pending_loan));
+      localStorage.setItem("pendingLoan", JSON.stringify(state.pendingLoan));
+    },
+    setPending(state, data) {
+      if (data) {
+        state.pendingLoan = data;
+      }
+      localStorage.setItem("pendingLoan", JSON.stringify(state.pendingLoan));
+    },
+    resetPending(state) {
+      state.pendingLoan = {
+        entity: null,
+        affiliation: null,
+        status: 2,
+        user: null,
+        due_date: null,
+        return_date: null,
+        checkout_date: null,
+        comments: null,
+        specific_materials: {},
+        generic_materials: [],
+      };
+      localStorage.setItem("pendingLoan", JSON.stringify(state.pendingLoan));
     },
   },
 };

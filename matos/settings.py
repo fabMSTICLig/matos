@@ -91,7 +91,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
 
     ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.SearchFilter','rest_framework.filters.OrderingFilter', 'core.filters.IdsFilter'),
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 

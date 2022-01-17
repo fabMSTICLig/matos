@@ -1,40 +1,25 @@
-import Vue from "vue";
+import { createApp } from "vue";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import Modal from "./plugins/modal";
+
 import App from "./App.vue";
-import router from "./router";
+import router from "./route";
 import store from "./store";
-import { CHECK_AUTH } from "./store/actions.type";
 import ApiService from "./common/api.service";
-import vueDebounce from "vue-debounce";
-
-// Setting a different event to listen to
-Vue.use(vueDebounce, {
-  listenTo: "input",
-});
-
-Vue.config.productionTip = false;
-
-Vue.filter("field", function (value, field) {
-  if (!value || !(field in value)) return "";
-  return value[field];
-});
-
-Vue.prototype.$removeFromArray = (array, elem) => {
-  var index = array.indexOf(elem);
-  if (index > -1) {
-    array.splice(index, 1);
-  }
-};
 
 ApiService.init();
 
-router.beforeEach((to, from, next) => {
-  Promise.all([store.dispatch(CHECK_AUTH)])
-    .then(next)
-    .catch(next);
-});
+const app = createApp(App).use(store);
+app.use(Modal);
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount("#app");
+app.config.globalProperties.$filters = {
+  field(value, fieldname) {
+    if (value) return value[fieldname];
+    else return "";
+  },
+};
+
+store.dispatch("checkAuth").catch(()=>{}).finally(() => {
+  app.use(router).mount("#app");
+});

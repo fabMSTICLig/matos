@@ -1,6 +1,5 @@
 <template>
-  <div id="app" class="container-fluid">
-    <link rel="stylesheet" href="/static/bootstrap.min.css" />
+  <div class="container-fluid">
     <div v-if="loaded">
       <Header />
       <router-view class="mr-5 ml-5" />
@@ -9,8 +8,8 @@
     <modal
       id="modal-cookie"
       title="Utilisation de cookie"
-      v-model="showCookie"
-      hideFooter
+      :show="showCookie"
+      hide-footer
     >
       <p>
         Ce site utilise des cookies afin de fonctionner. Ils sont uniquement
@@ -29,113 +28,61 @@
   </div>
 </template>
 
-<script>
-import "./assets/style.css";
-import Modal from "@/components/Modal";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { mapGetters } from "vuex";
-import { CHECK_AUTH } from "./store/actions.type";
-/*
-  Initialisation de l'application
-  Cookie déposé à la première utilisation
-  Chargement des différents stores
-*/
-export default {
-  name: "App",
-  components: {
-    Header,
-    Footer,
-    Modal,
-  },
-  data() {
-    return {
-      loaded: false,
-      showCookie: false,
-    };
-  },
-  computed: {
-    ...mapGetters(["authUser"]),
-  },
-  methods: {
-    validCookie() {
-      localStorage.setItem("cookiepopup", "true");
-      this.showCookie = false;
-    },
-  },
-  mounted() {
-    document.title = process.env.VUE_APP_TITLE;
-    this.$store
-      .dispatch(CHECK_AUTH)
-      .then(() => {
-        /* eslint-disable-next-line no-console */
-        console.log("connected");
-        var pall = [];
-        pall.push(
-          import(
-            /* webpackChunkName: "store-affiliations" */ "@/store/affiliations.module"
-          ).then((module) => {
-            this.$store.registerModule("affiliations", module.default);
-          })
-        );
-        pall.push(
-          import(
-            /* webpackChunkName: "store-tags" */ "@/store/tags.module"
-          ).then((module) => {
-            this.$store.registerModule("tags", module.default);
-          })
-        );
-        pall.push(
-          import(
-            /* webpackChunkName: "store-users" */ "@/store/users.module"
-          ).then((module) => {
-            this.$store.registerModule("users", module.default);
-          })
-        );
-        pall.push(
-          import(
-            /* webpackChunkName: "store-entities" */ "@/store/entities.module"
-          ).then((module) => {
-            this.$store.registerModule("entities", module.default);
-          })
-        );
-        pall.push(
-          import(
-            /* webpackChunkName: "store-loans" */ "@/store/loans.module"
-          ).then((module) => {
-            this.$store.registerModule("loans", module.default);
-            this.$store.commit("loans/onLoad");
-          })
-        );
-        pall.push(
-          import(
-            /* webpackChunkName: "store-materials" */ "@/store/materials.module"
-          ).then((module) => {
-            this.$store.registerModule(
-              "genericmaterials",
-              module.genericmaterials
-            );
-            this.$store.registerModule(
-              "specificmaterials",
-              module.specificmaterials
-            );
-            this.$store.registerModule("materials", module.materials);
-          })
-        );
-        Promise.all(pall).then(() => {
-          /* eslint-disable-next-line no-console */
-          console.log("loaded");
-          this.loaded = true;
-          /* eslint-disable-next-line no-console */
-          console.log(this.loaded);
-        });
-      })
-      .catch(() => {
-        this.loaded = true;
-      });
-    if (localStorage.getItem("cookiepopup") == null) {
-      this.showCookie = true;
+<script setup>
+import { useStore } from "vuex";
+import Modal from "@/plugins/modal";
+import Header from "@/components/AppHeader.vue";
+import Footer from "@/components/AppFooter.vue";
+
+import { ref, onMounted } from "vue";
+
+const loaded = ref(false);
+const showCookie = ref(false);
+const store = useStore();
+onMounted(async () => {
+  document.title = import.meta.env.VITE_APP_TITLE;
+  try {
+    if (store.getters.isAuthenticated) {
+      await store.dispatch("checkAuth");
     }
-  },
-};
+    console.log("connected");
+    const affiliationsPromise = import("./store/affiliations.module");
+    const tagsPromise = import("./store/tags.module");
+    const usersPromise = import("./store/users.module");
+    const entitiesPromise = import("./store/entities.module");
+    const loansPromise = import("./store/loans.module");
+    const materialsPromise = import("./store/materials.module");
+
+    const affiliations = await affiliationsPromise;
+    const tags = await tagsPromise;
+    const users = await usersPromise;
+    const entities = await entitiesPromise;
+    const loans = await loansPromise;
+    const materials = await materialsPromise;
+
+    store.registerModule("affiliations", affiliations.default);
+    store.registerModule("tags", tags.default);
+    store.registerModule("users", users.default);
+    store.registerModule("entities", entities.default);
+    store.registerModule("loans", loans.default);
+
+    store.registerModule("genericmaterials", materials.genericmaterials);
+    store.registerModule("specificmaterials", materials.specificmaterials);
+    store.registerModule("materials", materials.materials);
+
+    await store.dispatch("loans/onLoad");
+  } catch (e) {
+    console.log(e);
+  } finally {
+    loaded.value = true;
+  }
+
+  if (localStorage.getItem("cookiepopup") == null) {
+    showCookie.value = true;
+  }
+});
+function validCookie() {
+  localStorage.setItem("cookiepopup", "true");
+  showCookie.value = false;
+}
 </script>

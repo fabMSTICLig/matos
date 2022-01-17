@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers, exceptions
 from rest_framework.utils import model_meta
+import json
+import itertools
 from .models import Entity, User, Affiliation, Tag, SpecificMaterial, SpecificMaterialInstance, GenericMaterial, Loan, LoanGenericItem
 
 from rest_framework.serializers import ModelSerializer, IntegerField, RelatedField
@@ -92,14 +94,6 @@ class GenericMaterialPublicSerializer(serializers.ModelSerializer):
         model = GenericMaterial
         exclude = ['localisation', 'active']
 
-class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Specific Material objects.
-    """
-    class Meta:
-        model = SpecificMaterial
-        fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances']
-
 class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
     """
     Serializer for Instance of Specific Material.
@@ -107,6 +101,16 @@ class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecificMaterialInstance
         fields = '__all__'
+
+
+class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Specific Material objects.
+    """
+    instances = SpecificMaterialInstanceSerializer(many=True, read_only=True)
+    class Meta:
+        model = SpecificMaterial
+        fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances']
 
 class SpecificMaterialSerializer(serializers.ModelSerializer):
     """
@@ -117,14 +121,6 @@ class SpecificMaterialSerializer(serializers.ModelSerializer):
         model = SpecificMaterial
         fields = ['id','name','ref_int', 'ref_man', 'description', 'tags', 'entity', 'instances', 'localisation', 'active']
 
-class SpecificMaterialUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for specific material objects.
-    """
-    class Meta:
-        model = SpecificMaterial
-        fields = ['id','name','description']
-
 class LoanGenericItemSerializer(serializers.ModelSerializer):
     """
     Serializer for Loan generic items related
@@ -134,24 +130,29 @@ class LoanGenericItemSerializer(serializers.ModelSerializer):
         model = LoanGenericItem
         fields = ('material','quantity')
 
+class SpecificMaterialField(serializers.Field):
+    def to_representation(self, value):
+        materials={}
+        for item in value.all():
+            if(item.model.id not in materials):
+                materials[item.model.id] = []
+            materials[item.model.id].append(item.id)
+        return materials
+
+    def to_internal_value(self, data):
+        ids = set(itertools.chain.from_iterable(data.values()))
+        return SpecificMaterialInstance.objects.filter(pk__in=ids)
+
 class LoanSerializer(serializers.ModelSerializer):
     """
     Serializer for Loan objects
     """
     generic_materials = LoanGenericItemSerializer(source="loangenericitem_set",many=True)
-    models = serializers.SerializerMethodField()
-
-    def get_models(self, obj):
-        models=set()
-        if hasattr(obj, 'specific_materials'):
-            for item in obj.specific_materials.all():
-                if(item.model.entity_id == obj.entity.id):
-                    models.add(item.model.id)
-        return list(models)
+    specific_materials = SpecificMaterialField()
 
     class Meta:
         model = Loan
-        fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'affiliation', 'due_date', 'return_date', 'comments', 'specific_materials', 'models', 'generic_materials', 'parent', 'child')
+        fields = ('id', 'status', 'checkout_date', 'user', 'entity', 'affiliation', 'due_date', 'return_date', 'comments', 'specific_materials', 'generic_materials', 'parent', 'child')
         read_only_fields=('child', 'models')
         extra_kwargs={'status':{'error_messages':{'invalid_choice':'Veuillez séléctionner un status pour le prêt'}}}
 

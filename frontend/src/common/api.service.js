@@ -1,41 +1,38 @@
-import Vue from "vue";
 import axios from "axios";
-import VueAxios from "vue-axios";
 
 /*
 Définition de l'ApiService
 */
 const ApiService = {
   init() {
-    Vue.use(VueAxios, axios);
-    Vue.axios.defaults.baseURL = process.env.VUE_APP_API_URL;
-    Vue.axios.defaults.withCredentials = true;
-    Vue.axios.defaults.xsrfHeaderName = "X-CSRFToken";
-    Vue.axios.defaults.xsrfCookieName = "csrftoken";
+    axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL;
+    axios.defaults.withCredentials = true;
+    axios.defaults.xsrfHeaderName = "X-CSRFToken";
+    axios.defaults.xsrfCookieName = "csrftoken";
   },
 
-  query(resource, params) {
-    return Vue.axios.get(resource + "/", params);
+  async query(resource, params) {
+    return axios.get(resource + "/", { params });
   },
 
-  get(resource, slug = "") {
-    return Vue.axios.get(`${resource}/${slug}`);
+  async get(resource, slug = "") {
+    return axios.get(`${resource}/${slug}`);
   },
 
-  post(resource, params) {
-    return Vue.axios.post(resource + "/", params);
+  async post(resource, params) {
+    return axios.post(resource + "/", params);
   },
 
-  update(resource, slug, params) {
-    return Vue.axios.patch(`${resource}/${slug}/`, params);
+  async update(resource, slug, params) {
+    return axios.patch(`${resource}/${slug}/`, params);
   },
 
-  put(resource, params) {
-    return Vue.axios.put(resource + "/", params);
+  async put(resource, params) {
+    return axios.put(resource + "/", params);
   },
 
-  delete(resource, slug = "") {
-    return Vue.axios.delete(resource + "/" + (slug == "" ? "" : slug + "/"));
+  async delete(resource, slug = "") {
+    return axios.delete(resource + "/" + (slug == "" ? "" : slug + "/"));
   },
 };
 

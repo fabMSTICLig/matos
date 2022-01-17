@@ -1,13 +1,4 @@
-import ApiService from "@/common/api.service";
-
-import {
-  CHECK_AUTH,
-  UPDATE_AUTHUSER,
-  UPDATE_PASSWORD,
-  UPDATE_RGPD,
-  USER_DATA,
-} from "./actions.type";
-import { SET_AUTHUSER, PURGE_AUTH, SET_USERDATA } from "./mutations.type";
+import ApiService from "../common/api.service";
 
 const state = {
   authUser: {},
@@ -30,62 +21,51 @@ const getters = {
 };
 
 const actions = {
-  [CHECK_AUTH](context) {
-    return new Promise((resolve, reject) => {
-      ApiService.query("self", {})
-        .then(({ data }) => {
-          context.commit(SET_AUTHUSER, data.user);
-          resolve();
-        })
-        .catch((e) => {
-          console.log(e);
-          context.commit(PURGE_AUTH);
-          reject();
-        });
-    });
+  async checkAuth(context) {
+    try {
+      const { data } = await ApiService.query("self", {});
+      context.commit("setAuthUser", data.user);
+      return data.user;
+    } catch (e) {
+      console.log(e);
+      context.commit("purgeAuth");
+      throw "Not connected";
+    }
   },
-  [UPDATE_AUTHUSER](context, user) {
-    return ApiService.update("users", user.id, user).then(({ data }) => {
-      context.commit(SET_AUTHUSER, data);
+  async updateAuthUser(context, user) {
+    const { data } = await ApiService.update("users", user.id, user);
+    context.commit("setAuthUser", data);
+    return data;
+  },
+  async updatePassword(context, passwords) {
+    await ApiService.put(`users/${state.authUser.id}/set_password`, passwords);
+    return "Password changed";
+  },
+  async updateRGPD(context) {
+    const { data } = await ApiService.post(`self/rgpd`, { accept: true });
+    context.state.authUser.rgpd_accept = data["rgpd_accept"];
+    context.commit("setAuthUser", context.state.authUser);
+  },
+  async getUserData(context) {
+    try {
+      const data = await ApiService.query("self/data", {});
+      context.commit("setUserData", data.user);
       return data;
-    });
-  },
-  [UPDATE_PASSWORD](context, passwords) {
-    return ApiService.put(
-      `users/${state.authUser.id}/set_password`,
-      passwords
-    ).then(() => {
-      return "Password changed";
-    });
-  },
-  [UPDATE_RGPD](context) {
-    return ApiService.post(`self/rgpd`, { accept: true }).then(({ data }) => {
-      context.state.authUser.rgpd_accept = data["rgpd_accept"];
-      context.commit(SET_AUTHUSER, context.state.authUser);
-    });
-  },
-  [USER_DATA](context) {
-    return new Promise((resolve) => {
-      ApiService.query("self/data", {})
-        .then(({ data }) => {
-          context.commit(SET_USERDATA, data.user);
-          resolve();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    });
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   },
 };
 
 const mutations = {
-  [SET_AUTHUSER](state, user) {
+  setAuthUser(state, user) {
     state.authUser = user;
   },
-  [PURGE_AUTH](state) {
+  purgeAuth(state) {
     state.authUser = {};
   },
-  [SET_USERDATA](state, userData) {
+  setUserData(state, userData) {
     state.userData = userData;
   },
 };

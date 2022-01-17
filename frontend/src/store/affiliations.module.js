@@ -1,6 +1,5 @@
-import createCrud from "@/common/storeCrudHelper";
-
-import ApiService from "@/common/api.service";
+import createCrud from "./crud.factory";
+import ApiService from "../common/api.service";
 
 const affiliations_extra = {
   state: {
@@ -12,11 +11,10 @@ const affiliations_extra = {
     },
   },
   actions: {
-    fetchTypes({ commit }) {
-      return ApiService.query("affiliations/types", {}).then(({ data }) => {
-        commit("setTypes", data);
-        return data;
-      });
+    async fetchTypes({ commit }) {
+      const { data } = await ApiService.query("affiliations/types", {});
+      commit("setTypes", data);
+      return data;
     },
   },
   mutations: {
