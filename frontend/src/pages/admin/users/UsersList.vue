@@ -5,14 +5,14 @@
         <div class="card-header">
           <div class="row justify-content-between">
             <div class="col-6">
-          <input
-            class="form-control"
-            v-model="searchInput"
-            type="search"
-            placeholder="Search"
-          >
-        </div>
-        </div>
+              <input
+                v-model="searchInput"
+                class="form-control"
+                type="search"
+                placeholder="Search"
+              >
+            </div>
+          </div>
         </div>
         <div class="card-body">
           <div class="table-responsive">

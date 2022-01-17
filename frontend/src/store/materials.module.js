@@ -1,9 +1,6 @@
 import createCrud from "./crud.factory";
 import ApiService from "../common/api.service";
 
-const instances_extra = {};
-const instances = createCrud("instances", instances_extra);
-
 const specific_extra = {
   actions: {
     async createInstance({ commit }, { data, prefix = "" }) {
@@ -113,11 +110,11 @@ export const materials = {
       commit("fetchMaterialsSuccess", data);
       return getters.list;
     },
-    async fetchSingleGenericMaterial({ commit }, { id }) {
+    async fetchSingleGenericMaterial(_, { id }) {
       const { data } = await ApiService.get("materials/g", id);
       return data;
     },
-    async fetchSingleSpecificMaterial({ commit }, { id }) {
+    async fetchSingleSpecificMaterial(_, { id }) {
       const { data } = await ApiService.get("materials/s", id);
       return data;
     },

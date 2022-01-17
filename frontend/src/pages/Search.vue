@@ -1,7 +1,10 @@
 <template>
   <div>
     <h1>Rechercher</h1>
-    <div class="row" v-if="loaded">
+    <div
+      v-if="loaded"
+      class="row"
+    >
       <div class="col-xl-3">
         <div class="card">
           <div class="card-header">
@@ -10,21 +13,36 @@
           <div class="card-body">
             <form class="form">
               <div class="mb-3">
-                <label class="form-label" for="searchInput">Chercher</label
-              ><input
+                <label
+                  class="form-label"
+                  for="searchInput"
+                >Chercher</label><input
                   id="searchInput"
                   v-model="searchInput"
                   type="search"
                   class="form-control"
                   placeholder="Arduino"
-                />
+                >
               </div>
               <div class="mb-3">
-                <label class="form-label" for="typeInput">Type</label>
-                <select id="typeInput" v-model="typeInput" class="form-control">
-                  <option value="">Les deux</option>
-                  <option value="g">Generique</option>
-                  <option value="s">Specifique</option>
+                <label
+                  class="form-label"
+                  for="typeInput"
+                >Type</label>
+                <select
+                  id="typeInput"
+                  v-model="typeInput"
+                  class="form-control"
+                >
+                  <option value="">
+                    Les deux
+                  </option>
+                  <option value="g">
+                    Generique
+                  </option>
+                  <option value="s">
+                    Specifique
+                  </option>
                 </select>
               </div>
 
@@ -56,10 +74,11 @@
                   v-model="hiddenInput"
                   type="checkbox"
                   class="form-check-input"
-                />
-                <label class="form-check-label" for="check-active"
-                  >Invisible</label
                 >
+                <label
+                  class="form-check-label"
+                  for="check-active"
+                >Invisible</label>
               </div>
             </form>
           </div>
@@ -84,18 +103,16 @@
                 class="list-group-item list-group-item-action flex-column align-items-start"
               >
                 <div class="d-flex w-100 justify-content-between">
-                  <a href="#" @click.prevent="goToMaterial(item)"
-                    ><h4>{{ item.name }}</h4></a
-                  >
-                  <strong
-                    ><router-link
-                      :to="{
-                        name: 'entityinfos',
-                        params: { entityid: item.entity },
-                      }"
-                      >{{ getEntityName(item.entity) }}</router-link
-                    ></strong
-                  >
+                  <a
+                    href="#"
+                    @click.prevent="goToMaterial(item)"
+                  ><h4>{{ item.name }}</h4></a>
+                  <strong><router-link
+                    :to="{
+                      name: 'entityinfos',
+                      params: { entityid: item.entity },
+                    }"
+                  >{{ getEntityName(item.entity) }}</router-link></strong>
                 </div>
                 <markdown :description="item.description" />
                 <p>
@@ -126,7 +143,7 @@
 <script setup>
 import { ref, computed, watch, onBeforeMount } from "vue";
 import { useStore } from "vuex";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import useDebouncedRef from "@/composables/useDebouncedRef";
 
 import DisplayIdList from "@/components/ui/DisplayIdList.vue";
@@ -135,7 +152,6 @@ import TagsInput from "@/components/ui/TagsInput.vue";
 import Pagination from "@/components/nav/ListPagination.vue";
 
 const store = useStore();
-const route = useRoute();
 const router = useRouter();
 
 const loaded = ref(false);

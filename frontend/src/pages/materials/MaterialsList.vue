@@ -1,5 +1,8 @@
 <template>
-  <div v-if="loaded" class="row">
+  <div
+    v-if="loaded"
+    class="row"
+  >
     <div class="col-12 col-md-12 col-lg-6">
       <div class="card">
         <div class="card-header">
@@ -10,17 +13,29 @@
                 class="form-control"
                 type="search"
                 placeholder="Search"
-              />
+              >
             </div>
             <div class="col-auto">
-                <div class="input-group">
-              <label class="input-group-text" for="typeselect">Type</label>
-              <select v-model="typeInput" class="form-control">
-                <option value="">Les deux</option>
-                <option value="g">Generique</option>
-                <option value="s">Specifique</option>
-              </select>
-            </div>
+              <div class="input-group">
+                <label
+                  class="input-group-text"
+                  for="typeselect"
+                >Type</label>
+                <select
+                  v-model="typeInput"
+                  class="form-control"
+                >
+                  <option value="">
+                    Les deux
+                  </option>
+                  <option value="g">
+                    Generique
+                  </option>
+                  <option value="s">
+                    Specifique
+                  </option>
+                </select>
+              </div>
             </div>
             <div class="col-auto">
               <Dropdown
@@ -48,7 +63,7 @@
                     'table-active':
                       selectedObject &&
                       item.id + item.name ==
-                        selectedObject.id + selectedObject.name,
+                      selectedObject.id + selectedObject.name,
                     'table-danger': !item.active,
                   }"
                   @click="selectedObject = item"
@@ -69,16 +84,30 @@
       </div>
     </div>
     <div class="col-12 col-md-6">
-      <div v-if="selectedObject" class="card">
+      <div
+        v-if="selectedObject"
+        class="card"
+      >
         <div class="card-header">
           <h3 class="float-start">
             Matériel {{ isGeneric ? "Générique" : "Spécifique" }}
           </h3>
-          <div class="btn-group float-end" role="group">
-            <router-link class="btn btn-primary" role="button" :to="loansRoute">
+          <div
+            class="btn-group float-end"
+            role="group"
+          >
+            <router-link
+              class="btn btn-primary"
+              role="button"
+              :to="loansRoute"
+            >
               Prêts
             </router-link>
-            <router-link class="btn btn-primary" role="button" :to="editRoute">
+            <router-link
+              class="btn btn-primary"
+              role="button"
+              :to="editRoute"
+            >
               Modifier
             </router-link>
           </div>
@@ -90,23 +119,36 @@
           <markdown :description="selectedObject.description" />
           <table class="table">
             <tr>
-              <th scope="row">Ref interne</th>
+              <th scope="row">
+                Ref interne
+              </th>
               <td>{{ selectedObject.ref_int }}</td>
             </tr>
             <tr>
-              <th scope="row">Ref fabricant</th>
+              <th scope="row">
+                Ref fabricant
+              </th>
               <td>{{ selectedObject.ref_man }}</td>
             </tr>
             <tr>
-              <th scope="row">Localisation</th>
+              <th scope="row">
+                Localisation
+              </th>
               <td>{{ selectedObject.localisation }}</td>
             </tr>
             <tr v-if="isGeneric">
-              <th scope="row">Quantité</th>
+              <th scope="row">
+                Quantité
+              </th>
               <td>{{ selectedObject.quantity }}</td>
             </tr>
-            <tr v-if="!selectedObject.active" class="text-danger">
-              <th scope="row">Visibilité</th>
+            <tr
+              v-if="!selectedObject.active"
+              class="text-danger"
+            >
+              <th scope="row">
+                Visibilité
+              </th>
               <td>Invisible</td>
             </tr>
           </table>

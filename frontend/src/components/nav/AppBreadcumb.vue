@@ -1,33 +1,33 @@
 <template>
   <nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <router-link
-      v-for="item in breaditems"
-      :key="item.name"
-      v-slot="{ href, navigate, isExactActive }"
-      :to="{ name: item.name, params: item.params }"
-      custom
-    >
-      <li
-        class="breadcrumb-item"
-        :class="[isExactActive && 'active']"
-        :aria-current="[isExactActive && 'page']"
+    <ol class="breadcrumb">
+      <router-link
+        v-for="item in breaditems"
+        :key="item.name"
+        v-slot="{ href, navigate, isExactActive }"
+        :to="{ name: item.name, params: item.params }"
+        custom
       >
-        <a
-          v-if="!isExactActive"
-          :href="href"
-          @click="navigate"
+        <li
+          class="breadcrumb-item"
+          :class="[isExactActive && 'active']"
+          :aria-current="[isExactActive && 'page']"
         >
-          <span v-text="item.label" />
-        </a>
-        <span
-          v-else
-          v-text="item.label"
-        />
-      </li>
-    </router-link>
-  </ol>
-</nav>
+          <a
+            v-if="!isExactActive"
+            :href="href"
+            @click="navigate"
+          >
+            <span v-text="item.label" />
+          </a>
+          <span
+            v-else
+            v-text="item.label"
+          />
+        </li>
+      </router-link>
+    </ol>
+  </nav>
 </template>
 
 <script setup>

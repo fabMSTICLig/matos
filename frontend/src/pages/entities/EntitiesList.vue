@@ -6,11 +6,11 @@
           <div class="row justify-content-between">
             <div class="col-6">
               <input
-                class="form-control"
                 v-model="searchInput"
+                class="form-control"
                 type="search"
                 placeholder="Search"
-              />
+              >
             </div>
             <div class="col-auto">
               <router-link
@@ -58,27 +58,36 @@
       </div>
     </div>
     <div class="col-12 col-md-6">
-      <div v-if="selectedObject" class="card">
+      <div
+        v-if="selectedObject"
+        class="card"
+      >
         <div class="card-header">
-          <h3 class="float-start" v-text="selectedObject.name" />
-          <div class="btn-group float-end" role="group">
+          <h3
+            class="float-start"
+            v-text="selectedObject.name"
+          />
+          <div
+            class="btn-group float-end"
+            role="group"
+          >
             <button
-              class="btn btn-primary"
               v-show="isManager"
+              class="btn btn-primary"
               @click="toRoute('entityedit')"
             >
               Modifier
             </button>
             <button
-              class="btn btn-primary"
               v-show="isManager"
+              class="btn btn-primary"
               @click="toRoute('materialslist')"
             >
               Matériels
             </button>
             <button
-              class="btn btn-primary"
               v-show="isManager"
+              class="btn btn-primary"
               @click="toRoute('entityloans')"
             >
               Prêts
@@ -88,8 +97,7 @@
         <div class="card-body">
           <markdown :description="selectedObject.description" />
           <p class="card-text">
-            <span><strong>Contact :&nbsp;</strong></span
-            ><a :href="'mailto:' + selectedObject.contact">{{
+            <span><strong>Contact :&nbsp;</strong></span><a :href="'mailto:' + selectedObject.contact">{{
               selectedObject.contact
             }}</a>
           </p>

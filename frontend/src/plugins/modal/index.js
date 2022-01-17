@@ -1,7 +1,7 @@
 import { createVNode, render } from "vue";
 import Modal from "./Modal.vue";
 
-Modal.install = function (app, options = {}) {
+Modal.install = function (app) {
   const confirmHandler = async (options) => {
     let node = null;
     const container = document.createElement("div");

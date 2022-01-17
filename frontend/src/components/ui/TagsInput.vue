@@ -37,7 +37,7 @@
   </ul>-->
   <Multiselect
     ref="input"
-    :modelValue="modelValue"
+    :model-value="modelValue"
     mode="tags"
     :close-on-select="false"
     :searchable="true"

@@ -1,19 +1,28 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div v-if="material" class="card">
+      <div
+        v-if="material"
+        class="card"
+      >
         <div class="card-header">
-          <h3 class="float-start" v-text="material.name" />
+          <h3
+            class="float-start"
+            v-text="material.name"
+          />
           <div class="float-end">
-            <div class="btn-group" role="group">
+            <div
+              class="btn-group"
+              role="group"
+            >
               <button
                 class="btn btn-primary"
                 type="button"
-                @click="addMaterial()"
                 :class="{
                   disabled:
                     pendingLoan.entity && pendingLoan.entity != material.entity,
                 }"
+                @click="addMaterial()"
               >
                 Ajouter
               </button>
@@ -44,7 +53,10 @@
                   aria-labelledby="dropdownMenuButton"
                   :style="dropdownStyle"
                 >
-                  <li v-for="item in managedEntities" :key="item.id">
+                  <li
+                    v-for="item in managedEntities"
+                    :key="item.id"
+                  >
                     <button
                       class="dropdown-item"
                       type="button"
@@ -65,35 +77,42 @@
                 :description="material.description"
               />
             </div>
-            <div  class="col-12 col-md-6">
-            <table class="table">
-              <tr>
-                <th scope="row">Appartient à</th>
-                <td>
-                  <router-link
-                    :to="{
-                      name: 'entityinfos',
-                      params: { entityid: material.entity },
-                    }"
-                    >{{ materialEntity.name }}</router-link
-                  >
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Ref interne</th>
-                <td>{{ material.ref_int }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Ref fabricant</th>
-                <td>{{ material.ref_man }}</td>
-              </tr>
-            </table>
+            <div class="col-12 col-md-6">
+              <table class="table">
+                <tr>
+                  <th scope="row">
+                    Appartient à
+                  </th>
+                  <td>
+                    <router-link
+                      :to="{
+                        name: 'entityinfos',
+                        params: { entityid: material.entity },
+                      }"
+                    >
+                      {{ materialEntity.name }}
+                    </router-link>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    Ref interne
+                  </th>
+                  <td>{{ material.ref_int }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    Ref fabricant
+                  </th>
+                  <td>{{ material.ref_man }}</td>
+                </tr>
+              </table>
             
-            <p class="col-12 col-md-6">
-              <span><strong>Tags :&nbsp;</strong></span>
-              <DisplayIdList :items="materialTags" />
-            </p>
-          </div>
+              <p class="col-12 col-md-6">
+                <span><strong>Tags :&nbsp;</strong></span>
+                <DisplayIdList :items="materialTags" />
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -101,7 +120,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, watch, onBeforeMount, inject } from "vue";
+import { ref, computed, onBeforeMount, inject } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 
@@ -116,13 +135,6 @@ const material = ref(null);
 
 const materialTags = ref([]);
 const materialEntity = ref([]);
-
-const entityName = computed(() => {
-  let entity = store.getters["entities/byId"](material.value.entity);
-  if (entity) {
-    return entity.name;
-  } else return "";
-});
 
 onBeforeMount(async () => {
   let typeMat = "";
@@ -151,7 +163,7 @@ onBeforeMount(async () => {
     id: material.value.entity,
   });
 
-  let ids = authUser.value.entities.filter((e) => e != material.entity);
+  let ids = authUser.value.entities.filter((e) => e != material.value.entity);
   if (ids)
     managedEntities.value = await store.dispatch("entities/fetchList", {
       params: { ids: ids.join(",") },

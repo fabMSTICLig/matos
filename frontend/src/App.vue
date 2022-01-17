@@ -18,8 +18,16 @@
       </p>
 
       <div>
-        <div class="btn-group" role="group" aria-label="Accepter">
-          <button type="button" class="btn btn-primary" @click="validCookie">
+        <div
+          class="btn-group"
+          role="group"
+          aria-label="Accepter"
+        >
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="validCookie"
+          >
             J'ai compris
           </button>
         </div>

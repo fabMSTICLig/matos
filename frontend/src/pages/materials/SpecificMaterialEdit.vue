@@ -1,66 +1,88 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div v-if="object" class="card">
+      <div
+        v-if="object"
+        class="card"
+      >
         <div class="card-header">
           <h3 v-text="cardName" />
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-12 col-md-4">
-              <form ref="editorForm" class="row g-3">
+              <form
+                ref="editorForm"
+                class="row g-3"
+              >
                 <fieldset>
                   <legend>Informations</legend>
                   <div class="mb-3">
-                    <label class="form-label" for="name">Nom</label
-                  ><input
+                    <label
+                      class="form-label"
+                      for="name"
+                    >Nom</label><input
                       id="name"
                       v-model="object.name"
                       class="form-control"
                       type="text"
                       required
-                    />
+                    >
                   </div>
                   <div class="mb-3">
-                    <label class="form-label" for="description">Description</label
-                  ><textarea
+                    <label
+                      class="form-label"
+                      for="description"
+                    >Description</label><textarea
                       id="description"
-                      rows="5"
                       v-model="object.description"
+                      rows="5"
                       class="form-control"
                     />
-                    <a href="#" @click.prevent="showHelp = true">Aide</a>
+                    <a
+                      href="#"
+                      @click.prevent="showHelp = true"
+                    >Aide</a>
                   </div>
                   <div class="mb-3">
-                    <label class="form-label" for="refInt">Référence interne</label
-                  ><input
+                    <label
+                      class="form-label"
+                      for="refInt"
+                    >Référence interne</label><input
                       id="refInt"
                       v-model="object.ref_int"
                       class="form-control"
                       type="text"
-                    />
+                    >
                   </div>
                   <div class="mb-3">
-                    <label class="form-label" for="refMan">Référence fabriquant</label
-                  ><input
+                    <label
+                      class="form-label"
+                      for="refMan"
+                    >Référence fabriquant</label><input
                       id="refMan"
                       v-model="object.ref_man"
                       class="form-control"
                       type="text"
-                    />
+                    >
                   </div>
                   <div class="mb-3">
-                    <label class="form-label" for="localisation">Localisation</label
-                  ><input
+                    <label
+                      class="form-label"
+                      for="localisation"
+                    >Localisation</label><input
                       id="localisation"
                       v-model="object.localisation"
                       class="form-control"
                       type="text"
-                    />
+                    >
                   </div>
                   <div class="mb-3">
                     <label class="form-label">Tags</label>
-                    <TagsInput v-model="object.tags" ressource="tags" />
+                    <TagsInput
+                      v-model="object.tags"
+                      ressource="tags"
+                    />
                   </div>
                   <div class="mb-3 form-check form-switch">
                     <input
@@ -68,14 +90,18 @@
                       v-model="object.active"
                       type="checkbox"
                       class="form-check-input"
-                    />
-                    <label class="form-check-label" for="check-active"
-                      >Visible</label
                     >
+                    <label
+                      class="form-check-label"
+                      for="check-active"
+                    >Visible</label>
                   </div>
                 </fieldset>
               </form>
-              <div class="btn-group" role="group">
+              <div
+                class="btn-group"
+                role="group"
+              >
                 <button
                   v-if="isNew"
                   class="btn btn-primary"
@@ -107,15 +133,21 @@
                 <div class="col-12 col-md-6">
                   <fieldset>
                     <legend>Instances</legend>
-                    <form ref="editorInstances" @submit.prevent="addInstance">
+                    <form
+                      ref="editorInstances"
+                      @submit.prevent="addInstance"
+                    >
                       <div class="input-group">
                         <span class="input-group-text">Ajouter</span>
                         <input
                           v-model="newInstanceName"
                           class="form-control"
                           required
-                        />
-                        <button class="btn btn-primary" type="submit">
+                        >
+                        <button
+                          class="btn btn-primary"
+                          type="submit"
+                        >
                           Valider
                         </button>
                       </div>
@@ -147,34 +179,44 @@
                 </div>
                 <div class="col-12 col-md-6">
                   <div v-if="!isNew && selectedInstance">
-                    <form @submit.prevent="updateInstance" class="row g-3">
+                    <form
+                      class="row g-3"
+                      @submit.prevent="updateInstance"
+                    >
                       <fieldset>
                         <legend>Instance</legend>
                         <div class="mb-3">
-                          <label class="form-label" for="nameI">Nom</label
-                        ><input
+                          <label
+                            class="form-label"
+                            for="nameI"
+                          >Nom</label><input
                             id="nameI"
                             v-model="selectedInstance.name"
                             class="form-control"
                             type="text"
                             required
-                          />
+                          >
                         </div>
                         <div class="mb-3">
-                          <label class="form-label" for="serialNumI">Numéro série</label
-                        ><input
+                          <label
+                            class="form-label"
+                            for="serialNumI"
+                          >Numéro série</label><input
                             id="serialNumI"
                             v-model="selectedInstance.serial_num"
                             class="form-control"
                             type="text"
-                          />
+                          >
                         </div>
                         <div class="mb-3">
-                          <label class="form-label" for="descriptionI">Description</label>
+                          <label
+                            class="form-label"
+                            for="descriptionI"
+                          >Description</label>
                           <textarea
                             id="descriptionI"
-                            rows="3"
                             v-model="selectedInstance.description"
+                            rows="3"
                             class="form-control"
                           />
                         </div>
@@ -184,17 +226,22 @@
                             v-model="selectedInstance.active"
                             type="checkbox"
                             class="form-check-input"
-                          />
+                          >
                           <label
                             class="form-check-label"
                             for="check-active-instance"
-                            >Visible</label
-                          >
+                          >Visible</label>
                         </div>
                       </fieldset>
                       <div class="row">
-                        <div class="btn-group col-auto" role="group">
-                          <button class="btn btn-primary" type="submit">
+                        <div
+                          class="btn-group col-auto"
+                          role="group"
+                        >
+                          <button
+                            class="btn btn-primary"
+                            type="submit"
+                          >
                             Modifier
                           </button>
                         </div>
@@ -209,8 +256,8 @@
                 <h4>Aperçu description</h4>
                 <markdown
                   v-if="object.description"
-                  :description="object.description"
                   v-model:showHelp="showHelp"
+                  :description="object.description"
                 />
               </div>
             </div>

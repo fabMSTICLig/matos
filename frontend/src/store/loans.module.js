@@ -26,7 +26,7 @@ const loans_extra = {
       commit("createSuccess", data.child);
       return data.child;
     },
-    async onLoad({ commit, state, dispatch }, id) {
+    async onLoad({ commit, dispatch }, id) {
       if (id) commit("setPending", await dispatch("fetchSingle", { id: id }));
       else if (localStorage.getItem("pendingLoan") != null) {
         let loan = JSON.parse(localStorage.getItem("pendingLoan"));
@@ -38,7 +38,7 @@ const loans_extra = {
         commit("resetPending");
       }
     },
-    copyPending({ commit, state }, data) {
+    copyPending({ commit}, data) {
       commit("setPending", Object.assign({}, data, { id: null, status: 3 }));
     },
     addMaterial({ commit, state }, mat) {

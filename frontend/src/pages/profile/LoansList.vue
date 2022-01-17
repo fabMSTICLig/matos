@@ -1,20 +1,28 @@
 <template>
   <div class="row">
-    <h1 class="col-12">Mes prêts</h1>
+    <h1 class="col-12">
+      Mes prêts
+    </h1>
     <div class="col-12 col-md-6">
-      <div class="card" v-if="loaded">
+      <div
+        v-if="loaded"
+        class="card"
+      >
         <div class="card-header">
           <div class="row gx-2">
             <div class="col-auto">
               <div class="form-check">
-                <label class="form-check-label" for="checkInProgress">En cours</label>
+                <label
+                  class="form-check-label"
+                  for="checkInProgress"
+                >En cours</label>
                 <input
                   id="checkInProgress"
                   v-model="inProgress"
                   type="checkbox"
                   class="form-check-input"
                   aria-label="Checkbox pour prêt en cours"
-                />
+                >
               </div>
             </div>
           </div>
@@ -61,10 +69,19 @@
       </div>
     </div>
     <div class="col-12 col-md-6">
-      <div v-if="selectedObject" class="card">
+      <div
+        v-if="selectedObject"
+        class="card"
+      >
         <div class="card-header">
-          <h3 class="float-start" v-text="selectedObject.name" />
-          <div class="btn-group float-end" role="group">
+          <h3
+            class="float-start"
+            v-text="selectedObject.name"
+          />
+          <div
+            class="btn-group float-end"
+            role="group"
+          >
             <button
               class="btn btn-primary"
               role="button"
@@ -77,13 +94,17 @@
         <div class="card-body">
           <table class="table">
             <tr>
-              <th scope="row">Entité</th>
+              <th scope="row">
+                Entité
+              </th>
               <td>
                 {{ $filters.field(entityById(selectedObject.entity), "name") }}
               </td>
             </tr>
             <tr>
-              <th scope="row">Affiliation</th>
+              <th scope="row">
+                Affiliation
+              </th>
               <td>
                 {{
                   $filters.field(
@@ -95,19 +116,27 @@
             </tr>
 
             <tr>
-              <th scope="row">Status</th>
+              <th scope="row">
+                Status
+              </th>
               <td>{{ loanStatus[selectedObject.status] }}</td>
             </tr>
             <tr>
-              <th scope="row">Date sortie</th>
+              <th scope="row">
+                Date sortie
+              </th>
               <td>{{ selectedObject.checkout_date }}</td>
             </tr>
             <tr>
-              <th scope="row">Date retour prévue</th>
+              <th scope="row">
+                Date retour prévue
+              </th>
               <td>{{ selectedObject.due_date }}</td>
             </tr>
             <tr>
-              <th scope="row">Date retour</th>
+              <th scope="row">
+                Date retour
+              </th>
               <td>{{ selectedObject.return_date }}</td>
             </tr>
           </table>
@@ -118,17 +147,23 @@
           </p>
 
           <h5>Matériels</h5>
-          <ul class="list-group" v-if="!materialsLoading">
+          <ul
+            v-if="!materialsLoading"
+            class="list-group"
+          >
             <li
               v-for="item in specificMaterials"
               :key="'s' + item.model.id"
               class="list-group-item d-flex justify-content-between align-items-start"
             >
               <div class="ms-2 me-auto">
-                <div class="">{{ item.model.name }}</div>
+                <div class="">
+                  {{ item.model.name }}
+                </div>
                 <ul class="list-group">
                   <li
                     v-for="instance in item.instances"
+                    :key="instance.id"
                     class="list-group-item"
                   >
                     {{ instance.name }}
@@ -153,7 +188,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, watch, onBeforeMount, reactive } from "vue";
+import { ref, computed, watch, onBeforeMount } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -186,7 +221,6 @@ function postFetch(loans) {
 
 const {
   selectedObject,
-  searchInput,
   currentPage,
   pagesCount,
   perPage,
@@ -205,8 +239,8 @@ watch(inProgress, () => {
 });
 
 const loanStatus = computed(() => store.state.loans.status);
-const entityById = computed((id) => store.getters["entities/byId"]);
-const affiliationById = computed((id) => store.getters["affiliations/byId"]);
+const entityById = computed(() => store.getters["entities/byId"]);
+const affiliationById = computed(() => store.getters["affiliations/byId"]);
 
 const materialsLoading = ref(true);
 const genericMaterials = ref([]);

@@ -9,15 +9,21 @@
           <h3 v-text="cardName" />
         </div>
         <div class="card-body">
-          <form ref="editorForm" class="row g-3">
-                <div class="col-12">
-                  <label class="form-label" for="name">Name</label><input
-                    id="name"
-                    v-model="object.name"
-                    class="form-control"
-                    type="text"
-                    required
-                  >
+          <form
+            ref="editorForm"
+            class="row g-3"
+          >
+            <div class="col-12">
+              <label
+                class="form-label"
+                for="name"
+              >Name</label><input
+                id="name"
+                v-model="object.name"
+                class="form-control"
+                type="text"
+                required
+              >
             </div>
             <div
               class="btn-group col-auto"
@@ -57,12 +63,9 @@
 
 <script setup>
 import { computed, onBeforeMount } from "vue";
-import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 
 import useEditor from "@/composables/useEditor";
-
-const store = useStore();
 
 const { editorForm, object, isNew, initObject, create, update, destroy } =
   useEditor("tags", { name: "" }, "Tag");

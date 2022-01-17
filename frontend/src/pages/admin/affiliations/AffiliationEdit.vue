@@ -1,26 +1,42 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div v-if="object" class="card">
+      <div
+        v-if="object"
+        class="card"
+      >
         <div class="card-header">
           <h3>{{ cardName }}</h3>
         </div>
         <div class="card-body">
-          <form ref="editorForm" class="row g-3">
+          <form
+            ref="editorForm"
+            class="row g-3"
+          >
             <div class="col-12">
-              <label class="form-label" for="name">Name</label>
+              <label
+                class="form-label"
+                for="name"
+              >Name</label>
               <input
                 id="name"
                 v-model="object.name"
                 class="form-control"
                 type="text"
                 required
-              />
+              >
             </div>
 
             <div class="col-12">
-              <label class="form-label" for="type">Type</label>
-              <select id="type" v-model="object.type" class="form-select">
+              <label
+                class="form-label"
+                for="type"
+              >Type</label>
+              <select
+                id="type"
+                v-model="object.type"
+                class="form-select"
+              >
                 <option
                   v-for="(typename, type) in affiliationTypes"
                   :key="type"
@@ -29,7 +45,10 @@
                 />
               </select>
             </div>
-            <div class="btn-group col-auto" role="group">
+            <div
+              class="btn-group col-auto"
+              role="group"
+            >
               <button
                 v-if="isNew"
                 class="btn btn-primary"

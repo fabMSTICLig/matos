@@ -6,7 +6,10 @@
           <h3>Ajout massif matériel générique</h3>
         </div>
         <div class="card-body">
-          <form id="editorForm" class="row g-3">
+          <form
+            id="editorForm"
+            class="row g-3"
+          >
             <div class="mb-3">
               Format :
               <ul>
@@ -38,11 +41,14 @@
                 accept=".csv"
                 class="custom-file-input"
                 @change="changeFile"
-              />
+              >
             </div>
             <div>
-              <span>Fichier : </span
-              ><span v-if="file" class="mr-2" v-text="file.name" />
+              <span>Fichier : </span><span
+                v-if="file"
+                class="mr-2"
+                v-text="file.name"
+              />
               <button
                 v-if="file"
                 class="btn btn-danger"
@@ -78,10 +84,11 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ApiService from "@/common/api.service";
 
+const showModal = inject("show");
 const file = ref(null);
 const textinput = ref(
   "name	quantity	ref_int	ref_fab	desc	loc	tags\narduino uno	10	fabardui	A000073	https://www.arduino.cc/	S03/A1/E3	arduino, elec"
@@ -122,7 +129,7 @@ function send() {
       .catch((e) => {
         if (e.response) {
           console.log(e.response.data.detail);
-          showMsgOk(e.response.data.detail);
+          showModal({content:e.response.data.detail});
         } else console.log(e);
       });
   }

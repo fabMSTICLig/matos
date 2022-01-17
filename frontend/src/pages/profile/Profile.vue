@@ -4,65 +4,94 @@
       <h3>Votre profile</h3>
     </div>
     <div class="card-body">
-      <form id="editor-form" class="form">
+      <form
+        id="editor-form"
+        class="form"
+      >
         <div class="mb-3">
-          <label class="form-label" for="username">Username</label
-        ><input
+          <label
+            class="form-label"
+            for="username"
+          >Username</label><input
             id="username"
             v-model="authUser.username"
             class="form-control"
             type="text"
             readonly
-          />
+          >
         </div>
         <div class="mb-3">
-          <label class="form-label" for="firstname">Prénom</label
-        ><input
+          <label
+            class="form-label"
+            for="firstname"
+          >Prénom</label><input
             id="firstname"
             v-model="authUser.first_name"
             class="form-control"
             type="text"
             required
             readonly
-          />
+          >
         </div>
         <div class="mb-3">
-          <label class="form-label" for="lastname">Nom</label
-        ><input
+          <label
+            class="form-label"
+            for="lastname"
+          >Nom</label><input
             id="lastname"
             v-model="authUser.last_name"
             class="form-control"
             type="text"
             required
             readonly
-          />
+          >
         </div>
         <div class="mb-3">
-          <label class="form-label" for="email">Email</label
-        ><input
+          <label
+            class="form-label"
+            for="email"
+          >Email</label><input
             id="email"
             v-model="authUser.email"
             class="form-control"
             type="email"
             required
             readonly
-          />
+          >
         </div>
         <div class="mb-3">
           <label class="form-label">Affiliations</label>
-          <DynList v-model="authUser.affiliations" ressource="affiliations" />
+          <DynList
+            v-model="authUser.affiliations"
+            ressource="affiliations"
+          />
         </div>
-        <div class="mt-2" role="group">
-          <button class="btn btn-primary" type="button" @click="updateUser">
+        <div
+          class="mt-2"
+          role="group"
+        >
+          <button
+            class="btn btn-primary"
+            type="button"
+            @click="updateUser"
+          >
             Valider
           </button>
-        <div class="btn btn-primary float-end" @click="personalData">
-          Télécharger mes données
-        </div>
+          <div
+            class="btn btn-primary float-end"
+            @click="personalData"
+          >
+            Télécharger mes données
+          </div>
         </div>
       </form>
     </div>
-    <modal id="modal-rgpd" v-model="showRGPD" title="RGPD" hide-footer>
+    <modal
+      id="modal-rgpd"
+      v-model="showRGPD"
+      title="RGPD"
+      hide-footer
+    >
       <h6>Conditions d'utilisation</h6>
       <p>
         Pour permettre le bon fonctionnment du site certaines de vos
@@ -80,8 +109,16 @@
 
       <h6>Accepter vous ces termes ?</h6>
       <div>
-        <div class="btn-group" role="group" aria-label="RGPD Accept">
-          <button type="button" class="btn btn-primary" @click="accept">
+        <div
+          class="btn-group"
+          role="group"
+          aria-label="RGPD Accept"
+        >
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="acceptRGPD"
+          >
             Oui
           </button>
           <button
@@ -97,7 +134,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, onBeforeMount, inject } from "vue";
+import { ref, computed, inject } from "vue";
 import { useStore } from "vuex";
 
 import DynList from "@/components/ui/DynList.vue";
@@ -120,19 +157,18 @@ async function updateUser() {
           showModal({ content: "Profile mis à jour" });
 }
 async function personalData() {
-  let data = await store.dispatch(USER_DATA);
+  let data = await store.dispatch("userData");
   let dateObj = new Date();
   let month = dateObj.getMonth() + 1; //months from 1-12
   let day = dateObj.getUTCDate();
   let year = dateObj.getUTCFullYear();
   let labelData = authUser.value.username + "_" + day + month + year + ".json";
-  props.totalPages;
   let a = document.createElement("a");
   let file = new Blob([JSON.stringify(data, null, 2)], {
     type: "text/plain",
   });
   a.href = URL.createObjectURL(file);
-  a.download = fileName;
+  a.download = labelData;
   a.click();
 }
 </script>

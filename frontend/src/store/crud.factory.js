@@ -50,7 +50,7 @@ const createCrud = (ressource, source) => {
         return getters.list;
       },
       async fetchSingle({ commit, state }, { id, prefix = "" }) {
-        if(state.entities.hasOwnProperty(id)) return state.entities[id]
+        if(Object.keys(state.entities).indexOf(id)>-1) return state.entities[id]
 
         const { data } = await ApiService.get(prefix + ressource, id);
         commit("fetchSingleSuccess", data);

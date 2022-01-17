@@ -1,10 +1,13 @@
 <template>
   <div>
     <div v-if="!readonly">
-      <div class="input-group" style="height: 43px">
+      <div
+        class="input-group"
+        style="height: 43px"
+      >
         <Multiselect
           ref="mtselect"
-          :modelValue="valuesIntern"
+          :model-value="valuesIntern"
           track-by="id"
           label="name"
           mode="multiple"
@@ -18,9 +21,9 @@
           :multiple-label="multipleLabel"
           no-options-text="Veuillez entrer des charactères"
           :hide-selected="true"
+          :can-clear="false"
+          open-direction="top"
           @change="change"
-          :canClear="false"
-          openDirection="top"
         />
       </div>
     </div>

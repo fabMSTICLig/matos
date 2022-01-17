@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 

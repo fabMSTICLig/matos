@@ -1,7 +1,6 @@
-import { ref, computed, watch, inject } from "vue";
+import { ref, computed, inject } from "vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
-import useDebouncedRef from "./useDebouncedRef";
 
 export default function useEditor(
   ressource,
@@ -11,7 +10,6 @@ export default function useEditor(
     prefix = "",
     msgCreated = " created",
     msgUpdated = " updated",
-    msgDeleted = " deleted",
     askDelete = `Do you want to delete this ${objectName} ?`,
   } = {}
 ) {

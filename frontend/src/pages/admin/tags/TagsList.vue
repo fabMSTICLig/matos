@@ -6,21 +6,24 @@
           <div class="row justify-content-between">
             <div class="col-6">
               <input
-                class="form-control"
                 v-model="searchInput"
+                class="form-control"
                 type="search"
                 placeholder="Search"
-              />
+              >
             </div>
             <div class="col-auto">
-              <div class="btn-group float-end" role="group">
+              <div
+                class="btn-group float-end"
+                role="group"
+              >
                 <router-link
                   class="btn btn-primary"
                   role="button"
                   :to="{ name: 'tag', params: { tagid: 'new' } }"
                 >
-                  Ajouter </router-link
-                ><button
+                  Ajouter
+                </router-link><button
                   type="button"
                   class="btn btn-danger"
                   title="Supprimer les tags inutilisés"
@@ -62,10 +65,19 @@
       </div>
     </div>
     <div class="col-12 col-md-6">
-      <div v-if="selectedObject" class="card">
+      <div
+        v-if="selectedObject"
+        class="card"
+      >
         <div class="card-header">
-          <h3 class="float-start" v-text="selectedObject.name" />
-          <div class="btn-group float-end" role="group">
+          <h3
+            class="float-start"
+            v-text="selectedObject.name"
+          />
+          <div
+            class="btn-group float-end"
+            role="group"
+          >
             <router-link
               class="btn btn-primary"
               role="button"

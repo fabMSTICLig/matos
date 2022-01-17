@@ -3,25 +3,33 @@
     <h2 v-if="!matid">
       {{ entityName }}
     </h2>
-    <div class="row" v-if="loaded">
+    <div
+      v-if="loaded"
+      class="row"
+    >
       <div class="col-12 col-md-6">
         <div class="card">
           <div class="card-header">
-          <div class="row justify-content-start  align-items-center">
+            <div class="row justify-content-start  align-items-center">
               <div class="col-auto">
                 <input
                   v-model="searchInput"
                   class="form-control"
                   type="search"
                   placeholder="Search"
-                />
+                >
               </div>
               <div class="col-auto">
                 <div class="input-group">
-                  <label class="input-group-text" for="typeselect"
-                    >Ordre :
+                  <label
+                    class="input-group-text"
+                    for="typeselect"
+                  >Ordre :
                   </label>
-                  <select v-model="sortInput" class="form-select">
+                  <select
+                    v-model="sortInput"
+                    class="form-select"
+                  >
                     <option
                       v-for="item in sortChoices"
                       :key="item.value"
@@ -34,16 +42,17 @@
               </div>
               <div class="col-auto">
                 <div class="form-check">
-                  <label class="form-check-label" for="checkInProgress"
-                    >En cours</label
-                  >
+                  <label
+                    class="form-check-label"
+                    for="checkInProgress"
+                  >En cours</label>
                   <input
                     id="checkInProgress"
                     v-model="inProgress"
                     type="checkbox"
                     class="form-check-input"
                     aria-label="Checkbox pour prêt en cours"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -101,13 +110,26 @@
         </div>
       </div>
       <div class="col-12 col-md-6">
-        <div v-if="selectedObject" class="card">
+        <div
+          v-if="selectedObject"
+          class="card"
+        >
           <div class="card-header">
-            <h3 class="float-start" v-text="selectedObject.name" />
-            <button class="btn btn-primary" role="button" @click="setCopy()">
+            <h3
+              class="float-start"
+              v-text="selectedObject.name"
+            />
+            <button
+              class="btn btn-primary"
+              role="button"
+              @click="setCopy()"
+            >
               Copier
             </button>
-            <div class="btn-group float-end" role="group">
+            <div
+              class="btn-group float-end"
+              role="group"
+            >
               <button
                 class="btn btn-primary"
                 role="button"
@@ -127,17 +149,23 @@
           <div class="card-body">
             <table class="table">
               <tr>
-                <th scope="row">Utilisateur</th>
+                <th scope="row">
+                  Utilisateur
+                </th>
                 <td>
-                  <a href="" @click.prevent="showUser()">
+                  <a
+                    href=""
+                    @click.prevent="showUser()"
+                  >
                     {{
                       $filters.field(userById(selectedObject.user), "username")
-                    }}</a
-                  >
+                    }}</a>
                 </td>
               </tr>
               <tr>
-                <th scope="row">Affiliation</th>
+                <th scope="row">
+                  Affiliation
+                </th>
                 <td>
                   {{
                     $filters.field(
@@ -149,19 +177,27 @@
               </tr>
 
               <tr>
-                <th scope="row">Status</th>
+                <th scope="row">
+                  Status
+                </th>
                 <td>{{ loanStatus[selectedObject.status] }}</td>
               </tr>
               <tr>
-                <th scope="row">Date sortie</th>
+                <th scope="row">
+                  Date sortie
+                </th>
                 <td>{{ selectedObject.checkout_date }}</td>
               </tr>
               <tr>
-                <th scope="row">Date retour prévue</th>
+                <th scope="row">
+                  Date retour prévue
+                </th>
                 <td>{{ selectedObject.due_date }}</td>
               </tr>
               <tr>
-                <th scope="row">Date retour</th>
+                <th scope="row">
+                  Date retour
+                </th>
                 <td>{{ selectedObject.return_date }}</td>
               </tr>
             </table>
@@ -172,17 +208,23 @@
             </p>
 
             <h5>Matériels</h5>
-            <ul class="list-group" v-if="!materialsLoading">
+            <ul
+              v-if="!materialsLoading"
+              class="list-group"
+            >
               <li
                 v-for="item in specificMaterials"
                 :key="'s' + item.model.id"
                 class="list-group-item d-flex justify-content-between align-items-start"
               >
                 <div class="ms-2 me-auto">
-                  <div class="">{{ item.model.name }}</div>
+                  <div class="">
+                    {{ item.model.name }}
+                  </div>
                   <ul class="list-group">
                     <li
                       v-for="instance in item.instances"
+                      :key="instance.id"
                       class="list-group-item"
                     >
                       {{ instance.name }}
@@ -212,13 +254,10 @@
       :resolve="() => (isShowUser = false)"
     >
       <p class="card-text">
-        <span
-          ><strong>{{ currentUser.username }} :&nbsp;</strong></span
-        >{{ currentUser.first_name }} {{ currentUser.last_name }}
+        <span><strong>{{ currentUser.username }} :&nbsp;</strong></span>{{ currentUser.first_name }} {{ currentUser.last_name }}
       </p>
       <p>
-        <span><strong>Email :&nbsp;</strong></span
-        ><a :href="'mailto:' + currentUser.email">{{ currentUser.email }}</a>
+        <span><strong>Email :&nbsp;</strong></span><a :href="'mailto:' + currentUser.email">{{ currentUser.email }}</a>
       </p>
       <h5>Affiliations</h5>
       <DisplayIdList :items="userAffiliations" />
@@ -227,7 +266,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount, reactive, inject } from "vue";
+import { ref, computed, watch, onBeforeMount, inject } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 
@@ -319,8 +358,8 @@ watch(sortInput, () => {
 });
 
 const loanStatus = computed(() => store.state.loans.status);
-const affiliationById = computed((id) => store.getters["affiliations/byId"]);
-const userById = computed((id) => store.getters["users/byId"]);
+const affiliationById = computed(() => store.getters["affiliations/byId"]);
+const userById = computed(() => store.getters["users/byId"]);
 
 const isShowUser = ref(false);
 const currentUser = computed(() => userById.value(selectedObject.value.user));
@@ -386,8 +425,9 @@ async function destroyLoan(item) {
   });
   if (isConfirmed) {
     await store.dispatch("loans/destroy", {
-      id: object.value.id,
+      id: item.id,
     });
+    selectedObject.value=null;
   }
 }
 

@@ -1,9 +1,19 @@
 <template>
   <div>
-    <div v-if="object" class="card">
+    <div
+      v-if="object"
+      class="card"
+    >
       <div class="card-header">
-        <h3 class="float-start" v-text="cardName" />
-        <div v-if="!isNew" class="btn-group float-end" role="group">
+        <h3
+          class="float-start"
+          v-text="cardName"
+        />
+        <div
+          v-if="!isNew"
+          class="btn-group float-end"
+          role="group"
+        >
           <router-link
             class="btn btn-primary"
             role="button"
@@ -27,39 +37,52 @@
         </div>
       </div>
       <div class="card-body">
-        <form ref="editorForm" class="row g-3">
+        <form
+          ref="editorForm"
+          class="row g-3"
+        >
           <div class="col-12 col-md-6">
             <fieldset>
               <legend>Informations</legend>
               <div class="mb-3">
-                <label class="form-label" for="name">Nom</label
-                ><input
+                <label
+                  class="form-label"
+                  for="name"
+                >Nom</label><input
                   id="name"
                   v-model="object.name"
                   class="form-control"
                   type="text"
                   required
-                />
+                >
               </div>
               <div class="mb-3">
-                <label class="form-label" for="contact">Contact</label
-                ><input
+                <label
+                  class="form-label"
+                  for="contact"
+                >Contact</label><input
                   id="contact"
                   v-model="object.contact"
                   class="form-control"
                   type="email"
                   required
-                />
+                >
               </div>
               <div class="mb-3">
-                <label class="form-label" for="description">Description</label>
+                <label
+                  class="form-label"
+                  for="description"
+                >Description</label>
                 <textarea
                   id="description"
                   v-model="object.description"
                   rows="3"
                   class="form-control"
                 />
-                <a href="#" @click.prevent="showHelp = true">Aide</a>
+                <a
+                  href="#"
+                  @click.prevent="showHelp = true"
+                >Aide</a>
               </div>
             </fieldset>
           </div>
@@ -101,7 +124,10 @@
             </fieldset>
           </div>
           <div class="row">
-            <div class="btn-group col-auto" role="group">
+            <div
+              class="btn-group col-auto"
+              role="group"
+            >
               <button
                 v-if="isNew"
                 class="btn btn-primary"
@@ -136,7 +162,6 @@
 
 <script setup>
 import { ref, computed, onBeforeMount } from "vue";
-import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 
 import useEditor from "@/composables/useEditor";
@@ -144,7 +169,6 @@ import useEditor from "@/composables/useEditor";
 import DynList from "@/components/ui/DynList.vue";
 import Markdown from "@/components/ui/Markdown.vue";
 
-const store = useStore();
 const showHelp = ref(false);
 
 const { editorForm, object, isNew, initObject, create, update, destroy } =
