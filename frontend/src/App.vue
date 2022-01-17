@@ -18,16 +18,8 @@
       </p>
 
       <div>
-        <div
-          class="btn-group"
-          role="group"
-          aria-label="Accepter"
-        >
-          <button
-            type="button"
-            class="btn btn-primary"
-            @click="validCookie"
-          >
+        <div class="btn-group" role="group" aria-label="Accepter">
+          <button type="button" class="btn btn-primary" @click="validCookie">
             J'ai compris
           </button>
         </div>
@@ -51,34 +43,33 @@ onMounted(async () => {
   document.title = import.meta.env.VITE_APP_TITLE;
   try {
     if (store.getters.isAuthenticated) {
-      await store.dispatch("checkAuth");
+      console.log("connected");
+      const affiliationsPromise = import("./store/affiliations.module");
+      const tagsPromise = import("./store/tags.module");
+      const usersPromise = import("./store/users.module");
+      const entitiesPromise = import("./store/entities.module");
+      const loansPromise = import("./store/loans.module");
+      const materialsPromise = import("./store/materials.module");
+
+      const affiliations = await affiliationsPromise;
+      const tags = await tagsPromise;
+      const users = await usersPromise;
+      const entities = await entitiesPromise;
+      const loans = await loansPromise;
+      const materials = await materialsPromise;
+
+      store.registerModule("affiliations", affiliations.default);
+      store.registerModule("tags", tags.default);
+      store.registerModule("users", users.default);
+      store.registerModule("entities", entities.default);
+      store.registerModule("loans", loans.default);
+
+      store.registerModule("genericmaterials", materials.genericmaterials);
+      store.registerModule("specificmaterials", materials.specificmaterials);
+      store.registerModule("materials", materials.materials);
+
+      await store.dispatch("loans/onLoad");
     }
-    console.log("connected");
-    const affiliationsPromise = import("./store/affiliations.module");
-    const tagsPromise = import("./store/tags.module");
-    const usersPromise = import("./store/users.module");
-    const entitiesPromise = import("./store/entities.module");
-    const loansPromise = import("./store/loans.module");
-    const materialsPromise = import("./store/materials.module");
-
-    const affiliations = await affiliationsPromise;
-    const tags = await tagsPromise;
-    const users = await usersPromise;
-    const entities = await entitiesPromise;
-    const loans = await loansPromise;
-    const materials = await materialsPromise;
-
-    store.registerModule("affiliations", affiliations.default);
-    store.registerModule("tags", tags.default);
-    store.registerModule("users", users.default);
-    store.registerModule("entities", entities.default);
-    store.registerModule("loans", loans.default);
-
-    store.registerModule("genericmaterials", materials.genericmaterials);
-    store.registerModule("specificmaterials", materials.specificmaterials);
-    store.registerModule("materials", materials.materials);
-
-    await store.dispatch("loans/onLoad");
   } catch (e) {
     console.log(e);
   } finally {

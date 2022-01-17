@@ -27,9 +27,8 @@ const actions = {
       context.commit("setAuthUser", data.user);
       return data.user;
     } catch (e) {
-      console.log(e);
       context.commit("purgeAuth");
-      throw "Not connected";
+      throw new Error("Not connected");
     }
   },
   async updateAuthUser(context, user) {
