@@ -172,7 +172,8 @@
                       Demander
                     </button>
                     <p v-if="extMsg">
-                      {{ extMsg }}
+                      Vous avez déjà envoyé une demande de prolongation à la date {{ extMsg }}.<br>
+                      Si vous avez besoin de modifier la date, merci de contacter l'entité directement par mail.
                     </p>
                   </div>
 
@@ -657,10 +658,7 @@ const extLoans = ref(
 const extMsg = computed(() => {
   if (extLoans.value) {
     if (pendingLoan.value.id in extLoans.value) {
-      return (
-        "Vous avez déjà envoyé une demande de prolongation à la date " +
-        extLoans.value[pendingLoan.value.id]
-      );
+      return extLoans.value[pendingLoan.value.id]
     }
   }
   return "";
