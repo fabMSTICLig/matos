@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from datetime import datetime
+from datetime import datetime, date
 import json
 import csv
 
@@ -864,6 +864,24 @@ class LoanViewSet(viewsets.ModelViewSet):
         """
         return Response(dict((x, y) for x, y in Loan.Status.choices), status=status.HTTP_200_OK)
 
+    @action(methods=['post'], detail=True)
+    def ask_extension(self, request,pk=None):
+        """
+        Ask a date extention for the loan
+        """
+        loan = get_object_or_404(Loan,pk=pk)
+        if(loan.status != Loan.Status.ACCEPTED):
+            raise serializers.ValidationError("Vous pouvez demander une prolongation uniquement pour un prêt qui a été accepté.")
+        try:
+            ext_date = date.fromisoformat(request.data['ext_date'])
+            if(ext_date <= loan.due_date):
+                return Response("La nouvelle date doit être postérieure à la date de retour prévue",
+                                status=status.HTTP_400_BAD_REQUEST)
+            Emails.send_extension(loan, ext_date)
+            return Response({"message":"Demande envoyée"})
+        except (ValueError, KeyError):
+            return Response("Mauvais format de date",
+                            status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
     def make_child(self, request,pk=None):

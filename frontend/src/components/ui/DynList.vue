@@ -12,18 +12,18 @@
           label="name"
           mode="multiple"
           :options="fetchOptions"
-          :close-on-select="false"
-          :filter-results="isArray"
-          :min-chars="0"
-          :resolve-on-load="isArray"
-          :delay="1"
+          :loaing="optionsLoading"
+          :clear-on-select="!isArray"
+          :close-on-select="!isArray"
+          :filter-results="false"
+          :resolve-on-load="true"
+          :delay="200"
           :searchable="true"
           :multiple-label="multipleLabel"
           no-options-text="Veuillez entrer des charactères"
-          :hide-selected="true"
           :can-clear="false"
           open-direction="top"
-          @change="change"
+          @select="select"
         />
       </div>
     </div>
@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount, defineProps, defineEmits } from "vue";
+import { ref, computed, onMounted, defineProps, defineEmits } from "vue";
 import { useStore } from "vuex";
 
 import Multiselect from "@vueform/multiselect";
@@ -82,30 +82,19 @@ const props = defineProps({
 });
 
 const mtselect = ref();
-
-const valuesLoadBuffer = ref([])
-
-const valuesIntern = computed(()=>{
-  if (isArray.value)
-    return props.ressource.filter(
-      (o) => props.modelValue.includes(o.id)
-    );
-    else{
-      return valuesLoadBuffer.value
-    }
-});
+const valuesIntern = ref([]);
+const optionsLoading = ref(false);
 const isArray = computed(() => Array.isArray(props.ressource));
-onBeforeMount(async () => {
-  if (!isArray.value)
-    store
-      .dispatch(props.ressource + "/fetchList", {
-        params: { ids: props.modelValue.join(",") },
-      })
-      .then((data) => {
-        data.forEach((o) =>
-          mtselect.value.select({ value: o, name: props.makeLabel(o) })
-        );
-      });
+onMounted(async () => {
+  if (!isArray.value) {
+    valuesIntern.value = await store.dispatch(props.ressource + "/fetchList", {
+      params: { ids: props.modelValue.join(",") },
+    });
+  } else {
+    valuesIntern.value = props.ressource.filter((o) =>
+      props.modelValue.includes(o.id)
+    );
+  }
 });
 
 function multipleLabel() {
@@ -114,14 +103,20 @@ function multipleLabel() {
 
 async function fetchOptions(query) {
   let data = [];
-  if (Array.isArray(props.ressource)) data = props.ressource;
-  else {
-    data = await store.dispatch(props.ressource + "/fetchList", {
-      params: { search: query },
-    });
+  if (Array.isArray(props.ressource)) {
+    if (query == null) query = "";
+    data = props.ressource.filter((o) => o.name.includes(query));
+  } else {
+    if (query) {
+      optionsLoading.value = true;
+      data = await store.dispatch(props.ressource + "/fetchList", {
+        params: { search: query },
+      });
+      optionsLoading.value = false;
+    }
   }
   return data
-    .filter((o) => !props.modelValue.includes(o.id))
+    .filter((o) => !valuesIntern.value.some((v) => v.id == o.id))
     .map((o) => {
       return {
         name: props.makeLabel(o),
@@ -131,17 +126,21 @@ async function fetchOptions(query) {
     });
 }
 
-function change(v) {
-  if(!isArray.value)
-    valuesLoadBuffer.value=v
+function select(o) {
+  valuesIntern.value.push(o);
   emit(
     "update:modelValue",
-    v.map((o) => o.id)
+    valuesIntern.value.map((o) => o.id)
   );
+  if(isArray.value) mtselect.value.refreshOptions();
 }
-
 function removeItem(item) {
-  mtselect.value.remove({ value: item });
+  let index = valuesIntern.value.findIndex((o) => o.id == item.id);
+  if (index != -1) valuesIntern.value.splice(index, 1);
+  emit(
+    "update:modelValue",
+    valuesIntern.value.map((o) => o.id)
+  );
 }
 </script>
 <style src="@vueform/multiselect/themes/default.css"></style>

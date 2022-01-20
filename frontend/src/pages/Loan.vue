@@ -595,6 +595,10 @@ function checkErrors() {
     );
   }
 }
+
+function removeMaterial(mat) {
+  store.dispatch("loans/removeMaterial", mat);
+}
 function cleanMaterials() {
   store.commit("loans/resetPending");
 }

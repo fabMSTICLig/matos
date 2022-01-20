@@ -67,4 +67,27 @@ class Emails:
         except:
             print("fail to send notif to "+loan.entity.contact)
     
+    @staticmethod
+    def send_extension(loan, date):
 
+        context = { 'SITE_URL': settings.SITE_URL, 'loan': loan , 'date_ext': date }
+
+        subject = render_to_string(
+            template_name='email/extension_subject.txt',
+            context=context
+        ).strip()
+        text_content = render_to_string(
+            template_name='email/extension_message.txt',
+            context=context
+        )
+        html_content = render_to_string(
+            template_name='email/extension_message.html',
+            context=context
+        )
+        msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.entity.contact], reply_to=[loan.user.email])
+        msg.attach_alternative(html_content, "text/html")
+        try:
+            msg.send()
+        except:
+            print("fail to send notif to "+loan.entity.contact)
+ 
