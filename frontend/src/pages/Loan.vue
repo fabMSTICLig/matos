@@ -149,6 +149,34 @@
                     >
                   </div>
                   <div
+                    v-if="readOnly && !pendingLoan.return_date"
+                    class="mb-3"
+                  >
+                    <label
+                      class="form-label"
+                      for="extDate"
+                    >Demande prolongation:</label>
+                    <input
+                      v-if="!extMsg"
+                      id="extDate"
+                      v-model="extDate"
+                      class="form-control"
+                      type="date"
+                    >
+                    <button
+                      v-if="!extMsg"
+                      type="button"
+                      class="btn btn-warning"
+                      @click="askExtension"
+                    >
+                      Demander
+                    </button>
+                    <p v-if="extMsg">
+                      {{ extMsg }}
+                    </p>
+                  </div>
+
+                  <div
                     v-if="canManage"
                     class="mb-3"
                   >
@@ -391,6 +419,7 @@ import DynList from "@/components/ui/DynList.vue";
 const store = useStore();
 const router = useRouter();
 const showModal = inject("show");
+const confirmModal = inject("confirm");
 
 const props = defineProps({
   loanid: {
@@ -509,10 +538,12 @@ async function loadLoan(id = null) {
     let u = await store.dispatch("users/fetchSingle", {
       id: pendingLoan.value.user,
     });
-    msuser.value.select({
-      label: "@" + u.username + " " + u.first_name + " " + u.last_name,
-      value: u.id,
-    });
+    if (canManage.value) {
+      msuser.value.select({
+        label: "@" + u.username + " " + u.first_name + " " + u.last_name,
+        value: u.id,
+      });
+    }
   }
 }
 
@@ -615,6 +646,47 @@ function destroyLoan() {
   store.dispatch("loans/destroy", { id: pendingLoan.value.id }).then(() => {
     newLoan();
   });
+}
+const extLoans = ref(
+  JSON.parse(
+    sessionStorage.getItem("extLoans")
+      ? sessionStorage.getItem("extLoans")
+      : "{}"
+  )
+);
+const extMsg = computed(() => {
+  if (extLoans.value) {
+    if (pendingLoan.value.id in extLoans.value) {
+      return (
+        "Vous avez déjà envoyé une demande de prolongation à la date " +
+        extLoans.value[pendingLoan.value.id]
+      );
+    }
+  }
+  return "";
+});
+const extDate = ref();
+async function askExtension() {
+  const isConfirmed = await confirmModal({
+    content:
+      "Voulez vous vraiment envoyer une demande de prolongation du prêt ?",
+  });
+  if (isConfirmed) {
+    try {
+      await store.dispatch("loans/askExtension", {
+        id: pendingLoan.value.id,
+        date: extDate.value,
+      });
+      showModal({
+        content:
+          "Demande envoyée. Veuillez attendre la réponse de l'entité avant d'envoyer une nouvelle demande.",
+      });
+      extLoans.value[pendingLoan.value.id] = extDate.value;
+      sessionStorage.setItem("extLoans", JSON.stringify(extLoans.value));
+    } catch (e) {
+      showModal({ content: e.response.data });
+    }
+  }
 }
 async function makeChild() {
   try {

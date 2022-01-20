@@ -873,13 +873,14 @@ class LoanViewSet(viewsets.ModelViewSet):
         if(loan.status != Loan.Status.ACCEPTED):
             raise serializers.ValidationError("Vous pouvez demander une prolongation uniquement pour un prêt qui a été accepté.")
         try:
+            print(request.data['ext_date'])
             ext_date = date.fromisoformat(request.data['ext_date'])
             if(ext_date <= loan.due_date):
                 return Response("La nouvelle date doit être postérieure à la date de retour prévue",
                                 status=status.HTTP_400_BAD_REQUEST)
             Emails.send_extension(loan, ext_date)
             return Response({"message":"Demande envoyée"})
-        except (ValueError, KeyError):
+        except:
             return Response("Mauvais format de date",
                             status=status.HTTP_400_BAD_REQUEST)
 

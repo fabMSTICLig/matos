@@ -20,6 +20,10 @@ const loans_extra = {
       commit("setStatus", data);
       return data;
     },
+    async askExtension(_, { id, date }) {
+      const { message } = await ApiService.post("loans/" + id + "/ask_extension", {'ext_date':date});
+      return message;
+    },
     async makeChild({ commit }, { id }) {
       const { data } = await ApiService.post("loans/" + id + "/make_child");
       commit("updateSuccess", data.parent);
