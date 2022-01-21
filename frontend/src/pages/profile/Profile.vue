@@ -59,7 +59,10 @@
             readonly
           >
         </div>
-        <div class="mb-3">
+        <div
+          v-if="authUser.rgpd_accept"
+          class="mb-3"
+        >
           <label class="form-label">Affiliations</label>
           <DynList
             v-model="authUser.affiliations"
@@ -88,7 +91,7 @@
     </div>
     <modal
       id="modal-rgpd"
-      v-model="showRGPD"
+      v-model:show="showRGPD"
       title="RGPD"
       hide-footer
     >
@@ -134,7 +137,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, inject } from "vue";
+import { ref, computed, inject, onBeforeMount } from "vue";
 import { useStore } from "vuex";
 
 import DynList from "@/components/ui/DynList.vue";
@@ -152,9 +155,15 @@ function acceptRGPD() {
   });
 }
 
+onBeforeMount(() => {
+  if (!authUser.value.rgpd_accept) {
+    showRGPD.value = true;
+  }
+});
+
 async function updateUser() {
-  await store.dispatch("updateAuthUser", authUser.value)
-          showModal({ content: "Profile mis à jour" });
+  await store.dispatch("updateAuthUser", authUser.value);
+  showModal({ content: "Profile mis à jour" });
 }
 async function personalData() {
   let data = await store.dispatch("userData");
