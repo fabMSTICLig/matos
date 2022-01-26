@@ -7,10 +7,7 @@
             <h4 class="float-start">
               {{ title }}
             </h4>
-            <div
-              class="btn-group float-end"
-              role="group"
-            >
+            <div class="btn-group float-end" role="group">
               <router-link
                 v-if="updateMode && canManage"
                 class="btn btn-primary"
@@ -35,10 +32,7 @@
             </div>
           </div>
           <div class="card-body">
-            <ul
-              v-show="errors.length != 0"
-              class="text-danger"
-            >
+            <ul v-show="errors.length != 0" class="text-danger">
               <li
                 v-for="error in errors"
                 :key="error"
@@ -46,20 +40,11 @@
                 v-text="error"
               />
             </ul>
-            <form
-              class="form"
-              @submit.prevent="submitLoan"
-            >
+            <form class="form" @submit.prevent="submitLoan">
               <div class="row">
                 <div class="col-12 col-md-5 col-lg-5">
-                  <div
-                    v-if="canManage"
-                    class="mb-3"
-                  >
-                    <label
-                      class="form-label"
-                      for="user"
-                    >Utilisateur :</label>
+                  <div v-if="canManage" class="mb-3">
+                    <label class="form-label" for="user">Utilisateur :</label>
                     <Multiselect
                       id="user"
                       ref="msuser"
@@ -74,23 +59,19 @@
                     />
                   </div>
                   <div class="mb-3">
-                    <label
-                      class="form-label"
-                      for="entity"
-                    >Entité :</label>
+                    <label class="form-label" for="entity">Entité :</label>
                     <input
                       id="entity"
                       type="text"
                       class="form-control"
                       :value="entityName"
                       readonly
-                    >
+                    />
                   </div>
                   <div class="mb-3">
-                    <label
-                      class="form-label"
-                      for="affiliation"
-                    >Affiliation :</label>
+                    <label class="form-label" for="affiliation"
+                      >Affiliation :</label
+                    >
                     <Multiselect
                       id="affiliation"
                       v-model="pendingLoan.affiliation"
@@ -102,29 +83,36 @@
                   </div>
 
                   <div class="mb-3">
-                    <label
-                      class="form-label"
-                      for="status"
-                    >Status :</label>
-                    <select
-                      id="status"
-                      v-model="pendingLoan.status"
-                      class="form-select"
-                      :disabled="!canManage"
-                    >
-                      <option
-                        v-for="(val, key) in status"
-                        :key="key"
-                        :value="key"
-                        v-text="val"
-                      />
-                    </select>
+                    <label class="form-label" for="status">Status :</label>
+                    <div class="input-group">
+                      <select
+                        id="status"
+                        v-model="pendingLoan.status"
+                        class="form-select"
+                        :disabled="!canManage"
+                      >
+                        <option
+                          v-for="(val, key) in status"
+                          :key="key"
+                          :value="key"
+                          v-text="val"
+                        />
+                      </select>
+                      <button
+                        class="btn btn-primary"
+                        v-if="
+                          pendingLoan.id && canManage && pendingLoan.status == 2
+                        "
+                        @click="acceptLoan"
+                      >
+                        Accepter
+                      </button>
+                    </div>
                   </div>
                   <div class="mb-3">
-                    <label
-                      class="form-label"
-                      for="checkoutDate"
-                    >Date sortie :</label>
+                    <label class="form-label" for="checkoutDate"
+                      >Date sortie :</label
+                    >
                     <input
                       id="checkoutDate"
                       v-model="pendingLoan.checkout_date"
@@ -132,13 +120,12 @@
                       type="date"
                       required
                       :disabled="readOnly"
-                    >
+                    />
                   </div>
                   <div class="mb-3">
-                    <label
-                      class="form-label"
-                      for="dueDate"
-                    >Date retour prévue:</label>
+                    <label class="form-label" for="dueDate"
+                      >Date retour prévue:</label
+                    >
                     <input
                       id="dueDate"
                       v-model="pendingLoan.due_date"
@@ -146,23 +133,19 @@
                       type="date"
                       required
                       :disabled="readOnly"
-                    >
+                    />
                   </div>
-                  <div
-                    v-if="readOnly && !pendingLoan.return_date"
-                    class="mb-3"
-                  >
-                    <label
-                      class="form-label"
-                      for="extDate"
-                    >Demande prolongation:</label>
+                  <div v-if="readOnly && !pendingLoan.return_date" class="mb-3">
+                    <label class="form-label" for="extDate"
+                      >Demande prolongation:</label
+                    >
                     <input
                       v-if="!extMsg"
                       id="extDate"
                       v-model="extDate"
                       class="form-control"
                       type="date"
-                    >
+                    />
                     <button
                       v-if="!extMsg"
                       type="button"
@@ -172,32 +155,29 @@
                       Demander
                     </button>
                     <p v-if="extMsg">
-                      Vous avez déjà envoyé une demande de prolongation à la date {{ extMsg }}.<br>
-                      Si vous avez besoin de modifier la date, merci de contacter l'entité directement par mail.
+                      Vous avez déjà envoyé une demande de prolongation à la
+                      date {{ extMsg }}.<br />
+                      Si vous avez besoin de modifier la date, merci de
+                      contacter l'entité directement par mail.
                     </p>
                   </div>
 
-                  <div
-                    v-if="canManage"
-                    class="mb-3"
-                  >
-                    <label
-                      class="form-label"
-                      for="returnDate"
-                    >Date retour:</label>
+                  <div v-if="canManage" class="mb-3">
+                    <label class="form-label" for="returnDate"
+                      >Date retour:</label
+                    >
                     <input
                       id="returnDate"
                       v-model="pendingLoan.return_date"
                       class="form-control"
                       type="date"
-                    >
+                    />
                   </div>
 
                   <div class="mb-3">
-                    <label
-                      class="form-label"
-                      for="commentary"
-                    >Commentaire :</label>
+                    <label class="form-label" for="commentary"
+                      >Commentaire :</label
+                    >
                     <textarea
                       id="commentary"
                       v-model="pendingLoan.comments"
@@ -207,10 +187,7 @@
                   </div>
                 </div>
                 <div class="col-12 col-md-7">
-                  <p
-                    v-show="emptyLoan"
-                    class="text-danger"
-                  >
+                  <p v-show="emptyLoan" class="text-danger">
                     Votre prêt doit contenir au moins un matériel. Pour un
                     materiel spécifique veuillez choisir une instance
                   </p>
@@ -219,12 +196,8 @@
                     <table class="table">
                       <thead>
                         <tr class="d-flex">
-                          <th class="col-8">
-                            Matériels
-                          </th>
-                          <th class="col-3">
-                            Quantité
-                          </th>
+                          <th class="col-8">Matériels</th>
+                          <th class="col-3">Quantité</th>
                           <th class="col-1" />
                         </tr>
                       </thead>
@@ -245,7 +218,7 @@
                               max="10000"
                               class="number-input form-control form-control"
                               :disabled="readOnly"
-                            >
+                            />
                           </td>
 
                           <td class="col-1 disabled">
@@ -267,10 +240,7 @@
                           :key="'s' + key"
                           class="d-flex"
                         >
-                          <td
-                            class="col-11"
-                            colspan="2"
-                          >
+                          <td class="col-11" colspan="2">
                             {{ sms[key].name }}
                             <div>
                               <h6>Instances</h6>
@@ -303,18 +273,15 @@
                   <div
                     v-if="
                       updateMode &&
-                        (pendingLoan.child ||
-                          pendingLoan.parent ||
-                          pendingLoan.status == 3)
+                      (pendingLoan.child ||
+                        pendingLoan.parent ||
+                        pendingLoan.status == 3)
                     "
                     class="mb-3"
                   >
                     <label class="form-label">Historique :</label>
                     <div class>
-                      <div
-                        role="group"
-                        class="btn-group"
-                      >
+                      <div role="group" class="btn-group">
                         <button
                           v-if="updateMode && pendingLoan.parent"
                           class="btn btn-info"
@@ -326,9 +293,9 @@
                         <button
                           v-if="
                             updateMode &&
-                              canManage &&
-                              !pendingLoan.child &&
-                              pendingLoan.status == 3
+                            canManage &&
+                            !pendingLoan.child &&
+                            pendingLoan.status == 3
                           "
                           class="btn btn-info"
                           type="button"
@@ -352,10 +319,7 @@
               </div>
 
               <div class="col-12">
-                <div
-                  role="group"
-                  class="btn-group"
-                >
+                <div role="group" class="btn-group">
                   <button
                     v-if="!readOnly"
                     class="btn btn-primary float-start"
@@ -389,10 +353,7 @@
                     Vider
                   </button>
                 </div>
-                <div
-                  role="group"
-                  class="btn-group float-end"
-                >
+                <div role="group" class="btn-group float-end">
                   <button
                     v-if="updateMode"
                     class="btn btn-danger"
@@ -567,6 +528,13 @@ function handleErrors(e) {
   console.log(e.response);
 }
 
+async function acceptLoan() {
+  pendingLoan.value.status = 3;
+  if (!(await submitLoan())) {
+    pendingLoan.value.status = 2;
+  }
+}
+
 async function submitLoan() {
   checkErrors();
   if (errors.value.length) {
@@ -587,6 +555,7 @@ async function submitLoan() {
         errors.value = [];
       } catch (e) {
         handleErrors(e);
+        return false;
       }
     } else {
       if (pendingLoan.value.user == null) {
@@ -604,8 +573,12 @@ async function submitLoan() {
         errors.value = [];
       } catch (e) {
         handleErrors(e);
+        return false;
       }
     }
+    return true;
+  } else {
+    return false;
   }
 }
 function checkErrors() {
@@ -658,7 +631,7 @@ const extLoans = ref(
 const extMsg = computed(() => {
   if (extLoans.value) {
     if (pendingLoan.value.id in extLoans.value) {
-      return extLoans.value[pendingLoan.value.id]
+      return extLoans.value[pendingLoan.value.id];
     }
   }
   return "";
