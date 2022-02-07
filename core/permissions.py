@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.contrib.auth import get_user_model
 from .models import Entity, SpecificMaterial,SpecificMaterialInstance, GenericMaterial, Loan
 
 class IsManager(permissions.BasePermission):
@@ -7,6 +8,13 @@ class IsManager(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return request.user.is_staff or (request.user.is_authenticated and request.user.entities.count()>0)
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff:
+            return True
+        if isinstance(obj, get_user_model()):
+            return obj.loans.filter(entity__in=request.user.entities.values_list('id', flat=True)).count()>0
+        return False
 
 class IsAdminOrIsSelf(permissions.BasePermission):
     """

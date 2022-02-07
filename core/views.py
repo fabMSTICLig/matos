@@ -85,9 +85,9 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action in ['list', 'retrieve']:
             permission_classes = [IsManager]
-        elif self.action in ['update', 'partial_update', 'retrieve', 'set_password']:
+        elif self.action in ['update', 'partial_update', 'set_password']:
             permission_classes = [IsAdminOrIsSelf, IsAuthenticated]
         else:
             permission_classes = [IsAdminUser]

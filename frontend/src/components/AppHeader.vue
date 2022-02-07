@@ -205,6 +205,7 @@ function logout() {
 }
 
 const loanQuantity = computed(() => {
+  if(store.getters["loans/pendingLoan"])
   return (
     store.getters["loans/pendingLoan"].generic_materials.reduce(
       (a, v) => a + parseInt(v.quantity),
@@ -212,5 +213,6 @@ const loanQuantity = computed(() => {
     ) +
     Object.keys(store.getters["loans/pendingLoan"].specific_materials).length
   );
+  else return 0;
 });
 </script>
