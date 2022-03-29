@@ -363,7 +363,7 @@
                     Nouveau prêt
                   </button>
                 </div>
-              </div>
+                </div>
             </form>
           </div>
         </div>
@@ -480,8 +480,13 @@ function updateSpecificInstance(instances, model) {
 
 async function loadLoan(id = null) {
   if (id) {
-    await store.dispatch("loans/onLoad", id);
-    router.push({ name: "loan" });
+    try{
+      await store.dispatch("loans/onLoad", id);
+    }
+    catch (_){
+      newLoan();
+      return;
+    }
   }
   await store.dispatch("affiliations/fetchList", { params: { limit: 1000 } });
   await store.dispatch("loans/fetchStatus");
@@ -522,10 +527,7 @@ function handleErrors(e) {
         : e.response.data
     );
   else console.log(e);
-  console.log(errors.value);
   window.scrollTo(0, 0);
-  // eslint-disable-next-line
-  console.log(e.response);
 }
 
 async function acceptLoan() {
