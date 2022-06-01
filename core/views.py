@@ -552,7 +552,7 @@ class MaterialsView(APIView):
             except:
                 pass
    
-        #Filter search
+        # Filter search
         search = request.query_params.get('search', None)
 
         hidden = request.query_params.get('hidden', False)
@@ -586,7 +586,7 @@ class MaterialsView(APIView):
                 genmats = genmats.none()
 
 
-        if not hidden:
+        if not hidden and loanid is None:
             genmats = genmats.filter(active=True)
             spemats = spemats.filter(active=True)
 
