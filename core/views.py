@@ -557,7 +557,7 @@ class MaterialsView(APIView):
 
         hidden = request.query_params.get('hidden', False)
 
-        if hidden and hidden != "true" or not (request.user.is_staff or request.user.entities.count()):
+        if hidden and hidden != "true":
             hidden = False
 
         mattype = request.query_params.get('type', None)

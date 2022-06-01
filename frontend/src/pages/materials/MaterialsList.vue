@@ -290,7 +290,7 @@ const loansRoute = computed(() => {
 });
 
 function fetchList() {
-  let paramsDefault = {};
+  let paramsDefault = {hidden:true};
   if (searchInput.value) {
     paramsDefault["search"] = searchInput.value;
   }

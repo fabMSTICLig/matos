@@ -494,6 +494,7 @@ async function loadLoan(id = null) {
     params: {
       gmids: pendingLoan.value.generic_materials.map((o) => o.material).join(),
       smids: Object.keys(pendingLoan.value.specific_materials).join(),
+      hidden: true,
     },
   });
   if (pendingLoan.value.entity)
