@@ -1,53 +1,65 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div
-        v-if="object"
-        class="card"
-      >
+      <div v-if="object" class="card">
         <div class="card-header">
           <h3 class="float-start">
             {{ object.name }}
           </h3>
-          <div
-            class="btn-group float-end"
-            role="group"
-          >
+          <div v-if="isManager" class="btn-group float-end" role="group">
             <router-link
-              v-show="isManager"
-              class="btn btn-primary"
+              class="btn btn-outline-primary"
               role="button"
               :to="{
-                name: 'entityedit',
+                name: 'materialslist',
                 params: { entityid: object.id },
               }"
             >
-              Modifier
+              Gestion Matériels
             </router-link>
             <router-link
-              v-if="isManager"
-              class="btn btn-primary float-end"
+              class="btn btn-outline-primary"
               role="button"
               :to="{
-                name: 'entitieslist',
+                name: 'entityloans',
+                params: { entityid: object.id },
               }"
             >
-              Retour
+              Gestion prêts
+            </router-link>
+            <router-link
+              class="btn btn-outline-primary"
+              role="button"
+              :to="{
+                name: 'entity',
+                params: { entityid: object.id },
+              }"
+            >
+              Statistiques
             </router-link>
           </div>
         </div>
         <div class="card-body">
-          <fieldset>
-            <legend>Informations</legend>
-            <markdown
-              :description="object.description"
-            />
-            <p class="card-text">
-              <span><strong>Contact :&nbsp;</strong></span><a :href="'mailto:' + object.contact">{{ object.contact }}</a>
-            </p>
-            <h4>Affiliations :&nbsp;</h4>
-            <DisplayIdList :items="selectedAffiliations" />
-          </fieldset>
+          <markdown :description="object.description" />
+          <p class="card-text">
+            <span><strong>Contact :&nbsp;</strong></span
+            ><a :href="'mailto:' + object.contact">{{ object.contact }}</a>
+          </p>
+          <h4>Affiliations :&nbsp;</h4>
+          <DisplayIdList :items="selectedAffiliations" />
+          <router-link
+            v-if="isManager"
+            class="btn btn-primary btn-xl btn-circle position-absolute bottom-0 end-0"
+            role="button"
+            :to="{
+              name: 'entityedit',
+              params: { entityid: object.id },
+            }"
+          >
+            <svg class="svg-icon">
+              <use href="#edit" />
+            </svg>
+          </router-link>
         </div>
       </div>
     </div>
@@ -55,37 +67,41 @@
 </template>
 
 <script setup>
-import { computed, watch, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { watch, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
-
-import useEditor from "@/composables/useEditor";
+import { storeToRefs } from "pinia";
+import { useEntitiesStore } from "@/stores/entities";
+import { useAuthStore } from "@/stores/auth";
+import { useAffiliationsStore } from "@/stores/affiliations";
 
 import DisplayIdList from "@/components/ui/DisplayIdList.vue";
-import Markdown from "@/components/ui/Markdown.vue";
+import Markdown from "@/components/ui/MarkdownComponent.vue";
 
-const store = useStore();
-const authUser = computed(() => store.getters["authUser"]);
-const isManager = computed(() => {
-  return (
-    (object.value && authUser.value.entities.indexOf(object.value.id) > -1) ||
-    authUser.value.is_staff
-  );
+const authStore = useAuthStore();
+const { isManager } =
+  storeToRefs(authStore);
+
+const store = useEntitiesStore();
+const { currentEntity: object } = storeToRefs(store);
+
+const affiliationsStore = useAffiliationsStore();
+const { list: selectedAffiliations } = storeToRefs(affiliationsStore);
+
+const route = useRoute();
+
+onBeforeMount(async () => {
+  loadAffiliations();
 });
-
-const { object, initObject } = useEditor("entities", {}, "Entité");
-
-const selectedAffiliations = computed(() => store.getters["affiliations/list"]);
-watch(object, () => {
+function loadAffiliations() {
   if (object.value) {
     if (object.value.affiliations)
-      store.dispatch("affiliations/fetchList", {
-        params: { ids: object.value.affiliations.join(",") },
-      });
+      affiliationsStore.fetchList({ ids: object.value.affiliations.join(",") });
   }
-});
-const route = useRoute();
-onBeforeMount(() => {
-  return initObject(route);
-});
+}
+watch(
+  () => route.params.entityid,
+  () => {
+    loadAffiliations();
+  }
+);
 </script>

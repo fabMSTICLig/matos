@@ -170,7 +170,7 @@ class SpecificMaterialInstance(models.Model):
 
 class Loan(models.Model):
     class Status(models.IntegerChoices):
-        REQUESTED = 2, 'Demandé'
+        REQUESTED = 2, 'En attente'
         ACCEPTED = 3, 'Accepté'
         DENIED = 4, 'Refusé'
         CANCELED = 1, 'Annulé'

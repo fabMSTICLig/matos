@@ -1,10 +1,7 @@
 <template>
   <div>
     <div id="editor">
-      <div
-        id="markdown"
-        v-html="compiledMarkdown"
-      />
+      <div id="markdown" v-html="compiledMarkdown" />
     </div>
     <modal
       id="modal-syntaxe"
@@ -40,11 +37,7 @@
       <h6>Citations</h6>
       <span> > Citations </span>
       <div class="row justify-content-md-center">
-        <button
-          type="button"
-          class="btn btn-info"
-          @click="hideHelp"
-        >
+        <button type="button" class="btn btn-primary" @click="hideHelp">
           Ok
         </button>
       </div>
@@ -56,7 +49,7 @@
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 
-import { computed, defineProps, defineEmits } from "vue";
+import { computed } from "vue";
 
 import Modal from "@/plugins/modal";
 
@@ -64,16 +57,30 @@ const emit = defineEmits(["update:showHelp"]);
 const props = defineProps({
   description: {
     type: String,
-    default:null,
+    default: null,
   },
+  limit: {
+    type: Number,
+    default: 0,
+  },
+
   showHelp: {
     type: Boolean,
     default: false,
   },
 });
 const compiledMarkdown = computed(() => {
-  if (props.description) return DOMPurify.sanitize(marked(props.description));
-  else return "";
+  if (props.description) {
+    if (!props.limit) {
+      return DOMPurify.sanitize(marked(props.description));
+    } else {
+      let desmin = props.description
+        .split("\n")
+        .slice(0, props.limit)
+        .join("\n");
+      return DOMPurify.sanitize(marked(desmin));
+    }
+  } else return "";
 });
 
 function hideHelp() {

@@ -1,45 +1,63 @@
 <template>
   <div class="row">
-    <div class="col-12 col-md-6">
+    <div class="col-12">
       <div class="card">
         <div class="card-header">
           <div class="row justify-content-between">
-            <div class="col-6">
+            <h3 class="col-auto">Utilisateurs</h3>
+          </div>
+        </div>
+        <div class="card-body">
+          <form class="row row-cols-lg-auto g-3 align-items-center">
+            <div class="col-12">
+              <label class="form-label visually-hidden" for="searchInput"
+                >Chercher</label
+              >
               <input
+                id="searchInput"
                 v-model="searchInput"
                 class="form-control"
                 type="search"
                 placeholder="Search"
-              >
+              />
             </div>
-          </div>
-        </div>
-        <div class="card-body">
+          </form>
+
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
                   <th>Nom utilisateur</th>
-                  <th>Prénom</th>
-                  <th>Nom</th>
+                  <th>Prénom Nom</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="item in objectsList"
-                  :key="item.id"
-                  @click="selectedObject = item"
-                >
+                <tr v-for="item in objects" :key="item.id">
                   <td v-text="item.username" />
-                  <td v-text="item.first_name" />
-                  <td v-text="item.last_name" />
+                  <td>
+                    <a :href="'mailto:' + item.email"
+                      >{{ item.first_name }} {{ item.last_name }}</a
+                    >
+                  </td>
+                  <td class="text-end">
+                    <router-link
+                      class="btn btn-primary"
+                      role="button"
+                      :to="{
+                        name: 'user',
+                        params: { userid: item.id },
+                      }"
+                    >
+                      Modifier
+                    </router-link>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <pagination
-            :total-pages="pagesCount"
-            :total="objectsCount"
+            :total="totalCount"
             :per-page="perPage"
             :current-page="currentPage"
             @pagechanged="onPageChange"
@@ -47,90 +65,45 @@
         </div>
       </div>
     </div>
-    <div class="col-12 col-md-6">
-      <div
-        v-if="selectedObject"
-        class="card"
-      >
-        <div class="card-header">
-          <h3
-            class="float-start"
-            v-text="selectedObject.username"
-          />
-          <div
-            class="btn-group float-end"
-            role="group"
-          >
-            <router-link
-              class="btn btn-primary"
-              role="button"
-              :to="{ name: 'user', params: { userid: selectedObject.id } }"
-            >
-              Modifier
-            </router-link>
-          </div>
-        </div>
-        <div class="card-body">
-          <p class="card-text">
-            <span><strong>{{ selectedObject.username }} :&nbsp;</strong></span>{{ selectedObject.first_name }} {{ selectedObject.last_name }}
-          </p>
-          <p>
-            <span><strong>Email :&nbsp;</strong></span><a :href="'mailto:' + selectedObject.email">{{
-              selectedObject.email
-            }}</a>
-          </p>
-          <h5>Affiliations</h5>
-          <DisplayIdList :items="selectedAffiliations" />
-          <h5>Entities</h5>
-          <DisplayIdList :items="selectedEntities" />
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, watch, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { onBeforeMount, ref } from "vue";
+import { storeToRefs } from "pinia";
+import useDebouncedRef from "@/composables/useDebouncedRef";
+import { useUsersStore } from "@/stores/users";
 
-import DisplayIdList from "@/components/ui/DisplayIdList.vue";
-
-import useListFSP from "@/composables/useListFSP";
 import Pagination from "@/components/nav/ListPagination.vue";
+import useSearchStorage from "@/composables/useSearchStorage";
 
-const {
-  selectedObject,
-  searchInput,
+const store = useUsersStore();
+const loaded = ref(false);
+
+const { objects, count: totalCount } = storeToRefs(store);
+
+const searchInput = useDebouncedRef("");
+const currentPage = ref(1);
+const perPage = ref(parseInt(import.meta.env.VITE_APP_MAXLIST));
+
+function onPageChange(page) {
+  currentPage.value = page;
+}
+
+async function fetch(params) {
+  await store.fetchList({ ...params });
+}
+
+const { refresh } = useSearchStorage(
+  "users",
+  fetch,
+  { search: searchInput },
   currentPage,
-  pagesCount,
-  perPage,
-  onPageChange,
-  loadPage,
-  objectsList,
-  objectsCount,
-  fetchList,
-} = useListFSP("users");
+  perPage.value
+);
 
-const store = useStore();
-
-const selectedAffiliations = computed(() => store.getters["affiliations/list"]);
-const selectedEntities = computed(() => store.getters["entities/list"]);
-
-watch(selectedObject, () => {
-  if (selectedObject.value) {
-    if (selectedObject.value.affiliations)
-      store.dispatch("affiliations/fetchList", {
-        params: { ids: selectedObject.value.affiliations.join(",") },
-      });
-    if (selectedObject.value.entities)
-      store.dispatch("entities/fetchList", {
-        params: { ids: selectedObject.value.entities.join(",") },
-      });
-  }
-});
-
-onBeforeMount(() => {
-  loadPage();
-  return fetchList();
+onBeforeMount(async () => {
+  await refresh();
+  loaded.value = true;
 });
 </script>

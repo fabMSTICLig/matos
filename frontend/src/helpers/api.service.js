@@ -19,16 +19,16 @@ const ApiService = {
     return axios.get(`${resource}/${slug}`);
   },
 
-  async post(resource, params) {
-    return axios.post(resource + "/", params);
+  async post(resource, data, params) {
+    return axios.post(resource + "/", data, {params});
   },
 
-  async update(resource, slug, params) {
-    return axios.patch(`${resource}/${slug}/`, params);
+  async update(resource, slug, data, params) {
+    return axios.patch(`${resource}/${slug}/`, data,  {params});
   },
 
-  async put(resource, params) {
-    return axios.put(resource + "/", params);
+  async put(resource, data, params) {
+    return axios.put(resource + "/", data, {params});
   },
 
   async delete(resource, slug = "") {

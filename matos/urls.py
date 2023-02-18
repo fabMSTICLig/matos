@@ -26,7 +26,7 @@ urlpatterns = [
     path('admin/login/', lambda r: redirect("/")),
     path('admin/logout/', lambda r: redirect("/")),
     path('admin/', admin.site.urls),
-#    path('auth/', include('django.contrib.auth.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
     path('cas/login/', django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
     path('cas/logout/', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     path('api/', include('core.urls')),

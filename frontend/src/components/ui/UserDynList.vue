@@ -1,10 +1,7 @@
 <template>
   <div>
     <div v-if="!readonly">
-      <div
-        class="input-group"
-        style="height: 43px"
-      >
+      <div class="input-group" style="height: 43px">
         <Multiselect
           ref="mtselect"
           :model-value="valuesIntern"
@@ -12,9 +9,9 @@
           label="name"
           mode="multiple"
           :options="fetchOptions"
-          :loaing="optionsLoading"
-          :clear-on-select="!isArray"
-          :close-on-select="!isArray"
+          :loading="optionsLoading"
+          :clear-on-select="true"
+          :close-on-select="true"
           :filter-results="false"
           :resolve-on-load="true"
           :delay="200"
@@ -35,7 +32,9 @@
       >
         <span>
           <slot :item="item">
-            {{ item.name }}
+            <strong>@{{ item.username }} :</strong>
+            {{ item.first_name }}
+            {{ item.last_name }}
           </slot>
         </span>
         <button
@@ -52,24 +51,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
+import { useUsersStore } from "@/stores/users";
 
 import Multiselect from "@vueform/multiselect";
 
 const emit = defineEmits(["update:modelValue"]);
 
 const props = defineProps({
-  ressource: {
-    type: [Function, Array],
-    required: true,
-  },
   modelValue: {
     type: Array,
     required: true,
-  },
-  makeLabel: {
-    type: Function,
-    default: (o) => o.name,
   },
   readonly: {
     type: Boolean,
@@ -78,18 +70,15 @@ const props = defineProps({
   },
 });
 
+const usersStore = useUsersStore();
+
 const mtselect = ref();
 const valuesIntern = ref([]);
 const optionsLoading = ref(false);
-const isArray = computed(() => Array.isArray(props.ressource));
 onMounted(async () => {
-  if (!isArray.value) {
-    valuesIntern.value = await props.ressource({ ids: props.modelValue.join(",") });
-  } else {
-    valuesIntern.value = props.ressource.filter((o) =>
-      props.modelValue.includes(o.id)
-    );
-  }
+  valuesIntern.value = await usersStore.fetchList({
+    ids: props.modelValue.join(","),
+  });
 });
 
 function multipleLabel() {
@@ -98,21 +87,16 @@ function multipleLabel() {
 
 async function fetchOptions(query) {
   let data = [];
-  if (Array.isArray(props.ressource)) {
-    if (query == null) query = "";
-    data = props.ressource.filter((o) => o.name.includes(query));
-  } else {
-    if (query) {
-      optionsLoading.value = true;
-      data = await props.ressource({ search: query });
-      optionsLoading.value = false;
-    }
+  if (query) {
+    optionsLoading.value = true;
+    data = await usersStore.fetchList({ search: query });
+    optionsLoading.value = false;
   }
   return data
     .filter((o) => !valuesIntern.value.some((v) => v.id == o.id))
     .map((o) => {
       return {
-        name: props.makeLabel(o),
+        name: "@" + o.username + " " + o.first_name + " " + o.last_name,
         value: o,
         disabled: false,
       };
@@ -125,7 +109,6 @@ function select(o) {
     "update:modelValue",
     valuesIntern.value.map((o) => o.id)
   );
-  if(isArray.value) mtselect.value.refreshOptions();
 }
 function removeItem(item) {
   let index = valuesIntern.value.findIndex((o) => o.id == item.id);

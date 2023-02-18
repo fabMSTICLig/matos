@@ -1,40 +1,4 @@
 <template>
-  <!--  <ul class="list-group list-group-horizontal d-flew flex-wrap">
-    <li
-      v-for="item in objects_filtered"
-      :key="item.id"
-      class="list-group-item border rounded"
-    >
-      <span> {{ item.name }}</span>
-      <button
-        type="button"
-        class="btn btn-danger btn-sm ml-1"
-        @click="removeTag(item)"
-      >
-        X
-      </button>
-    </li>
-    <input
-      v-model="inputValue"
-      type="text"
-      class="form-control"
-      :list="_uid"
-      placeholder="Ajouter"
-      @keyup.enter="addTag"
-      @change="addTag"
-    >
-    <datalist
-      v-if="activeDset"
-      :id="_uid"
-    >
-      <option
-        v-for="item in objects_datalist"
-        :key="item.id"
-        :value="item.name"
-        v-text="item.name"
-      />
-    </datalist>
-  </ul>-->
   <Multiselect
     ref="input"
     :model-value="modelValue"
@@ -51,20 +15,23 @@
   />
 </template>
 <script setup>
-import { ref, computed, onBeforeMount, defineProps, defineEmits } from "vue";
-import { useStore } from "vuex";
+import { ref, computed } from "vue";
 import Multiselect from "@vueform/multiselect";
 
 const emit = defineEmits(["update:modelValue"]);
 
 const props = defineProps({
   ressource: {
-    type: String,
+    type : Array,
     required: true,
   },
   modelValue: {
     type: Array,
     required: true,
+  },
+  create:{
+    type: Function,
+    default: ()=>{},
   },
   forbidAdd: {
     type: Boolean,
@@ -79,22 +46,14 @@ const props = defineProps({
 
 const input = ref();
 
-const store = useStore();
-onBeforeMount(() => {
-  if(!props.noLoad)store.dispatch(props.ressource + "/fetchList",{params:{limit:1000}});
-});
-
 const options = computed(() =>
-  store.getters[props.ressource + "/list"].map((o) => {
+  props.ressource.map((o) => {
     return { value: o.id, label: o.name };
   })
 );
 
 function addOption(query) {
-  store
-    .dispatch(props.ressource + "/create", {
-      data: { name: query },
-    })
+    props.create({ name: query })
     .then((data) => {
       emit("update:modelValue", [].concat(props.modelValue).concat([data.id]));
     })

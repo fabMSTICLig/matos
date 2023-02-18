@@ -16,71 +16,63 @@ const routes = [
     component: () => import("../pages/profile/Profile.vue"),
   },
   {
-    path: "/search",
-    name: "search",
-    beforeEnter: requireAuth,
-    component: () => import("../pages/Search.vue"),
-  },
-  {
-    path: "/loan/:loanid?",
-    name: "loan",
-    beforeEnter: requireAuth,
-    component: () => import("../pages/Loan.vue"),
-    props: true,
-  },
-  {
     path: "/loans",
     name: "authloans",
     beforeEnter: requireAuth,
     component: () => import("../pages/profile/LoansList.vue"),
   },
   {
-    path: "/materials",
-    component: () => import("../pages/materials/Materials.vue"),
-    name: "materials",
+    path: "/myloan/:loanid",
+    name: "authloan",
+    beforeEnter: requireAuth,
+    component: () => import("../pages/Loan.vue"),
+    props: true,
+  },
+  {
+    path: "/loan/:loanid",
+    name: "loan",
+    beforeEnter: requireAuth,
+    component: () => import("../pages/Loan.vue"),
+    props: true,
+  },
+  {
+    path: "/basket",
+    name: "basket",
+    beforeEnter: requireAuth,
+    component: () => import("../pages/Loan.vue"),
+  },
+  {
+    path: "/search",
+    name: "search",
+    beforeEnter: requireAuth,
+    component: () => import("../pages/Search.vue"),
+  },
+  {
+    path: "/addmaterial",
+    name: "addmaterial",
+    beforeEnter: requireAuth,
+    component: () => import("../pages/Search.vue"),
+  },
+  {
+    path: "/materials/g/:matid",
+    component: () => import("../pages/materials/Material.vue"),
+    name: "genericmaterialitem",
     meta: {
-      breadcumb: {
-        label: "Materiels",
-        name: "materials",
-      },
+      routeparam: "matid",
     },
-    children: [
-      {
-        path: "g/:matid",
-        component: () => import("../pages/materials/Material.vue"),
-        name: "genericmaterialitem",
-        meta: {
-          routeparam: "matid",
-          breadcumb: {
-            label: "materiel générique",
-            name: "genericmaterialitem",
-          },
-        },
-      },
-      {
-        path: "s/:matid",
-        component: () => import("../pages/materials/Material.vue"),
-        name: "specificmaterialitem",
-        meta: {
-          routeparam: "matid",
-          breadcumb: {
-            label: "materiel spécifique",
-            name: "specificmaterialitem",
-          },
-        },
-      },
-    ],
+  },
+  {
+    path: "/materials/s/:matid",
+    component: () => import("../pages/materials/Material.vue"),
+    name: "specificmaterialitem",
+    meta: {
+      routeparam: "matid",
+    },
   },
   {
     path: "/affiliations",
     component: () => import("../pages/admin/affiliations/Affiliations.vue"),
     beforeEnter: requireAdmin,
-    meta: {
-      breadcumb: {
-        label: "Affiliations",
-        name: "affiliations",
-      },
-    },
     children: [
       {
         path: "",
@@ -93,14 +85,6 @@ const routes = [
         name: "affiliation",
         meta: {
           routeparam: "affid",
-          routedelete: "affiliations",
-          breadcumb: {
-            label: {
-              ressource: "affiliations",
-              labelprop: "name",
-            },
-            name: "affiliation",
-          },
         },
         component: () =>
           import("../pages/admin/affiliations/AffiliationEdit.vue"),
@@ -111,12 +95,6 @@ const routes = [
     path: "/tags",
     component: () => import("../pages/admin/tags/Tags.vue"),
     beforeEnter: requireAdmin,
-    meta: {
-      breadcumb: {
-        label: "Tags",
-        name: "tags",
-      },
-    },
     children: [
       {
         path: "",
@@ -128,14 +106,6 @@ const routes = [
         name: "tag",
         meta: {
           routeparam: "tagid",
-          routedelete: "tags",
-          breadcumb: {
-            label: {
-              ressource: "tags",
-              labelprop: "name",
-            },
-            name: "tag",
-          },
         },
         component: () => import("../pages/admin/tags/TagEdit.vue"),
       },
@@ -145,12 +115,6 @@ const routes = [
     path: "/users",
     component: () => import("../pages/admin/users/Users.vue"),
     beforeEnter: requireAdmin,
-    meta: {
-      breadcumb: {
-        label: "Utilisateurs",
-        name: "users",
-      },
-    },
     children: [
       {
         path: "",
@@ -162,20 +126,17 @@ const routes = [
         name: "user",
         meta: {
           routeparam: "userid",
-          routedelete: "users",
-          breadcumb: {
-            label: {
-              ressource: "users",
-              labelprop: "username",
-            },
-            name: "user",
-          },
         },
         component: () => import("../pages/admin/users/UserEdit.vue"),
       },
     ],
   },
-  entitiesRoutes,
+  {
+    path: "/showentities",
+    name: "showentities",
+    component: () => import("../pages/entities/ShowEntities.vue"),
+  },
+  ...entitiesRoutes,
 ];
 const router = createRouter({
   history: createWebHashHistory(),

@@ -1,66 +1,161 @@
 <template>
   <div class="row">
-    <h1 class="col-12">
-      Mes prêts
-    </h1>
-    <div class="col-12 col-md-6">
-      <div
-        v-if="loaded"
-        class="card"
-      >
+    <div class="col-12">
+      <div class="card">
         <div class="card-header">
-          <div class="row gx-2">
+          <div class="row justify-content-between">
             <div class="col-auto">
-              <div class="form-check">
-                <label
-                  class="form-check-label"
-                  for="checkInProgress"
-                >En cours</label>
-                <input
-                  id="checkInProgress"
-                  v-model="inProgress"
-                  type="checkbox"
-                  class="form-check-input"
-                  aria-label="Checkbox pour prêt en cours"
-                >
-              </div>
+              <h3 v-if="isAuthLoans">Mes prêts</h3>
+              <h3 v-if="isEntityLoans">{{ currentEntity.name }}: Prêts</h3>
+              <h3 v-if="isMaterialLoans">
+                {{ currentEntity.name }}: [{{ materialName }}] Prêts
+              </h3>
+            </div>
+            <div class="col-auto">
+              <router-link
+                v-if="!isAuthLoans"
+                class="btn btn-outline-secondary float-end"
+                role="button"
+                :to="returnRoute"
+              >
+                Retour
+              </router-link>
             </div>
           </div>
         </div>
         <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <input
+                v-model="searchInput"
+                class="form-control"
+                type="search"
+                placeholder="Search"
+              />
+            </div>
+            <div class="col-auto">
+              <div class="input-group">
+                <label class="input-group-text" for="statusselect"
+                  >Status</label
+                >
+                <select v-model="statusInput" class="form-control">
+                  <option value="">Tous</option>
+                  <option
+                    v-for="(value, key) in loanStatus"
+                    :key="key"
+                    :value="key"
+                  >
+                    {{ value }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="form-check">
+                <input
+                  id="inProgressInput"
+                  v-model="inProgressInput"
+                  class="form-check-input"
+                  type="checkbox"
+                  true-value="null"
+                  false-value=""
+                />
+                <label class="form-check-label" for="inProgressInput">
+                  Non rendus
+                </label>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="input-group">
+                <label class="input-group-text" for="typeselect"
+                  >Ordre :
+                </label>
+                <select v-model="dateOrderInput" class="form-select">
+                  <option
+                    v-for="item in sortChoices"
+                    :key="item.value"
+                    :value="item.value"
+                  >
+                    {{ item.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
           <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
               <thead>
                 <tr>
-                  <th>Entité</th>
+                  <th>Materiels</th>
+                  <th v-if="isAuthLoans">Entité</th>
+                  <th v-if="!isAuthLoans">Utilisateur</th>
+                  <th>Affiliation</th>
                   <th>Status</th>
                   <th>Date sortie</th>
                   <th>Date retour prévue</th>
                   <th>Date retour</th>
+                  <th></th>
                 </tr>
               </thead>
-              <tbody>
-                <tr
-                  v-for="item in objectsList"
-                  :key="item.id"
-                  :class="{
-                    'table-active':
-                      selectedObject && item.id == selectedObject.id,
-                  }"
-                  @click="selectedObject = item"
-                >
-                  <td>{{ $filters.field(entityById(item.entity), "name") }}</td>
+              <tbody v-if="loaded">
+                <tr v-for="item in loans" :key="item.id">
+                  <td>
+                    <ul class="list-group list-group-flush">
+                      <li
+                        v-for="mat in mats[item.id]"
+                        :key="mat.material"
+                        class="list-group-item border-0 py-0 d-flex justify-content-between align-items-start"
+                      >
+                        {{
+                          mat.quantity
+                            ? genericmaterials[mat.material].name
+                            : specificmaterials[mat.material].name
+                        }}
+                        <span
+                          v-if="mat.quantity"
+                          class="badge bg-primary rounded-pill"
+                          >{{ mat.quantity }}</span
+                        >
+                      </li>
+                    </ul>
+                  </td>
+                  <td v-if="isAuthLoans">{{ entities[item.entity].name }}</td>
+                  <td v-if="!isAuthLoans">
+                    <a :href="'mailto:' + users[item.user].email">
+                      {{ users[item.user].username }}</a
+                    >
+                  </td>
+                  <td>
+                    {{
+                      item.affiliation
+                        ? affiliations[item.affiliation].name
+                        : ""
+                    }}
+                  </td>
                   <td v-text="loanStatus[item.status]" />
                   <td v-text="item.checkout_date" />
-                  <td v-text="item.due_date" />
+                  <td>{{ item.due_date }}</td>
                   <td v-text="item.return_date" />
+                  <td>
+                    <button
+                      class="btn btn-primary float-end"
+                      role="button"
+                      @click="toLoan(item.id)"
+                    >
+                      {{
+                        isAuthLoans && item.status != 2
+                          ? "Consulter"
+                          : "Modifier"
+                      }}
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <pagination
-            :total-pages="pagesCount"
-            :total="objectsCount"
+            v-if="loaded"
+            :total="totalCount"
             :per-page="perPage"
             :current-page="currentPage"
             @pagechanged="onPageChange"
@@ -68,231 +163,187 @@
         </div>
       </div>
     </div>
-    <div class="col-12 col-md-6">
-      <div
-        v-if="selectedObject"
-        class="card"
-      >
-        <div class="card-header">
-          <h3
-            class="float-start"
-            v-text="selectedObject.name"
-          />
-          <div
-            class="btn-group float-end"
-            role="group"
-          >
-            <button
-              class="btn btn-primary"
-              role="button"
-              @click="editLoan(selectedObject)"
-            >
-              {{ isEditable ? "Modifier" : "Consulter" }}
-            </button>
-          </div>
-        </div>
-        <div class="card-body">
-          <table class="table">
-            <tr>
-              <th scope="row">
-                Entité
-              </th>
-              <td>
-                {{ $filters.field(entityById(selectedObject.entity), "name") }}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">
-                Affiliation
-              </th>
-              <td>
-                {{
-                  $filters.field(
-                    affiliationById(selectedObject.affiliation),
-                    "name"
-                  )
-                }}
-              </td>
-            </tr>
-
-            <tr>
-              <th scope="row">
-                Status
-              </th>
-              <td>{{ loanStatus[selectedObject.status] }}</td>
-            </tr>
-            <tr>
-              <th scope="row">
-                Date sortie
-              </th>
-              <td>{{ selectedObject.checkout_date }}</td>
-            </tr>
-            <tr>
-              <th scope="row">
-                Date retour prévue
-              </th>
-              <td>{{ selectedObject.due_date }}</td>
-            </tr>
-            <tr>
-              <th scope="row">
-                Date retour
-              </th>
-              <td>{{ selectedObject.return_date }}</td>
-            </tr>
-          </table>
-
-          <h5>Commentaires</h5>
-          <p class="card-text">
-            {{ selectedObject.comments }}
-          </p>
-
-          <h5>Matériels</h5>
-          <ul
-            v-if="!materialsLoading"
-            class="list-group"
-          >
-            <li
-              v-for="item in specificMaterials"
-              :key="'s' + item.model.id"
-              class="list-group-item d-flex justify-content-between align-items-start"
-            >
-              <div class="ms-2 me-auto">
-                <div class="">
-                  {{ item.model.name }}
-                </div>
-                <ul class="list-group">
-                  <li
-                    v-for="instance in item.instances"
-                    :key="instance.id"
-                    class="list-group-item"
-                  >
-                    {{ instance.name }}
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li
-              v-for="item in genericMaterials"
-              :key="'g' + item.material.id"
-              class="list-group-item d-flex justify-content-between align-items-start"
-            >
-              {{ item.material.name }}
-              <span class="badge bg-primary rounded-pill">{{
-                item.quantity
-              }}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import { ref, computed, onBeforeMount } from "vue";
+import { storeToRefs } from "pinia";
+import { useRoute } from "vue-router";
+import useLoanRouting from "@/composables/useLoanRouting";
+import useDebouncedRef from "@/composables/useDebouncedRef";
 
+import { useLoansStore } from "@/stores/loans";
+import { useAuthStore } from "@/stores/auth";
+import { useAffiliationsStore } from "@/stores/affiliations";
+import { useEntitiesStore } from "@/stores/entities";
+import { useUsersStore } from "@/stores/users";
+import {
+  useMaterialsStore,
+  useSpecificMaterialsStore,
+  useGenericMaterialsStore,
+} from "@/stores/materials";
 import Pagination from "@/components/nav/ListPagination.vue";
+import useSearchStorage from "@/composables/useSearchStorage";
 
-import useListFSP from "@/composables/useListFSP";
+const route = useRoute();
 
-const store = useStore();
-const loaded = ref(true);
+const isAuthLoans = computed(() => route.name == "authloans");
+const isEntityLoans = computed(() => route.name == "entityloans");
+const isMaterialLoans = computed(
+  () =>
+    route.name == "specificmaterialloans" ||
+    route.name == "genericmaterialloans"
+);
 
-const authUser = computed(() => store.getters.authUser);
+const store = useLoansStore();
 
-const fetchParams = ref({ user: authUser.value.id });
+const { toLoan } = useLoanRouting(store);
 
-const inProgress = ref(true);
-fetchParams.value.rds = "null";
+const authStore = useAuthStore();
+const { authUser } = storeToRefs(authStore);
 
-function postFetch(loans) {
-  if (loans.length > 0) {
-    const entitiesIds = new Set(loans.map((l) => l.entity));
-    const affiliationsIds = new Set(loans.map((l) => l.affiliation));
-    store.dispatch("entities/fetchList", {
-      params: { ids: [...entitiesIds].join(",") },
-    });
-    store.dispatch("affiliations/fetchList", {
-      params: { ids: [...affiliationsIds].join(",") },
-    });
-  }
-}
+const affiliationsStore = useAffiliationsStore();
+const { objects: affiliations } = storeToRefs(affiliationsStore);
+const entitiesStore = useEntitiesStore();
+const { objects: entities, currentEntity } = storeToRefs(entitiesStore);
+const materialsStore = useMaterialsStore();
+const { specificmaterials, genericmaterials } = storeToRefs(materialsStore);
+const usersStore = useUsersStore();
+const { objects: users } = storeToRefs(usersStore);
 
-const {
-  selectedObject,
-  currentPage,
-  pagesCount,
-  perPage,
-  onPageChange,
-  objectsList,
-  objectsCount,
-  fetchList,
-} = useListFSP("loans", { fetchParams, postFetch });
-
-watch(inProgress, () => {
-  if (inProgress.value) fetchParams.value.rds = "null";
-  else delete fetchParams.value.rds;
-  currentPage.value = 1;
-  selectedObject.value = null;
-  fetchList();
+const loaded = ref(false);
+const returnRoute = computed(() => {
+  if (isEntityLoans.value) return { name: "entityinfos" };
+  else if (isMaterialLoans.value) return { name: "materialslist" };
+  else return "/";
 });
 
-const loanStatus = computed(() => store.state.loans.status);
-const entityById = computed(() => store.getters["entities/byId"]);
-const affiliationById = computed(() => store.getters["affiliations/byId"]);
+const loans = ref([]);
+const { count: totalCount, status: loanStatus } = storeToRefs(store);
 
-const materialsLoading = ref(true);
-const genericMaterials = ref([]);
-const specificMaterials = ref([]);
+const mats = ref({});
 
-watch(selectedObject, async () => {
-  if (selectedObject.value) {
-    materialsLoading.value = true;
-    await store.dispatch("materials/fetchMaterialsByLoan", {
-      loanid: selectedObject.value.id,
+const sortChoices = {
+  due_date: { value: "due_date", label: "Date retour prévue" },
+  checkout_date: { value: "-checkout_date", label: "Date sortie" },
+  return_date: { value: "return_date", label: "Date de retour" },
+};
+
+const searchInput = useDebouncedRef("");
+const statusInput = ref();
+const dateOrderInput = ref("due_date");
+const inProgressInput = ref();
+const currentPage = ref(1);
+const perPage = ref(parseInt(import.meta.env.VITE_APP_MAXLIST));
+
+function onPageChange(page) {
+  currentPage.value = page;
+}
+
+async function fetch(params) {
+  loaded.value = false;
+  if (isAuthLoans.value)
+    loans.value = await store.fetchList({ ...params, user: authUser.value.id });
+  else if (isEntityLoans.value)
+    loans.value = await store.fetchList({
+      ...params,
+      entity: currentEntity.value.id,
     });
-    genericMaterials.value = selectedObject.value.generic_materials.map(
-      (item) => {
-        return {
-          quantity: item.quantity,
-          material: store.getters["materials/genericmaterials"][item.material],
-        };
+  else if (isMaterialLoans.value) {
+    if (route.name == "genericmaterialloans")
+      loans.value = await store.fetchList({
+        ...params,
+        gm: route.params.matid,
+      });
+    else if (route.name == "specificmaterialloans")
+      loans.value = await store.fetchList({
+        ...params,
+        sm: route.params.matid,
+      });
+  }
+  if (loans.value.length > 0) {
+    let usersIds = new Set();
+    let entitiesIds = new Set();
+    let affiliationsIds = new Set();
+    let genIds = new Set();
+    let speIds = new Set();
+    let proms = [];
+    loans.value.forEach((l) => {
+      let matsL = [];
+      usersIds.add(l.user);
+      entitiesIds.add(l.entity);
+      if (l.affiliation) {
+        affiliationsIds.add(l.affiliation);
       }
-    );
-    specificMaterials.value = Object.entries(
-      selectedObject.value.specific_materials
-    ).map(([model, instances]) => {
-      return {
-        model: store.getters["materials/specificmaterials"][model],
-        instances: store.getters["materials/specificmaterials"][
-          model
-        ].instances.filter((ins) => instances.includes(ins.id)),
-      };
+      if (l.generic_materials.length) {
+        l.generic_materials.slice(0, 3).forEach((m) => {
+          genIds.add(m.material);
+          matsL.push(m);
+        });
+      }
+      if (
+        l.generic_materials.length < 3 &&
+        Object.keys(l.specific_materials).length > 0
+      ) {
+        Object.keys(l.specific_materials)
+          .slice(0, 3 - l.generic_materials.length)
+          .forEach((m) => {
+            speIds.add(m);
+            matsL.push({ material: m });
+          });
+      }
+      mats.value[l.id] = matsL;
     });
-    materialsLoading.value = false;
-  } else {
-    store.commit("materials/clearMaterials");
-    genericMaterials.value = [];
-    specificMaterials.value = [];
+    if (isAuthLoans.value)
+      proms.push(entitiesStore.fetchList({ ids: [...entitiesIds].join(",") }));
+    else {
+      proms.push(usersStore.fetchList({ ids: [...usersIds].join(",") }));
+    }
+    proms.push(
+      affiliationsStore.fetchList({ ids: [...affiliationsIds].join(",") })
+    );
+
+    proms.push(materialsStore.fetchMaterialsByIds([...genIds], [...speIds]));
+
+    await Promise.all(proms);
+    loaded.value = true;
   }
-});
-
-const isEditable = computed(() => {
-  return selectedObject.value && selectedObject.value.status == 2;
-});
-
-const router = useRouter();
-function editLoan(item) {
-  router.push({ name: "loan", params: { loanid: item.id } });
 }
 
-onBeforeMount(() => {
-  var pall = [];
-  pall.push(store.dispatch("loans/fetchStatus"));
-  pall.push(fetchList());
-  Promise.all(pall).then(() => {
-    loaded.value = true;
-  });
+const materialName = ref("");
+
+const { refresh } = useSearchStorage(
+  route.name,
+  fetch,
+  {
+    search: searchInput,
+    status: statusInput,
+    rds: inProgressInput,
+    ordering: dateOrderInput,
+  },
+  currentPage,
+  perPage.value
+);
+
+onBeforeMount(async () => {
+  await store.fetchStatus();
+  await refresh();
+  if (isMaterialLoans.value) {
+    if (route.name == "genericmaterialloans")
+      materialName.value = (
+        await useGenericMaterialsStore().fetchSingle(
+          route.params.matid,
+          "entities/" + route.params.entityid+ "/"
+        )
+      ).name;
+    else if (route.name == "specificmaterialloans")
+      materialName.value = (
+        await useSpecificMaterialsStore().fetchSingle(
+          route.params.matid,
+          "entities/" + route.params.entityid + "/"
+        )
+      ).name;
+  }
+  loaded.value = true;
 });
 </script>

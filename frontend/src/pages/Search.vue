@@ -1,10 +1,6 @@
 <template>
   <div>
-    <h1>Rechercher</h1>
-    <div
-      v-if="loaded"
-      class="row"
-    >
+    <div v-if="loaded" class="row">
       <div class="col-xl-3">
         <div class="card">
           <div class="card-header">
@@ -13,46 +9,30 @@
           <div class="card-body">
             <form class="form">
               <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="searchInput"
-                >Chercher</label><input
+                <label class="form-label" for="searchInput">Chercher</label
+                ><input
                   id="searchInput"
                   v-model="searchInput"
                   type="search"
                   class="form-control"
                   placeholder="Arduino"
-                >
+                />
               </div>
               <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="typeInput"
-                >Type</label>
-                <select
-                  id="typeInput"
-                  v-model="typeInput"
-                  class="form-control"
-                >
-                  <option value="">
-                    Les deux
-                  </option>
-                  <option value="g">
-                    Generique
-                  </option>
-                  <option value="s">
-                    Specifique
-                  </option>
+                <label class="form-label" for="typeInput">Type</label>
+                <select id="typeInput" v-model="typeInput" class="form-control">
+                  <option value="">Les deux</option>
+                  <option value="g">Generique</option>
+                  <option value="s">Specifique</option>
                 </select>
               </div>
 
-              <div class="mb-3">
+              <div v-if="toBasket" class="mb-3">
                 <label class="form-label">Entités</label>
                 <TagsInput
                   v-model="entitiesInput"
-                  ressource="entities"
+                  :ressource="entitiesList"
                   forbid-add
-                  no-load
                 />
               </div>
 
@@ -60,9 +40,8 @@
                 <label class="form-label">Tags</label>
                 <TagsInput
                   v-model="tagsInput"
-                  ressource="tags"
+                  :ressource="tagsList"
                   forbid-add
-                  no-load
                 />
               </div>
               <div
@@ -74,11 +53,10 @@
                   v-model="hiddenInput"
                   type="checkbox"
                   class="form-check-input"
+                />
+                <label class="form-check-label" for="check-active"
+                  >Invisible</label
                 >
-                <label
-                  class="form-check-label"
-                  for="check-active"
-                >Invisible</label>
               </div>
             </form>
           </div>
@@ -87,53 +65,86 @@
       <div class="col">
         <div class="card">
           <div class="card-header">
-            <pagination
-              :total-pages="pagesCount"
-              :total="objectsCount"
-              :per-page="perPage"
-              :current-page="currentPage"
-              @pagechanged="onPageChange"
-            />
+            <h3 class="float-start">
+              {{
+                !toBasket
+                  ? "Modification prêt" +
+                    (!isAuthLoan
+                      ? " [" + entities[pendingLoan.entity].name + "]"
+                      : "") +
+                    ": "
+                  : ""
+              }}Liste matériel
+            </h3>
+            <button
+              v-if="!toBasket"
+              class="btn btn-secondary float-end"
+              @click="goBackToLoan"
+            >
+              Retour au prêt
+            </button>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li
-                v-for="item in objectsList"
+                v-for="item in materials"
                 :key="item.name + item.id"
                 class="list-group-item list-group-item-action flex-column align-items-start"
               >
                 <div class="d-flex w-100 justify-content-between">
-                  <a
-                    href="#"
-                    @click.prevent="goToMaterial(item)"
-                  ><h4>{{ item.name }}</h4></a>
-                  <strong><router-link
-                    :to="{
-                      name: 'entityinfos',
-                      params: { entityid: item.entity },
-                    }"
-                  >{{ getEntityName(item.entity) }}</router-link></strong>
+                  <a href="#" @click.prevent="goToMaterial(item)"
+                    ><h4>{{ item.name }}</h4></a
+                  >
+                  <strong
+                    ><router-link
+                      :to="{
+                        name: 'entityinfos',
+                        params: { entityid: item.entity },
+                      }"
+                      >{{ entities[item.entity].name }}</router-link
+                    ></strong
+                  >
                 </div>
-                <markdown :description="item.description" />
-                <p>
+                <markdown :description="item.description" :limit="3" />
+                <p v-if="item.tags.length">
                   <strong>Tags :</strong>
                   <DisplayIdList :items="getTags(item.tags)" />
                 </p>
 
                 <button
+                  v-if="!inLoan(item)"
                   class="btn btn-primary wt-1"
                   type="button"
                   :class="{
-                    disabled:
+                    'disabled btn-secondary':
                       pendingLoan.entity && pendingLoan.entity != item.entity,
                   }"
-                  title="Les matériels d'un prêt doivent tous appartenir à la même entité"
                   @click="addItem(item)"
                 >
-                  Ajouter
+                  Ajouter {{ toBasket ? "au panier" : "au prêt" }}
                 </button>
+                <button v-else class="btn btn-secondary" disabled>
+                  Déjà dans le {{ toBasket ? "panier" : "prêt" }}
+                </button>
+                <p>
+                  <small
+                    v-if="
+                      pendingLoan.entity && pendingLoan.entity != item.entity
+                    "
+                    >Les matériels d'un prêt doivent tous appartenir à la même
+                    entité</small
+                  >
+                </p>
               </li>
             </ul>
+            <div class="mt-4 d-flex justify-content-center">
+              <pagination
+                :total="totalCount"
+                :per-page="perPage"
+                :current-page="currentPage"
+                @pagechanged="onPageChange"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -141,33 +152,50 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import { ref, computed, onBeforeMount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
+import { useLoansStore } from "@/stores/loans";
+import { useEntitiesStore } from "@/stores/entities";
+import { useMaterialsStore } from "@/stores/materials";
+import { useTagsStore } from "@/stores/tags";
 import useDebouncedRef from "@/composables/useDebouncedRef";
+import useSearchStorage from "@/composables/useSearchStorage";
+import useLoanRouting from "@/composables/useLoanRouting";
 
 import DisplayIdList from "@/components/ui/DisplayIdList.vue";
-import Markdown from "@/components/ui/Markdown.vue";
+import Markdown from "@/components/ui/MarkdownComponent.vue";
 import TagsInput from "@/components/ui/TagsInput.vue";
 import Pagination from "@/components/nav/ListPagination.vue";
 
-const store = useStore();
+const route = useRoute();
 const router = useRouter();
 
+const toBasket = computed(() => route.name == "search");
+
+const materialsStore = useMaterialsStore();
+const {
+  list: materials,
+  count: totalCount,
+} = storeToRefs(materialsStore);
+
 const loaded = ref(false);
-const authUser = computed(() => store.getters.authUser);
-const isAdmin = computed(() => store.getters.isAdmin);
+const authStore = useAuthStore();
+const { authUser, isAdmin } = storeToRefs(authStore);
 
-const objectsList = computed(() => {
-  return store.getters["materials/list"];
-});
-const objectsCount = computed(() => {
-  return store.state["materials"].count;
-});
+const loansStore = useLoansStore();
+const { isAuthLoan, goBackToLoan } = useLoanRouting(loansStore, authUser);
 
-const pendingLoan = computed(() => store.getters["loans/pendingLoan"]);
+const { basket, currentLoan } = storeToRefs(loansStore);
+
+const pendingLoan = toBasket.value ? ref(basket) : ref(currentLoan);
+
+const tagsStore = useTagsStore();
+const { objects: tags, list: tagsList } = storeToRefs(tagsStore);
+
 function getTags(tagids) {
-  return tagids.map((id) => store.getters["tags/byId"](id));
+  return tagids.map((id) => tags.value[id]);
 }
 
 function goToMaterial(item) {
@@ -184,105 +212,80 @@ function goToMaterial(item) {
   }
 }
 function addItem(item) {
-  if (pendingLoan.value.entity == null && entitiesInput.value.indexOf(item.entity)==-1) {
+  if (
+    pendingLoan.value.entity == null &&
+    entitiesInput.value.indexOf(item.entity) == -1
+  ) {
     entitiesInput.value.push(item.entity);
   }
-  store.dispatch("loans/addMaterial", item);
-}
-function getEntityName(id) {
-  let entity = store.getters["entities/byId"](id);
-  if (entity) return entity.name;
-  else return "";
+  loansStore.addMaterial(item, toBasket.value);
 }
 
-function ssGetOrDefault(key, defaultValue) {
-  return sessionStorage.getItem(key)
-    ? sessionStorage.getItem(key)
-    : defaultValue;
+function inLoan(item) {
+  if ("quantity" in item) {
+    return (
+      pendingLoan.value.generic_materials.find((mat) => {
+        return mat.material == item.id;
+      }) != undefined
+    );
+  } else {
+    return item.id in pendingLoan.value.specific_materials;
+  }
 }
 
-const ssSearch = "search_search";
-const ssType = "search_type";
-const ssEntities = "search_entities";
-const ssTags = "search_tags";
-const ssHidden = "search_hidden";
+const entitiesStore = useEntitiesStore();
+const { objects: entities, list: entitiesList } = storeToRefs(entitiesStore);
 
-const searchInput = useDebouncedRef(ssGetOrDefault(ssSearch, ""));
-const typeInput = ref(ssGetOrDefault(ssType, ""));
-const entitiesInput = ref(JSON.parse(ssGetOrDefault(ssEntities, "[]")));
-const tagsInput = ref(JSON.parse(ssGetOrDefault(ssTags, "[]")));
-const hiddenInput = ref(JSON.parse(ssGetOrDefault(ssHidden, "false")));
-
-watch([searchInput, typeInput, entitiesInput, tagsInput, hiddenInput], () => {
-  currentPage.value = 1;
-  fetchList();
-});
-watch(searchInput, () => {
-  sessionStorage.setItem(ssSearch, searchInput.value);
-});
-watch(typeInput, () => {
-  sessionStorage.setItem(ssType, typeInput.value);
-});
-watch(entitiesInput, () => {
-  sessionStorage.setItem(ssEntities, JSON.stringify(entitiesInput.value));
-});
-watch(tagsInput, () => {
-  sessionStorage.setItem(ssTags, JSON.stringify(tagsInput.value));
-});
-watch(hiddenInput, () => {
-  sessionStorage.setItem(ssHidden, JSON.stringify(hiddenInput.value));
-});
-
+const searchInput = useDebouncedRef("");
+const typeInput = ref("");
+const entitiesInput = ref([]);
+const tagsInput = ref([]);
+const hiddenInput = ref(false);
 
 const currentPage = ref(1);
-
-const pagesCount = computed(() => {
-  return Math.ceil(objectsCount.value / import.meta.env.VITE_APP_MAXLIST);
-});
-const perPage = computed(() => {
-  return parseInt(import.meta.env.VITE_APP_MAXLIST);
-});
+const perPage = ref(parseInt(import.meta.env.VITE_APP_MAXLIST));
 
 function onPageChange(page) {
   currentPage.value = page;
-  sessionStorage.setItem("search_page", page);
-  fetchList();
 }
 
-function loadPage() {
-  if (sessionStorage.getItem("search_page")) {
-    currentPage.value = parseInt(sessionStorage.getItem("search_page"));
-  }
-}
-
-function fetchList() {
-  let paramsDefault = {};
-  if (searchInput.value) {
-    paramsDefault["search"] = searchInput.value;
-  }
-  if (entitiesInput.value) {
-    paramsDefault["entities"] = entitiesInput.value.join();
-  }
-  if (tagsInput.value) {
-    paramsDefault["tags"] = tagsInput.value.join();
-  }
-  paramsDefault["type"] = typeInput.value;
-  paramsDefault["hidden"] = hiddenInput.value;
-
-  paramsDefault.limit = import.meta.env.VITE_APP_MAXLIST;
-  paramsDefault.offset =
-    (currentPage.value - 1) * import.meta.env.VITE_APP_MAXLIST;
-  return store.dispatch("materials/fetchMaterials", {
-    params: { ...paramsDefault },
-  });
+const { refresh, resetSearch } = useSearchStorage(
+  route.name,
+  fetch,
+  {
+    search: searchInput,
+    type: typeInput,
+    entities: entitiesInput,
+    tags: tagsInput,
+    hidden: hiddenInput,
+  },
+  currentPage,
+  perPage.value
+);
+async function fetch(params) {
+  await materialsStore.fetchMaterials(params);
 }
 
 onBeforeMount(async () => {
-  loadPage();
-  await store.dispatch("tags/fetchList",{params:{limit:1000}});
-  await store.dispatch("entities/fetchList",{params:{limit:1000}});
-  const list = await fetchList();
-  loaded.value = true;
-  return list;
+  if (route.name == "addmaterial" && loansStore.currentLoan == null)
+    router.push("/");
+  else {
+    if (route.name == "addmaterial")
+      entitiesInput.value.push(loansStore.currentLoan.entity);
+    else {
+      if ("entityid" in route.query) {
+        let entid = parseInt(route.query.entityid);
+        if (!isNaN(entid)) {
+          resetSearch();
+          entitiesInput.value.push(entid);
+        }
+        router.replace({ query: {} });
+      }
+    }
+    await tagsStore.fetchList({ limit: 1000 });
+    await entitiesStore.fetchList({ limit: 1000 });
+    await refresh();
+    loaded.value = true;
+  }
 });
 </script>

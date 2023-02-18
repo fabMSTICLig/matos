@@ -3,29 +3,23 @@
   <!--<nav v-if="!(isInFirstPage && isInLastPage) && totalPages != 0">-->
   <nav>
     <ul class="pagination">
-      <li
-        class="page-item"
-        :class="{ disabled: isInFirstPage }"
-      >
+      <li class="page-item" :class="{ disabled: isInFirstPage }">
         <button
           class="page-link"
           aria-label="Go to first page"
           @click="onClickFirstPage"
         >
-          First
+          Premier
         </button>
       </li>
 
-      <li
-        class="page-item"
-        :class="{ disabled: isInFirstPage }"
-      >
+      <li class="page-item" :class="{ disabled: isInFirstPage }">
         <button
           class="page-link"
           aria-label="Go to previous page"
           @click="onClickPreviousPage"
         >
-          Previous
+          Précédent
         </button>
       </li>
 
@@ -44,45 +38,35 @@
         </button>
       </li>
 
-      <li
-        class="page-item"
-        :class="{ disabled: isInLastPage }"
-      >
+      <li class="page-item" :class="{ disabled: isInLastPage }">
         <button
           class="page-link"
           aria-label="Go to next page"
           @click="onClickNextPage"
         >
-          Next
+          Suivant
         </button>
       </li>
 
-      <li
-        class="page-item"
-        :class="{ disabled: isInLastPage }"
-      >
+      <li class="page-item" :class="{ disabled: isInLastPage }">
         <button
           class="page-link"
           aria-label="Go to last page"
           @click="onClickLastPage"
         >
-          Last
+          Dernier
         </button>
       </li>
     </ul>
   </nav>
 </template>
 <script setup>
-import { computed, defineProps, defineEmits } from "vue";
+import { computed } from "vue";
 const props = defineProps({
   maxVisibleButtons: {
     type: Number,
     required: false,
     default: 3,
-  },
-  totalPages: {
-    type: Number,
-    required: true,
   },
   total: {
     type: Number,
@@ -98,13 +82,18 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(["pagechanged"]);
+
+const totalPages = computed(() => {
+  return Math.ceil(props.total / props.perPage);
+});
+
 const startPage = computed(() => {
   if (props.currentPage === 1) {
     return 1;
   }
 
-  if (props.currentPage === props.totalPages) {
-    return Math.max(props.totalPages - props.maxVisibleButtons + 1, 1);
+  if (props.currentPage === totalPages.value) {
+    return Math.max(totalPages.value - props.maxVisibleButtons + 1, 1);
   }
 
   return props.currentPage - 1;
@@ -112,7 +101,7 @@ const startPage = computed(() => {
 const endPage = computed(() => {
   return Math.min(
     startPage.value + props.maxVisibleButtons - 1,
-    props.totalPages
+    totalPages.value
   );
 });
 const pages = computed(() => {
@@ -130,7 +119,7 @@ const isInFirstPage = computed(() => {
   return props.currentPage <= 1;
 });
 const isInLastPage = computed(() => {
-  return props.currentPage >= props.totalPages;
+  return props.currentPage >= totalPages.value;
 });
 function onClickFirstPage() {
   emit("pagechanged", 1);
@@ -145,7 +134,7 @@ function onClickNextPage() {
   emit("pagechanged", props.currentPage + 1);
 }
 function onClickLastPage() {
-  emit("pagechanged", props.totalPages);
+  emit("pagechanged", totalPages.value);
 }
 function isPageActive(page) {
   return props.currentPage === page;

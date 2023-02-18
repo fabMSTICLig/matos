@@ -2,7 +2,7 @@
   <ul class="list-group list-group-horizontal d-flew flex-wrap">
     <li
       v-for="item in items"
-      :key="item.id"
+      :key="item"
       class="list-group-item border rounded"
     >
       {{ item[fieldName] }}
@@ -11,7 +11,6 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
 defineProps({
   items: {
     type: Array,

@@ -1,36 +1,30 @@
 <template>
   <div
     ref="root"
-    class="dropdown"
-    :class="{ 'nav-item':isNav }"
+    class="btn-group"
+    :class="{ 'nav-item': isNav }"
+    role="group"
     @focusout="hide"
   >
     <a
       :id="'button' + uid"
       href=""
       class="dropdown-toggle"
-      :class="[isNav ? 'nav-link' : 'btn btn-primary', { 'show': show }]"
+      :class="[isNav ? 'nav-link' : 'btn '+btnStyle, { show: show }]"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
       @click.prevent="toogle"
-    >{{ label }}</a>
-    <ul
-      :id="'tooltip' + uid"
-      class="dropdown-menu"
-      :class="{ 'show': show }"
+      >{{ label }}</a
     >
-      <li
-        v-for="item in items"
-        :key="item.label"
-      >
-        <router-link
-          v-slot="{ href, navigate }"
-          :to="item.to"
-          custom
-        >
+    <ul :id="'tooltip' + uid" class="dropdown-menu" :class="{ show: show }" :style="show ? style : ''">
+      <li v-for="item in items" :key="item.label">
+        <router-link v-slot="{ href, navigate }" :to="item.to" custom>
           <a
             :href="href"
             class="dropdown-item"
             @click="goto($event, navigate)"
-          >{{ item.label }}</a>
+            >{{ item.label }}</a
+          >
         </router-link>
       </li>
     </ul>
@@ -38,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
 defineProps({
@@ -55,9 +49,15 @@ defineProps({
     required: false,
     default: false,
   },
+  btnStyle: {
+    type: String,
+    default: 'btn-primary',
+  }
 });
 const uid = uuidv4();
 const show = ref(false);
+
+const style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 40px);"
 
 const toogle = function () {
   show.value = !show.value;

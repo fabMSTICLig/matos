@@ -66,7 +66,7 @@
           <label class="form-label">Affiliations</label>
           <DynList
             v-model="authUser.affiliations"
-            ressource="affiliations"
+            :ressource="fetchAffs"
           />
         </div>
         <div
@@ -137,22 +137,26 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, inject, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { ref, inject, onBeforeMount } from "vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
+import { useAffiliationsStore } from "@/stores/affiliations";
 
 import DynList from "@/components/ui/DynList.vue";
 import Modal from "@/plugins/modal";
 
-const store = useStore();
+const store = useAuthStore();
+const { authUser } = storeToRefs(store);
 const showModal = inject("show");
 
-const authUser = computed(() => store.getters.authUser);
+const storeAffiliations = useAffiliationsStore();
+const {fetchList: fetchAffs} = storeAffiliations;
+
 const showRGPD = ref(false);
-function acceptRGPD() {
-  store.dispatch("updateRGPD").then(() => {
+async function acceptRGPD() {
+  await store.updateRGPD()
     showRGPD.value = false;
-    store.dispatch("affiliations/fetchList");
-  });
+    storeAffiliations.fetchList();
 }
 
 onBeforeMount(() => {
@@ -162,11 +166,11 @@ onBeforeMount(() => {
 });
 
 async function updateUser() {
-  await store.dispatch("updateAuthUser", authUser.value);
+  await store.updateUser(authUser.value);
   showModal({ content: "Profile mis à jour" });
 }
 async function personalData() {
-  let data = await store.dispatch("userData");
+  let data = await store.getUserData();
   let dateObj = new Date();
   let month = dateObj.getMonth() + 1; //months from 1-12
   let day = dateObj.getUTCDate();

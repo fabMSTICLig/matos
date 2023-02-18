@@ -1,138 +1,77 @@
 <template>
   <div>
-    <div
-      v-if="object"
-      class="card"
-    >
+    <div v-if="object" class="card">
       <div class="card-header">
-        <h3
-          class="float-start"
-          v-text="cardName"
-        />
-        <div
-          v-if="!isNew"
-          class="btn-group float-end"
-          role="group"
-        >
-          <router-link
-            class="btn btn-primary"
-            role="button"
-            :to="{
-              name: 'materialslist',
-              params: { entityid: object.id },
-            }"
+        <h3 class="float-start" v-text="cardName" />
+        <div v-if="isAdmin" class="col-auto btn-group float-end" role="group">
+          <button
+            v-if="!isNew"
+            class="btn btn-danger"
+            type="button"
+            @click.prevent="destroy()"
           >
-            Matériels
-          </router-link>
-          <router-link
-            class="btn btn-primary"
-            role="button"
-            :to="{
-              name: 'entityloans',
-              params: { entityid: object.id },
-            }"
-          >
-            Prêts
-          </router-link>
+            Supprimer
+          </button>
         </div>
       </div>
       <div class="card-body">
-        <form
-          ref="editorForm"
-          class="row g-3"
-        >
-          <div class="col-12 col-md-6">
-            <fieldset>
-              <legend>Informations</legend>
-              <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="name"
-                >Nom</label><input
-                  id="name"
-                  v-model="object.name"
-                  class="form-control"
-                  type="text"
-                  required
-                >
-              </div>
-              <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="contact"
-                >Contact</label><input
-                  id="contact"
-                  v-model="object.contact"
-                  class="form-control"
-                  type="email"
-                  required
-                >
-              </div>
-              <div class="mb-3">
-                <label
-                  class="form-label"
-                  for="description"
-                >Description</label>
-                <textarea
-                  id="description"
-                  v-model="object.description"
-                  rows="3"
-                  class="form-control"
-                />
-                <a
-                  href="#"
-                  @click.prevent="showHelp = true"
-                >Aide</a>
-              </div>
-            </fieldset>
+        <form ref="editorForm" class="row g-3">
+          <div class="col-12 col-md-6 border-end">
+            <div class="mb-3">
+              <label class="form-label" for="name">Nom</label
+              ><input
+                id="name"
+                v-model="object.name"
+                class="form-control"
+                type="text"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="contact">Contact</label
+              ><input
+                id="contact"
+                v-model="object.contact"
+                class="form-control"
+                type="email"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Manageurs</label
+              ><UserDynList v-model="object.managers"> </UserDynList>
+              <div class="mb-3"></div>
+              <label class="form-label">Affiliations</label>
+              <DynList v-model="object.affiliations" :ressource="fetchAffs" />
+            </div>
           </div>
 
           <div class="col-12 col-md-6">
+            <div class="mb-3">
+              <label class="form-label" for="description">Description</label>
+              <textarea
+                id="description"
+                v-model="object.description"
+                rows="3"
+                class="form-control"
+              />
+              <a href="#" @click.prevent="showHelp = true">Aide</a>
+            </div>
+            <h4>Aperçu description</h4>
+            <hr />
             <markdown
               v-model:showHelp="showHelp"
               :description="object.description"
             />
           </div>
 
-          <div class="col-12 col-md-6">
-            <fieldset>
-              <legend>Managers</legend>
-              <div class="mb-3">
-                <DynList
-                  v-model="object.managers"
-                  ressource="users"
-                  :make-label="makeUserLabel"
-                >
-                  <template #default="slotProps">
-                    <strong>@{{ slotProps.item.username }} :</strong>
-                    {{ slotProps.item.first_name }}
-                    {{ slotProps.item.last_name }}
-                  </template>
-                </DynList>
-              </div>
-            </fieldset>
-          </div>
-          <div class="col-12 col-md-6">
-            <fieldset>
-              <legend>Affiliations</legend>
-              <div class="mb-3">
-                <DynList
-                  v-model="object.affiliations"
-                  ressource="affiliations"
-                />
-              </div>
-            </fieldset>
-          </div>
-          <div class="row">
-            <div
-              class="btn-group col-auto"
-              role="group"
-            >
+          <div class="col-12">
+            <div class="btn-group float-end" role="group">
               <button
                 v-if="isNew"
                 class="btn btn-primary"
                 type="button"
-                @click="create"
+                @click="create()"
               >
                 Ajouter
               </button>
@@ -140,17 +79,16 @@
                 v-if="!isNew"
                 class="btn btn-primary"
                 type="button"
-                @click="update(msg)"
+                @click="update()"
               >
                 Modifier
               </button>
               <button
-                v-if="!isNew"
-                class="btn btn-danger"
+                class="btn btn-secondary"
                 type="button"
-                @click="destroy"
+                @click.prevent="cancel"
               >
-                Supprimer
+                Annuler
               </button>
             </div>
           </div>
@@ -162,31 +100,65 @@
 
 <script setup>
 import { ref, computed, onBeforeMount } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
+import { useEntitiesStore } from "@/stores/entities";
+import { useAffiliationsStore } from "@/stores/affiliations";
 
 import useEditor from "@/composables/useEditor";
 
+import UserDynList from "@/components/ui/UserDynList.vue";
 import DynList from "@/components/ui/DynList.vue";
-import Markdown from "@/components/ui/Markdown.vue";
+import Markdown from "@/components/ui/MarkdownComponent.vue";
 
 const showHelp = ref(false);
 
-const { editorForm, object, isNew, initObject, create, update, destroy } =
-  useEditor(
-    "entities",
-    {
-      name: "",
-      description: "",
-      contact: "",
-      affiliations: [],
-      managers: [],
-    },
-    "Entité"
-  );
+const authStore = useAuthStore();
+const { isAdmin } = storeToRefs(authStore);
 
-function makeUserLabel(u) {
-  return "@" + u.username + " " + u.first_name + " " + u.last_name;
+const store = useEntitiesStore();
+const {
+  editorForm,
+  object,
+  isNew,
+  initObject,
+  create: createEditor,
+  update: updateEditor,
+  destroy: destroyEditor,
+} = useEditor(
+  store,
+  {
+    name: "",
+    description: "",
+    contact: "",
+    affiliations: [],
+    managers: [],
+  },
+  "entities"
+);
+
+const router = useRouter();
+async function create() {
+  const data = await createEditor(false);
+  if (data.id)
+    router.push({ name: "entityinfos", params: { entityid: data.id } });
 }
+
+async function update() {
+  await updateEditor(false);
+  router.push({ name: "entityinfos", params: route.params });
+}
+async function cancel() {
+  router.push({ name: "entityinfos", params: route.params });
+}
+async function destroy() {
+  await destroyEditor(false);
+  router.push("/");
+}
+
+const storeAffiliations = useAffiliationsStore();
+const { fetchList: fetchAffs } = storeAffiliations;
 
 const cardName = computed(() =>
   isNew.value ? "Nouvelle Entité" : object.value.name

@@ -1,33 +1,13 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div
-        v-if="material"
-        class="card"
-      >
+      <div v-if="material" class="card">
         <div class="card-header">
-          <h3
-            class="float-start"
-            v-text="material.name"
-          />
+          <h3 class="float-start" v-text="material.name" />
           <div class="float-end">
-            <div
-              class="btn-group"
-              role="group"
-            >
-              <button
-                class="btn btn-primary"
-                type="button"
-                :class="{
-                  disabled:
-                    pendingLoan.entity && pendingLoan.entity != material.entity,
-                }"
-                @click="addMaterial()"
-              >
-                Ajouter
-              </button>
+            <div class="btn-group" role="group">
               <router-link
-                v-if="isManager"
+                v-if="isManagerOf"
                 class="btn btn-primary"
                 role="button"
                 :to="editRoute"
@@ -49,15 +29,12 @@
                   Copier
                 </button>
                 <ul
-                  :class="{'show': showDropdown}"
+                  :class="{ show: showDropdown }"
                   class="dropdown-menu"
                   aria-labelledby="dropdownMenuButton"
                   :style="dropdownStyle"
                 >
-                  <li
-                    v-for="item in managedEntities"
-                    :key="item.id"
-                  >
+                  <li v-for="item in managedEntities" :key="item.id">
                     <button
                       class="dropdown-item"
                       type="button"
@@ -74,16 +51,12 @@
         <div class="card-body">
           <div class="row">
             <div class="col-12 col-md-6">
-              <markdown
-                :description="material.description"
-              />
+              <markdown :description="material.description" />
             </div>
             <div class="col-12 col-md-6">
               <table class="table">
                 <tr>
-                  <th scope="row">
-                    Appartient à
-                  </th>
+                  <th scope="row">Appartient à</th>
                   <td>
                     <router-link
                       :to="{
@@ -96,19 +69,15 @@
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">
-                    Ref interne
-                  </th>
+                  <th scope="row">Ref interne</th>
                   <td>{{ material.ref_int }}</td>
                 </tr>
                 <tr>
-                  <th scope="row">
-                    Ref fabricant
-                  </th>
+                  <th scope="row">Ref fabricant</th>
                   <td>{{ material.ref_man }}</td>
                 </tr>
               </table>
-            
+
               <p class="col-12 col-md-6">
                 <span><strong>Tags :&nbsp;</strong></span>
                 <DisplayIdList :items="materialTags" />
@@ -122,13 +91,34 @@
 </template>
 <script setup>
 import { ref, computed, onBeforeMount, inject } from "vue";
-import { useStore } from "vuex";
+import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import {
+  useMaterialsStore,
+  useSpecificMaterialsStore,
+  useGenericMaterialsStore,
+} from "@/stores/materials";
+import { useEntitiesStore } from "@/stores/entities";
+import { useTagsStore } from "@/stores/tags";
 
-import Markdown from "@/components/ui/Markdown.vue";
+import Markdown from "@/components/ui/MarkdownComponent.vue";
 import DisplayIdList from "@/components/ui/DisplayIdList.vue";
 
-const store = useStore();
+const store = useMaterialsStore();
+
+const authStore = useAuthStore();
+const { authUser, isManager } = storeToRefs(authStore);
+
+const isManagerOf = computed(
+  () =>
+    material.value &&
+    authUser.value.entities.indexOf(material.value.entity) > -1
+);
+
+const tagsStore = useTagsStore();
+const entitiesStore = useEntitiesStore();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -146,37 +136,23 @@ onBeforeMount(async () => {
     typeMat = "fetchSingleGenericMaterial";
   }
 
-  material.value = Object.assign(
-    {},
-    await store.dispatch("materials/" + typeMat, {
-      id: route.params[route.meta.routeparam],
-    })
-  );
+  material.value = Object.assign({}, await store[typeMat](route.params.matid));
   if (material.value.tags) {
     materialTags.value = [
-      ...(await store.dispatch("tags/fetchList", {
-        params: { ids: material.value.tags.join(",") },
-      })),
+      ...(await tagsStore.fetchList({ ids: material.value.tags.join(",") })),
     ];
   }
   //Récupération de l'entité avant de flush mémoire avec entité user
-  materialEntity.value = await store.dispatch("entities/fetchSingle", {
-    id: material.value.entity,
-  });
+  materialEntity.value = await entitiesStore.fetchSingle(material.value.entity);
 
   let ids = authUser.value.entities.filter((e) => e != material.value.entity);
   if (ids)
-    managedEntities.value = await store.dispatch("entities/fetchList", {
-      params: { ids: ids.join(",") },
+    managedEntities.value = await entitiesStore.fetchList({
+      ids: ids.join(","),
     });
   else managedEntities.value = [];
 });
 
-const authUser = computed(() => store.getters.authUser);
-const isManager = computed(() => {
-  return authUser.value.entities.length || authUser.value.is_staff;
-});
-const pendingLoan = computed(() => store.getters["loans/pendingLoan"]);
 const editRoute = computed(() => {
   let name = "specificmaterial";
   if ("quantity" in material.value) {
@@ -188,11 +164,8 @@ const editRoute = computed(() => {
   };
 });
 
-function addMaterial() {
-  store.dispatch("loans/addMaterial", material.value);
-}
-
 const managedEntities = ref([]);
+///Visual dropdown
 const showDropdown = ref(false);
 const dropdownStyle = computed(() => {
   if (showDropdown.value)
@@ -204,31 +177,32 @@ function toggleDropdown() {
   showDropdown.value = !showDropdown.value;
 }
 function hideDropdown(e) {
-  console.log(e);
-  if (!dropcopy.value.contains(e.relatedTarget)) {
+  if (dropcopy.value && !dropcopy.value.contains(e.relatedTarget)) {
     showDropdown.value = false;
   }
 }
+///////
+
+const speMatS = useSpecificMaterialsStore();
+const genMatS = useGenericMaterialsStore();
+
 async function copyMaterial(entity) {
   /*
         Copie du matériel dans une entité gérée
       */
-  let ressource = "";
+  let storeMat = "";
   let routeName = "";
   if (route.name == "genericmaterialitem") {
-    ressource = "genericmaterials";
+    storeMat = genMatS;
     routeName = "genericmaterial";
   } else if (route.name == "specificmaterialitem") {
-    ressource = "specificmaterials";
+    storeMat = speMatS;
     routeName = "specificmaterial";
   }
   var prefix = "entities/" + entity.id + "/";
 
   try {
-    const mat = await store.dispatch(ressource + "/create", {
-      data: material.value,
-      prefix: prefix,
-    });
+    const mat = await storeMat.create(material.value, prefix);
     router.push({
       name: routeName,
       params: { matid: mat.id, entityid: entity.id },

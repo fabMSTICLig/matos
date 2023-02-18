@@ -1,185 +1,204 @@
 <template>
-  <div
-    v-if="loaded"
-    class="row"
-  >
-    <div class="col-12 col-md-12 col-lg-6">
-      <div class="card">
-        <div class="card-header">
-          <div class="row justify-content-between align-items-center">
-            <div class="col-6">
-              <input
-                v-model="searchInput"
-                class="form-control"
-                type="search"
-                placeholder="Search"
-              >
-            </div>
-            <div class="col-auto">
-              <div class="input-group">
-                <label
-                  class="input-group-text"
-                  for="typeselect"
-                >Type</label>
-                <select
-                  v-model="typeInput"
-                  class="form-control"
-                >
-                  <option value="">
-                    Les deux
-                  </option>
-                  <option value="g">
-                    Generique
-                  </option>
-                  <option value="s">
-                    Specifique
-                  </option>
-                </select>
-              </div>
-            </div>
-            <div class="col-auto">
-              <Dropdown
-                :items="newMaterialRoutes"
-                label="Ajouter"
-              />
-            </div>
-          </div>
+  <div v-if="loaded" class="card">
+    <div class="card-header">
+      <div class="row justify-content-between">
+        <div class="col-auto">
+          <h3>{{ currentEntity.name }}: Gestion Matériels</h3>
         </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="item in objectsList"
-                  :key="item.id + item.name"
-                  :class="{
-                    'table-active':
-                      selectedObject &&
-                      item.id + item.name ==
-                      selectedObject.id + selectedObject.name,
-                    'table-danger': !item.active,
-                  }"
-                  @click="selectedObject = item"
-                >
-                  <td v-text="item.name" />
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <pagination
-            :total-pages="pagesCount"
-            :total="objectsCount"
-            :per-page="perPage"
-            :current-page="currentPage"
-            @pagechanged="onPageChange"
+        <div class="col-auto btn-group" role="group">
+          <button
+            class="btn btn-outline-primary"
+            @click.prevent="showHelp = true"
+          >
+            <span class="badge rounded-pill text-bg-primary">i</span>
+          </button>
+          <Dropdown
+            :items="newMaterialRoutes"
+            label="Ajouter un matériel"
+            btn-style="btn-outline-primary"
           />
+          <router-link
+            class="btn btn-outline-secondary"
+            role="button"
+            :to="returnRoute"
+          >
+            Retour
+          </router-link>
         </div>
       </div>
     </div>
-    <div class="col-12 col-md-6">
-      <div
-        v-if="selectedObject"
-        class="card"
-      >
-        <div class="card-header">
-          <h3 class="float-start">
-            Matériel {{ isGeneric ? "Générique" : "Spécifique" }}
-          </h3>
-          <div
-            class="btn-group float-end"
-            role="group"
-          >
-            <router-link
-              class="btn btn-primary"
-              role="button"
-              :to="loansRoute"
-            >
-              Prêts
-            </router-link>
-            <router-link
-              class="btn btn-primary"
-              role="button"
-              :to="editRoute"
-            >
-              Modifier
-            </router-link>
+    <div class="card-body">
+      <div class="row  align-items-center">
+        <div class="col-auto">
+          <input
+            v-model="searchInput"
+            class="form-control"
+            type="search"
+            placeholder="Search"
+          />
+        </div>
+        <div class="col-auto">
+          <div class="input-group">
+            <label class="input-group-text" for="typeselect">Type</label>
+            <select v-model="typeInput" class="form-control">
+              <option value="">Les deux</option>
+              <option value="g">Generique</option>
+              <option value="s">Specifique</option>
+            </select>
           </div>
         </div>
-        <div class="card-body">
-          <h3>
-            {{ selectedObject.name }}
-          </h3>
-          <markdown :description="selectedObject.description" />
-          <table class="table">
-            <tr>
-              <th scope="row">
-                Ref interne
-              </th>
-              <td>{{ selectedObject.ref_int }}</td>
-            </tr>
-            <tr>
-              <th scope="row">
-                Ref fabricant
-              </th>
-              <td>{{ selectedObject.ref_man }}</td>
-            </tr>
-            <tr>
-              <th scope="row">
-                Localisation
-              </th>
-              <td>{{ selectedObject.localisation }}</td>
-            </tr>
-            <tr v-if="isGeneric">
-              <th scope="row">
-                Quantité
-              </th>
-              <td>{{ selectedObject.quantity }}</td>
-            </tr>
-            <tr
-              v-if="!selectedObject.active"
-              class="text-danger"
-            >
-              <th scope="row">
-                Visibilité
-              </th>
-              <td>Invisible</td>
-            </tr>
-          </table>
-          <p v-if="!isGeneric">
-            <span><strong>Instances :&nbsp;</strong></span>
-            <DisplayIdList :items="selectedInstances" />
-          </p>
-
-          <p>
-            <span><strong>Tags :&nbsp;</strong></span>
-            <DisplayIdList :items="selectedTags" />
-          </p>
+        <div class="col-auto">
+          <div class="form-check">
+            <input
+              id="hiddenInput"
+              v-model="hiddenInput"
+              class="form-check-input"
+              type="checkbox"
+            />
+            <label class="form-check-label" for="hiddenInput">
+              Afficher matériel caché
+            </label>
+          </div>
         </div>
       </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Ref Interne</th>
+              <th>Ref Fabriquant</th>
+              <th>Localisation</th>
+              <th>Quantité</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in objectsList"
+              :key="item.id + item.name"
+              :class="{
+                'table-danger': !item.active,
+              }"
+            >
+              <td v-text="item.name" />
+              <td>
+                {{ item.quantity != undefined ? "Générique" : "Spécifique" }}
+              </td>
+              <td v-text="item.ref_int" />
+              <td v-text="item.ref_man" />
+              <td v-text="item.localisation" />
+              <td> {{item.quantity != undefined ? item.quantity : item.instances.length }}</td>
+              <td class="text-end">
+                <router-link
+                  class="btn btn-primary m-2"
+                  role="button"
+                  :to="{ name: (item.quantity!=undefined) ? 'genericmaterial': 'specificmaterial' , params: { matid: item.id } }"
+                >
+                  Modifier
+                </router-link>
+                <router-link
+                  class="btn btn-primary"
+                  role="button"
+                  :to="{ name: (item.quantity!=undefined) ? 'genericmaterialloans': 'specificmaterialloans', params: { matid: item.id } }"
+                >
+                  Voir les prêts
+                </router-link>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pagination
+        :total="totalCount"
+        :per-page="perPage"
+        :current-page="currentPage"
+        @pagechanged="onPageChange"
+      />
+      <modal
+        id="modal-help"
+        title="Type de matériel"
+        :show="showHelp"
+        :resolve="
+          () => {
+            showHelp = false;
+          }
+        "
+      >
+        <p>
+          Ce site utilise deux type de matériel
+          <strong>Spécifique et Générique</strong>
+        </p>
+        <ul>
+          <li>
+            Le matériel <strong>Spécifique</strong> correspond au matériel dont
+            on ne peut pas intervertir les instances. Par exemple le fablab
+            possède 10 tablettes MarqueX (10 instances), chaque tablette a un
+            numéro de série, s'il prête la tablette 1 (l'instance 1), il est
+            important que ce soit la tablette 1 qui revienne.
+          </li>
+          <li>
+            Le matériel <strong>Générique</strong> correspond au matériel dont
+            on peut intervertir les instances. Par exemple, le fablab possède
+            des cartes Arduino Uno, quand il prête une carte Arduino Uno, il
+            souhaite qu'une carte Arduino Uno soit retournée, mais ce n'est pas
+            très grave si ce n'est pas la même que celle prêtée.
+          </li>
+        </ul>
+      </modal>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { ref, computed, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 import useDebouncedRef from "@/composables/useDebouncedRef";
 
-import Dropdown from "@/components/ui/Dropdown.vue";
-import DisplayIdList from "@/components/ui/DisplayIdList.vue";
-import Markdown from "@/components/ui/Markdown.vue";
-import Pagination from "@/components/nav/ListPagination.vue";
+import { useEntitiesStore } from "@/stores/entities";
+import { useMaterialsStore } from "@/stores/materials";
 
-const store = useStore();
+import useSearchStorage from "@/composables/useSearchStorage";
+import Dropdown from "@/components/ui/Dropdown.vue";
+import Pagination from "@/components/nav/ListPagination.vue";
+import Modal from "@/plugins/modal";
+
+const entitiesStore = useEntitiesStore();
+const { currentEntity } = storeToRefs(entitiesStore);
 const route = useRoute();
+
+const store = useMaterialsStore();
+const { list: objectsList, count: totalCount } = storeToRefs(store);
+
+const searchInput = useDebouncedRef("");
+const typeInput = ref("");
+const hiddenInput = ref(true);
+const currentPage = ref(1);
+const perPage = ref(parseInt(import.meta.env.VITE_APP_MAXLIST));
+
+function onPageChange(page) {
+  currentPage.value = page;
+}
+
+async function fetch(params) {
+  await store.fetchMaterials(
+    { ...params },
+    "entities/" + route.params.entityid + "/"
+  );
+}
+
+const { refresh } = useSearchStorage(
+  "materials",
+  fetch,
+  { search: searchInput, type: typeInput, hidden: hiddenInput },
+  currentPage,
+  perPage.value
+);
 
 const loaded = ref(false);
 const newMaterialRoutes = [
+  
   {
     to: { name: "genericmaterial", params: { matid: "new" } },
     label: "Générique",
@@ -188,139 +207,20 @@ const newMaterialRoutes = [
     to: { name: "specificmaterial", params: { matid: "new" } },
     label: "Spécifique",
   },
-  {
+  /*{
     to: { name: "genericmaterialbulk" },
     label: "Générique massif",
-  },
+    },*/
 ];
 
-const objectsList = computed(() => {
-  return store.getters["materials/list"];
-});
-const objectsCount = computed(() => {
-  return store.state["materials"].count;
+const returnRoute = computed(() => {
+  return { name: "entityinfos", params: route.params };
 });
 
-const selectedObject = ref(null);
-const selectedTags = computed(() => store.getters["tags/list"]);
-const selectedInstances = computed(() =>
-  selectedObject.value ? selectedObject.value.instances : []
-);
-const isGeneric = computed(() => {
-  return "quantity" in selectedObject.value;
-});
-
-const ssObject = "entitymatlist_object";
-const ssSearch = "entitymatlist_search";
-const ssType = "entitymatlist_type";
-
-function ssGetOrDefault(key, defaultValue) {
-  return sessionStorage.getItem(key)
-    ? sessionStorage.getItem(key)
-    : defaultValue;
-}
-
-watch(selectedObject, () => {
-  if (selectedObject.value) {
-    sessionStorage.setItem(
-      ssObject,
-      "" + selectedObject.value.id + selectedObject.value.name
-    );
-    if (selectedObject.value.tags)
-      store.dispatch("tags/fetchList", {
-        params: { ids: selectedObject.value.tags.join(",") },
-      });
-  } else sessionStorage.removeItem(ssObject);
-});
-
-const searchInput = useDebouncedRef(ssGetOrDefault(ssSearch, ""));
-const typeInput = ref(ssGetOrDefault(ssType, ""));
-
-watch([searchInput, typeInput], () => {
-  currentPage.value = 1;
-  fetchList();
-});
-watch([searchInput], () => {
-  sessionStorage.setItem(ssSearch, searchInput.value);
-});
-watch([typeInput], () => {
-  sessionStorage.setItem(ssType, typeInput.value);
-});
-
-const currentPage = ref(1);
-
-const pagesCount = computed(() => {
-  return Math.ceil(objectsCount.value / import.meta.env.VITE_APP_MAXLIST);
-});
-const perPage = computed(() => {
-  return parseInt(import.meta.env.VITE_APP_MAXLIST);
-});
-
-function onPageChange(page) {
-  currentPage.value = page;
-  sessionStorage.setItem("materials_page", page);
-  fetchList();
-}
-
-function loadPage() {
-  if (sessionStorage.getItem("materials_page")) {
-    currentPage.value = parseInt(sessionStorage.getItem("materials_page"));
-  }
-}
-
-const editRoute = computed(() => {
-  let name = "specificmaterial";
-  if ("quantity" in selectedObject.value) {
-    name = "genericmaterial";
-  }
-  return { name: name, params: { matid: selectedObject.value.id } };
-});
-const loansRoute = computed(() => {
-  var name = "loansmaterialspecific";
-  if ("quantity" in selectedObject.value) {
-    name = "loansmaterialgeneric";
-  }
-  return {
-    name: name,
-    params: {
-      matid: selectedObject.value.id,
-      entityid: route.params.entityid,
-    },
-  };
-});
-
-function fetchList() {
-  let paramsDefault = {hidden:true};
-  if (searchInput.value) {
-    paramsDefault["search"] = searchInput.value;
-  }
-  paramsDefault["type"] = typeInput.value;
-
-  paramsDefault.limit = import.meta.env.VITE_APP_MAXLIST;
-  paramsDefault.offset =
-    (currentPage.value - 1) * import.meta.env.VITE_APP_MAXLIST;
-  return store
-    .dispatch("materials/fetchMaterials", {
-      prefix: "entities/" + route.params.entityid + "/",
-      params: { ...paramsDefault },
-    })
-    .then((list) => {
-      let obj = null;
-      if (sessionStorage.getItem("materials_object")) {
-        let id = sessionStorage.getItem("materials_object");
-        obj = list.find((o) => o.id + o.name == id);
-      }
-      if (obj) selectedObject.value = obj;
-      else selectedObject.value = list[0];
-      return list;
-    });
-}
+const showHelp = ref(false);
 
 onBeforeMount(async () => {
-  loadPage();
-  const list = await fetchList();
+  await refresh();
   loaded.value = true;
-
-  return list;
 });
 </script>

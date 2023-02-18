@@ -1,42 +1,38 @@
 <template>
   <div class="row">
     <div class="col-12">
-      <div
-        v-if="object"
-        class="card"
-      >
-        <div class="card-header">
-          <h3>{{ cardName }}</h3>
+      <div v-if="object" class="card">
+        <div class="card-header row justify-content-between">
+          <h3 class="col-auto">
+            Affiliations: <strong>{{ cardName }}</strong>
+          </h3>
+          <div class="col-auto btn-group float-end" role="group">
+            <button
+              v-if="!isNew"
+              class="btn btn-danger"
+              type="button"
+              @click.prevent="destroy()"
+            >
+              Supprimer
+            </button>
+          </div>
         </div>
         <div class="card-body">
-          <form
-            ref="editorForm"
-            class="row g-3"
-          >
+          <form ref="editorForm" class="row g-3">
             <div class="col-12">
-              <label
-                class="form-label"
-                for="name"
-              >Name</label>
+              <label class="form-label" for="name">Name</label>
               <input
                 id="name"
                 v-model="object.name"
                 class="form-control"
                 type="text"
                 required
-              >
+              />
             </div>
 
             <div class="col-12">
-              <label
-                class="form-label"
-                for="type"
-              >Type</label>
-              <select
-                id="type"
-                v-model="object.type"
-                class="form-select"
-              >
+              <label class="form-label" for="type">Type</label>
+              <select id="type" v-model="object.type" class="form-select">
                 <option
                   v-for="(typename, type) in affiliationTypes"
                   :key="type"
@@ -45,10 +41,7 @@
                 />
               </select>
             </div>
-            <div
-              class="btn-group col-auto"
-              role="group"
-            >
+            <div class="btn-group col-auto" role="group">
               <button
                 v-if="isNew"
                 class="btn btn-primary"
@@ -66,12 +59,11 @@
                 Modifier
               </button>
               <button
-                v-if="!isNew"
-                class="btn btn-danger"
+                class="btn btn-secondary"
                 type="button"
-                @click.prevent="destroy()"
+                @click.prevent="cancel"
               >
-                Supprimer
+                Annuler
               </button>
             </div>
           </form>
@@ -83,26 +75,34 @@
 
 <script setup>
 import { computed, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 
+import { useAffiliationsStore } from "@/stores/affiliations";
 import useEditor from "@/composables/useEditor";
 
-const store = useStore();
+const store = useAffiliationsStore();
 
-const { editorForm, object, isNew, initObject, create, update, destroy } =
-  useEditor("affiliations", { name: "", type: null }, "Affiliation");
+const {
+  editorForm,
+  object,
+  isNew,
+  initObject,
+  create,
+  update,
+  destroy,
+  cancel,
+} = useEditor(store, { name: "", type: null }, { name: "affiliations" });
 
 const cardName = computed(() =>
   isNew.value ? "Nouvelle affiliation" : object.value.name
 );
-const affiliationTypes = computed(() => store.getters["affiliations/types"]);
+const { types: affiliationTypes } = storeToRefs(store);
 
 const route = useRoute();
 
-onBeforeMount(() => {
-  store.dispatch("affiliations/fetchTypes").then(() => {
-    return initObject(route);
-  });
+onBeforeMount(async () => {
+  await store.fetchTypes();
+  return initObject(route);
 });
 </script>

@@ -8,12 +8,17 @@ export default function useDebouncedRef(value, delay = 300) {
         track();
         return value;
       },
-      set(newValue) {
+      set(newValue, force = false) {
         clearTimeout(timeout);
-        timeout = setTimeout(() => {
+        if (force) {
           value = newValue;
           trigger();
-        }, delay);
+        } else {
+          timeout = setTimeout(() => {
+            value = newValue;
+            trigger();
+          }, delay);
+        }
       },
     };
   });
