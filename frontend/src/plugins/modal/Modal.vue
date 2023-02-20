@@ -10,32 +10,24 @@
     >
       <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
-          <div
-            v-if="!hideHeader"
-            class="modal-header"
-          >
+          <div v-if="!hideHeader" class="modal-header">
             <h5 class="modal-title">
               {{ title }}
             </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
+              class="btn-close"
+              data-bs-dismiss="modal"
               aria-label="Close"
               @click.prevent="handleClose()"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+            ></button>
           </div>
           <div class="modal-body">
             <slot>
               <p>{{ content }}</p>
             </slot>
           </div>
-          <div
-            v-if="!hideFooter"
-            class="modal-footer"
-          >
+          <div v-if="!hideFooter" class="modal-footer">
             <button
               v-if="!confirmFooter"
               type="button"

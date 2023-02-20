@@ -6,12 +6,17 @@
           <a
             class="logo-font"
             href="/"
-          > Matos </a>
-          |
-          <a
+          >Matos</a> 
+          | 
+          <router-link
             class="logo-font"
-            href="/legalnotice"
-          > Legal notice </a>
+            to="/legalnotice"
+          >Mentions légales</router-link>
+          | 
+          <router-link
+            class="logo-font"
+            to="/datapolicy"
+          >Traitement des données</router-link>
         </div>
         <div class="col align-self-end media">
           <img

@@ -21,7 +21,6 @@ import django_cas_ng.views
 
 urlpatterns = [
     re_path(r'^$', view=TemplateView.as_view(template_name='index.html')),
-    re_path(r'^legalnotice$', view=TemplateView.as_view(template_name='legalnotice.html')),
     re_path(r'^su/', include('django_su.urls')),
     path('admin/login/', lambda r: redirect("/")),
     path('admin/logout/', lambda r: redirect("/")),

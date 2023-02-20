@@ -28,7 +28,7 @@
       </div>
     </div>
     <div class="card-body">
-      <div class="row  align-items-center">
+      <div class="row align-items-center">
         <div class="col-auto">
           <input
             v-model="searchInput"
@@ -89,19 +89,37 @@
               <td v-text="item.ref_int" />
               <td v-text="item.ref_man" />
               <td v-text="item.localisation" />
-              <td> {{item.quantity != undefined ? item.quantity : item.instances.length }}</td>
+              <td>
+                {{
+                  item.quantity != undefined
+                    ? item.quantity
+                    : item.instances.length
+                }}
+              </td>
               <td class="text-end">
                 <router-link
                   class="btn btn-primary m-2"
                   role="button"
-                  :to="{ name: (item.quantity!=undefined) ? 'genericmaterial': 'specificmaterial' , params: { matid: item.id } }"
+                  :to="{
+                    name:
+                      item.quantity != undefined
+                        ? 'genericmaterial'
+                        : 'specificmaterial',
+                    params: { matid: item.id },
+                  }"
                 >
                   Modifier
                 </router-link>
                 <router-link
                   class="btn btn-primary"
                   role="button"
-                  :to="{ name: (item.quantity!=undefined) ? 'genericmaterialloans': 'specificmaterialloans', params: { matid: item.id } }"
+                  :to="{
+                    name:
+                      item.quantity != undefined
+                        ? 'genericmaterialloans'
+                        : 'specificmaterialloans',
+                    params: { matid: item.id },
+                  }"
                 >
                   Voir les prêts
                 </router-link>
@@ -160,7 +178,7 @@ import { useEntitiesStore } from "@/stores/entities";
 import { useMaterialsStore } from "@/stores/materials";
 
 import useSearchStorage from "@/composables/useSearchStorage";
-import Dropdown from "@/components/ui/Dropdown.vue";
+import Dropdown from "@/components/ui/DropdownComponent.vue";
 import Pagination from "@/components/nav/ListPagination.vue";
 import Modal from "@/plugins/modal";
 
@@ -198,7 +216,6 @@ const { refresh } = useSearchStorage(
 
 const loaded = ref(false);
 const newMaterialRoutes = [
-  
   {
     to: { name: "genericmaterial", params: { matid: "new" } },
     label: "Générique",
@@ -207,10 +224,10 @@ const newMaterialRoutes = [
     to: { name: "specificmaterial", params: { matid: "new" } },
     label: "Spécifique",
   },
-  /*{
+  {
     to: { name: "genericmaterialbulk" },
     label: "Générique massif",
-    },*/
+  },
 ];
 
 const returnRoute = computed(() => {

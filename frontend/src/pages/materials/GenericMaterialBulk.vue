@@ -3,13 +3,10 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <h3>Ajout massif matériel générique</h3>
+          <h3>{{ currentEntity.name }}: Ajout massif matériel générique</h3>
         </div>
         <div class="card-body">
-          <form
-            id="editorForm"
-            class="row g-3"
-          >
+          <form id="editorForm" class="row g-3">
             <div class="mb-3">
               Format :
               <ul>
@@ -41,14 +38,11 @@
                 accept=".csv"
                 class="custom-file-input"
                 @change="changeFile"
-              >
+              />
             </div>
             <div>
-              <span>Fichier : </span><span
-                v-if="file"
-                class="mr-2"
-                v-text="file.name"
-              />
+              <span>Fichier : </span
+              ><span v-if="file" class="mr-2" v-text="file.name" />
               <button
                 v-if="file"
                 class="btn btn-danger"
@@ -68,14 +62,26 @@
                 :disabled="file"
               />
             </div>
-            <div class="row">
-              <button
-                class="btn btn-primary col-auto"
-                type="button"
-                @click="send"
-              >
-                Ajouter
-              </button>
+            <div class="col-12">
+              <div class="float-end">
+                <div class="btn-group" role="group">
+                  <button
+                    class="btn btn-primary"
+                    type="button"
+                    @click.prevent="send()"
+                  >
+                    Ajouter
+                  </button>
+                  
+                  <button
+                    class="btn btn-secondary"
+                    type="button"
+                    @click.prevent="cancel()"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -85,10 +91,16 @@
 </template>
 <script setup>
 import { ref, inject } from "vue";
+import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import ApiService from "@/common/api.service";
+import { useEntitiesStore } from "@/stores/entities";
+import ApiService from "@/helpers/api.service";
 
 const showModal = inject("show");
+
+const entitiesStore = useEntitiesStore();
+const { currentEntity } = storeToRefs(entitiesStore);
+
 const file = ref(null);
 const textinput = ref(
   "name	quantity	ref_int	ref_fab	desc	loc	tags\narduino uno	10	fabardui	A000073	https://www.arduino.cc/	S03/A1/E3	arduino, elec"
@@ -123,15 +135,20 @@ function send() {
       .then(() => {
         router.push({
           name: "materialslist",
-          params: route.params,
         });
       })
       .catch((e) => {
         if (e.response) {
           console.log(e.response.data.detail);
-          showModal({content:e.response.data.detail});
+          showModal({ content: e.response.data.detail });
         } else console.log(e);
       });
   }
+}
+
+function cancel(){
+        router.push({
+          name: "materialslist",
+        });
 }
 </script>

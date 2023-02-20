@@ -102,7 +102,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useLoansStore } from "@/stores/loans";
 import { useEntitiesStore } from "@/stores/entities";
-import Dropdown from "./ui/Dropdown.vue";
+import Dropdown from "./ui/DropdownComponent.vue";
 
 const title = import.meta.env.VITE_APP_TITLE;
 const cas = import.meta.env.VITE_APP_CASNAME;

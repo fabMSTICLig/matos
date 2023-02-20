@@ -629,7 +629,11 @@ async function sendRequest() {
 async function updateLoan(hist = false) {
   if (!isEmptyLoan.value && !checkErrors()) {
     if (pendingLoan.value.return_date == "")
-      pendingLoan.value.return_date = null;
+    pendingLoan.value.return_date = null;
+    else if(pendingLoan.value.status == 2){
+      showModal({content: "Un prêt ne peut être en attente avec une date de retour. Il est possible que vous ayez oublié de l'accepter."})
+      return false;
+    }
     try {
       await store.updateCurrent(hist);
       goBack();

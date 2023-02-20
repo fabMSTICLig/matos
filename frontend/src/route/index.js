@@ -10,6 +10,16 @@ const routes = [
     component: Home,
   },
   {
+    path: "/datapolicy",
+    name: "datapolicy",
+    component: () => import("../pages/DataPolicy.vue"),
+  },
+  {
+    path: "/legalnotice",
+    name: "legalnotice",
+    component: () => import("../pages/LegalNotice.vue"),
+  },
+  {
     path: "/profile",
     name: "profile",
     beforeEnter: requireAuth,
@@ -134,6 +144,7 @@ const routes = [
   {
     path: "/showentities",
     name: "showentities",
+    beforeEnter: requireAuth,
     component: () => import("../pages/entities/ShowEntities.vue"),
   },
   ...entitiesRoutes,
