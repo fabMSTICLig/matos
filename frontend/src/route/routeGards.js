@@ -21,7 +21,7 @@ export async function requireAuth(to, from, next) {
       });
     }
   } else {
-    next("/");
+    window.location.href=import.meta.env.VITE_APP_LOGIN_URL;
   }
 }
 export async function requireAdmin(to, from, next) {
