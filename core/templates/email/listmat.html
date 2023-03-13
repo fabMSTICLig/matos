@@ -1,0 +1,21 @@
+<p>Commentaire:</p>
+{% autoescape on %}
+<p>{{ loan.comments }}</p>
+{% endautoescape %}
+
+<p>Les matériels empruntés sont les suivants :</p>
+<ul>
+{% for matgen in loan.loangenericitem_set.all %}
+<li>{{ matgen.material.name }} ({{ matgen.quantity }} exemplaire{{ matgen.quantity|pluralize }})</li>
+{% endfor %}
+</ul>
+<ul>
+{% for model,matlist in loan.get_dict_specmat.items %}
+<li>{{ model.name }}
+    <ul>
+    {% for mat in matlist %}
+        <li>{{ mat.name }}</li>
+{% endfor %}
+    </ul></li>
+{% endfor %}
+</ul>

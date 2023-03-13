@@ -1,32 +1,31 @@
-import Vue from "vue";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import Modal from "./plugins/modal";
+
 import App from "./App.vue";
-import router from "./router";
-import store from "./store";
-import { BootstrapVue, IconsPlugin, DropdownPlugin } from "bootstrap-vue";
-import { CHECK_AUTH } from "./store/actions.type";
-import ApiService from "./common/api.service";
-
-Vue.config.productionTip = false;
-
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
-Vue.use(DropdownPlugin);
-
-Vue.filter("field", function(value, field) {
-  if (!value || !(field in value)) return "";
-  return value[field];
-});
+import router from "./route";
+import { useAuthStore } from "./stores/auth";
+import ApiService from "./helpers/api.service";
 
 ApiService.init();
 
-router.beforeEach((to, from, next) => {
-  Promise.all([store.dispatch(CHECK_AUTH)])
-    .then(next)
-    .catch(next);
-});
+const app = createApp(App);
+var pinia = createPinia();
+app.use(pinia);
+app.use(router)
+app.use(Modal);
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount("#app");
+const authStore = useAuthStore()
+
+app.config.globalProperties.$filters = {
+  field(value, fieldname) {
+    if (value) return value[fieldname];
+    else return "";
+  },
+};
+
+authStore.checkAuth().finally(() => {
+  app.mount("#app");
+});

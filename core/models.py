@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 from django.contrib import admin
-import uuid # Required for unique book instances
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
 
@@ -112,18 +111,21 @@ class Material(models.Model):
     tags : Tag[]
         list of tag of the material (Ex, electronic, linux, arduino)
     """
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
     ref_int = models.CharField(max_length=50, null=True, blank=True)
     ref_man = models.CharField(max_length=50, null=True, blank=True)
     localisation = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name="%(class)ss")
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="%(class)ss")
+    active = models.BooleanField(default=True)
+
     def __str__(self):
         return self.name
 
     class Meta:
         abstract = True
+        unique_together = ['name', 'entity']
 
 class GenericMaterial(Material):
     """
@@ -158,15 +160,20 @@ class SpecificMaterialInstance(models.Model):
     serial_num = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     model = models.ForeignKey(SpecificMaterial, on_delete=models.CASCADE, related_name="instances")
+    active = models.BooleanField(default=True)
     def __str__(self):
         return self.model.name +"(" + self.name + ")"
 
+    class Meta:
+        unique_together = ['name', 'model']
+
+
 class Loan(models.Model):
     class Status(models.IntegerChoices):
-        PENDING = 1, 'En Attente'
-        REQUESTED = 2, 'Demandé'
+        REQUESTED = 2, 'En attente'
         ACCEPTED = 3, 'Accepté'
         DENIED = 4, 'Refusé'
+        CANCELED = 1, 'Annulé'
 
     status = models.PositiveSmallIntegerField(
         choices=Status.choices,
@@ -174,6 +181,7 @@ class Loan(models.Model):
     checkout_date =  models.DateField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="loans")
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE, related_name="loans")
+    affiliation = models.ForeignKey(Affiliation, null=True, blank=True, on_delete=models.SET_NULL, related_name="loans")
     due_date =  models.DateField()
     return_date =  models.DateField(null=True, blank=True)
     comments = models.TextField(null=True, blank=True)
@@ -181,9 +189,17 @@ class Loan(models.Model):
         SpecificMaterialInstance, blank=True, related_name="loans")
     generic_materials = models.ManyToManyField(
         GenericMaterial, blank=True, related_name="loans",through="LoanGenericItem")
-    parent = models.OneToOneField('Loan', null=True, blank=True, on_delete=models.SET_NULL, related_name="child")
+    parent = models.OneToOneField('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="child")
     def __str__(self):
         return self.user.username +"(" + self.checkout_date.isoformat() + ")"
+
+    def get_dict_specmat(self):
+        dictmat = {}
+        for specmat in self.specific_materials.all():
+            if specmat.model not in dictmat:
+                dictmat[specmat.model]=[]
+            dictmat[specmat.model].append(specmat)
+        return dictmat
 
 
 class LoanGenericItem(models.Model):
@@ -193,5 +209,3 @@ class LoanGenericItem(models.Model):
 
     class Meta:
         unique_together = ['loan', 'material']
-
-

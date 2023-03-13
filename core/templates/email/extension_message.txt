@@ -1,0 +1,12 @@
+{% if newloan %}Une nouvelle demande de matériels vient d'être faite par {{loan.user.username}} {{ SITE_URL }}#/loan/{{ loan.id }}{% else %}La demande de prêt suivante a été annulée par {{loan.user.username}} {{ SITE_URL }}#/loan/{{ loan.id }}
+{% endif %}
+
+Nom: @{{loan.user.username}} {{loan.user.first_name}} {{loan.user.last_name}}
+Email: {{loan.user.email}}
+Pour l'entité {{loan.entity.name}}
+
+Date d'emprunt: {{loan.checkout_date}}
+Date de retour prévue: {{loan.due_date}}
+
+{% include "email/listmat.txt" %}
+

@@ -1,0 +1,9 @@
+Commentaire
+{{ loan.comments }}
+
+Les matériels empruntés sont les suivants :
+{% for matgen in loan.loangenericitem_set.all %}* {{ matgen.material.name }} ({{ matgen.quantity  }} exemplaire{{ matgen.quantity|pluralize }})
+{% endfor %}
+{% for matspec in loan.specific_materials.all|dictsort:"model.id" %}
+{% ifchanged matspec.model.id %}* {{ matspec.model.name }}
+{% endifchanged %}  * {{ matspec.name }}{% endfor %}

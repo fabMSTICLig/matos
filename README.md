@@ -57,6 +57,10 @@ lancer les migrations
 
 > sudo python3 manage.py migrate
 
+démarrer le serveur
+
+> sudo python3 manage.py runserver
+
 ### authentification
 
 ### création d’un superutilisateur
@@ -70,11 +74,10 @@ ouvrir un terminal et se placer à la racine du projet
 se loguer avec l’identifiant superutilisateur, puis ajouter des utilisateur depuis  « Users » 
 Ajouter les permissions __Staff status__.
 
-### ajout d’un manager
 
-> sur l’interface d’administration, aller sur un utilisateur (Users), puis affecter le groupe « manager » à l’utilisateur. Revenir sur l’application, et vérifier que la rubrique « Organisations » apparaît, une fois logué avec l’utilisateur
-Autre possibilité, se loguer avec son compte CAS depuis l’application « CAS Login » et  depuis l’administration effectuer les mêmes étapes
+### login
 
+> login depuis le CAS de l'université
 
 ### Vuejs
 
@@ -91,16 +94,17 @@ modifier le fichier .env.local à votre besoin, en fonction de l'environnement s
 
 L’application se lance sur http://localhost:8000
 
+
 _____
 
 
 L’application comprend trois ensembles :
 
-- api
-- adminplatform
+- core
+- matos
 - frontend
 
-        Api
+        Api (core)
       
 permet d’interagir avec la plateforme pour accéder et modifier les ressources suivantes :
 
@@ -109,21 +113,24 @@ permet d’interagir avec la plateforme pour accéder et modifier les ressources
 - Utilisateurs (provenant de CAS ou enregistré préalablement)
 - gestion et accès aux entités
 
-deux rôles sont affectés :
+trois rôles sont affectés :
 				- utilisateur (accéder aux ressources en lecture)
 				- manager (gestion des ressources pour une entité)
+				- admin (gestion de l'ensemble de la plateforme)
   
 
-            Adminplatform
+ 		Administration 
 
-Composante de gestion de la plateforme. Permet de :
+avec le rôle admin, l'ensemble de la plateforme peut être gérée.
+Permettant de :
 - créer / modifier et supprimer les entités
 - ajouter des utilisateurs et affiliations aux entités
 - gérer les catégories de matériels
 - gérer les utilisateurs de la plateforme
 - gérer les prêts de toutes les entités
+- ajouter des managers aux entités
 
-un rôle est affecté :   
-                - Admin
+		Manager
 
-cette application est dédiée à la gestion des ressources côté administrateur, elle expose la même api avec les composantes d'administration
+chaque entité comporte un ou plusieurs managers, responsable des prêts et des équipements qu'il possède. Il peut gérer les informations de l'entité. 
+

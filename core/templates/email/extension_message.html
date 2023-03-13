@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+</head>
+<body>
+  L'utilisateur {{loan.user.username}} demande une prolongation du prêt <a href="{{ SITE_URL }}#/loan/{{ loan.id }}">accès à la réservation</a> jusqu'au {{date_ext}}
+
+<p>Nom: @{{loan.user.username}} {{loan.user.first_name}} {{loan.user.last_name}}</p>
+<p>Email: <a href="mailto:{{loan.user.email}}">{{loan.user.email}}</a></p>
+<p>Pour l'entité {{loan.entity.name}}</p>
+<br/>
+<p>Date d'emprunt: {{loan.checkout_date}}</p>
+<p>Date de retour prévue: {{loan.due_date}}</p>
+<p>Prolongation demandée: {{date_ext}}</p>
+<br/>
+
+<hr />
+
+{% include "email/listmat.html" %}
+
+
+</body>

@@ -1,0 +1,24 @@
+Votre demande d'emprunt a été {{ status }}. {{ SITE_URL }}#/loan/{{ loan.id }}
+
+{% if loan.status == '3' %}
+Vous pouvez prendre contact avec l'entité {{loan.entity.name}} {{loan.entity.contact}}
+{% endif %}
+
+{% if status == '1' %}
+La demande de prêt suivante a été annulée par {{loan.user.username}}
+email: {{loan.user.email}}
+pour l'entité {{loan.entity.name}}
+
+{{loan.user.email}}
+
+Date d'emprunt: {{loan.checkout_date}}
+
+Date de retour prévue: {{loan.due_date}}
+
+{% endif %}
+
+{% include "email/listmat.txt" %}
+
+
+
+Ce mail est automatique, veuillez ne pas y répondre directement.
