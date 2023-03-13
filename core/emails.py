@@ -35,7 +35,7 @@ class Emails:
             template_name='email/statusloan_message.html',
             context=context
         )
-        msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.user.email])
+        msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.user.email], reply_to=[loan.entity.contact])
         msg.attach_alternative(html_content, "text/html")
         try:
             msg.send()
