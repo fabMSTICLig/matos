@@ -47,7 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'first_name', 'last_name', 'is_staff', 'rgpd_accept', 'affiliations', 'entities', 'externe')
         # remove if not using ldap info update : 'email', 'first_name',
         # 'last_name'
-        read_only_fields = ('username', 'email', 'first_name', 'last_name')
+        read_only_fields = ('username', 'email', 'first_name', 'last_name', 'is_pro')
 
     def get_externe(self, obj):
         return len(obj.password) == 0

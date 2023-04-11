@@ -37,6 +37,17 @@
                 required
               />
             </div>
+            <div class="mb-3 form-check form-switch">
+              <input
+                id="check-active"
+                v-model="object.is_pro"
+                type="checkbox"
+                class="form-check-input"
+              />
+              <label class="form-check-label" for="check-active"
+                >Pro uniquement</label
+              >
+            </div>
             <div class="mb-3">
               <label class="form-label">Manageurs</label
               ><UserDynList v-model="object.managers"> </UserDynList>

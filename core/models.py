@@ -51,6 +51,7 @@ class User(AbstractUser):
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="members")
     rgpd_accept =  models.DateField(null=True, blank=True)
+    is_pro = models.BooleanField(default=False)
     def __str__(self):
         return self.username+"("+self.first_name+" "+self.last_name+")"
 
@@ -76,6 +77,7 @@ class Entity(models.Model):
     description = models.TextField(blank=True)
     affiliations = models.ManyToManyField(
         Affiliation, blank=True, related_name="entities")
+    is_pro = models.BooleanField(default=False)
     def __str__(self):
         return self.name
     class Meta:

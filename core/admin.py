@@ -7,10 +7,10 @@ from django import forms
 class CustomUserAdmin(UserAdmin):
     ...
     fieldsets = UserAdmin.fieldsets + (
-        ('PlatPret', {'fields': ('rgpd_accept','affiliations',)}),
+        ('PlatPret', {'fields': ('is_pro', 'rgpd_accept','affiliations')}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('PlatPret', {'fields': ('rgpd_accept','affiliations',)}),
+        ('PlatPret', {'fields': ('is_pro', 'rgpd_accept','affiliations',)}),
     )
     change_form_template = "admin/auth/user/change_form.html"
     change_list_template = "admin/auth/user/change_list.html"

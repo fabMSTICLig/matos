@@ -227,6 +227,16 @@ class EntityViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['name']
 
+    def get_queryset(self):
+
+        # If user is not pro and not specific search (for old loan), hide
+        # entity
+        ids_q = self.request.query_params.get('ids', None)
+        if (ids_q is None and not self.request.user.is_pro):
+            return Entity.objects.all().filter(is_pro=False)
+        else:
+            return Entity.objects.all()
+
 
 class AffiliationViewSet(viewsets.ModelViewSet):
     """
@@ -590,7 +600,9 @@ class MaterialsView(APIView):
                     entitiesid = ents
                 except BaseException:
                     pass
-
+        # Specific search
+        # hidden and is_pro not checked to always be able to show an old loan
+        # TODO if user not manager only show materiel in own loans
         loanid = request.query_params.get('loan', None)
         loan = None
         if (loanid is not None):
@@ -621,62 +633,66 @@ class MaterialsView(APIView):
             except BaseException:
                 pass
 
-        # Filter search
-        search = request.query_params.get('search', None)
-
-        hidden = request.query_params.get('hidden', False)
-
-        if hidden and hidden != "true":
-            hidden = False
-
-        mattype = request.query_params.get('type', None)
-        if (mattype is not None and mattype != 's' and mattype != 'g'):
-            mattype = None
-
-        tags = request.query_params.get('tags', None)
-        tagsid = []
-        if (tags is not None):
-            tagst = tags.split(',')
-            try:
-                for i, v in enumerate(tagst):
-                    tagst[i] = int(v)
-                tagsid = tagst
-            except BaseException:
-                pass
-
         genmats = GenericMaterial.objects.all()
         spemats = SpecificMaterial.objects.all()
 
-        if mattype:
-            if mattype == 'g':
-                spemats = spemats.none()
-            elif mattype == 's':
-                genmats = genmats.none()
-
-        if not hidden and loanid is None:
-            genmats = genmats.filter(active=True)
-            spemats = spemats.filter(active=True)
-
-        if search:
-            searchQ = Q(name__icontains=search) | Q(
-                ref_int__icontains=search) | Q(ref_man__icontains=search)
-            genmats = genmats.filter(searchQ).distinct()
-            spemats = spemats.filter(searchQ).distinct()
-        if entitiesid:
-            genmats = genmats.filter(entity__in=entitiesid).distinct()
-            spemats = spemats.filter(entity__in=entitiesid).distinct()
-
-        if tagsid:
-            genmats = genmats.filter(tags__in=tagsid).distinct()
-            spemats = spemats.filter(tags__in=tagsid).distinct()
-
-        spematinsts = []
         if loan:
             genmats = genmats.filter(pk__in=loan.generic_materials.all())
             spemats = spemats.filter(instances__loans__in=[loan]).distinct()
         elif gmids or smids:
             genmats = genmats.filter(pk__in=gmids)
             spemats = spemats.filter(pk__in=smids)
+
+        if (not (loan or gmids or smids)):
+            # Search Mode
+            search = request.query_params.get('search', None)
+
+            hidden = request.query_params.get('hidden', False)
+
+            if hidden and hidden != "true":
+                hidden = False
+
+            mattype = request.query_params.get('type', None)
+            if (mattype is not None and mattype != 's' and mattype != 'g'):
+                mattype = None
+
+            tags = request.query_params.get('tags', None)
+            tagsid = []
+            if (tags is not None):
+                tagst = tags.split(',')
+                try:
+                    for i, v in enumerate(tagst):
+                        tagst[i] = int(v)
+                    tagsid = tagst
+                except BaseException:
+                    pass
+
+            if mattype:
+                if mattype == 'g':
+                    spemats = spemats.none()
+                elif mattype == 's':
+                    genmats = genmats.none()
+
+            if (not request.user.is_pro):
+                genmats = genmats.filter(entity__is_pro=False)
+                spemats = spemats.filter(entity__is_pro=False)
+
+            if not hidden:
+                genmats = genmats.filter(active=True)
+                spemats = spemats.filter(active=True)
+
+            if search:
+                searchQ = Q(name__icontains=search) | Q(
+                    ref_int__icontains=search) | Q(ref_man__icontains=search)
+                genmats = genmats.filter(searchQ).distinct()
+                spemats = spemats.filter(searchQ).distinct()
+            if entitiesid:
+                genmats = genmats.filter(entity__in=entitiesid).distinct()
+                spemats = spemats.filter(entity__in=entitiesid).distinct()
+
+            if tagsid:
+                genmats = genmats.filter(tags__in=tagsid).distinct()
+                spemats = spemats.filter(tags__in=tagsid).distinct()
 
         paginator = LimitOffsetPaginationMulti()
         genmats, spemats = paginator.paginate_queryset(
@@ -913,11 +929,13 @@ class LoanViewSet(viewsets.ModelViewSet):
         hist = request.query_params.get('hist', False)
 
         partial = kwargs.pop('partial', False)
-        if (hist=='true' and (request.user.is_staff or request.user in instance.entity.managers.all())):
+        if (hist == 'true' and (
+                request.user.is_staff or request.user in instance.entity.managers.all())):
             if (hasattr(instance, "child")):
                 raise serializers.ValidationError(
                     "Le prêt a déjà un successeur.")
-            if (instance.status != Loan.Status.ACCEPTED or instance.return_date is not None):
+            if (instance.status !=
+                    Loan.Status.ACCEPTED or instance.return_date is not None):
                 raise serializers.ValidationError(
                     "Vous pouvez copier uniquement un prêt qui a été accepté et non rendu.")
             nowdate = timezone.now().date()
@@ -925,14 +943,14 @@ class LoanViewSet(viewsets.ModelViewSet):
                     nowdate):
                 raise serializers.ValidationError(
                     "La date de rendu prévu doit être dans le future.")
-            #On vérifie que tout est valid sans appliqué les modifications
+            # On vérifie que tout est valid sans appliqué les modifications
             serializer = self.get_serializer(
                 instance, data=request.data, partial=partial)
             serializer.is_valid(raise_exception=True)
-            #on cloture le prêt
-            instance.return_date = nowdate;
+            # on cloture le prêt
+            instance.return_date = nowdate
             instance.save()
-            #on réouvre un nouveau prêt avec date de sortie aujourd'hui
+            # on réouvre un nouveau prêt avec date de sortie aujourd'hui
             del request.data['id']
             request.data.update({'checkout_date': nowdate})
             request.data.update({'parent': instance.id})
