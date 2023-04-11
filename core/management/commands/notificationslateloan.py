@@ -13,7 +13,6 @@ class Command(BaseCommand):
     help = 'Send notification for late return'
 
     def handle(self, *args, **options):
-        print("Late Loan notif")
         loans = Loan.objects.filter(return_date=None).filter(due_date__lt=datetime.today()).filter(status=Loan.Status.ACCEPTED)
 
         for loan in loans:
@@ -32,7 +31,6 @@ class Command(BaseCommand):
             )
             msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.user.email])
             msg.attach_alternative(html_content, "text/html")
-            #print(msg.message())
             try:
                 msg.send()
             except:

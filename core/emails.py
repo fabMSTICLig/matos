@@ -13,7 +13,6 @@ class Emails:
 
     @staticmethod
     def send_status(loan):
-        print(loan)
         if(loan.status == Loan.Status.CANCELED):
             status = "annulée"
         elif(loan.status == Loan.Status.REQUESTED):

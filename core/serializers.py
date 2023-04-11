@@ -184,7 +184,11 @@ class SpecificMaterialField(serializers.Field):
         return materials
 
     def to_internal_value(self, data):
-        ids = set(itertools.chain.from_iterable(data.values()))
+        ids = set()
+        if(isinstance(data, dict)):
+            ids = set(itertools.chain.from_iterable(data.values()))
+        else:
+            ids = set(data)
         return SpecificMaterialInstance.objects.filter(pk__in=ids)
 
 

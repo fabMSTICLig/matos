@@ -1020,7 +1020,6 @@ class LoanViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError(
                 "Vous pouvez demander une prolongation uniquement pour un prêt qui a été accepté.")
         try:
-            print(request.data['ext_date'])
             ext_date = date.fromisoformat(request.data['ext_date'])
             if (ext_date <= loan.due_date):
                 return Response(
