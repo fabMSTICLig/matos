@@ -31,7 +31,7 @@
               class="btn btn-outline-primary"
               role="button"
               :to="{
-                name: 'entity',
+                name: 'entityStats',
                 params: { entityid: object.id },
               }"
             >

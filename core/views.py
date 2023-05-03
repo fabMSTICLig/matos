@@ -656,14 +656,14 @@ class MaterialsView(APIView):
             if (mattype is not None and mattype != 's' and mattype != 'g'):
                 mattype = None
 
-            tags = request.query_params.get('tags', None)
-            tagsid = []
+            tags = request.query_params.getlist('tags[]', None)
+
             if (tags is not None):
-                tagst = tags.split(',')
+                tagsid = tags
                 try:
-                    for i, v in enumerate(tagst):
-                        tagst[i] = int(v)
-                    tagsid = tagst
+                    for i, v in enumerate(tagsid):
+                        tagsid[i] = int(v)
+                        
                 except BaseException:
                     pass
 

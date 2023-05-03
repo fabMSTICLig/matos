@@ -93,6 +93,15 @@ const routes = [
         },
         component: () => import("../pages/profile/LoansList.vue"),
       },
+      {
+        path: "stats",
+        name: "entityStats",
+        beforeEnter: requireManager,
+        meta: {
+          routeparam: "entityid",
+        },
+        component: () => import("../pages/stats/ShowStats.vue"),
+      },
     ],
   },
 ];

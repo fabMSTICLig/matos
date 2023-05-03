@@ -12,6 +12,10 @@
               </h3>
             </div>
             <div class="col-auto">
+              <button v-if="isEntityLoans" class="btn btn-outline-secondary" id="DL_arch" @click="dlArch(currentEntity.id)">
+                <img src="@/../public/download.png" width="24" height="24">
+                  Télécharger données d'archive de {{ (new Date().getFullYear() - 1).toString() }}
+              </button>
               <router-link
                 v-if="!isAuthLoans"
                 class="btn btn-outline-secondary float-end"
@@ -182,6 +186,7 @@ import {
   useSpecificMaterialsStore,
   useGenericMaterialsStore,
 } from "@/stores/materials";
+import { usePurgeStore } from "@/stores/purge"
 import Pagination from "@/components/nav/ListPagination.vue";
 import useSearchStorage from "@/composables/useSearchStorage";
 
@@ -346,4 +351,19 @@ onBeforeMount(async () => {
   }
   loaded.value = true;
 });
+
+const purgeStore = usePurgeStore()
+
+  async function dlArch(ent) {
+    let a = document.createElement("a");
+    let recep = await purgeStore.getDataArch({'entity_selected':ent})
+
+    let file = new Blob([JSON.stringify(recep,null,2)], {
+      type: "text/plain",
+    });
+
+    a.href = URL.createObjectURL(file);
+    a.download = "Données Archivées_Année " + (new Date().getFullYear() - 1).toString() + ".json";
+    a.click();
+  }
 </script>
