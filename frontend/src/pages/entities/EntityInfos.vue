@@ -27,7 +27,7 @@
             >
               Gestion prêts
             </router-link>
-            <!--<router-link
+            <router-link
               class="btn btn-outline-primary"
               role="button"
               :to="{
@@ -36,7 +36,7 @@
               }"
             >
               Statistiques
-            </router-link>-->
+            </router-link>
           </div>
         </div>
         <div class="card-body">
