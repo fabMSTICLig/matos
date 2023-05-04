@@ -58,7 +58,7 @@ démarrer le serveur
 
 ### Vuejs
 
-ouvrir un second terminal, puis se placer dans le répertoire « frontend »
+ouvrir un second terminal, puis se placer dans le répertoire « frontend »
 
 installer la dernier version de nodejs avec NVM https://github.com/nvm-sh/nvm#installing-and-updating
 
