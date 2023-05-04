@@ -1,65 +1,48 @@
-# Plateforme prêt matériels électronique / équipements
+# Plateforme prêt matériels
 
 ## Installation
 
-git
-python 3 (with pip)
-yarn
+- git
+- python 3 (with pip)
+- nodejs
+
+
+Cloner le dépôt
+> git clone https://gricad-gitlab.univ-grenoble-alpes.fr/fabmstic/platepret.git
 
 ### Django
 ouvrir un terminal,
 se positionner à la racine. 
 
-Installer les librairies python3 > pip et virtualenv
-
 > sudo apt-get update
 > sudo apt-get -y upgrade
 
-> python3 -v
-> sudo apt-get install -y 
-> python3-pip
-> sudo apt-get install 
-> build-essential libssl-dev 
-> libffi-dev python-dev
-
 > sudo apt-get install -y python3-venv
 
-Cloner le dépôt
-> git clone https://gricad-gitlab.univ-grenoble-alpes.fr/fabmstic/platepret.git
+créer l’environnement virtuel
 
-se positionner dans la branche dev :
-
-> git checkout dev
+> python3 -m venv venv
 
 activer l’environnement virtuel
-
-> python3 -m virtualenv venv
-
-source venv/bin/activate
+> . ./venv/bin/activate
 
 installer les dépendances :
 
-> sudo pip3 install -r requirements.txt
+> pip install -r requirements.txt
 
 ### settings
 
-Adapter les variables d'environnement situées dans Djangovue > settings.py
+> cp matos/local_settings.py.example matos/local_settings.py
 
-> CAS_SERVER_URL (url du service CAS)
-> ALLOWED_HOSTS (domaines autorisés en développement)
--
-> CORS_ORIGIN_WHITELIST (domaines autorisés pour les accès CORS)
+modifier `matos/local_settings.py` et `matos/settings.py`
 
-lancer les migrations
+appliquer les migrations
 
-> sudo python3 manage.py makemigrations
-…
-
-> sudo python3 manage.py migrate
+> python3 manage.py migrate
 
 démarrer le serveur
 
-> sudo python3 manage.py runserver
+> python3 manage.py runserver
 
 ### authentification
 
@@ -69,31 +52,22 @@ ouvrir un terminal et se placer à la racine du projet
 
 - sudo python3 manage.py createsuperuser --username=joe --email=joe@example.com
  
-### création d’un administrateur
-> depuis l’interface d’administration, http://localhost:8000/admin
-se loguer avec l’identifiant superutilisateur, puis ajouter des utilisateur depuis  « Users » 
-Ajouter les permissions __Staff status__.
-
-
 ### login
 
 > login depuis le CAS de l'université
+> login local sur http://localhost:8000/auth/login
 
 ### Vuejs
 
 ouvrir un second terminal, puis se placer dans le répertoire « frontend »
-installer yarn :
 
-https://classic.yarnpkg.com/en/docs/install#debian-stable
+installer la dernier version de nodejs avec NVM https://github.com/nvm-sh/nvm#installing-and-updating
 
-modifier le fichier .env.local à votre besoin, en fonction de l'environnement souhaité
+modifier le fichier .env et .env.local à votre besoin, en fonction de l'environnement souhaité
 
-> yarn install
+> npm install
 
-> yarn build
-
-L’application se lance sur http://localhost:8000
-
+> npm build
 
 _____
 
@@ -104,7 +78,7 @@ L’application comprend trois ensembles :
 - matos
 - frontend
 
-        Api (core)
+		Api (core)
       
 permet d’interagir avec la plateforme pour accéder et modifier les ressources suivantes :
 
@@ -117,9 +91,8 @@ trois rôles sont affectés :
 				- utilisateur (accéder aux ressources en lecture)
 				- manager (gestion des ressources pour une entité)
 				- admin (gestion de l'ensemble de la plateforme)
-  
 
- 		Administration 
+		Administration
 
 avec le rôle admin, l'ensemble de la plateforme peut être gérée.
 Permettant de :
