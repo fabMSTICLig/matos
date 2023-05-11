@@ -657,13 +657,11 @@ class MaterialsView(APIView):
                 mattype = None
 
             tags = request.query_params.getlist('tags[]', None)
-
             if (tags is not None):
                 tagsid = tags
                 try:
                     for i, v in enumerate(tagsid):
                         tagsid[i] = int(v)
-                        
                 except BaseException:
                     pass
 
