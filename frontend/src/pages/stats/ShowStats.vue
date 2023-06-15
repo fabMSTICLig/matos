@@ -53,11 +53,11 @@
               <div class="col-auto btn-toolbar">
                 <div class="dropdwn">
                   <button v-if="(data != undefined)" class="btn btn-outline-secondary dropdown-toggle" id="dropDL" @click="(showDL = !showDL)">
-                    <img src="@/../public/download.png" width="24" height="24">
+                    <img src="@/../public/download.png" width="18" height="18">
                     Télécharger
                   </button>
                   <button v-else class="btn btn-outline-secondary dropdown-toggle" id="dropDL" @click="(showDL = !showDL)" disabled>
-                    <img src="@/../public/download.png" width="24" height="24">
+                    <img src="@/../public/download.png" width="18" height="18">
                     Télécharger
                   </button>
                   <ul class="dropdown-menu" :class="{ show: showDL }">

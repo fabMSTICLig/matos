@@ -117,7 +117,7 @@
                         }}
                         <span
                           v-if="mat.quantity"
-                          class="badge bg-primary rounded-pill"
+                          class="badge rounded-pill"
                           >{{ mat.quantity }}</span
                         >
                       </li>

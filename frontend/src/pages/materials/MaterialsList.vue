@@ -7,10 +7,10 @@
         </div>
         <div class="col-auto btn-group" role="group">
           <button
-            class="btn btn-outline-primary"
+            class="btn btn-outline-info"
             @click.prevent="showHelp = true"
           >
-            <span class="badge rounded-pill text-bg-primary">i</span>
+            <span class="badge rounded-pill">i</span>
           </button>
           <Dropdown
             :items="newMaterialRoutes"
@@ -98,7 +98,7 @@
               </td>
               <td class="text-end">
                 <router-link
-                  class="btn btn-primary m-2"
+                  class="btn btn-primary mb-1"
                   role="button"
                   :to="{
                     name:
