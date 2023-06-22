@@ -79,6 +79,18 @@
     border-color: var(--main-color-one);
 }
 
+.card-header .btn.btn-danger {
+    color: var(--main-color-two);
+    border-color: var(--main-color-two);
+    background-color: var(--main-color-one);
+}
+
+.card-header .btn.btn-danger:hover, .card-header .btn.btn-danger:active {
+    color: var(--main-color-one);
+    background-color: var(--main-color-two);
+    border-color: var(--main-color-two);
+}
+
 td .btn {
     width: 100%;
 }
@@ -168,55 +180,6 @@ li .badge {
     color: var(--secondary-font-color);
 }
 
-.petiteT {
-    width: 389.5px;
-    max-height: 325.5px;
-    margin: 5px;
-    padding: 1rem;
-}
-
-.petiteT img {
-    width: auto;
-    max-height: 30%;
-}
-
-.petiteT .card-body {
-    max-height: 70%;
-
-}
-
-.moyT {
-    width: 379.5px;
-    max-height: 504.5px;
-    margin: 10px;
-    padding: 1rem;
-}
-
-.moyT img {
-    width: auto;
-    max-height: 30%;
-}
-
-.moyT .card-body {
-    max-height: 70%;
-}
-
-.grandeT {
-    width: 779px;
-    max-height: 679px;
-    margin: 10px;
-    padding: 1rem;
-}
-
-.grandeT img {
-    width: auto;
-    max-height: 60%;
-}
-
-.grandeT .card-body {
-    max-height: 40%;
-}
-
 .corps a {
     font-family: "Open Sans",Verdana,sans-serif;
     font-size: 14px;
@@ -233,124 +196,7 @@ li .badge {
     color: var(--main-color-two);
 }
 
-@media (min-width: 1360px) and (max-width: 1630px) {
-    .petiteT {
-        width: 281.5px;
-        max-height: 352.5px;
-        margin: 5px;
-        padding: 1rem;
-    }
-
-    .moyT {
-        width: 271.5px;
-        max-height: 564.5px;
-        margin: 10px;
-        padding: 1rem;
-    }
-
-    .grandeT {
-        width: 563px;
-        max-height: 558px;
-        margin: 10px;
-        padding: 1rem;
-    }
-}
-
-@media (min-width: 992px) and (max-width: 1365.98px) {
-    .petiteT {
-        width: 220.5px;
-        max-height: 347.5px;
-        margin: 5px;
-        padding: 1rem;
-    }
-
-    .petiteT h2 {
-        font-size: 18px;
-    }
-
-    .moyT {
-        width: 441px;
-        max-height: 452.5px;
-        margin: 10px;
-        padding: 1rem;
-    }
-
-    .grandeT {
-        width: 441px;
-        max-height: 504px;
-        margin: 10px;
-        padding: 1rem;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 991.98px) {
-    .petiteT {
-        width: 340px;
-        max-height: 317.5px;
-        margin: 5px;
-        padding: 1rem;
-    }
-
-    .moyT {
-        width: 340px;
-        max-height: 437.5px;
-        margin: 10px;
-        padding: 1rem;
-    }
-
-    .grandeT {
-        width: 340px;
-        max-height: 461.5px;
-        margin: 10px;
-        padding: 1rem;
-    }
-}
-
-@media (min-width: 576px) and (max-width: 768px) {
-    .petiteT {
-        width: 255px;
-        max-height: 344px;
-        margin: 5px;
-        padding: 1rem;
-    }
-
-    .moyT {
-        width: 250px;
-        max-height: 512.5px;
-        margin: 10px;
-        padding: 1rem;
-    }
-
-    .grandeT {
-        width: 250px;
-        max-height: 436px;
-        margin: 10px;
-        padding: 1rem;
-    }
-}
-
 @media (max-width: 576px) {
-    .petiteT {
-        width: 444px;
-        max-height: 332px;
-        margin: 5px;
-        padding: 1rem;
-    }
-
-    .moyT {
-        width: 464px;
-        max-height: 412.5px;
-        margin: 10px;
-        padding: 1rem;
-    }
-
-    .grandeT {
-        width: 464px;
-        max-height: 480px;
-        margin: 10px;
-        padding: 1rem;
-    }
-
     .corps h1 {
         font-size: 1.5rem;
     }

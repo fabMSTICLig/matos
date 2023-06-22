@@ -12,10 +12,6 @@
               </h3>
             </div>
             <div class="col-auto">
-              <button v-if="isEntityLoans" class="btn btn-outline-secondary" id="DL_arch" @click="dlArch(currentEntity.id)">
-                <img src="@/../public/download.png" width="24" height="24">
-                  Télécharger données d'archive de {{ (new Date().getFullYear() - 1).toString() }}
-              </button>
               <router-link
                 v-if="!isAuthLoans"
                 class="btn btn-outline-secondary float-end"

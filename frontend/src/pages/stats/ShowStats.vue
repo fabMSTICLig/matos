@@ -251,7 +251,7 @@
 
     let params = {'tri':triInput.value,'entity_selected':currentEntity.value.id,'start_d':startDate.value,'end_d': endDate.value,'filters_aff':tempStr,'filter_freq':filFreqInput.value,'reverse_order':sortInput.value,'offset':(currentPage.value-1) * 10,'limit':perPage.value,'clotured':clotLoanInput.value}
     data.value = await statStore.getDataPage(statInput.value,params)
-    totalCount.value = data.value.pop()
+    totalCount.value = data?.value.pop()
   }
 
   async function downloadStat(dl) {
