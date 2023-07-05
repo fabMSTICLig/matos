@@ -44,7 +44,7 @@
             Bloc principal
       -->
       <div class="col">
-        <div v-if="!showHelp" class="card mt-2">
+        <div v-if="(!showHelp && !showWait)" class="card mt-2">
           <div class="card-header">
             <div class="row justify-content-between">
               <div class="col-auto">
@@ -142,6 +142,9 @@
             />
           </div>
         </div>
+        <div v-if="(showWait && !showHelp)" class="h-100 d-flex justify-content-center align-items-center">
+          <p class="fw-semibold fs-2"> Merci de patientez, les calculs sont en cours... </p>
+        </div>
         <div v-if="showHelp" class="card mt-2">
           <div class="card-header">
             <div class="row justify-content-between">
@@ -178,13 +181,16 @@
   import lateralPlageDate from "@/components/stats_components/LateralPlageDate.vue"
   
   // Constantes et fonctions générales
-  const loaded = ref(false)
-  const route = useRoute();
-  const notChange = ref(true)
-  const showHelp = ref(false)
-  const columns = ref()
-  const showDL = ref(false)
+  const loaded = ref(false) // passe à true quand la page est chargée
+  const route = useRoute(); 
+  const notChange = ref(true) // indique si il y a eu un changement dans les paramètres depuis le dernier calcul
+  const showHelp = ref(false) // indique la visibilité de la page d'aide
+  const columns = ref() // contient les noms des colonnes du taleau des données
+  const showDL = ref(false) // indique la visibilité du menu déroulant de téléchargement
+  const showWait = ref(false) // indique la visibilité du message d'attente (quand on attend les données du serveur)
 
+  // fonction qui modifie la valeur de la variable notChange si celle-ci est True
+  // sinon ne fait rien
   function searchChange() {
     if (notChange.value){
       notChange.value = !notChange.value
@@ -195,17 +201,18 @@
   const { objects: entity, currentEntity } = storeToRefs(entitiesStore);
 
   // Constantes et fonctions, de gestion des Input
-  const sortChoices = {
+  const sortChoices = { // dictionnaire contenant les valeurs de l'input d'ordre
     desc: { value: "", label: "Décroissant : + => -" },
     asc: { value: "Reverse", label: "Croissant : - => +" },
   };
-  const sortInput = ref("");
-  const statInput = ref()
-  const triInput = ref()
-  const filFreqInput = ref("0")
-  const filAffInput = ref(["0","1","2","3","4","5","Naff"])
-  const clotLoanInput = ref("0")
+  const sortInput = ref(""); // valeur de l'input de l'ordre par défaut "", correspond à l'ordre décroissant
+  const statInput = ref() // contient la valeur de la statistique souhaitée
+  const triInput = ref() // contient la valeur du tri souhaité
+  const filFreqInput = ref("0") // contient la valeur du filtre par fréquence
+  const filAffInput = ref(["0","1","2","3","4","5","Naff"]) // contient la ou les valeurs des filtres par affiliation
+  const clotLoanInput = ref("0")  // contient la valeur du type de traitement souhaité pour la plage de dates
 
+  // construction of defaults values for dates
   const dDate = new Date()
   let tempDate = dDate.getFullYear().toString() + '-' // Year
   let tempSDate = (dDate.getFullYear() - 3).toString()
@@ -220,27 +227,30 @@
     tempDate = tempDate + dDate.getDate().toString() // Day
   }
   tempSDate = tempSDate + tempDate.slice(4)
-  const startDate = ref(tempSDate)
-  const endDate = ref(tempDate)
+  const startDate = ref(tempSDate)  // contient la date de début de la plage de dates => by default = day date - 3 years
+  const endDate = ref(tempDate) // contient la date de fin de la plage de dates => by default = day date
 
   // Constantes et fonctions de gestion des pages
-  const totalCount = ref(0)
-  const currentPage = ref(1);
-  const perPage = ref(parseInt(import.meta.env.VITE_APP_MAXLIST));
-  const data = ref()
+  const totalCount = ref(0) // nombre total de pages, défini au moment de la récupération des données d'une statistique
+  const currentPage = ref(1); // page actuelle => débute à 1
+  const perPage = ref(parseInt(import.meta.env.VITE_APP_MAXLIST)); // nombre d'éléments maximum par page, initialisé en fonction de la variable d'environnement de Vite
+  const data = ref() // correspond aux données réceptionnées pour une statistique
 
+  // fonction à appeler au changement de page, 
+  // modifie la valeur de la page actuelle et demande les données de la page au serveur
   function onPageChange(page) {
     currentPage.value = page;
     searchStat()
   }
 
-  // Fonctions et constantes pour appels API et réception des données
-  const statStore = useStatsStore();
+  // Fonctions et constantes pour appels API et réception des données pour une page d'une certaine statistique
+  const statStore = useStatsStore(); // store qui contient les méthodes d'appel à l'API
   async function searchStat() {
-    notChange.value = true
-    updateColumns()
+    notChange.value = true // on passe la variable à True
+    showWait.value = true // on montre le message d'attente en attendant de recevoir les données
+    updateColumns() // on met à jour les noms des colonnes du tableau
 
-    let tempStr = ""
+    let tempStr = "" // string temporaire pour construire la chaine qui contient les filtres pour le tri par affiliation
     for (let i = 0; i < filAffInput.value.length; i++) {
       if (i == filAffInput.value.length - 1) {
         tempStr += filAffInput.value[i]
@@ -249,13 +259,20 @@
       }
     }
 
+    // objet contenant les paramètres de la requête pour l'API
     let params = {'tri':triInput.value,'entity_selected':currentEntity.value.id,'start_d':startDate.value,'end_d': endDate.value,'filters_aff':tempStr,'filter_freq':filFreqInput.value,'reverse_order':sortInput.value,'offset':(currentPage.value-1) * 10,'limit':perPage.value,'clotured':clotLoanInput.value}
-    data.value = await statStore.getDataPage(statInput.value,params)
-    totalCount.value = data?.value.pop()
+    data.value = await statStore.getDataPage(statInput.value,params) // attente puis assignation du résultat à la variable data
+    totalCount.value = data?.value.pop()  // si data existe, prend le dernier élément (qui correspond au nombre de pages total) puis l'assigne à totalCount
+    showWait.value = false  // on masque le message d'attente car tout a été réceptionné
   }
-
+  /* 
+  appel API pour recevoir les données du fichier téléchargeable souhaité
+    parameter 'dl' contain a string with the format of document,
+    formats supports :
+        "pdf" | "txt" | "csv" | "json"
+  */
   async function downloadStat(dl) {
-    let tempStr = ""
+    let tempStr = "" // string temporaire pour construire la chaine qui contient les filtres pour le tri par affiliation
     for (let i = 0; i < filAffInput.value.length; i++) {
       if (i == filAffInput.value.length - 1) {
         tempStr += filAffInput.value[i]
@@ -264,14 +281,21 @@
       }
     }
 
+    // objet contenant les paramètres de la requête pour l'API
     let params = {'tri':triInput.value,'entity_selected':currentEntity.value.id,'start_d':startDate.value,'end_d': endDate.value,'filters_aff':tempStr,'filter_freq':filFreqInput.value,'reverse_order':sortInput.value,'clotured':clotLoanInput.value,'download':dl}
-    let tempRet = await statStore.getDataPage(statInput.value,params)
+    let tempRet = await statStore.getDataPage(statInput.value,params) // attente et récupération des données à télécharger (le fichier)
     return tempRet
   }
 
+  /* 
+  modifications des noms des colonnes du tableau de résultat
+        (effectué dans une fonction pour que la modification ne soit pas 
+        fait en temps réel mais seulement quand elle est souhaitée)
+  */
   function updateColumns() {
-    columns.value = []
+    columns.value = [] // réinitialisation du tableau des colonnes
 
+    // ajout des noms de colonnes en fonction du tri sélectionné
     if (triInput.value == 0) {
       columns.value.push("Affiliation")
     } else if (triInput.value == 1) {
@@ -282,6 +306,7 @@
       columns.value.push("Tag")
     }
 
+    // ajout des noms de colonnes en fonction de la statistique sélectionnée
     if (statInput.value == "nb_emp"){
       columns.value.push("Nombre d emprunts")
     } else if (statInput.value == "d_moy_emp") {
@@ -292,6 +317,8 @@
   }
 
   /*
+  Fonction qui met en place le téléchargement des données actuelles puis provoque le téléchargement
+
   type = integer appartenant à [0,1,2,3]
   0 = pdf
   1 = csv
@@ -299,74 +326,78 @@
   3 = txt
   */
   async function downloadActualData(type) {
+    // si la variable data contient des données
     if (data.value != undefined) {
+      // si le tri est par utilisateur, téléchargement impossible pour contrainte RGPD
       if (triInput.value == 1) {
         showDL.value = false
         alert("Contrainte RGPD\n => téléchargement des statistiques avec tri par utilisateur impossible")
-      } else {
-        let date = ""
+      } else { // sinon pour tout autre tri
+        let date = "" // construction de la chaine contenant les dates de la plage sélectionnée => sert pour le nom du fichier
         if (startDate.value != undefined && startDate.value != null) {
           date += "dDebut-" + startDate.value
         } else if (endDate.value != undefined && endDate.value != null) {
           date += "_dFin-" + endDate.value
         }
+        // initialisation des variables
         let labelData = ""
         let a = document.createElement("a");
         let file = null
 
-        // labelDate génération
-        if (type == 0) {
-          // in PDF
+        if (type == 0) {  // in PDF
+          // construction du nom du fichier
           labelData = "Statistiques_" + currentEntity.value.name + "_" + statInput.value + "_" + columns.value[columns.value.length-1] + "_" + date + ".pdf";
-          let pdfFile = await downloadStat("pdf")
-          pdfFile = pdfFile.toString()
-          file = new Blob([pdfFile], {
+          let pdfFile = await downloadStat("pdf") // récupération du fichier à télécharger
+          pdfFile = pdfFile.toString() // conversion en chaine de caractères (pour téléchargement)
+          file = new Blob([pdfFile], {  // construction d'un blob avec le fichier pdf en string
             type: "application/pdf",
           });
 
-        } else if (type == 1) {
-          // in CSV
+        } else if (type == 1) { // in CSV
+          // construction du nom du fichier
           labelData = "Statistiques_" + currentEntity.value.name + "_" + statInput.value + "_" + columns.value[columns.value.length-1] + "_" + date + ".csv";
+          // construction du début du fichier (pour les noms des colonnes)
           let csvfile = ""
           for (let c of columns.value) {
             csvfile += c + ","
           }
-          let tempFile = await downloadStat("csv")
-          csvfile += "\n" + tempFile
-          file = new Blob([csvfile], {
+          let tempFile = await downloadStat("csv") // récupération du fichier à télécharger
+          csvfile += "\n" + tempFile // concaténation du fichier reçu et du début construit au préalable
+          file = new Blob([csvfile], {  // construction d'un blob avec le fichier csv
             type: "text/plain",
           });
-        } else if (type == 2) {
-          // in JSON
+        } else if (type == 2) { // in JSON
+          // construction du nom du fichier
           labelData = "Statistiques_" + currentEntity.value.name + "_" + statInput.value + "_" + columns.value[columns.value.length-1] + "_" + date + ".json";
-          let jsonfile = await downloadStat("json")
-          file = new Blob([JSON.stringify({order:columns.value,values:jsonfile},null,2)], {
+          let jsonfile = await downloadStat("json") // récupération du fichier à télécharger
+          file = new Blob([JSON.stringify({order:columns.value,values:jsonfile},null,2)], { // construction d'un blob avec le fichier json et les colonnes
             type: "text/plain",
           });
-        } else {
-          // in TXT
+        } else {  // in TXT
+          // construction du nom du fichier
           labelData = "Statistiques_" + currentEntity.value.name + "_" + statInput.value + "_" + columns.value[columns.value.length-1] + "_" + date + ".txt";
+          // construction du début du fichier (pour les noms des colonnes)
           let txtfile = "|"
           for (let c of columns.value) {
             txtfile += c + "|"
           }
-          let tempFile = await downloadStat("txt")
-          txtfile += "\n" + tempFile
-          file = new Blob([txtfile], {
+          let tempFile = await downloadStat("txt") // récupération du fichier à télécharger
+          txtfile += "\n" + tempFile  // concaténation du fichier reçu et du début construit au préalable
+          file = new Blob([txtfile], {  // construction d'un blob avec le fichier txt
             type: "text/plain",
           });
         }
-        a.href = URL.createObjectURL(file);
-        a.download = labelData;
-        a.click();
+        a.href = URL.createObjectURL(file); // assignation d'un lien vers un objet (le fichier/blob construit) au lien 'a' construit au préalable
+        a.download = labelData; // définition du nom du fichier téléchargé en utilisant le lien
+        a.click();  // clic sur le lien pour lancer le téléchargement
 
-        showDL.value = false
+        showDL.value = false  // fermeture du menu déroulant de téléchargement
       }
-    } else {
-      showDL.value = false
-      alert("Aucune donnée à télécharger")
+    } else { // si data ne contient pas de données (normalement le bouton de téléchargement est désactivé dans ce cas)
+      showDL.value = false  // on ferme le menu déroulant de téléchargement
+      alert("Aucune donnée à télécharger")  // on informe l'utilisateur qu'il n'y a aucune donnée à télécharger
     }
   }
 
-  loaded.value = true
+  loaded.value = true // tout a été effectué donc la page a fini de charger
 </script>

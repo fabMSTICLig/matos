@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
+import "../src/assets/CSS/bootstrap_UGA-graphic.css";
 
 import Modal from "./plugins/modal";
 

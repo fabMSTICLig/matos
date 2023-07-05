@@ -18,7 +18,7 @@
               </button>
               <router-link
                 v-if="!isAuthLoans"
-                class="btn btn-outline-secondary float-end"
+                class="btn btn-outline-secondary"
                 role="button"
                 :to="returnRoute"
               >

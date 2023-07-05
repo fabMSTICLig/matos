@@ -68,6 +68,37 @@ modifier le fichier .env et .env.local à votre besoin, en fonction de l'environ
 
 > npm build
 
+### Sass, Bootstrap et charte graphique
+
+ouvrir un terminal, se placer dans le répertoire "frontend"
+
+utiliser la commande suivante pour compiler le Sass en un fichier CSS utilisable :
+
+> sass scss/uga_graphic_charter.scss src/assets/CSS/bootstrap_UGA-graphic.css
+
+/!\ sass est normalement déjà installé mais sinon utiliser :
+> npm install -g sass
+
+/!\ le fichier CSS compilé grâce au fichier Sass ne se situe pas dans le même dossier,
+   il est situé dans le dossier src/assets/CSS/
+
+### Tests interface (end to end) - Cypress
+
+ouvrir un terminal dans le répertoire "frontend"
+
+lancer Cypress grâce à la commande :
+> npm run cypress
+
+sélectionner "E2E Testing" puis le navigateur dans lequel vous voulez lancer les tests
+
+plusieurs dossiers de tests et fichiers s'ouvrent dans le navigateur sélectionné, tout en bas se trouve
+le fichier permettant d'effectuer tous les tests (durée d'environ 10min).
+
+/!\ Certaines erreurs se produisent parfois quand le serveur ne répond pas ou pas suffisamment vite,
+ce ne sont pas des erreurs qui se produisent dans un environnement normal.
+Pour être certain que ce n'est pas une erreur de ce type, il faut identifier le test d'où provient
+l'erreur et le relancer indépendamment (sélectionnez un fichier de test dans le dossier correspondant).
+
 _____
 
 - matos

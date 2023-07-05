@@ -1,8 +1,8 @@
 <template>
   <footer class="site-footer">
-    <div class="logo-area">
+    <div class="logo-area pad-logo-area footer-logo">
       <a href="https://www.univ-grenoble-alpes.fr" target="_blank">
-        <img :src="`${publicPath}21-UGA.png`" class="logo-uga"/>
+        <img :src="`${publicPath}21-UGA.png`" class="logo"/>
       </a>
     </div>
     <div class="container-fluid">
@@ -27,7 +27,6 @@
             <ul class="list-unstyled">
               <li>
                 <a
-                  class="logo-font"
                   href="/"
                 >
                   Matos
@@ -35,7 +34,6 @@
               </li>
               <li>
                 <router-link
-                  class="logo-font"
                   to="/legalnotice"
                 >
                   Mentions légales
@@ -43,7 +41,6 @@
               </li>
               <li>
                 <router-link
-                  class="logo-font"
                   to="/datapolicy"
                 >
                   Traitement des données
@@ -56,10 +53,6 @@
     </div>
   </footer>
 </template>
-
-<style>
-  @import "../assets/CSS/footer-screen.css";
-</style>
 
 <script setup>
   const publicPath = import.meta.env.BASE_URL

@@ -31,7 +31,7 @@ describe('tests des pages admin - Utilisateurs', () => {
 
   it('Bouton Modifier', () => {
     // clic sur le bouton modifier de la première ligne, élément utilisateur "Germain Lemasson"
-    cy.get(".corps .card-body table tbody > tr:first > td:last").click()
+    cy.get(".corps .card-body table tbody > tr:first > td:last").contains("Modifier").click()
     // vérification de l'url pour l'utilisateur "Germain Lemasson"
     cy.url().should("contain","/users/1")
   });
@@ -64,7 +64,7 @@ describe('tests des pages admin - Tags', () => {
 
   it('Bouton Modifier', () => {
     // clic sur le bouton modifier de la première ligne, élément tag "info"
-    cy.get(".corps .card-body table tbody > tr:first > td:last").click()
+    cy.get(".corps .card-body table tbody > tr:first > td:last").contains("Modifier").click()
     // vérification de l'url pour le tag "info"
     cy.url().should("contain","/tags/3")
   });
@@ -97,7 +97,7 @@ describe('tests des pages admin - Affiliations', () => {
 
   it('Bouton Modifier', () => {
     // clic sur le bouton modifier de la première ligne, élément affiliation "LIG"
-    cy.get(".corps .card-body table tbody > tr:first > td:last").click()
+    cy.get(".corps .card-body table tbody > tr:first > td:last").contains("Modifier").click()
     // vérification de l'url pour l'affiliation "LIG"
     cy.url().should("contain","/affiliations/1")
   });

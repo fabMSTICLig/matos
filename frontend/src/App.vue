@@ -43,10 +43,6 @@
     </svg>
 </template>
 
-<style>
-  @import "./assets/CSS/corps-screen.css";
-</style>
-
 <script setup>
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";

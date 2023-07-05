@@ -1,0 +1,248 @@
+// importation font-family textuel
+@import url("http://fonts.googleapis.com/css?family=Open+Sans:300italic,600italic,400,300,600,700,800");
+
+// Réécriture des valeurs par défaut
+    // variables
+        // ajout par rapport à bootstrap
+$footer-bg: #90C200; // couleur de fond pour le footer
+$reduce-primary: #A8E39E; // couleur plus claire que la primary
+$font-weight-superbold: 800;
+$bg-uga: #d9d9d9; // couleur de fond pour le bandeau Titre du header
+
+        // sur-couche à bootstrap
+$white: #fff;
+
+$primary: #00B649;
+$secondary: #117401;
+$danger:#dc3545; // même valeur que par défaut
+$info: $primary;
+
+$body-bg: $white; // couleur général de bootstrap, comprend notamment le fond de la page et les textes
+$font-family-sans-serif: "Open Sans", Verdana, sans-serif; // police de caractères
+$dropdown-bg: $footer-bg; // la couleur de fond du déroulement des menus déroulant
+$dropdown-link-hover-bg: $primary; // la couleur de fond d'un élément d'un menu déroulant lorsqu'on le survole
+$input-bg: $body-bg; // le fond des inputs (par défaut idem que body-bg)
+$card-cap-bg: $primary; // fond pour la partie header des cartes bootstrap
+$card-cap-color: $white; // couleur du texte pour la partie header des cartes bootstrap
+$border-radius: 0; // rayon des bordures pour tous les éléments (arrondi des angles des cartes et boutons => 0 = angles droits)
+$navbar-padding-y: 6px; // padding vertical (bottom & top) pour la class .navbar de bootstrap
+$link-hover-color: $footer-bg; // couleur des liens lorsqu'on les survole
+$btn-color: $white; // couleur de l'écriture dans les boutons
+$btn-font-weight: 700; // épaisseur de la police de caractères dans les boutons
+$btn-padding-x: .875rem; // padding (marges internes) horizontal (start & end) pour les boutons
+$btn-padding-y: .875rem; // padding (marges internes) vertical (start & end) pour les boutons
+$navbar-light-color: $white; // couleur du texte des éléments pour la class .navbar
+$navbar-light-hover-color: $white; // couleur du texte des éléments pour la class .navbar lorsqu'on les survole
+$navbar-light-active-color: $white; // couleur du texte des éléments pour la class .navbar lorsqu'on est sur la page correspondant à l'élément de la navbar
+
+/* 
+    L'importation s'effectue après car en scss, une variable dite "par défaut" avec "!default"
+    ne s'applique pas si elle est déjà définie au préalable.
+*/
+// importation des fichiers scss bootstrap
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+
+// class
+        // ajout par rapport à bootstrap
+// ajout du background pour le footer
+footer {
+    background-color: #{$footer-bg};
+    font-size: 14px;
+    padding-bottom: 2rem;
+
+    > .container-fluid {
+        padding-top: 2rem;
+    }
+
+    a {
+        --bs-link-color: #{$secondary};
+        text-decoration: none;
+        font-weight: normal;
+    }
+
+    a:hover {
+        color: #{$white};
+    }
+}
+
+// ajout de padding pour provoquer un léger espacement entre le corps
+// d'une page et le reste de la page (bords de page, header et footer)
+.corps {
+    padding: 2rem;
+
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: #{$font-weight-bold};
+    }
+
+    .card-header h1, .card-header h2, .card-header h3, .card-header h4, .card-header h5, .card-header h6 {
+        font-weight: #{$font-weight-superbold};
+    }
+}
+
+
+// ajout de padding pour espacer les éléments du header des bords de page
+header .container-fluid {
+    padding-left: 8%;
+    padding-right: 8%;
+}
+
+// lien UGA de l'header
+#back-to-uga {
+    color: #{$primary};
+
+    // espacement flèche et texte
+    > .btn-label {
+        padding-left: .5rem;
+        font-size: 14px;
+        font-weight: #{$font-weight-superbold};
+    }
+    // ajout du caractère flèche vers la gauche devant le lien UGA de l'header
+    > .icon-fleche-precedent::before {
+        content: "〈";
+    }
+}
+#back-to-uga:hover {
+    color: #{$link-hover-color};
+}
+
+// organisation du bloc central de l'header
+#block-uga-theme-branding {
+    height: 162px;
+    background-color: #{$bg-uga};
+
+    > .container-fluid {
+        height: 100%;
+
+        > .row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+// ajout d'une class CSS pour appliquer un font-weight de 800
+.fw-sbold {
+    font-weight: #{$font-weight-superbold};
+}
+// CSS pour les images
+// zone de logo
+.logo-area {
+    display: flex;
+    align-items: center;
+
+    // précision de la zone dans le cas où elle est dans le footer
+    &.footer-logo {
+        justify-content: center;
+        background-color: #{$bg-uga};
+    }
+    // si besoin d'un padding vertical (utilisé aussi dans le footer)
+    &.pad-logo-area {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+}
+// image à proprement parlée
+.logo {
+    width: auto;
+    height: 90px;
+}
+
+        // sur-couche à bootstrap
+// majuscules sur le texte des boutons
+.btn {
+    text-transform: uppercase;
+    color: #{$white}; // nécessaires pour certains types de boutons
+    border-width: 3px;
+}
+// couleur des btn-primary (outline ou non) et outline-info et danger
+.btn-primary, .btn-outline-primary, .btn-outline-info, .btn-danger {
+    --bs-btn-hover-color: #{$primary};
+    --bs-btn-hover-bg: #{$white};
+    --bs-btn-hover-border-color: #{$primary};
+
+    --bs-btn-active-color: #{$primary};
+    --bs-btn-active-bg: #{$white};
+    --bs-btn-active-border-color: #{$primary};
+}
+// couleur bordures btn-outline-primary
+.btn-outline-primary {
+    --bs-btn-border-color: #{$white};
+}
+// couleur en "hover" des boutons en cercles
+// Utile dans notre cas car le seul bouton cercle est le bouton "Edit" 
+// de la page d'entité et que l'icône ne se recolore pas
+.btn-circle {
+    --bs-btn-hover-bg: #{$reduce-primary};
+}
+// boutons d'informations et du badge au centre de chaque bouton info
+.btn-outline-info {
+    --bs-btn-bg: #{$primary};
+    --bs-btn-border-color: #{$white};
+
+    > .badge {
+        --bs-badge-color: #{$primary};
+        background-color: #{$white};
+    }
+
+    &:hover > .badge {
+        --bs-badge-color: #{$white};
+        background-color: #{$primary};
+    }
+}
+// couleur des boutons secondaires au survol et quand actifs
+.btn-secondary {
+    --bs-btn-hover-bg: #{$primary};
+    --bs-btn-active-bg: #{$primary};
+}
+
+// définition du background de la navbar
+.navbar {
+    background-color: #{$primary};
+}
+// définition de la forme de la (liste 'ul' de la) navbar
+.nav {
+    justify-content: space-between;
+    width: 100%;
+}
+// flèche sur le côté, pour le menu burger
+@media (max-width: 768px) {
+    .nav {
+        // suite correspond aux flèches apparaissant sous les éléments de la navbar
+        > li.nav-item > .nav-link {
+            display: flex;
+        }
+
+        > li.nav-item > .nav-link:hover::after, > li.nav-item > .nav-link.active::after {
+            display: inline-block;
+            width: 0px;
+            height: 0px;
+            border-style: solid;
+            border-width: 8px;
+            border-color: transparent #{$white} transparent transparent;
+            content: "";
+            margin-top: 3px;
+        }
+    }
+}
+// flèche en dessous, pour le menu classique
+@media (min-width: 769px) {
+    .nav {
+        // suite correspond aux flèches apparaissant sous les éléments de la navbar
+        > li.nav-item > .nav-link {
+            display: flex;
+            justify-content: center;
+        }
+        
+        > li.nav-item > .nav-link:hover::after, > li.nav-item > .nav-link.active::after {
+            position: absolute;
+            bottom: -5px;
+            width: 10px;
+            height: 10px;
+            content: '';
+            -webkit-transform: rotate(-45deg);
+            border-width: 1px 1px 0 0;
+            background: #{$white};
+        }
+    }
+}

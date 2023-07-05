@@ -98,7 +98,7 @@
               </td>
               <td class="text-end">
                 <router-link
-                  class="btn btn-primary mb-1"
+                  class="btn btn-primary me-1"
                   role="button"
                   :to="{
                     name:

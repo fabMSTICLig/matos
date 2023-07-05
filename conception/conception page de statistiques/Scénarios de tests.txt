@@ -1,0 +1,81 @@
+Tests des types de statistiques :
+Effectuer chacun des tests avec des configurations différentes :
+(
+	(seulement status "accepté")
+	des prêts avec 1 seule instance d'un unique objet spécifique
+	des prêts avec 2 ou plus instances d'un unique objet spécifique
+	des prêts avec 1 instance de plusieurs objets spécifiques différents
+	des prêts avec 2 ou plus instances de plusieurs objets spécifiques différents
+	
+	des prêts avec 1 seul exemplaire d'un unique objet générique
+	des prêts avec 2 ou plus exemplaires d'un unique objet générique
+	des prêts avec 1 exemplaire de plusieurs objets générique différents
+	des prêts avec 2 ou plus exemplaires de plusieurs objets générique différents
+	
+	des prêts avec des objets génériques et spécifiques à 1 exemplaire
+	des prêts avec des objets génériques et spécifiques à 2 ou plus exemplaires
+	
+	(
+	tester chaque configuration avec chaque status
+	"en attente" => non comptabilisé
+	"annulé" => non comptabilisé
+	"refusé" => non comptabilisé
+	"accepté" => comptabilisé
+	)
+	Seulement prêts acceptés + 1 prêt avec status à tester
+	prêts avec status à tester (le même)
+	Seulement 1 prêt avec status à tester + 1 prêt avec status à tester (différent)
+	configuration avec 1 prêt de chaque status au moins
+)
+
+	- Nombre d'emprunts,
+	Tests des tris :
+		- Affiliation (choix par défaut => tous)
+		- Utilisateur
+		- Objet
+		- Tag
+
+	- Durée moyenne d'emprunt
+	Tests des tris :
+		- Affiliation (choix par défaut => tous)
+		- Utilisateur
+		- Objet
+		- Tag
+	
+	- Fréquence d'emprunt
+	Tests des tris :
+		- Affiliation (choix par défaut => tous)
+		- Utilisateur
+		- Objet
+		- Tag
+
+Tests des types de traitement pour la plage de dates + tri par plage de dates :
+	- Type de traitement (avec n'importe quelle combinaison tri/statistique)
+		- Date de retour dans plage
+		Plage de dates (avec n'importe quelle combinaison tri/statistique)
+			- Définir seulement une date de fin
+			- Définir seulement une date de début
+			- Définir les deux dates
+			
+		- Date de sortie dans plage
+		Plage de dates (avec n'importe quelle combinaison tri/statistique)
+			- Définir seulement une date de fin
+			- Définir seulement une date de début
+			- Définir les deux dates
+			
+		- Date de sortie et de retour dans plage
+		Plage de dates (avec n'importe quelle combinaison tri/statistique)
+			- Définir seulement une date de fin
+			- Définir seulement une date de début
+			- Définir les deux dates
+
+Tests du filtrage par type d'affiliation :
+	- Tester chaque type d'affiliation indépendamment, 1 seul type activé
+	- Tester de la même façon avec 2 type simultanément activés
+	- Tester de nouveaux avec 3 puis 4 puis 5 puis 6 puis avec tous les types activés simultanément
+
+Tests du filtrage sur fréquence :
+(Attention => filtrage sur fréquence impossible avec le tri par utilisateur, à tester)
+	- Aucun filtrage => Par défaut
+	- Empruntés uniquement
+	- Jamais empruntés uniquement
