@@ -18,11 +18,11 @@
               <div class="row h-100 position-relative">
                   <div class="col-4 col-md-4 col-lg-3 logo-area">
                       <a href="/">
-                          <img src="../../public/LogoFalabMASTIC.png" class="logo"/>
+                          <img :src="`${publicPath}brand.svg`" class="logo"/>
                       </a>
                   </div>
                   <div class="col-4 col-md-4 col-lg-4 col-xl-4 d-flex">
-                      <h1 class="site-name fw-bold"> MATOS </h1>
+                      <h1 class="site-name fw-bold"> {{ title }} </h1>
                   </div>
                   <div class="col-4 d-none d-md-flex justify-content-end">
                     <div v-if="isAuthenticated" class="liste-secondaire">
@@ -155,6 +155,7 @@ import Dropdown from "./ui/DropdownComponent.vue";
 
 const title = import.meta.env.VITE_APP_TITLE;
 const cas = import.meta.env.VITE_APP_CASNAME;
+const publicPath = import.meta.env.BASE_URL
 
 const adminroutes = [
   {

@@ -2,7 +2,7 @@
   <footer class="site-footer">
     <div class="logo-area pad-logo-area footer-logo">
       <a href="https://www.univ-grenoble-alpes.fr" target="_blank">
-        <img :src="`${publicPath}21-UGA.png`" class="logo"/>
+        <img :src="`${publicPath}UGA.svg`" class="logo"/>
       </a>
     </div>
     <div class="container-fluid">

@@ -11,10 +11,10 @@
         <div v-if="show" class="card-body">
             <div class="form-check mb-1" @change="$emit('typeStat',statInput)">
                 <input
-                    type="radio"
                     :id="'statInput0'"
-                    class="form-check-input"
                     v-model="statInput"
+                    type="radio"
+                    class="form-check-input"
                     :value="'nb_emp'"
                     @click="$emit('notChange')"
                 />
@@ -27,10 +27,10 @@
             </div>
             <div class="form-check mb-1" @change="$emit('typeStat',statInput)">
                 <input
-                    type="radio"
                     :id="'statInput1'"
-                    class="form-check-input"
                     v-model="statInput"
+                    type="radio"
+                    class="form-check-input"
                     :value="'d_moy_emp'"
                     @click="$emit('notChange')"
                 />
@@ -43,10 +43,10 @@
             </div>
             <div class="form-check mb-1" @change="$emit('typeStat',statInput)">
                 <input
-                    type="radio"
                     :id="'statInput2'"
-                    class="form-check-input"
                     v-model="statInput"
+                    type="radio"
+                    class="form-check-input"
                     :value="'freq_emp'"
                     @click="$emit('notChange')"
                 />

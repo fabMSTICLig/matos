@@ -1,4 +1,5 @@
 import { requireAuth, requireManager } from "./routeGards";
+import {RouterView} from "vue-router";
 
 const routes = [
   {
@@ -28,7 +29,7 @@ const routes = [
         path: "materials/",
         name: "materials",
         beforeEnter: requireManager,
-        component: () => import("../pages/materials/Materials.vue"),
+        component: RouterView,
         children: [
           {
             path: "",

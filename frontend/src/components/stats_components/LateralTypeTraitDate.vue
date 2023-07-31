@@ -18,10 +18,10 @@
         <div v-if="show" class="card-body">
             <div class="form-check mb-2" @change="$emit('typeTraitDate',clotLoanInput)">
                 <input
-                    type="radio"
                     :id="'clotLoanInput0'"
-                    class="form-check-input"
                     v-model="clotLoanInput"
+                    type="radio"
+                    class="form-check-input"
                     :value="0"
                     @click="$emit('notChange')"
                 />
@@ -34,10 +34,10 @@
             </div>
             <div class="form-check mb-2" @change="$emit('typeTraitDate',clotLoanInput)">
                 <input
-                    type="radio"
                     :id="'clotLoanInput1'"
-                    class="form-check-input"
                     v-model="clotLoanInput"
+                    type="radio"
+                    class="form-check-input"
                     :value="1"
                     @click="$emit('notChange')"
                 />
@@ -50,10 +50,10 @@
             </div>
             <div class="form-check" @change="$emit('typeTraitDate',clotLoanInput)">
                 <input
-                    type="radio"
                     :id="'clotLoanInput2'"
-                    class="form-check-input"
                     v-model="clotLoanInput"
+                    type="radio"
+                    class="form-check-input"
                     :value="2"
                     @click="$emit('notChange')"
                 />

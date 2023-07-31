@@ -13,10 +13,10 @@
                 <div class="card-body">
                     <div class="form-check mb-1" @change="$emit('typeTri',triInput)">
                         <input
-                            type="radio"
                             :id="'triInput0'"
-                            class="form-check-input"
                             v-model="triInput"
+                            type="radio"
+                            class="form-check-input"
                             :value="0"
                             @click="$emit('notChange')"
                         />
@@ -29,10 +29,10 @@
                     </div>
                     <div class="form-check mb-1" @change="$emit('typeTri',triInput)">
                         <input
-                            type="radio"
                             :id="'triInput2'"
-                            class="form-check-input"
                             v-model="triInput"
+                            type="radio"
+                            class="form-check-input"
                             :value="2"
                             @click="$emit('notChange')"
                         />
@@ -49,10 +49,10 @@
                 <div class="card-body">
                     <div class="form-check mb-1" @change="$emit('typeTri',triInput)">
                         <input
-                            type="radio"
                             :id="'triInput1'"
-                            class="form-check-input"
                             v-model="triInput"
+                            type="radio"
+                            class="form-check-input"
                             :value="1"
                             @click="$emit('notChange')"
                         />
@@ -65,10 +65,10 @@
                     </div>
                     <div class="form-check mb-1" @change="$emit('typeTri',triInput)">
                         <input
-                            type="radio"
                             :id="'triInput3'"
-                            class="form-check-input"
                             v-model="triInput"
+                            type="radio"
+                            class="form-check-input"
                             :value="3"
                             @click="$emit('notChange')"
                         />
