@@ -27,16 +27,16 @@
             >
               Gestion prêts
             </router-link>
-            <!--<router-link
+            <router-link
               class="btn btn-outline-primary"
               role="button"
               :to="{
-                name: 'entity',
+                name: 'entityStats',
                 params: { entityid: object.id },
               }"
             >
               Statistiques
-            </router-link>-->
+            </router-link>
           </div>
         </div>
         <div class="card-body">

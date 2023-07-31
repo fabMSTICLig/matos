@@ -14,7 +14,7 @@
             <div class="col-auto">
               <router-link
                 v-if="!isAuthLoans"
-                class="btn btn-outline-secondary float-end"
+                class="btn btn-outline-secondary"
                 role="button"
                 :to="returnRoute"
               >
@@ -113,7 +113,7 @@
                         }}
                         <span
                           v-if="mat.quantity"
-                          class="badge bg-primary rounded-pill"
+                          class="badge rounded-pill"
                           >{{ mat.quantity }}</span
                         >
                       </li>

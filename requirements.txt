@@ -6,3 +6,4 @@ django-filter==22.1
 django-cas-ng==4.3.0
 django-auth-ldap==4.1.0
 django-su==1.0.0
+reportlab==4.0.0

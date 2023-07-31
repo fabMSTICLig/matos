@@ -268,7 +268,6 @@
                             v-if="!readOnly"
                             class="btn btn-danger"
                             type="button"
-                            style="margin-left: -10px"
                             @click="
                               removeMaterial(gms[item.material], isBasket)
                             "
@@ -304,7 +303,6 @@
                             v-if="!readOnly"
                             class="btn btn-danger"
                             type="button"
-                            style="margin-left: -10px"
                             @click="removeMaterial(sms[key], isBasket)"
                           >
                             X
@@ -338,7 +336,7 @@
                     type="button"
                     @click.prevent="showHelp = true"
                   >
-                    <span class="badge rounded-pill text-bg-primary">i</span>
+                    <span class="badge rounded-pill">i</span>
                   </button>
                   <router-link
                     v-if="pendingLoan.parent"

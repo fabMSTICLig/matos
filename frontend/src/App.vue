@@ -1,8 +1,7 @@
 <template>
-  <div class="container-fluid">
     <div v-if="firstCheck">
       <Header />
-      <router-view :key="$route.name" class="mr-5 ml-5" />
+      <router-view :key="$route.name" class="mr-5 ml-5 corps" />
       <Footer />
     </div>
     <modal
@@ -42,7 +41,6 @@
         </symbol>
       </defs>
     </svg>
-  </div>
 </template>
 
 <script setup>

@@ -799,3 +799,7 @@ class LoanMaterialsTests(APITestCase):
         self.assertGreater(datetime.date(2020,12,10), datetime.date(2020,11,11))
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+"class StatisticsTests(APITestCase):"
+
+"class PurgeTests(APITestCase):"

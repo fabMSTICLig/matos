@@ -26,7 +26,9 @@ créer l’environnement virtuel
 activer l’environnement virtuel
 > . ./venv/bin/activate
 
-installer les dépendances :
+installer les dépendances :
+(pour la dépendance générant les pdf, installer les librairies qui suivent avant d'installer avec requirements.txt)
+> sudo apt-get install libcairo2-dev pkg-config
 
 > pip install -r requirements.txt
 
@@ -46,9 +48,6 @@ démarrer le serveur
 
 ### authentification
 
-### création d’un superutilisateur
-> une fois l’installation de Django effectuée, la création d’un utilisateur se fait avec le shell :
-ouvrir un terminal et se placer à la racine du projet
 
 - sudo python3 manage.py createsuperuser --username=joe --email=joe@example.com
  
@@ -69,25 +68,46 @@ modifier le fichier .env et .env.local à votre besoin, en fonction de l'environ
 
 > npm build
 
+### Sass, Bootstrap et charte graphique
+
+ouvrir un terminal, se placer dans le répertoire "frontend"
+
+utiliser la commande suivante pour compiler le Sass en un fichier CSS utilisable :
+
+> sass scss/uga_graphic_charter.scss src/assets/CSS/bootstrap_UGA-graphic.css
+
+/!\ sass est normalement déjà installé mais sinon utiliser :
+> npm install -g sass
+
+/!\ le fichier CSS compilé grâce au fichier Sass ne se situe pas dans le même dossier,
+   il est situé dans le dossier src/assets/CSS/
+
+### Tests interface (end to end) - Cypress
+
+ouvrir un terminal dans le répertoire "frontend"
+
+lancer Cypress grâce à la commande :
+> npm run cypress
+
+sélectionner "E2E Testing" puis le navigateur dans lequel vous voulez lancer les tests
+
+plusieurs dossiers de tests et fichiers s'ouvrent dans le navigateur sélectionné, tout en bas se trouve
+le fichier permettant d'effectuer tous les tests (durée d'environ 10min).
+
+/!\ Certaines erreurs se produisent parfois quand le serveur ne répond pas ou pas suffisamment vite,
+ce ne sont pas des erreurs qui se produisent dans un environnement normal.
+Pour être certain que ce n'est pas une erreur de ce type, il faut identifier le test d'où provient
+l'erreur et le relancer indépendamment (sélectionnez un fichier de test dans le dossier correspondant).
+
 _____
 
-
-L’application comprend trois ensembles :
-
-- core
 - matos
 - frontend
 
 		Api (core)
       
-permet d’interagir avec la plateforme pour accéder et modifier les ressources suivantes :
+permet d’interagir avec la plateforme pour accéder et modifier les ressources suivantes :
 
-- gestion du matériel
-- Prêts et réservations
-- Utilisateurs (provenant de CAS ou enregistré préalablement)
-- gestion et accès aux entités
-
-trois rôles sont affectés :
 				- utilisateur (accéder aux ressources en lecture)
 				- manager (gestion des ressources pour une entité)
 				- admin (gestion de l'ensemble de la plateforme)
@@ -95,7 +115,7 @@ trois rôles sont affectés :
 		Administration
 
 avec le rôle admin, l'ensemble de la plateforme peut être gérée.
-Permettant de :
+Permettant de :
 - créer / modifier et supprimer les entités
 - ajouter des utilisateurs et affiliations aux entités
 - gérer les catégories de matériels
@@ -106,4 +126,3 @@ Permettant de :
 		Manager
 
 chaque entité comporte un ou plusieurs managers, responsable des prêts et des équipements qu'il possède. Il peut gérer les informations de l'entité. 
-

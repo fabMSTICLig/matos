@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHashHistory , RouterView} from "vue-router";
 import { requireAdmin, requireAuth } from "./routeGards";
 import Home from "../pages/Home.vue";
 import entitiesRoutes from "./entities";
@@ -23,7 +23,7 @@ const routes = [
     path: "/profile",
     name: "profile",
     beforeEnter: requireAuth,
-    component: () => import("../pages/profile/Profile.vue"),
+    component: () => import("../pages/profile/MyProfile.vue"),
   },
   {
     path: "/loans",
@@ -35,37 +35,37 @@ const routes = [
     path: "/myloan/:loanid",
     name: "authloan",
     beforeEnter: requireAuth,
-    component: () => import("../pages/Loan.vue"),
+    component: () => import("../pages/LoanEdit.vue"),
     props: true,
   },
   {
     path: "/loan/:loanid",
     name: "loan",
     beforeEnter: requireAuth,
-    component: () => import("../pages/Loan.vue"),
+    component: () => import("../pages/LoanEdit.vue"),
     props: true,
   },
   {
     path: "/basket",
     name: "basket",
     beforeEnter: requireAuth,
-    component: () => import("../pages/Loan.vue"),
+    component: () => import("../pages/LoanEdit.vue"),
   },
   {
     path: "/search",
     name: "search",
     beforeEnter: requireAuth,
-    component: () => import("../pages/Search.vue"),
+    component: () => import("../pages/SearchView.vue"),
   },
   {
     path: "/addmaterial",
     name: "addmaterial",
     beforeEnter: requireAuth,
-    component: () => import("../pages/Search.vue"),
+    component: () => import("../pages/SearchView.vue"),
   },
   {
     path: "/materials/g/:matid",
-    component: () => import("../pages/materials/Material.vue"),
+    component: () => import("../pages/materials/MaterialShow.vue"),
     name: "genericmaterialitem",
     meta: {
       routeparam: "matid",
@@ -73,7 +73,7 @@ const routes = [
   },
   {
     path: "/materials/s/:matid",
-    component: () => import("../pages/materials/Material.vue"),
+    component: () => import("../pages/materials/MaterialShow.vue"),
     name: "specificmaterialitem",
     meta: {
       routeparam: "matid",
@@ -81,7 +81,7 @@ const routes = [
   },
   {
     path: "/affiliations",
-    component: () => import("../pages/admin/affiliations/Affiliations.vue"),
+    component: RouterView,
     beforeEnter: requireAdmin,
     children: [
       {
@@ -103,7 +103,7 @@ const routes = [
   },
   {
     path: "/tags",
-    component: () => import("../pages/admin/tags/Tags.vue"),
+    component: RouterView,
     beforeEnter: requireAdmin,
     children: [
       {
@@ -123,7 +123,7 @@ const routes = [
   },
   {
     path: "/users",
-    component: () => import("../pages/admin/users/Users.vue"),
+    component: RouterView,
     beforeEnter: requireAdmin,
     children: [
       {
@@ -152,6 +152,9 @@ const routes = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes, // short for `routes: routes`
+  scrollBehavior () {
+    return { x: 0, y: 0 }
+  }
 });
 
 export default router;

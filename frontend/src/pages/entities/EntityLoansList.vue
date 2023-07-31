@@ -238,7 +238,7 @@
                 class="list-group-item d-flex justify-content-between align-items-start"
               >
                 {{ item.material.name }}
-                <span class="badge bg-primary rounded-pill">{{
+                <span class="badge rounded-pill">{{
                   item.quantity
                 }}</span>
               </li>
