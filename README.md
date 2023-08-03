@@ -74,7 +74,7 @@ ouvrir un terminal, se placer dans le répertoire "frontend"
 
 utiliser la commande suivante pour compiler le Sass en un fichier CSS utilisable :
 
-> sass scss/uga_graphic_charter.scss src/assets/CSS/bootstrap_UGA-graphic.css
+> sass scss/index.scss src/assets/CSS/bs_uga.css
 
 /!\ sass est normalement déjà installé mais sinon utiliser :
 > npm install -g sass

@@ -1,0 +1,218 @@
+
+// Boutons
+.btn {
+  text-transform: uppercase;
+  border-width: 2px;
+
+  font-size: 14px;
+  @include media-breakpoint-up(md) {
+    font-size: 15px;
+  }
+  @include media-breakpoint-up(lg) {
+    font-size: 16px;
+  }
+  @include media-breakpoint-up(xl) {
+    font-size: 18px;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none;
+  }
+}
+
+.btn-primary {
+  background-color: $uga-primary;
+  border-color: $uga-primary;
+  color: $link-bg-primary;
+
+  &:focus,
+  &:hover,
+  &:active {
+    background-color: $link-bg-primary;
+    border-color: $link-bg-white;
+    color: $uga-primary;
+    .icon {
+      svg path {
+        fill: $uga-primary;
+      }
+    }
+  }
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: $link-bg-white;
+  color: $link-bg-white;
+
+  &:focus,
+  &:hover,
+  &:active {
+    background-color: $link-bg-white;
+    border-color: $link-bg-white;
+    color: $white;
+    .icon {
+      svg path {
+        fill: white;
+      }
+    }
+  }
+}
+
+.btn-outline-primary {
+  color: $uga-primary;
+  border-color: $uga-primary;
+
+  &:focus,
+  &:hover,
+  &:active {
+    color: $text-bg-primary;
+    border-color: $uga-primary;
+    background-color: $uga-primary;
+    .icon {
+      svg path {
+        fill: $text-bg-primary;
+      }
+    }
+  }
+}
+
+.btn-check:focus + .btn-primary,
+.btn-primary:focus {
+  box-shadow: 0 0 0 .25rem rgba(($uga-primary), .5);
+}
+
+.bg-primary-color {
+  .btn-primary {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: $link-bg-white;
+
+    &:focus,
+    &:hover,
+    &:active {
+      background-color: $link-bg-white;
+      border-color: $link-bg-primary;
+      color: #ffffff;
+      .icon {
+        svg path {
+          fill: #ffffff;
+        }
+      }
+    }
+  }
+}
+
+.bg-secondary-color {
+  .btn-primary {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: $link-bg-white;
+
+    &:focus,
+    &:hover,
+    &:active {
+      background-color: $link-bg-white;
+      border-color: $link-bg-white;
+      color: #ffffff;
+      .icon {
+        svg path {
+          fill: #ffffff;
+        }
+      }
+    }
+  }
+}
+
+.btn-profile {
+  border: none;
+  background-color: transparent;
+}
+
+.btn-search {
+  display: inline-flex;
+  align-items: center;
+
+  .icon {
+    display: inline-flex;
+    height: 1rem;
+    @include media-breakpoint-up(sm) {
+      margin-right: 0.5rem !important;
+    }
+
+    svg {
+      width: auto;
+      height: 100%;
+      fill: $link-bg-primary;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    .icon {
+      display: inline-flex;
+      height: 1rem;
+      margin-right: 0;
+      @include media-breakpoint-up(sm) {
+        margin-right: 0.5rem !important;
+      }
+
+      svg {
+        width: auto;
+        height: 100%;
+        fill: $uga-primary;
+      }
+    }
+  }
+}
+.bg-primary-color .paragraph--type--bloc-carte-information .btn.btn-primary {
+  color: $link-bg-primary;
+  background: $uga-primary;
+  &:hover{
+    color: $text-bg-secondary;
+    background: $uga-secondary;
+  }
+}
+.bg-secondary-color .paragraph--type--bloc-carte-information .btn.btn-primary{
+  color: $link-bg-secondary;
+  background: $uga-secondary;
+  &:hover{
+    color: $text-bg-primary;
+    background: $uga-primary;
+    border-color: #ffffff;
+  }
+}
+
+.paragraph--type--bloc-recherche .bg-primary-color .btn-primary ,
+.paragraph--type--bloc-recherche .bg-secondary-color .btn-primary ,
+.bg-white .paragraph--type--bloc .btn-primary ,
+.bg-secondary-color .paragraph--type--bloc .btn-primary ,
+.bg-primary-color .paragraph--type--bloc .btn-primary ,
+.bg-neutral-color .paragraph--type--bloc .btn.btn-primary {
+  color: $link-bg-white;
+  background: #ffffff;
+  border-color: #ffffff;
+  &:hover{
+    color: $text-bg-primary;
+    background: $uga-primary;
+    border-color: #ffffff;
+  }
+}
+
+.paragraph--type--bloc-recherche .bg-primary-color .btn-primary {
+  &:hover{
+    color: #ffffff;
+    background: $link-bg-white;
+    border-color: $link-bg-primary;
+  }
+}
+
+.paragraph--type--bloc-recherche .bg-secondary-color .btn-primary {
+  &:hover{
+    color: #ffffff;
+    background: $link-bg-white;
+    border-color: $link-bg-white;
+  }
+}
+

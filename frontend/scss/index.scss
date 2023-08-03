@@ -1,0 +1,68 @@
+
+
+@import url("http://fonts.googleapis.com/css?family=Open+Sans:300italic,600italic,400,300,600,700,800");
+
+$white: #fff;
+
+$top-background: #f3f3f3;
+$top-color: #363636;
+$uga-primary: #00B649;
+$primary: #00B649;
+//$uga-primary: #db2c2d;
+$uga-secondary: #2d3039;
+$uga-neutral: #f3f3f3;
+$link-bg-white: #{$uga-primary};
+$link-bg-neutral: #db2c2d;
+$link-bg-primary: #ffffff;
+$link-bg-secondary: #ffffff;
+$text-bg-white: #363636;
+$text-bg-neutral: #363636;
+$text-bg-primary: #ffffff;
+$text-bg-secondary: #ffffff;
+
+
+$default-spacing : 25px;
+$font-stack-open: "Open Sans", Verdana, sans-serif;
+
+$btn-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+$btn-border-radius:0;
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1366px,
+  xxl: 1636px
+);
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1204px,
+  xxl: 1636px
+);
+
+$navbar-light-color:                rgba($white, .9);
+$navbar-light-hover-color:          rgba($white, 1);
+$navbar-light-active-color:         rgba($white, 1);
+$navbar-light-disabled-color:       rgba($white, .3);
+
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+.navbar-nav{
+  --bs-nav-link-padding-x: 1rem;
+  --bs-nav-link-padding-y: .825rem;
+}
+
+.container-liquid {
+  @extend .container;
+}
+.icon-fleche-precedent::before {
+        content: "〈";
+}
+@import "header";
+@import "footer";
+@import "buttons";
+
+
