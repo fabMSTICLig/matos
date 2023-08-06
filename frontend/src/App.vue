@@ -1,7 +1,7 @@
 <template>
   <div v-if="firstCheck">
     <Header />
-    <router-view :key="$route.name" class="mr-5 ml-5 corps" />
+    <router-view :key="$route.name" class="m-4 corps" />
     <Footer />
   </div>
   <modal
