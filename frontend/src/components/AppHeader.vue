@@ -1,35 +1,38 @@
 <template>
   <header id="header" class="header" role="banner">
     <div class="section clearfix">
-      <div class="menu_top d-none d-lg-block">
+      <div class="uga-menu-top navbar bg-white d-none d-lg-block">
         <div class="container-liquid">
-          <div class="row">
-            <div class="col-3 col-md-3 col-lg-4 col-xl-6">
-              <a
-                href="https://www.univ-grenoble-alpes.fr"
-                title="Université Grenoble Alpes"
-                role="button"
-                class="btn btn-back"
-              >
-                <span class="icon icon-fleche-precedent"> </span>
-                <span class="btn-label">Université Grenoble Alpes</span>
-              </a>
-            </div>
-            <div class="col-9 col-md-9 col-lg-8 col-xl-6">
-              <div class="float-end">
-                <Dropdown
-                  v-if="isAuthenticated"
-                  :items="userroutes"
-                  :label="authUser.username"
-                />
-                <a v-if="cas" class="btn btn-primary" href="/cas/login">
-                  <svg class="svg-icon">
-                    <use href="#profile" />
-                  </svg>
-                  Login</a
-                >
-              </div>
-            </div>
+          <div class="navbar-nav">
+            <a
+              href="https://www.univ-grenoble-alpes.fr"
+              title="Université Grenoble Alpes"
+              role="button"
+              class="btn-back nav-link"
+            >
+              <span class="icon icon-fleche-precedent">&lt; </span>
+              <span class="btn-label">Université Grenoble Alpes</span>
+            </a>
+          </div>
+          <div class="navbar-nav">
+            <Dropdown
+              v-if="isAuthenticated"
+              :items="userroutes"
+              :label="authUser.username"
+              isNav
+            >
+              <span class="btn-label">{{ authUser.username }}</span>
+            </Dropdown>
+            <a
+              v-if="!isAuthenticated"
+              class="btn btn-primary"
+              href="/cas/login"
+            >
+              <svg class="svg-icon">
+                <use href="#profile" />
+              </svg>
+              Login</a
+            >
           </div>
         </div>
       </div>
@@ -59,7 +62,7 @@
       </div>
       <nav
         id="block-uga-theme-menu-main"
-        class="uga-theme-main-nav navbar navbar-expand-lg"
+        class="uga-theme-main-nav navbar navbar-dark navbar-expand-lg d-none d-lg-block bg-primary"
         role="navigation"
         aria-labelledby="block-uga-theme-menu-main-menu"
       >
@@ -112,6 +115,7 @@
                 label="Gestion entités"
                 class="nav-item drop-align-rect"
                 is-nav
+                is-black
               />
               <router-link
                 v-if="isManager && myEntities.length == 1"
@@ -129,6 +133,7 @@
                 label="Admin"
                 class="nav-item"
                 is-nav
+                is-black
               />
               <li v-if="isAuthenticated" class="nav-item" role="presentation">
                 <router-link
@@ -149,206 +154,192 @@
         </div>
       </nav>
       <nav
-        id="block-uga-theme-menu-main-mobile"
-        class="uga-theme-main-nav navbar navbar-expand-lg"
+        class="uga-theme-main-nav navbar navbar-dark navbar-expand-lg d-block d-lg-none bg-primary"
         role="navigation"
         aria-labelledby="block-uga-theme-menu-main-mobile-menu"
       >
         <h2 id="block-uga-theme-menu-main-mobile-menu" class="visually-hidden">
           Navigation principale mobile
         </h2>
-
-        <div id="mainMenu" class="w-100">
-          <div class="navbar-group">
-            <div class="container-liquid">
-              <div class="col d-flex d-lg-none align-items-stretch">
-                <label
-                  for="navbar-toggle-menu"
-                  class="btn btn-primary navbar-toggler"
-                  data-toggle="collapse"
-                  data-target="#navbar"
-                  aria-expanded="false"
-                  aria-controls="navbar"
-                  :class="{ collapsed: !menuCollapse }"
-                >
-                  <span class="icon">
-                    <span class="navbar-toggler-icon"></span>
-                    <span class="navbar-toggler-icon"></span>
-                    <span class="navbar-toggler-icon"></span>
-                  </span>
-                  <span class="btn-label"> Menu </span>
-                </label>
-                <a
-                  v-if="!isAuthenticated"
-                  class="btn btn-primary collapsed"
-                  href="/cas/login"
-                >
-                  <svg class="svg-icon">
-                    <use href="#profile" />
-                  </svg>
-                  <span class="btn-label">Login</span></a
-                >
-                <router-link
-                  v-if="isAuthenticated"
-                  class="btn btn-primary collapsed"
-                  active-class="active"
-                  exact
-                  :to="{ name: 'basket' }"
-                >
-                  <svg class="svg-icon">
-                    <use href="#basket" />
-                  </svg>
-                  <span class="btn-label"> Panier ({{ loanQuantity }}) </span>
-                  </router-link>
-                  <label
-                  for="navbar-toggle-profile"
-                  class="btn btn-primary navbar-toggler"
-                  data-toggle="collapse"
-                  data-target="#navbar"
-                  aria-expanded="false"
-                  aria-controls="navbar"
-                  :class="{ collapsed: !profileCollapse }"
-                >
-                  <svg class="svg-icon">
-                    <use href="#profile" />
-                  </svg>
-                  <span class="btn-label">Menu utilisateur</span>
-                </label>
-              </div>
-            </div>
+        <div class="container-liquid">
+          <label
+            for="navbar-toggle-menu"
+            class="navbar-toggler btn btn-primary"
+            data-toggle="collapse"
+            data-target="#navbarMenu"
+            aria-expanded="false"
+            aria-controls="navbarMenu"
+            :class="{ collapsed: !menuCollapse }"
+          >
+            <svg class="svg-icon">
+              <use href="#burger" />
+            </svg>
+            <span class="btn-label"> Menu </span>
+          </label>
+          <a
+            v-if="!isAuthenticated"
+            class="navbar-toggler collapsed btn btn-primary"
+            href="/cas/login"
+          >
+            <svg class="svg-icon">
+              <use href="#profile" />
+            </svg>
+            <span class="btn-label">Login</span></a
+          >
+          <router-link
+            v-if="isAuthenticated"
+            class="navbar-toggler collapsed btn btn-primary"
+            active-class="active"
+            exact
+            :to="{ name: 'basket' }"
+          >
+            <svg class="svg-icon">
+              <use href="#basket" />
+            </svg>
+            <span class="btn-label"> Panier ({{ loanQuantity }}) </span>
+          </router-link>
+          <label
+            for="navbar-toggle-profile"
+            class="navbar-toggler btn btn-primary"
+            data-toggle="collapse"
+            data-target="#navbarProfile"
+            aria-expanded="false"
+            aria-controls="navbarProfile"
+            :class="{ collapsed: !profileCollapse }"
+          >
+            <svg class="svg-icon">
+              <use href="#profile" />
+            </svg>
+            <span class="btn-label">Menu utilisateur</span>
+          </label>
           </div>
-          <div id="mobileCollapseGroup">
-            <input
-              id="navbar-toggle-menu"
-              v-model="menuCollapse"
-              type="checkbox"
-              class="d-none"
-            />
-            <div
-              id="navbarMainContent"
-              class="navbar-collapse collapse"
-              data-bs-parent="#mobileCollapseGroup"
-              :class="{ show: menuCollapse }"
-            >
-              <div class="container-liquid">
-                <ul class="nav navbar-nav">
-                  <li v-if="!isAuthenticated" class="nav-item">
-                    <router-link
-                      active-class="active"
-                      class="nav-link"
-                      exact
-                      :to="{ name: 'home' }"
-                    >
-                      Matos
-                    </router-link>
-                  </li>
-                  <li v-if="isAuthenticated" class="nav-item">
-                    <router-link
-                      active-class="active"
-                      class="nav-link"
-                      exact
-                      :to="{ name: 'search' }"
-                    >
-                      Emprunt Matériels
-                    </router-link>
-                  </li>
-
-                  <li
-                    v-if="isAuthenticated"
-                    class="nav-item"
-                    role="presentation"
-                  >
-                    <router-link
-                      active-class="active"
-                      class="nav-link"
-                      exact
-                      :to="{ name: 'showentities' }"
-                    >
-                      Liste Entités
-                    </router-link>
-                  </li>
-                  <Dropdown
-                    v-if="isManager && myEntities.length > 1"
-                    :items="myEntities"
-                    label="Gestion entités"
-                    class="dropdown show active"
-                    is-nav
-                    :absolute="false"
-                  />
-                  <router-link
-                    v-if="isManager && myEntities.length == 1"
-                    class="nav-link"
-                    :to="myEntities[0].to"
-                    active-class="active"
-                    exact
-                  >
-                    Gestion {{ myEntities[0].label }}
-                  </router-link>
-                  <Dropdown
-                    v-if="isAdmin"
-                    :items="adminroutes"
-                    label="Admin"
-                    class="dropdown show active"
-                    is-nav
-                    :absolute="false"
-                  />
-                </ul>
-              </div>
-            </div>
-            <input
-              id="navbar-toggle-profile"
-              v-model="profileCollapse"
-              type="checkbox"
-              class="d-none"
-            />
-            <div
-              id="navbarProfileContent"
-              class="collapse navbar-collapse"
-              data-bs-parent="#mobileCollapseGroup"
-              :class="{ show: profileCollapse }"
-            >
-              <div
-                id="submenuDropdown-profile"
-                class="submenuDropdown-block d-flex d-lg-none"
+          <input
+            id="navbar-toggle-menu"
+            v-model="menuCollapse"
+            type="checkbox"
+            class="navbar-toggler-input"
+          />
+        <div
+          id="navbarMainContent"
+          class="navbar-collapse collapse ps-4"
+          data-bs-parent="#mobileCollapseGroup"
+          :class="{ show: menuCollapse }"
+        >
+          <ul class="nav navbar-nav">
+            <li v-if="!isAuthenticated" class="nav-item">
+              <router-link
+                active-class="active"
+                class="nav-link"
+                exact
+                :to="{ name: 'home' }"
               >
-                <div class="container-liquid">
-                  <ul class="nav navbar-nav">
-                    <li class="nav-item">
-                      <router-link
-                        active-class="active"
-                        class="nav-link"
-                        exact
-                        :to="{ name: 'profile' }"
-                      >
-                        Profile
-                      </router-link>
-                    </li>
-                    <li class="nav-item">
-                      <router-link
-                        active-class="active"
-                        class="nav-link"
-                        exact
-                        :to="{ name: 'authloans' }"
-                      >
-                        Mes prêts
-                      </router-link>
-                    </li>
-                    <li class="nav-item">
-                      <a href="#" class="nav-link" @click.prevent="logout()">
-                        Déconnexion
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+                Matos
+              </router-link>
+            </li>
+            <li v-if="isAuthenticated" class="nav-item">
+              <router-link
+                active-class="active"
+                class="nav-link"
+                exact
+                :to="{ name: 'search' }"
+              >
+                Emprunt Matériels
+              </router-link>
+            </li>
+
+            <li v-if="isAuthenticated" class="nav-item" role="presentation">
+              <router-link
+                active-class="active"
+                class="nav-link"
+                exact
+                :to="{ name: 'showentities' }"
+              >
+                Liste Entités
+              </router-link>
+            </li>
+            <Dropdown
+              v-if="isManager && myEntities.length > 1"
+              :items="myEntities"
+              label="Gestion entités"
+              class="dropdown show active"
+              is-nav
+              is-black
+              :absolute="false"
+            />
+            <router-link
+              v-if="isManager && myEntities.length == 1"
+              class="nav-link"
+              :to="myEntities[0].to"
+              active-class="active"
+              exact
+            >
+              Gestion {{ myEntities[0].label }}
+            </router-link>
+            <Dropdown
+              v-if="isAdmin"
+              :items="adminroutes"
+              label="Admin"
+              class="dropdown show active"
+              is-nav
+              is-black
+              :absolute="false"
+            />
+          </ul>
+        </div>
+
+          <input
+            id="navbar-toggle-profile"
+            v-model="profileCollapse"
+            type="checkbox"
+            class="navbar-toggler-input"
+          />
+        <div
+          id="navbarProfileContent"
+          class="collapse navbar-collapse"
+          :class="{ show: profileCollapse }"
+        >
+          <ul class="nav navbar-nav ps-4">
+            <li class="nav-item">
+              <router-link
+                active-class="active"
+                class="nav-link"
+                exact
+                :to="{ name: 'profile' }"
+              >
+                Profile
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link
+                active-class="active"
+                class="nav-link"
+                exact
+                :to="{ name: 'authloans' }"
+              >
+                Mes prêts
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" @click.prevent="logout()">
+                Déconnexion
+              </a>
+            </li>
+          </ul>
         </div>
       </nav>
     </div>
 
     <svg style="display: none" version="2.0">
       <defs>
+        <symbol id="burger" viewBox="0 0 20 20">
+          <path
+            fill="currentColor"
+            d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314
+								c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743
+								s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314
+								c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"
+          ></path>
+        </symbol>
         <symbol id="profile" viewBox="0 0 20 20">
           <path
             fill="currentColor"

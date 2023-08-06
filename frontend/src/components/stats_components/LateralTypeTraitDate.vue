@@ -10,7 +10,9 @@
                 type="button"
                 @click.stop="$emit('showHelp')"
             >
-            <span class="badge rounded-pill">i</span>
+            <svg class="svg-icon">
+              <use href="#info" />
+            </svg>
             </button>
             <p v-if="!show" class="dropdown-toggle"> <small> Dépliez Moi en cliquant ! </small> </p>
             <p v-else class="dropdown-toggle"> <small> Repliez Moi en cliquant ! </small> </p>

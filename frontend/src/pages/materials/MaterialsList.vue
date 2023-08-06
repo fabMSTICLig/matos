@@ -6,16 +6,16 @@
           <h3>{{ currentEntity.name }}: Gestion Matériels</h3>
         </div>
         <div class="col-auto btn-group" role="group">
-          <button
-            class="btn btn-outline-info"
-            @click.prevent="showHelp = true"
-          >
-            <span class="badge rounded-pill">i</span>
+          <button class="btn btn-outline-info" @click.prevent="showHelp = true">
+            <svg class="svg-icon">
+              <use href="#info" />
+            </svg>
           </button>
           <Dropdown
             :items="newMaterialRoutes"
             label="Ajouter un matériel"
             btn-style="btn-outline-primary"
+            is-black
           />
           <router-link
             class="btn btn-outline-secondary"

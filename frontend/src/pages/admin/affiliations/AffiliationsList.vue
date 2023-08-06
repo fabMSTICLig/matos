@@ -5,7 +5,7 @@
         <div class="card-header">
           <div class="row justify-content-between">
             <div class="col-auto">
-              <h3>Applications</h3>
+              <h3>Affiliations</h3>
             </div>
             <div class="col-auto">
               <router-link

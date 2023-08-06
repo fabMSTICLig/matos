@@ -1,25 +1,24 @@
 <template>
-  <div
+<component :is="isNav ? 'li' : 'div'"
     ref="root"
-    class="btn-group"
-    :class="{ 'nav-item': isNav }"
+    :class="{ 'nav-item': isNav, 'dropdown': isNav, 'btn-group':!isNav }"
     role="group"
     @focusout="hide"
   >
     <a
       :id="'button' + uid"
-      href=""
+      href="#"
       class="dropdown-toggle"
       :class="[isNav ? 'nav-link' : 'btn ' + btnStyle, { show: show }]"
       data-bs-toggle="dropdown"
       aria-expanded="false"
       @click.prevent="toogle"
-      >{{ label }}</a
+    ><slot>{{ label }}</slot></a
     >
     <ul
       :id="'tooltip' + uid"
       class="dropdown-menu"
-      :class="{ show: show }"
+      :class="{ show: show, 'dropdown-menu-dark':isBlack }"
       :style="(show && absolute) ? style : ''"
     >
       <li v-for="item in items" :key="item.label">
@@ -31,21 +30,21 @@
         >
           <a
             :href="href"
-            class="dropdown-item nav-link"
+            class="dropdown-item"
             @click="goto($event, navigate)"
             >{{ item.label }}</a
           >
         </router-link>
-        <a v-else href="#" class="dropdown-item nav-link" @click.prevent="item.click()">{{
+        <a v-else href="#" class="dropdown-item" @click.prevent="item.click()">{{
           item.label
         }}</a>
       </li>
     </ul>
-  </div>
+  </component>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
 const props = defineProps({
@@ -62,6 +61,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  isBlack: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   absolute: {
     type: Boolean,
     required: false,
@@ -69,14 +73,14 @@ const props = defineProps({
   },
   btnStyle: {
     type: String,
-    default: "btn-primary",
+    default: "",
   },
 });
 const uid = uuidv4();
 const show = ref(false);
 
-const style =
-  "position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 40px);";
+const style = computed(()=>
+  "position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, "+root.value.clientHeight+"px);");
 
 const toogle = function () {
   show.value = !show.value;

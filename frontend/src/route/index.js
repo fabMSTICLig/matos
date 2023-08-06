@@ -153,7 +153,7 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes, // short for `routes: routes`
   scrollBehavior () {
-    return { x: 0, y: 0 }
+    window.scrollTo(0,0);
   }
 });
 

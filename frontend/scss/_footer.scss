@@ -1,26 +1,22 @@
 /* Featured footer */
 
 .featured-bottom {
-  color: $text-bg-neutral;
+  color: $uga-text-color;
   background-color: $uga-neutral;
 
   .uga-partner-block {
     width: 100%;
-    padding: $default-spacing * 2.5 0 0 0;
+    padding: $spacer * 2.5 0 0 0;
     text-align: center;
 
     .item {
-      margin-right: $default-spacing * 2.5;
-      margin-bottom: $default-spacing * 2.5;
+      margin-right: $spacer * 2.5;
+      margin-bottom: $spacer * 2.5;
       img {
         height: 90px;
         width: auto;
       }
     }
-  }
-
-  a {
-    color: $link-bg-neutral;
   }
 }
 
@@ -30,16 +26,16 @@
 footer {
   padding-top: 2rem;
   padding-bottom: 2rem;
-  color: $text-bg-secondary;
+  color: $white;
   background-color: $uga-secondary;
 
   a {
     text-decoration: none;
-    color: $link-bg-secondary;
+    color: $white;
 
     &:focus,
     &:hover {
-      color: $uga-primary;
+      color: $primary;
     }
   }
   .social-footer {
@@ -70,7 +66,7 @@ footer {
         margin-bottom: 14px;
         em {
           font-style: normal;
-          color: $text-bg-secondary;
+          color: $white;
           margin-bottom: 14px;
           display: block;
         }
@@ -90,11 +86,11 @@ footer {
           font-family: $font-stack-open;
           font-size: 14px;
           font-weight: 400;
-          color: $link-bg-secondary;
+          color: $white;
 
           &:focus,
           &:hover {
-            color: $uga-primary;
+            color: $primary;
           }
         }
       }
@@ -104,7 +100,7 @@ footer {
 
 // bloc address
 .contact-address {
-  color: $text-bg-secondary;
+  color: $white;
 
   p, ul {
     font-family: $font-stack-open;
@@ -123,7 +119,7 @@ footer {
     line-height: 19px;
     display: none;
     text-align: left;
-    color: $text-bg-secondary;
+    color: $white;
   }
 
   ul {
@@ -148,7 +144,7 @@ footer {
           height: 32px;
           margin-right: 0.5rem;
           content: '';
-          border: 1px solid $link-bg-secondary;
+          border: 1px solid $white;
         }
       }
     }
@@ -194,17 +190,17 @@ footer {
   width: 40px;
   height: 40px;
   margin: 0 0 0 auto;
-  border: 2px solid $link-bg-secondary;
+  border: 2px solid $white;
 
   svg {
     path {
-      fill: $link-bg-secondary;
+      fill: $white;
     }
   }
 
   &:hover {
     color: $uga-secondary;
-    background-color: $link-bg-secondary;
+    background-color: $white;
 
     svg {
       path {

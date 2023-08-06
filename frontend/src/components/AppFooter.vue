@@ -80,7 +80,7 @@
             </div>
           </div>
           <div class="col-2">
-            <a href="#header" class="back-to-top" title="Back to top">
+            <a href="#" @click.prevent="backToTop()" class="back-to-top" title="Back to top">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -102,4 +102,8 @@
 
 <script setup>
 const publicPath = import.meta.env.BASE_URL;
+function backToTop()
+{
+window.scrollTo(0,0)
+}
 </script>
