@@ -65,13 +65,23 @@
                       <a href="/"> Matos </a>
                     </li>
                     <li>
+                      <router-link to="/contact">
+                        Contact
+                      </router-link>
+                    </li>
+                    <li>
+                      <router-link to="/credits">
+                        Credits
+                      </router-link>
+                    </li>
+                    <li>
                       <router-link to="/legalnotice">
                         Mentions légales
                       </router-link>
                     </li>
                     <li>
                       <router-link to="/datapolicy">
-                        Traitement des données
+                        Données personnelles
                       </router-link>
                     </li>
                   </ul>

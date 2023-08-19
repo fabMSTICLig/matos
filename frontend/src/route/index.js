@@ -10,6 +10,16 @@ const routes = [
     component: Home,
   },
   {
+    path: "/contact",
+    name: "contact",
+    component: () => import("../pages/ContactPage.vue"),
+  },
+  {
+    path: "/credits",
+    name: "credits",
+    component: () => import("../pages/CreditsPage.vue"),
+  },
+  {
     path: "/datapolicy",
     name: "datapolicy",
     component: () => import("../pages/DataPolicy.vue"),

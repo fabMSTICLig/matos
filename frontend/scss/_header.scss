@@ -8,27 +8,23 @@
   background-image: none;
 }
 
-.navbar-toggler{
-  border:0;
+.navbar-toggler {
+  border: 0;
   padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
-  &:focus{
-    box-shadow:none;
+  &:focus {
+    box-shadow: none;
   }
 }
 
-.navbar-toggler-input{
-  display : none;
+.navbar-toggler-input {
+  display: none;
 
-  &:not(:checked) + .navbar-collapse{
-    display:none;
+  &:not(:checked) + .navbar-collapse {
+    display: none;
   }
 }
-.navbar-collapse{
-  padding:0 1.5rem;
-  border-top: solid 1px #fff;
-}
 
-.nav-link{
+.nav-link {
   font-family: $font-stack-open;
   font-size: 14px;
   font-weight: 800;
@@ -38,20 +34,20 @@
   align-items: flex-start;
   height: 100%;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .uga-menu-top {
   .container-liquid {
-    height:45px;
+    height: 45px;
   }
- .btn-label{
+  .btn-label {
     &:hover,
     &:focus {
       text-decoration: underline;
     }
   }
 }
-
 
 #block-uga-theme-branding {
   position: relative;
@@ -171,7 +167,6 @@
   }
 }
 
-
 .header-search-block {
   position: absolute;
   right: 0;
@@ -193,11 +188,39 @@
   }
   .dropdown-toggle:after {
     content: none;
+    transform: none;
   }
-  .nav-link{ 
+
+  @include media-breakpoint-up(lg) {
+    .nav-item:first-child:after {
+      content: "";
+      position: absolute;
+      left: 0;
+      height: 0;
+      border-bottom: 1px solid $white;
+      /* Look it's automatic */
+      width: 100%;
+      /* or some really large value */
+    }
+  }
+  @include media-breakpoint-down(lg) {
+    .nav-item:first-child:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      height: 0;
+      border-top: 1px solid $white;
+      /* Look it's automatic */
+      width: 100%;
+      /* or some really large value */
+    }
+  }
+
+  .nav-link {
     @include media-breakpoint-up(md) {
       font-size: 16px;
     }
+    padding-bottom: 15px;
     &.is-active,
     &.active,
     &:hover {
@@ -205,16 +228,16 @@
         &:after {
           position: absolute;
           z-index: 99;
-          bottom: -5px;
+          bottom: 0px;
           left: calc(50% - 5px);
           display: block;
-          width: 10px;
-          height: 10px;
           content: "";
-          -webkit-transform: rotate(-45deg);
-          -webkit-transform-origin: 50% 50%;
-          border-width: 1px 1px 0 0;
-          background: white;
+          border-bottom: 0.7em solid;
+          border-right: 0.4em solid transparent;
+          border-top: 0;
+          border-left: 0.4em solid transparent;
+          //border-width: 1px 1px 0 0;
+          //background: white;
         }
       }
     }
@@ -226,4 +249,3 @@
     }
   }
 }
-

@@ -1,8 +1,10 @@
-@import url("http://fonts.googleapis.com/css?family=Open+Sans:300italic,600italic,400,300,600,700,800");
+@import url("//fonts.googleapis.com/css?family=Open+Sans:300italic,600italic,400,300,600,700,800");
+@import url("//fonts.googleapis.com/css?family=Calistoga:300italic,600italic,400,300,600,700,800");
 
 @import "../node_modules/bootstrap/scss/functions";
 
 $font-stack-open: "Open Sans", Verdana, sans-serif;
+$font-stack-calistoga:  "Calistoga", serif;
 
 $uga-text-color: #363636;
 $uga-secondary: #2d3039;
@@ -35,10 +37,28 @@ $container-max-widths: (
 
 // 3. Include remainder of required Bootstrap stylesheets
 @import "../node_modules/bootstrap/scss/variables";
-//@import "../node_modules/bootstrap/scss/variables-dark";
+@import "../node_modules/bootstrap/scss/variables-dark";
 
 
 // 4. Include any default map overrides here
+
+$display-font-sizes: (
+  1: 5rem,
+  2: 3rem,
+  3: 2.5rem,
+  4: 2rem,
+  5: 1.5rem,
+  6: 1rem
+);
+
+$font-family-sans-serif:$font-stack-open;
+
+$display-font-family: $font-stack-calistoga;
+$display-font-style:  null;
+$display-font-weight: 400;
+$display-line-height: 3.9rem;
+
+
 
 $navbar-dark-color:                $white;
 $navbar-dark-hover-color:          $white;
@@ -84,7 +104,7 @@ $dropdown-dark-link-active-bg:      $white;
 @import "../node_modules/bootstrap/scss/tables";
 @import "../node_modules/bootstrap/scss/forms";
 @import "../node_modules/bootstrap/scss/buttons";
-@import "../node_modules/bootstrap/scss/transitions";
+//@import "../node_modules/bootstrap/scss/transitions";
 @import "../node_modules/bootstrap/scss/dropdown";
 @import "../node_modules/bootstrap/scss/button-group";
 @import "../node_modules/bootstrap/scss/nav";
@@ -93,12 +113,12 @@ $dropdown-dark-link-active-bg:      $white;
 //@import "../node_modules/bootstrap/scss/accordion";
 //@import "../node_modules/bootstrap/scss/breadcrumb";
 @import "../node_modules/bootstrap/scss/pagination";
-@import "../node_modules/bootstrap/scss/badge";
+//@import "../node_modules/bootstrap/scss/badge";
 //@import "../node_modules/bootstrap/scss/alert";
 //@import "../node_modules/bootstrap/scss/progress";
 @import "../node_modules/bootstrap/scss/list-group";
 @import "../node_modules/bootstrap/scss/close";
-@import "../node_modules/bootstrap/scss/toasts";
+//@import "../node_modules/bootstrap/scss/toasts";
 @import "../node_modules/bootstrap/scss/modal";
 //@import "../node_modules/bootstrap/scss/tooltip";
 //@import "../node_modules/bootstrap/scss/popover";
@@ -197,5 +217,19 @@ $dropdown-dark-link-active-bg:      $white;
   }
 }
 
+/* -----
+SVG Icons - svgicons.sparkk.fr
+----- */
+.svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+.svg-icon-small {
+  width: 1em;
+  height: 1em;
+}
+
 @import "header";
 @import "footer";
+@import "actualite";
+@import "page";
