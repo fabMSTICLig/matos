@@ -98,7 +98,6 @@ le fichier permettant d'effectuer tous les tests (durée d'environ 10min).
 ce ne sont pas des erreurs qui se produisent dans un environnement normal.
 Pour être certain que ce n'est pas une erreur de ce type, il faut identifier le test d'où provient
 l'erreur et le relancer indépendamment (sélectionnez un fichier de test dans le dossier correspondant).
-
 _____
 
 - matos
