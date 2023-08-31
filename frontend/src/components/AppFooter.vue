@@ -35,7 +35,7 @@
                   <p>
                     FabLab MASTIC<br />
                     Université Grenoble Alpes<br />
-                    740, Rue de la Piscine<br />
+                    80 allée Ampère<br />
                     38400 Saint-Martin-d’Hères France
                   </p>
                   <p>
