@@ -199,6 +199,7 @@
             <span class="btn-label"> Panier ({{ loanQuantity }}) </span>
           </router-link>
           <label
+            v-if="isAuthenticated"
             for="navbar-toggle-profile"
             class="navbar-toggler btn btn-primary"
             data-toggle="collapse"
