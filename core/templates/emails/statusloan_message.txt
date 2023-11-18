@@ -17,7 +17,7 @@ Date de retour prévue: {{loan.due_date}}
 
 {% endif %}
 
-{% include "email/listmat.txt" %}
+{% include "emails/listmat.txt" %}
 
 
 

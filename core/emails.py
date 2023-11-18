@@ -23,15 +23,15 @@ class Emails:
             status = "refusée"
         context = { 'SITE_URL': settings.SITE_URL, 'loan': loan , 'status': status }
         subject = render_to_string(
-            template_name='email/statusloan_subject.txt',
+            template_name='emails/statusloan_subject.txt',
             context=context
         ).strip()
         text_content = render_to_string(
-            template_name='email/statusloan_message.txt',
+            template_name='emails/statusloan_message.txt',
             context=context
         )
         html_content = render_to_string(
-            template_name='email/statusloan_message.html',
+            template_name='emails/statusloan_message.html',
             context=context
         )
         msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.user.email], reply_to=[loan.entity.contact])
@@ -48,15 +48,15 @@ class Emails:
         context = { 'SITE_URL': settings.SITE_URL, 'loan': loan , 'newloan': newloan }
 
         subject = render_to_string(
-            template_name='email/manager_subject.txt',
+            template_name='emails/newloan_manager_subject.txt',
             context=context
         ).strip()
         text_content = render_to_string(
-            template_name='email/manager_message.txt',
+            template_name='emails/newloan_manager_message.txt',
             context=context
         )
         html_content = render_to_string(
-            template_name='email/manager_message.html',
+            template_name='emails/newloan_manager_message.html',
             context=context
         )
         msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.entity.contact], reply_to=[loan.user.email])
@@ -72,15 +72,15 @@ class Emails:
         context = { 'SITE_URL': settings.SITE_URL, 'loan': loan , 'date_ext': date }
 
         subject = render_to_string(
-            template_name='email/extension_subject.txt',
+            template_name='emails/extension_manager_subject.txt',
             context=context
         ).strip()
         text_content = render_to_string(
-            template_name='email/extension_message.txt',
+            template_name='emails/extension_manager_message.txt',
             context=context
         )
         html_content = render_to_string(
-            template_name='email/extension_message.html',
+            template_name='emails/extension_manager_message.html',
             context=context
         )
         msg = EmailMultiAlternatives(subject, text_content, settings.NOTIFICATION_SENDER, [loan.entity.contact], reply_to=[loan.user.email])

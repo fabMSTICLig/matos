@@ -7,7 +7,7 @@
 <body>
     <p>Attention vous devez rendre du matériel emprunté à l'entité {{ loan.entity.name }} le {{ loan.due_date }}. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;">Accès emprunt</a></p>
 
-    {% include "email/listmat.html" %}
+    {% include "emails/listmat.html" %}
 
     <p>Si vous avez déjà rendu le matériel, veuillez contacter l'entité {{ loan.entity.name }}</p>
 

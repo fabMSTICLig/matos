@@ -1,0 +1,22 @@
+Ci dessous la liste des prêts en retard pour l'entité {{ entity.name }}
+
+{% for loan in loans %}
+{{ SITE_URL }}#/loan/{{ loan.id }}
+Nom: @{{loan.user.username}} {{loan.user.first_name}} {{loan.user.last_name}}
+Email: {{loan.user.email}}
+
+Date d'emprunt: {{loan.checkout_date}}
+Date de retour prévue: {{loan.due_date}}
+
+Commentaire
+{{ loan.comments }}
+
+Les matériels empruntés sont les suivants :
+{% for matgen in loan.loangenericitem_set.all %}* {{ matgen.material.name }} ({{ matgen.quantity  }} exemplaire{{ matgen.quantity|pluralize }})
+{% endfor %}
+{% for matspec in loan.specific_materials.all|dictsort:"model.id" %}
+{% ifchanged matspec.model.id %}* {{ matspec.model.name }}
+{% endifchanged %}  * {{ matspec.name }}{% endfor %}
+------------------------------
+{% endfor %}
+

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+</head>
+<body>
+  <p>Ci dessous la liste des prêts en retard pour l'entité {{ entity.name }}</p>
+
+{% for loan in loans %}
+<div>
+  <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a>
+<p>Nom: @{{loan.user.username}} {{loan.user.first_name}} {{loan.user.last_name}}</p>
+<p>Email: <a href="mailto:{{loan.user.email}}">{{loan.user.email}}</a></p>
+<br/>
+<p>Date d'emprunt: {{loan.checkout_date}}</p>
+<p>Date de retour prévue: {{loan.due_date}}</p>
+<br/>
+
+<p>Commentaire:</p>
+{% autoescape on %}
+<p>{{ loan.comments }}</p>
+{% endautoescape %}
+
+<p>Les matériels empruntés sont les suivants :</p>
+<ul>
+{% for matgen in loan.loangenericitem_set.all %}
+<li>{{ matgen.material.name }} ({{ matgen.quantity }} exemplaire{{ matgen.quantity|pluralize }})</li>
+{% endfor %}
+</ul>
+<ul>
+{% for model,matlist in loan.get_dict_specmat.items %}
+<li>{{ model.name }}
+    <ul>
+    {% for mat in matlist %}
+        <li>{{ mat.name }}</li>
+{% endfor %}
+    </ul></li>
+{% endfor %}
+</ul>
+</div>
+<hr />
+{% endfor %}
+</body>

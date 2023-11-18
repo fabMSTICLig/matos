@@ -8,7 +8,7 @@
   <p>Attention la date de retour de votre emprunt de matériel est dépassée. <a href="{{ SITE_URL }}#/loan/{{ loan.id }}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">Accès emprunt</a></p>
   <p>Veuillez contacter rapidement l'entité {{ loan.entity.name }} afin de leur retourner le matériel.</p>
 
-{% include "email/listmat.html" %}
+{% include "emails/listmat.html" %}
 
 <p>Si vous avez déjà rendu le matériel, veuillez contacter l'entité {{ loan.entity.name }}</p>
 

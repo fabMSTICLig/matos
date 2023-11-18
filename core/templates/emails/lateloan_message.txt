@@ -1,7 +1,7 @@
 Attention la date de retour de votre emprunt de matériel est dépassée. {{ SITE_URL }}#/loan/{{ loan.id }}
 Veuillez contacter rapidement l'entité {{ loan.entity.name }} afin de leur retourner le matériel.
 
-{% include "email/listmat.txt" %}
+{% include "emails/listmat.txt" %}
 
 Si vous avez déjà rendu le matérieli, veuillez contacter l'entité {{ loan.entity.name }}
 

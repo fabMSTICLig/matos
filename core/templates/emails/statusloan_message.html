@@ -4,6 +4,6 @@
 {% if status == '3' %}
 <p>Vous pouvez prendre contact avec l'entité <a href="mailto:{{loan.entity.contact}}" style="font-size:15px; color:#143b79; margin-top:25px;margin-bottom:15px;text-decoration:underline;">{{loan.entity.name}}</a><p>
 {% endif %}
-{% include "email/listmat.html" %}
+{% include "emails/listmat.html" %}
 
 <p>Ce mail est automatique, veuillez ne pas y répondre directement.</p>

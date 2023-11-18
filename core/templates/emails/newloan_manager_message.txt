@@ -8,5 +8,5 @@ Pour l'entité {{loan.entity.name}}
 Date d'emprunt: {{loan.checkout_date}}
 Date de retour prévue: {{loan.due_date}}
 
-{% include "email/listmat.txt" %}
+{% include "emails/listmat.txt" %}
 
