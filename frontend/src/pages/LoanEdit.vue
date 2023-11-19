@@ -230,10 +230,14 @@
               </div>
               <div class="col-12 col-md-7">
                 <p v-show="isEmptyLoan" class="text-danger">
-                  Votre prêt doit contenir au moins un matériel. Pour un
-                  materiel spécifique veuillez choisir une instance
+                  Votre prêt doit contenir au moins un matériel.
                 </p>
-
+                <p v-show="isEmptySpeMat" class="text-danger">
+                  Pour chaque materiel spécifique, veuillez choisir au moins une
+                  instance. Si vous ne savez pas quelle instance choisir, prenez
+                  en une au hasard, le gestionnaire de l'entité la modifira au
+                  moment de la validtion.
+                </p>
                 <div class="table-responsive-md">
                   <table class="table">
                     <thead>
@@ -459,12 +463,7 @@ const { authUser, isAdmin } = storeToRefs(authStore);
 
 const { basket, currentLoan, historyChange } = storeToRefs(store);
 
-const {
-  initBasket,
-  cancelCurrent,
-  removeMaterial,
-  resetBasket,
-} = store;
+const { initBasket, cancelCurrent, removeMaterial, resetBasket } = store;
 
 const { isAuthLoan, goBack, initOrigin } = useLoanRouting(store, authUser);
 
@@ -485,12 +484,11 @@ const canManage = computed(() => {
   );
 });
 const isEmptyLoan = computed(() => {
-  return (
-    pendingLoan.value.generic_materials.length == 0 &&
-    Object.values(pendingLoan.value.specific_materials).reduce(
-      (p, v) => p + v.length,
-      0
-    ) == 0
+  return pendingLoan.value.generic_materials.length == 0 && isEmptySpeMat.value;
+});
+const isEmptySpeMat = computed(() => {
+  return Object.values(pendingLoan.value.specific_materials).some(
+    (v) => v.length == 0
   );
 });
 const readOnly = computed(() => {
@@ -607,7 +605,7 @@ function handleErrors(e) {
 }
 
 async function sendRequest() {
-  if (!isEmptyLoan.value && !checkErrors()) {
+  if (!isEmptyLoan.value && !isEmptySpeMat && !checkErrors()) {
     if (pendingLoan.value.return_date == "")
       pendingLoan.value.return_date = null;
     try {
@@ -625,11 +623,14 @@ async function sendRequest() {
 }
 
 async function updateLoan(hist = false) {
-  if (!isEmptyLoan.value && !checkErrors()) {
+  if (!isEmptyLoan.value && !isEmptySpeMat && !checkErrors()) {
     if (pendingLoan.value.return_date == "")
-    pendingLoan.value.return_date = null;
-    else if(pendingLoan.value.status == 2){
-      showModal({content: "Un prêt ne peut être en attente avec une date de retour. Il est possible que vous ayez oublié de l'accepter."})
+      pendingLoan.value.return_date = null;
+    else if (pendingLoan.value.status == 2) {
+      showModal({
+        content:
+          "Un prêt ne peut être en attente avec une date de retour. Il est possible que vous ayez oublié de l'accepter.",
+      });
       return false;
     }
     try {
