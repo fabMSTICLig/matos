@@ -18,16 +18,16 @@
             composantes universitaires, écoles d'ingénieurs, laboratoires de
             recherche et services qui lui sont rattachés. Parfois certains
             matériels sont inutilisés pendant de longues périodes et les
-            différentes entités, qui les possèdent, sont disposé à prêter ces
+            différentes entités, qui les possèdent, sont disposées à prêter ces
             matériels. Cependant, il est difficile de savoir qui possède quoi et
             ce qui est disponible.
           </p>
 
           <p class="text-justify">
             Pour cette raison, le site de prêt Matos a été créé afin d'aider à
-            la mutualisation du matériel. L'idée est que toutes entités de
-            l'université puissent mettre à disposition le matériel qu'elle
-            souhaite.
+            la mutualisation du matériel. <strong>L'idée est que toute entité de
+              l'université puisse mettre à disposition le matériel qu'elle
+              souhaite.</strong>
           </p>
           <h6>
             <router-link :to="{ name: 'search' }"
@@ -36,8 +36,8 @@
           </h6>
           <p>
             Pour emprunter du matériel, ajoutez le(s) matériel(s) souhaité(s) à
-            votre panier, indiquez la date d'emprumt souhaitée. Une demande de
-            prêt sera automatiquement envoyée à l'entité concerné. Elle vous
+            votre panier, indiquez la date d'emprunt souhaitée. Une demande de
+            prêt sera automatiquement envoyée à l'entité concernée. Elle vous
             répondra dans les meilleurs délais.
           </p>
           <h6>
@@ -46,20 +46,20 @@
             </router-link>
           </h6>
           <p>
-            Vous pouvez consultez toutes les entités proposant du matériel à
-            l'emprunt. Remarque: une entité peut être un laboratoire, un service
+            Vous pouvez consulter toutes les entités proposant du matériel à
+            l'emprunt. Remarque : une entité peut être un laboratoire, un service
             dans un laboratoire, une composante universitaire, une plateforme
             technique, un fablab, ...
           </p>
           <h6>
             <a :href="'mailto:matos'+'@'+'univ-grenoble-alpes.fr'"
-              >Prêtez du matériel >>
+              >Prêter du matériel >>
             </a>
           </h6>
           <p>
             Si vous souhaitez prêter du matériel, contacter un administrateur du
             site afin qu'il crée une entité. Vous pourrez alors définir le(s)
-            manageur(s) de votre entité, ajouter du matériel proposé à l'emprumt
+            manageur(s) de votre entité, ajouter du matériel proposé à l'emprunt
             et gérer les prêts depuis le site.
           </p>
         </div>
