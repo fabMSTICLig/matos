@@ -487,7 +487,9 @@ const isEmptyLoan = computed(() => {
   return pendingLoan.value.generic_materials.length == 0 && isEmptySpeMat.value;
 });
 const isEmptySpeMat = computed(() => {
-  return Object.values(pendingLoan.value.specific_materials).some(
+  let spemats = Object.values(pendingLoan.value.specific_materials)
+  if(spemats.length==0) return 0;
+  else return Object.values(pendingLoan.value.specific_materials).some(
     (v) => v.length == 0
   );
 });
