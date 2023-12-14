@@ -607,7 +607,7 @@ function handleErrors(e) {
 }
 
 async function sendRequest() {
-  if (!isEmptyLoan.value && !isEmptySpeMat && !checkErrors()) {
+  if (!isEmptyLoan.value && !isEmptySpeMat.value && !checkErrors()) {
     if (pendingLoan.value.return_date == "")
       pendingLoan.value.return_date = null;
     try {
@@ -625,7 +625,7 @@ async function sendRequest() {
 }
 
 async function updateLoan(hist = false) {
-  if (!isEmptyLoan.value && !isEmptySpeMat && !checkErrors()) {
+  if (!isEmptyLoan.value && !isEmptySpeMat.value && !checkErrors()) {
     if (pendingLoan.value.return_date == "")
       pendingLoan.value.return_date = null;
     else if (pendingLoan.value.status == 2) {
