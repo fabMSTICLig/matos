@@ -1,9 +1,26 @@
+"""
+Copyright (C) 2020-2024 LIG Université Grenoble Alpes
+
+
+This file is part of Matos.
+
+Matos is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+FacManager is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with FacManager. If not, see <https://www.gnu.org/licenses/>
+
+@author Germain Lemasson
+@author Clément Lesaulnier
+@author Robin Courault
+"""
+
 import os
 
 DEBUG=True
 
 # Web acces protections
-SITE_URL = "https://matos.univ-grenoble-alpes.fr"
+SITE_URL = "https://matos.exemple.fr"
 ALLOWED_HOSTS = ['localhost']
 CSRF_COOKIE_DOMAIN="localhost"
 
@@ -24,7 +41,7 @@ if DEBUG == False :
 
 # CAS settings
 CAS_VERSION = '3'
-CAS_SERVER_URL = "https://cas-simsu.grenet.fr/login"
+CAS_SERVER_URL = "https://cas.exemple.fr/login"
 CAS_ADMIN_PREFIX = "admin"
 
 #LDAP settings
@@ -37,9 +54,9 @@ AUTH_LDAP_USER_SEARCH = LDAPSearch(
 AUTH_LDAP_USER_ATTR_MAP = {"first_name": "givenName", "last_name": "sn", "email": "mail"}
 
 # Emails which received notification mails
-EMAIL_ADMIN = ['admin@example.org',]
-NOTIFICATION_SENDER = 'fabmstic@univ-grenoble-alpes.fr'
-NOTIFICATION_REPLYTO = ['noreply@matos.univ-grenoble-alpes.fr']
+EMAIL_ADMIN = ['admin@exemple.org',]
+NOTIFICATION_SENDER = 'admin@exemple.fr'
+NOTIFICATION_REPLYTO = ['noreply@matos.exemple.fr']
 
 if DEBUG == True:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
