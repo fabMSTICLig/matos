@@ -1,4 +1,5 @@
 # Plateforme prêt matériels
+Code developments under license GPL-3.0
 
 ## Installation
 
