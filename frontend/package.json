@@ -12,24 +12,24 @@
     "cypress": "cypress open"
   },
   "dependencies": {
-    "@vueform/multiselect": "^2.5.8",
-    "axios": "^1.2.2",
+    "@vueform/multiselect": "^2.6",
+    "axios": "^1.7",
     "bootstrap": "^5.3.1",
-    "dompurify": "^2.4.1",
+    "dompurify": "^3.1",
     "dotenv": "^16.0.0",
-    "marked": "^4.2.5",
-    "pinia": "^2.0.28",
+    "marked": "^12.0",
+    "pinia": "^2.1",
     "uuid": "^9.0.0",
     "vue": "^3.2.25",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.0.0",
-    "@vue/eslint-config-prettier": "^7.0.0",
-    "cypress": "^4.2.0",
-    "eslint": "^8.31.0",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "cypress": "^13.2.0",
+    "eslint": "^8.0.0",
     "eslint-plugin-vue": "^9.8.0",
-    "prettier": "2.8.1",
-    "vite": "^4.0.4"
+    "prettier": "3.0.0",
+    "vite": "^5.0.0"
   }
 }
