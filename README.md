@@ -7,10 +7,6 @@ Code developments under license GPL-3.0
 - python 3 (with pip)
 - nodejs
 
-
-Cloner le dépôt
-> git clone https://gricad-gitlab.univ-grenoble-alpes.fr/fabmstic/platepret.git
-
 ### Django
 ouvrir un terminal,
 se positionner à la racine. 
