@@ -322,7 +322,8 @@ async function create() {
   }
 }
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  await tagsStore.fetchList({ limit: 1000 });
   return initObject(route);
 });
 const addForm = ref();

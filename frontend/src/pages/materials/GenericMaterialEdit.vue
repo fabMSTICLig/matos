@@ -212,7 +212,8 @@ const cardName = computed(() =>
   isNew.value ? "Nouveau matériel" : object.value.name
 );
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  await tagsStore.fetchList({ limit: 1000 });
   return initObject(route);
 });
 </script>
