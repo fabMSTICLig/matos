@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License along with Fac
 from __future__ import unicode_literals
 from datetime import datetime, date
 import json
+from io import StringIO
 import csv
 
 from django.contrib.auth import get_user_model, update_session_auth_hash
@@ -382,7 +383,8 @@ class EntityGenericMaterialViewSet(EntityMaterialMixin, viewsets.ModelViewSet):
             text = request.data['text']
         if (text):
             try:
-                data = list(csv.reader(text.splitlines(), delimiter='\t'))
+                f = StringIO(text)
+                data = list(csv.reader(f, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL))
             except BaseException:
                 raise ParseError("Fichier csv au mauvais format")
             rows = data
