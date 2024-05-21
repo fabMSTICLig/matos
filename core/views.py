@@ -710,6 +710,7 @@ class MaterialsView(APIView):
                 genmats = genmats.filter(tags__in=tagsid).distinct()
                 spemats = spemats.filter(tags__in=tagsid).distinct()
 
+        genmats = genmats.order_by("-id")
         paginator = LimitOffsetPaginationMulti()
         genmats, spemats = paginator.paginate_queryset(
             [genmats, spemats], request)
