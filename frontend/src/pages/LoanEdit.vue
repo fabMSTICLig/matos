@@ -550,8 +550,10 @@ async function findUser(query) {
 
 function userChanged(uid) {
   let user = usersStore.objects[uid];
-  pendingLoan.value.affiliation =
-    user.affiliations.length > 0 ? user.affiliations[0] : null;
+  if(!pendingLoan.value.affiliation){
+    pendingLoan.value.affiliation =
+      user.affiliations.length > 0 ? user.affiliations[0] : null;
+  }
 }
 
 const entitiesStore = useEntitiesStore();
@@ -585,6 +587,7 @@ onMounted(async () => {
     initOrigin();
   }
   await loadLoan();
+  console.log(pendingLoan.value)
 });
 
 watch(props, async () => {
