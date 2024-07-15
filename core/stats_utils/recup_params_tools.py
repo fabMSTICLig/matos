@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License along with Fac
 # -*- coding: utf-8 -*-
 from datetime import date
 
+from rest_framework.exceptions import PermissionDenied, ParseError, NotFound
+
 from ..models import (
     Entity,
     Affiliation,
@@ -42,19 +44,19 @@ def params_request_tri(req):
     tri = req.query_params.get('tri', None)
     "Si paramètre tri est none c'est anormal et on ne peut pas continuer"
     if (tri is None or tri==""):
-        raise Exception("param tri is None or not exist")
+        raise ParseError("param tri is None or not exist")
     else:
         "tri != None donc transformation en entier"
         try:
             tri = int(tri)
         except:
             "Si tri n'est pas un entier, int() renvoie une erreur qu'on intercepte"
-            raise Exception("param tri, is not an integer")
+            raise ParseError("param tri, is not an integer")
         "tri compris entre 0 et 3 ?"
         if (tri >= 0 and tri <= 3):
             return tri
         else:
-            raise Exception("param tri is not in [0,3]")
+            raise ParseError("param tri is not in [0,3]")
 
 """
 Traitement du paramètre standard entity_selected d'une requête de statistiques
@@ -73,17 +75,17 @@ def params_request_entity(req):
     user = req.user
     "si paramètre est none ou inexistant, on ne peut continuer"
     if (entity_sel is None or entity_sel==""):
-        raise Exception("param entity_selected is None or not exist")
+        raise ParseError("param entity_selected is None or not exist")
     else:
         "entity_sel est une entité existante ?"
         try:
             entity_sel = Entity.objects.get(pk = entity_sel)
-            if (entity_sel.managers.contains(user)):
+            if (user.is_staff or entity_sel.managers.contains(user)):
                 return entity_sel
             else:
-                raise Exception(user.username + " don't have permission to consult stats of this entity")
+                raise PermissionDenied(user.username + " don't have permission to consult stats of this entity")
         except Entity.DoesNotExist:
-            raise Exception("param entity_selected is not an existing entity")
+            raise ParseError("param entity_selected is not an existing entity")
 
 """
 Traitement du paramètre optionnel clotured d'une requête de statistiques
@@ -123,24 +125,24 @@ def params_request_d(req, param):
     d = req.query_params.get(param, None)
 
     if (d is None or d == ""):
-        raise Exception("param " + param + " is None or not exist")
+        raise ParseError("param " + param + " is None or not exist")
     else:
         d = d.split('-')
         if (len(d) != 3):
-            raise Exception("incorrect number of arguments in param " + param + " or wrong separator")
+            raise ParseError("incorrect number of arguments in param " + param + " or wrong separator")
         else:
             for i in range(3):
                 "transformation en entiers des chaînes stockées"
                 try:
                     d[i] = int(d[i])
                 except:
-                    raise Exception("arguments are not integers in " + param)
+                    raise ParseError("arguments are not integers in " + param)
                 
             "transformation en date du tableau d"
             try:
                 d_date = date(d[0],d[1],d[2])
             except:
-                raise Exception("incorrect arguments to make a date in " + param)
+                raise ParseError("incorrect arguments to make a date in " + param)
     return d_date
 
 """
@@ -204,7 +206,7 @@ def set_tri_filters(req):
         for f in tri_filters_aff:
             "Si valeur non présente parmi les possibilités valides alors le filtre est incorrect car une valeur au moins est invalide"
             if (['0','1','2','3','4','5','Naff'].count(f) == 0):
-                raise Exception("filtre incorrect, valeur non présente parmi ['0','1','2','3','4','5','Naff']")
+                raise ParseError("filtre incorrect, valeur non présente parmi ['0','1','2','3','4','5','Naff']")
                 
         "déclaration tableau des types d'affiliation sélectionnés (temporaire)"
         tab_filters_temp = []
@@ -239,16 +241,10 @@ return => tableau des valeurs des paramètres
 """
 def recup_all_params(req):
     "Récupération du paramètre tri de la requête + vérifications"
-    try:
-        tri = params_request_tri(req)
-    except Exception as excep:
-        raise Exception(str(excep))
+    tri = params_request_tri(req)
     
     "Récupération du paramètre entity_selected"
-    try:
-        entity_sel = params_request_entity(req)
-    except Exception as excep:
-        raise Exception(str(excep))
+    entity_sel = params_request_entity(req)
     
     "Récupération du paramètre start_d de la requête + vérifications"
     try:
@@ -272,10 +268,7 @@ def recup_all_params(req):
     "si tri par affiliation alors besoins des filtres"
     if (tri==0):
         "Récupération et formatage des filtres"
-        try:
-            tri_filters_aff = set_tri_filters(req)
-        except Exception as excep:
-            raise Exception(str(excep))
+        tri_filters_aff = set_tri_filters(req)
     else:
         """ 
         Si paramètre tri n'est pas none et qu'il est différent de 0
