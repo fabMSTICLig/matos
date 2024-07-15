@@ -85,12 +85,12 @@ def trait_spe_aff(base_loan,type_stat,tri_filters_aff,tri_filter_freq):
 """
 traitement spécifique pour un tri par material
 """
-def trait_spe_mat(base_loan,type_stat,tri_filter_freq):
+def trait_spe_mat(base_loan,type_stat,tri_filter_freq, entity):
     "tableau de résulats"
     stat= []
     res = None
     "Chargement des données de tri correspondantes"
-    data_tri = GenericMaterial.objects.all()
+    data_tri = GenericMaterial.objects.filter(entity=entity)
     for gmat in data_tri.all():
         if (type_stat != "d_moy_emp"):
             base_loan_temp = base_loan.filter(generic_materials__pk = gmat.pk)
@@ -108,7 +108,7 @@ def trait_spe_mat(base_loan,type_stat,tri_filter_freq):
         if (res is not None):
             stat.append([[gmat.name,gmat.ref_int,gmat.ref_man,"",""],res])
 
-    data_tri = SpecificMaterialInstance.objects.all()
+    data_tri = SpecificMaterialInstance.objects.filter(model__entity=entity)
     for smat in data_tri.all():
         if (type_stat != "d_moy_emp"):
             base_loan_temp = base_loan.filter(specific_materials__pk = smat.pk)
@@ -135,7 +135,7 @@ def trait_global(all_params,base_loan,type_stat,tri_filter_freq = 0):
     if (all_params["tri"] == 0):
         return trait_spe_aff(base_loan,type_stat,all_params["tri_filters_aff"],tri_filter_freq)
     elif (all_params["tri"] == 2):
-        return trait_spe_mat(base_loan,type_stat,tri_filter_freq)
+        return trait_spe_mat(base_loan,type_stat,tri_filter_freq,all_params['entity_sel'])
     else:
         "tableau de résulats"
         stat= []
