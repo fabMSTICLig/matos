@@ -15,9 +15,6 @@ You should have received a copy of the GNU General Public License along with Fac
 @author Robin Courault
 
 -->
-
-[warn] --jsx-bracket-same-line is deprecated.
-[warn] Ignored unknown option --log-level=error. Did you mean --loglevel?
 <template>
   <div class="row">
     <!--
@@ -461,12 +458,15 @@ async function downloadActualData(type) {
         "Contrainte RGPD\n => téléchargement des statistiques avec tri par utilisateur impossible"
       );
     } else {
+
+      let triName = ['aff', '', 'mats', 'tags'];
       // sinon pour tout autre tri
       let date = ""; // construction de la chaine contenant les dates de la plage sélectionnée => sert pour le nom du fichier
       if (startDate.value != undefined && startDate.value != null) {
-        date += "dDebut-" + startDate.value;
-      } else if (endDate.value != undefined && endDate.value != null) {
-        date += "_dFin-" + endDate.value;
+        date += "s" + startDate.value;
+      }
+      if (endDate.value != undefined && endDate.value != null) {
+        date += "_e" + endDate.value;
       }
       // initialisation des variables
       let labelData = "";
@@ -480,9 +480,9 @@ async function downloadActualData(type) {
           "Statistiques_" +
           currentEntity.value.name +
           "_" +
-          statInput.value +
+          triName[triInput.value]+
           "_" +
-          columns.value[columns.value.length - 1] +
+          statInput.value +
           "_" +
           date +
           ".pdf";
@@ -499,9 +499,9 @@ async function downloadActualData(type) {
           "Statistiques_" +
           currentEntity.value.name +
           "_" +
-          statInput.value +
+          triName[triInput.value]+
           "_" +
-          columns.value[columns.value.length - 1] +
+          statInput.value +
           "_" +
           date +
           ".csv";
@@ -523,9 +523,9 @@ async function downloadActualData(type) {
           "Statistiques_" +
           currentEntity.value.name +
           "_" +
-          statInput.value +
+          triName[triInput.value]+
           "_" +
-          columns.value[columns.value.length - 1] +
+          statInput.value +
           "_" +
           date +
           ".json";
@@ -544,9 +544,9 @@ async function downloadActualData(type) {
           "Statistiques_" +
           currentEntity.value.name +
           "_" +
-          statInput.value +
+          triName[triInput.value]+
           "_" +
-          columns.value[columns.value.length - 1] +
+          statInput.value +
           "_" +
           date +
           ".txt";
