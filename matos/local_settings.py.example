@@ -58,6 +58,9 @@ EMAIL_ADMIN = ['admin@exemple.org',]
 NOTIFICATION_SENDER = 'admin@exemple.fr'
 NOTIFICATION_REPLYTO = ['noreply@matos.exemple.fr']
 
+PURGE_DATE = '0002-08-31'
+#ISPRO_SCHEMA = ['@pro.exemple.fr','@expert.example.com']
+
 if DEBUG == True:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     STATIC_ROOT = ''
