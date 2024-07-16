@@ -58,7 +58,13 @@ EMAIL_ADMIN = ['admin@exemple.org',]
 NOTIFICATION_SENDER = 'admin@exemple.fr'
 NOTIFICATION_REPLYTO = ['noreply@matos.exemple.fr']
 
+#Date de la purge
+#l'année correspond au delta par rapport à l'année courrante
+#Exemple PURGE_DATE = '0002-08-31' on est en 2024 les données avant le 31-08-2022 seront purgées
 PURGE_DATE = '0002-08-31'
+
+#Si ISPRO_SCHEMA est défini, les utilisateurs seront automatiquement considérés comme pro
+#si leur adresse mail se termine par l'une de ces valeurs
 #ISPRO_SCHEMA = ['@pro.exemple.fr','@expert.example.com']
 
 if DEBUG == True:
