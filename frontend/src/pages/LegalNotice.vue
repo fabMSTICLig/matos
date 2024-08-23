@@ -155,8 +155,8 @@ You should have received a copy of the GNU General Public License along with Fac
         </p>
         <p>
           Toutes les informations concernant la protection des données (traces,
-          cookies, statistiques…) font l’objet de la rubrique Données
-          personnelles.
+          cookies, statistiques…) font l’objet de la rubrique <a href="/#/datapolicy">Données
+            personnelles</a>.
         </p>
         <h3>Liens et création de liens</h3>
         <p>

@@ -64,7 +64,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
   async function getUserData() {
     try {
-      const data = await ApiService.query("self/data", {});
+      const { data } = await ApiService.query("self/data", {});
       return data;
     } catch (e) {
       console.log(e);

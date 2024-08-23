@@ -86,7 +86,7 @@ You should have received a copy of the GNU General Public License along with Fac
             v-model="authUser.affiliations"
             :ressource="fetchAffs"
           />
-        </div>
+        </div> 
         <div
           class="mt-2"
           role="group"
@@ -104,29 +104,44 @@ You should have received a copy of the GNU General Public License along with Fac
           >
             Télécharger mes données
           </div>
+          </div>
+          <div
+            v-if="authUser.rgpd_accept"
+            class="mt-2">
+          <h5>Mentions RGPD</h5>
+          <p>Vous avez accepté les mentions suivantes le <strong>{{authUser.rgpd_accept}}</strong></p>
+
+          <p>Sur la base de votre consentement l’équipe Matos collecte vos données personnelles uniquement nécessaires au service d’emprunt de matériel.</p>
+          <p>
+            Seules les entités habilitées mettant à disposition du matériel sont destinataires de vos données.</p>
+          <p>
+            Nous conservons vos données pendant toute la durée d’utilisation du site puis les supprimons de nos bases deux ans après la dernière connexion.</p>
+          <p>
+            Vous pouvez accéder aux données vous concernant, les rectifier, demander leur effacement ou exercer votre droit à la limitation du traitement de vos données. Vous pouvez retirer à tout moment votre consentement au traitement de vos données.</p>
+          <p>
+            Pour exercer ces droits ou pour toute question relative au traitement de vos données da,s ce site, vous pouvez contacter le délégué à la protection des données de l’établissement : <a href="mailto:dpo@grenet.fr">dpo@grenet.fr</a>.</p>
+          <p>
+            Vous disposez également le droit de contacter la cnil.fr pour faire une réclamation si vous estimez que vos droits ne sont pas respectés.</p>
         </div>
       </form>
     </div>
     <modal
       id="modal-rgpd"
       v-model:show="showRGPD"
-      title="RGPD"
+      title="Mentions RGPD"
       hide-footer
     >
-      <h6>Conditions d'utilisation</h6>
-      <p>
-        Pour permettre le bon fonctionnment du site certaines de vos
-        informations sont stockées.
-      </p>
-      <p>
-        Nom d'utilisateur, Prénom, Nom, Email sont utilisés afin de vous
-        contacter. Seul les managers des entités ont accés à ces informations.
-      </p>
-      <p>
-        Ces informations ainsi que celles liées aux prêts seront stockées 3 ans
-        après que vous ayez quitté l'université ou sur demande à l'adresse
-        matos@univ-grenoble-alpes.fr
-      </p>
+          <p>Sur la base de votre consentement l’équipe Matos collecte vos données personnelles uniquement nécessaires au service d’emprunt de matériel.</p>
+          <p>
+            Seules les entités habilitées mettant à disposition du matériel sont destinataires de vos données.</p>
+          <p>
+            Nous conservons vos données pendant toute la durée d’utilisation du site puis les supprimons de nos bases deux ans après la dernière connexion.</p>
+          <p>
+            Vous pouvez accéder aux données vous concernant, les rectifier, demander leur effacement ou exercer votre droit à la limitation du traitement de vos données. Vous pouvez retirer à tout moment votre consentement au traitement de vos données.</p>
+          <p>
+            Pour exercer ces droits ou pour toute question relative au traitement de vos données da,s ce site, vous pouvez contacter le délégué à la protection des données de l’établissement : <a href="mailto:dpo@grenet.fr">dpo@grenet.fr</a>.</p>
+          <p>
+            Vous disposez également le droit de contacter la cnil.fr pour faire une réclamation si vous estimez que vos droits ne sont pas respectés.</p>
 
       <h6>Accepter vous ces termes ?</h6>
       <div>

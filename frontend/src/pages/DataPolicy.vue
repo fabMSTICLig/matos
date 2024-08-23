@@ -19,197 +19,52 @@ You should have received a copy of the GNU General Public License along with Fac
 <template>
   <div class="container text-justify p-4 col-lg-8 offset-lg-2">
     <main class="row">
-      <h1 class="uga-page-title">Crédits</h1>
+      <h1 class="uga-page-title">Données personnelles</h1>
       <PartageTools />
 
       <div class="uga-page-content">
         <h3>Politique de confidentialité</h3>
-        <p>
-          L’Université Grenoble Alpes, dont le siège social est situé 621 avenue
-          centrale 38400 Saint-Martin-d’Hères, en sa qualité de responsable du
-          traitement, s'engage à ce que les traitements de données personnelles
-          effectués sur les sites internet et intranet qu’elle héberge, soient
-          conformes au règlement général sur la protection des données (RGPD) et
-          à la loi Informatique et Libertés.
-        </p>
-        <ol>
-          <li>Les données que nous collectons</li>
-          <li>Comment utilisons-nous les données que nous collectons ?</li>
-          <li>Qui sont les destinataires des données que nous collectons ?</li>
-          <li>Combien de temps conservons-nous vos données ?</li>
-          <li>Comment vos données sont-elles protégées ?</li>
-          <li>Quels sont vos droits sur vos données ?</li>
-        </ol>
-        <h3>1. Les données que nous collectons</h3>
-        <p>
-          En utilisant les sites internet et intranet de l’Université Grenoble
-          Alpes, vous êtes amenés à nous transmettre des informations, dont
-          certaines sont de nature à vous identifier :
-        </p>
-        <h4>Données des formulaires</h4>
-        <p>
-          Nous collectons les informations strictement nécessaires pour répondre
-          à votre demande.
-        </p>
-        <h4>Les cookies</h4>
-        <p>
-          Nous utilisons différents cookies pour mesurer l’audience et intégrer
-          des services permettant d’améliorer l’interactivité du site.
-        </p>
-        <p>
-          <strong>Les cookies essentiels</strong> : ces cookies sont
-          indispensables pour assurer le bon fonctionnement du site :
-          Tarteaucitron permet de stocker vos choix en matière de consentement,
-          conservé pendant 1 an.
-        </p>
-        <p>
-          <strong>Les cookies de mesure d’audience</strong> : nous utilisons
-          l’outil de mesure d’audience Matomo, outil français qui récolte et
-          analyse vos données liées à la visite de notre site à des fins
-          d’amélioration continue de l’information diffusée. L’outil Matomo
-          permet d’héberger en local, sur un serveur de l’université, les
-          données récoltées. Matomo ne transmet pas de données personnelles à
-          des tiers. Il installe des cookies, fichiers texte placés sur votre
-          ordinateur qui collectent des données personnelles permettant de
-          fournir uniquement des données statistiques de fréquentation (le
-          nombre de pages vues, le nombre de visites, l’activité des visiteurs
-          sur le site et leur fréquence de retour).
-        </p>
-        <h4>Matomo</h4>
-        <p>
-          Vos donnée relatives à votre connexion : Lors de votre navigation sur
-          les sites internet et intranet de l’Université Grenoble Alpes, nous
-          collectons des informations personnelles vous concernant telles que
-          notamment la date, l’heure de la connexion et/ou navigation, le type
-          de navigateur, la langue du navigateur, votre adresse IP (conservées
-          36 mois).
-        </p>
-        <ul>
-          <li>
-            <strong>_pk_id :</strong> permet de stocker votre identifiant unique
-            de visite (si la mesure d'audience Matomo est active), conservé
-            pendant 13 mois
-          </li>
-          <li>
-            <strong>_pk_ses :</strong> permet le stockage temporaire de vos
-            données de visite (si la mesure d'audience Matomo est active),
-            conservé pendant 30 minutes Vous pouvez choisir d’empêcher le dépôt
-            de cookies par Matomo avant d’utiliser ce site. Vous pouvez aussi
-            désactiver partiellement ou en totalité l'utilisation des cookies,
-            en sélectionnant les paramètres appropriés de votre navigateur.
-          </li>
-        </ul>
-        <p>
-          <strong>Les cookies tiers :</strong> il s’agit des cookies utilisés
-          par des tiers, tels que les réseaux sociaux et les plateformes
-          audio-vidéos. Vous pouvez refuser ces cookies lors de votre visite sur
-          nos sites internet. Voici les services tiers utilisés sur nos sites :
-          Facebook, Facebook (post), Linkedin, Instagram, Twitter, YouTube,
-          Viaméo, Dailymotion, Acast, Ausha, SoundCloud.
-        </p>
-        <h3>2. Comment utilisons-nous les données que nous collectons ?</h3>
-        <p>Nous utilisons les données que nous recueillons afin de :</p>
-        <ul>
-          <li>
-            répondre à vos demandes sur la base légale de l’intérêt légitime.
-          </li>
-          <li>
-            conserver vos données de connexion pour répondre à une obligation
-            légale
-          </li>
-          <li>
-            analyser votre navigation sur nos sites internet avec Matomo sur la
-            base légale du consentement
-          </li>
-          <li>
-            mettre à disposition des fonctionnalités d’accès aux réseaux sociaux
-            sur la base légale du consentement
-          </li>
-        </ul>
-        <h3>3. Qui sont les destinataires des données que nous collectons ?</h3>
-        <ul>
-          <li>
-            <p>
-              les destinataires de vos données sont les services communication
-              et informatique ainsi que les personnels autorisés de l’Université
-              Grenoble Alpes.
-            </p>
-          </li>
-          <li>
-            <p>
-              notre prestataire sous-traitant tarte au citron a accès aux
-              données d’acceptation et refus des cookies sur nos sites.
-            </p>
-          </li>
-          <li>
-            conformément à la réglementation en vigueur, les données peuvent
-            être transmises aux autorités compétentes sur requête dans le cas de
-            la recherche des auteurs d’infractions commises sur internet.
-          </li>
-          <li>
-            vos données peuvent être collectées par des tiers (réseaux sociaux
-            et plateformes de vidéos) pour des finalités qui leur sont propres,
-            conformément à leur politique de confidentialité. L’Université
-            Grenoble Alpes n’a pas le contrôle sur ces cookies tiers.
-          </li>
-        </ul>
-        <h3>4. Combien de temps conservons-nous vos données ?</h3>
-        <p>
-          Vos données sont conservées pendant la durée nécessaire à la
-          réalisation des finalités poursuivies telles qu’énoncées dans la
-          présente politique, et ce, conformément à la législation applicable :
-        </p>
-        <ul>
-          <li>
-            les données utilisées aux fins de réponse à vos demandes à partir
-            des formulaires sont conservées le temps nécessaire au traitement de
-            votre demande et pour une durée maximale d’un an.
-          </li>
-          <li>
-            les données de connexion et navigation sont conservées légalement 36
-            mois.
-          </li>
-          <li>
-            les durées de conservation des cookies de Matomo sont indiqués dans
-            le paragraphe ci-dessus « Les cookies de mesure d’audience ».
-          </li>
-        </ul>
-        <h3>5. Comment vos données sont-elles protégées ?</h3>
-        <p>
-          Nous prenons des mesures adéquates sur le plan de la technique et de
-          l’organisation pour interdire l’accès non autorisé ou la modification,
-          divulgation, perte ou destruction de vos données. A cet effet, les
-          sites de l’Université Grenoble Alpes bénéficient d’une connexion
-          sécurisée de type « SSL » qui crypte et protège les données lors de
-          leur transmission sur le réseau internet. Aussi, l’accès à vos données
-          personnelles et à leur traitement est limité aux seules personnes
-          autorisées.
-        </p>
-        <h3>6. Quels sont vos droits sur vos données ?</h3>
-        <p>
-          Conformément aux lois et règlements applicables en matière de
-          protection des données personnelles, vous bénéficiez d’un certain
-          nombre de droits relatifs à vos données en fonction de la base légale
-          du traitement auxquelles elles se rapportent, à savoir :
-        </p>
-        <ul>
-          <li>un droit d’accès</li>
-          <li>un droit de rectification</li>
-          <li>un droit à l’effacement ou droit à l’oubli</li>
-          <li>un droit à la limitation du traitement</li>
-          <li>un droit d’opposition au traitement</li>
-          <li>
-            le droit de retirer votre consentement à tout moment Pour exercer
-            ces droits, vous pouvez contacter notre Délégué à la protection des
-            données personnelles à l’adresse suivante :
-            <a href="mailto:dpo@grenet.fr">dpo@grenet.fr</a> / Tél. 33 (0)4 56
-            52 90 44.
-          </li>
-        </ul>
-        <p>
-          En cas de contestation légitime non satisfaite, vous pouvez introduire
-          une réclamation auprès d'une autorité de contrôle (voir <a href="cnil.fr">cnil.fr</a>).
-        </p>
+        <p>Matos, s’engage à ce que les traitements de données personnelles effectués dans le cadre de la mise à disposition de son site internet soient conformes au règlement européen n° 2016/679, dit Règlement Général sur la Protection des Données à caractère personnel (RGPD) ainsi qu’à la loi Informatique et Libertés.</p>
+        <p>Dans la présente politique de confidentialité (la « <strong>Politique</strong> »), nous vous expliquons comment et pourquoi nous utilisons vos données, quels sont vos droits et comment les exercer.</p>
+        <h3>1. C’est quoi une donnée à caractère personnel ?</h3>
+        <p>Une donnée personnelle (« <strong>Donnée Personnelle </strong>» ou « <strong>Donnée</strong> ») désigne toute information relative à une personne physique identifiée ou identifiable :</p>
+ <ul>
+   <li>directement (nom, prénom, adresse e-mail) ; ou</li>
+   <li>indirectement (adresse IP, géolocalisation).</li>
+ </ul>
+    <h3>2. A qui s’adresse cette politique de confidentialité ?</h3>
+ <p>La présente politique, s’adresse à tous les utilisateurs du site matos.univ-grenoble-alpes.fr qui créent un compte ou se connectent ou naviguent sur ledit site.</p>
+    <h3>3. Pourquoi vos données sont-elles collectées ?</h3>
+ <p>Nous collectons vos données identifiantes : nom, prénom et adresse mail pour :</p>
+ <ul>
+    <li>La gestion des prêts sur la base de l’intérêt légitime</li>
+    <li>La réalisation de statistiques annuelles des prêts sur l’intérêt légitime</li>
+    <li>Enquête d’amélioration du service sur la base de votre de votre consentement.</li>
+ </ul>
+    <h3>4. Combien de temps conservons-nous vos données ?</h3>
+ <p>Nous conservons vos données dans nos serveurs pendant 2 ans. Elles sont traitées par les services internes ne font objet d’aucun transfert vers des destinataires ou partenaires externes.</p>
+    <h3>5. Quels sont vos droits</h3>
+ <p>Vous pouvez :</p>
+ <ul>
+    <li>Solliciter une copie des Données – <strong>Droit d’accès</strong></li>
+    <li>Corriger une Donnée inexacte vous concernant – <strong>Droit de rectification</strong></li>
+    <li>Demander l’effacement de certaines Données qui vous concernent, – <strong>Droit d’effacement</strong></li>
+    <li>S’opposer à ce que nous traitions vos Données – <strong>Droit d’opposition</strong></li>
+    <li>Limiter l’utilisation de vos Données le temps que votre demande soit traitée – <strong>Droit de limitation du traitement</strong></li>
+ </ul>
+    <h3>6. Comment exercer vos droits ?</h3>
+ <p>Ces droits peuvent être exercés en nous écrivant :</p>
+ <p>Par voie postale : 621 avenue Centrale
+ </br>
+ 38400 Saint-Martin-d'Hères
+ </br>
+ France</p>
+ <p>Par voie électronique : relaisdpo@univ-grenoble-alpes.fr</p>
+ <p>Vous pouvez également vous adresser à la <strong>Commission Nationale de l’Informatique et des Libertés (CNIL)</strong>, autorité de régulation chargée de faire respecter la réglementation sur la protection des données à caractère personnel en France, par internet https://www.cnil.fr/fr/agir ou par voie postale à l’adresse suivante : Commission Nationale de l'Informatique et des Libertés, 3 Place de Fontenoy - TSA 80715, 75334 PARIS CEDEX.</p>
+    <h3>7.  Sécurité des données :</h3>
+ <p>Matos s’engage à mettre en place les mesures techniques et organisationnelles afin de garantir une sécurité maximale de vos données personnelle interdisant ainsi l’accès non autorisé ou la modification, divulgation, perte ou destruction de vos données. Aussi, l’accès à vos données personnelles et à leur traitement est limité aux seules personnes autorisées.</p>
+ <p>Lorsqu’une violation de Données susceptible d’engendrer un risque élevé pour vos droits et libertés est détectée, vous serez informés de cette violation dans les meilleurs délais.</p>
+ <p>Pour toute question concernant la politique de confidentialité ou relative au traitement de vos données, contactez-nous à l’adresse relaisdpo@univ-grenoble-alpes.fr.</p>
       </div>
 
       <PartageTools />
@@ -218,7 +73,7 @@ You should have received a copy of the GNU General Public License along with Fac
         <div>
           <p>
             <time class="published" datetime="2023-09-01T00:00:00+02:00">
-              Publié le 01 septembre 2023
+              Publié le 23 aout 2024
             </time>
           </p>
         </div>

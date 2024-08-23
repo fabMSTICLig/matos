@@ -35,10 +35,6 @@ You should have received a copy of the GNU General Public License along with Fac
           <strong>Gestion des contenus :</strong> ce site fonctionne avec
           les outils Django et VusJs.
         </p>
-        <p>
-          <strong>Gestion des cookies :</strong> la gestion des cookies est
-          opérée par Tarte au Citron.
-        </p>
         <h3>Photographies/Vidéos</h3>
         <p>Droits réservés :</p>
         <p>© Université Grenoble Alpes</p>
