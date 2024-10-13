@@ -148,7 +148,7 @@ class GenericMaterialPublicSerializer(serializers.ModelSerializer):
                     ).aggregate(Sum('quantity'))['quantity__sum']
             return obj.quantity-tot if tot is not None else obj.quantity
         else:
-            return True
+            return None
 
 
 class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
