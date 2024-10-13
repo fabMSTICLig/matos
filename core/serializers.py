@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License along with Fac
 @author Robin Courault
 """
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from rest_framework import serializers, exceptions
 from rest_framework.utils import model_meta
 import json
@@ -125,9 +126,29 @@ class GenericMaterialPublicSerializer(serializers.ModelSerializer):
     """
     Serializer for Generic Material objects.
     """
+    avail = serializers.SerializerMethodField()
     class Meta:
         model = GenericMaterial
-        exclude = ['localisation', 'active']
+        fields = [
+            'id',
+            'name',
+            'ref_int',
+            'ref_man',
+            'description',
+            'tags',
+            'quantity',
+            'entity',
+            'avail']
+
+    def get_avail(self, obj):
+        if obj.quantity!=0:
+            tot=LoanGenericItem.objects.filter(material=obj,
+                    loan__return_date=None,
+                    loan__status=Loan.Status.ACCEPTED
+                    ).aggregate(Sum('quantity'))['quantity__sum']
+            return obj.quantity-tot if tot is not None else obj.quantity
+        else:
+            return True
 
 
 class SpecificMaterialInstanceSerializer(serializers.ModelSerializer):
@@ -144,6 +165,7 @@ class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
     Serializer for Specific Material objects.
     """
     instances = SpecificMaterialInstanceSerializer(many=True, read_only=True)
+    avail = serializers.SerializerMethodField()
 
     class Meta:
         model = SpecificMaterial
@@ -155,7 +177,16 @@ class SpecificMaterialPublicSerializer(serializers.ModelSerializer):
             'description',
             'tags',
             'entity',
+            'avail',
             'instances']
+
+    def get_avail(self, obj):
+        instances = obj.instances.all()
+        notavail = obj.instances.filter(
+                loans__status=Loan.Status.ACCEPTED,
+                loans__return_date=None)
+        return len(instances)-len(notavail)
+
 
 
 class SpecificMaterialSerializer(serializers.ModelSerializer):

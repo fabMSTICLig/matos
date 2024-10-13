@@ -144,12 +144,18 @@ You should have received a copy of the GNU General Public License along with Fac
                 <button v-else class="btn btn-secondary" disabled>
                   Déjà dans le {{ toBasket ? "panier" : "prêt" }}
                 </button>
-                <p>
-                  <small
+                <div v-if="item.avail<=0" class="text-warning-emphasis" role="alert">
+                  Non disponible aujourd'hui
+                </div>
+                <div v-if="item.avail != true && item.avail>0">
+                  {{item.avail}} en stock aujourd'hui
+                </div>
+                <p
                     v-if="
                       pendingLoan.entity && pendingLoan.entity != item.entity
                     "
-                    >Les matériels d'un prêt doivent tous appartenir à la même
+                  >
+                  <small>Les matériels d'un prêt doivent tous appartenir à la même
                     entité</small
                   >
                 </p>
