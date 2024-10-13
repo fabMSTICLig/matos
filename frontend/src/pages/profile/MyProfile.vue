@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with Fac
 <template>
   <div class="card">
     <div class="card-header">
-      <h3>Votre profile</h3>
+      <h3>Votre profil</h3>
     </div>
     <div class="card-body">
       <form
@@ -200,7 +200,7 @@ onBeforeMount(() => {
 
 async function updateUser() {
   await store.updateUser(authUser.value);
-  showModal({ content: "Profile mis à jour" });
+  showModal({ content: "Profil mis à jour" });
 }
 async function personalData() {
   let data = await store.getUserData();

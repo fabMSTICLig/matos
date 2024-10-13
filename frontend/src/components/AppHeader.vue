@@ -325,7 +325,7 @@ You should have received a copy of the GNU General Public License along with Fac
                 exact
                 :to="{ name: 'profile' }"
               >
-                Profile
+                Profil
               </router-link>
             </li>
             <li class="nav-item">
@@ -406,7 +406,7 @@ const adminroutes = [
 const userroutes = [
   {
     to: { name: "profile" },
-    label: "Profile",
+    label: "Profil",
   },
   {
     to: { name: "authloans" },
