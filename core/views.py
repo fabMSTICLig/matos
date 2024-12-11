@@ -700,15 +700,19 @@ class MaterialsView(APIView):
             if search:
                 searchQ = Q(name__icontains=search) | Q(
                     ref_int__icontains=search) | Q(ref_man__icontains=search)
-                genmats = genmats.filter(searchQ).distinct()
-                spemats = spemats.filter(searchQ).distinct()
+                genmats = genmats.filter(searchQ)
+                spemats = spemats.filter(searchQ)
             if entitiesid:
-                genmats = genmats.filter(entity__in=entitiesid).distinct()
-                spemats = spemats.filter(entity__in=entitiesid).distinct()
+                genmats = genmats.filter(entity__in=entitiesid)
+                spemats = spemats.filter(entity__in=entitiesid)
 
             if tagsid:
-                genmats = genmats.filter(tags__in=tagsid).distinct()
-                spemats = spemats.filter(tags__in=tagsid).distinct()
+                for tid in tagsid:
+                    genmats = genmats.filter(tags__in=[tid])
+                    spemats = spemats.filter(tags__in=[tid])
+            
+            genmats = genmats.distinct()
+            spemats = spemats.distinct()
 
         genmats = genmats.order_by("-id")
         paginator = LimitOffsetPaginationMulti()
