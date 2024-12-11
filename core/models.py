@@ -32,7 +32,7 @@ class Affiliation(models.Model):
     type : str
         Type of the institution
     """
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50,unique=True)
     TYPE_AFFILIATION = (
          ('Labo','Laboratoire'),
          ('Ecole','Ecole'),
