@@ -14,17 +14,25 @@ You should have received a copy of the GNU General Public License along with Fac
 @author Clément Lesaulnier
 @author Robin Courault
 """
-from django.dispatch import receiver
-from django_cas_ng.signals import cas_user_authenticated
-from django_auth_ldap.backend import LDAPBackend
+from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.db.models import Q
+from django_auth_ldap.backend import LDAPBackend
 
-@receiver(cas_user_authenticated)
-def cas_user_authenticated_callback(sender, **kwargs):
-    args = {}
-    args.update(kwargs)
-    user = LDAPBackend().populate_user(args.get('user').username)
-    if user is not None:
-        user.set_unusable_password()
-        user.is_pro=user.email.endswith(tuple(settings.ISPRO_SCHEMA))
-        user.save()
+import datetime
+
+from core.models import Loan, User
+
+
+class Command(BaseCommand):
+    help = 'Check users from ldap server, if deleted user loan go to anonymous user.'
+
+    def handle(self, *args, **options):
+        oldusers=[]
+        anonuser=User.objects.get(username="anonymous")
+        for user in User.objects.exclude(username="anonymous").filter(password=''):
+            userldap = LDAPBackend().populate_user(user.username)
+            if(userldap is None):
+                oldusers.append(user.id)
+        Loan.objects.filter(user__in=oldusers).update(user=anonuser)
+        User.objects.filter(id__in=oldusers).delete()
