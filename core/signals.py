@@ -25,6 +25,7 @@ def cas_user_authenticated_callback(sender, **kwargs):
     args.update(kwargs)
     user = LDAPBackend().populate_user(args.get('user').username)
     if user is not None:
-        user.set_unusable_password()
-        user.is_pro=user.email.endswith(tuple(settings.ISPRO_SCHEMA))
-        user.save()
+        if(args.get('created')):
+            user.set_unusable_password()
+            user.is_pro=user.email.endswith(tuple(settings.ISPRO_SCHEMA))
+            user.save()

@@ -708,7 +708,11 @@ async function destroyLoan() {
   const isConfirmed = await confirmModal({
     content: "Voulez vous vraiment supprimer ce prêt ?",
   });
-  if (isConfirmed) store.destroy(pendingLoan.value.id);
+  if (isConfirmed)
+  {
+    store.destroy(pendingLoan.value.id);
+    goBack();
+  }
 }
 
 /////////// ask extenstion
