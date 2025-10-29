@@ -80,6 +80,12 @@ You should have received a copy of the GNU General Public License along with Fac
             manageur(s) de votre entité, ajouter du matériel proposé à l'emprunt
             et gérer les prêts depuis le site.
           </p>
+          <p>
+          <a :href="`${publicPath}matos-emprunteur.pdf`">Notice emprunteur</a> 
+          </p>
+          <a :href="`${publicPath}matos-preteur.pdf`">Notice prêteur</a> 
+          <p>
+          </p>
         </div>
       </div>
     </div>
@@ -92,4 +98,7 @@ export default {
 };
 </script>
 
-<script setup></script>
+<script setup>
+
+const publicPath = import.meta.env.BASE_URL;
+</script>
